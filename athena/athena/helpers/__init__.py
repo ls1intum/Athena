@@ -1,5 +1,8 @@
-from .programming_submission_zip import get_programming_submission_zip
+from .programming_exercise import get_repository_zip, get_repository_zips, get_repository, get_repositories
 
 __all__ = [
-    "get_programming_submission_zip",
+    "get_repository_zip",
+    "get_repository_zips",
+    "get_repository",
+    "get_repositories",
 ]

@@ -1,5 +1,5 @@
 from athena import app, feedback_consumer, feedback_provider, submissions_consumer, submission_selector, ProgrammingExercise
-from athena.helpers import get_programming_submission_zip
+from athena.helpers import get_repository_zip
 from athena.storage import *
 
 @submissions_consumer
@@ -7,10 +7,10 @@ def receive_submissions(exercise: ProgrammingExercise, submissions: List[Submiss
     print(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
     for submission in submissions:
         print(f"- Submission {submission.id}")
-        zip_content = get_programming_submission_zip(submission)
-        # list the files in the zip
-        for file in zip_content.namelist():
-            print(f"  - {file}")
+        with get_repository_zip(submission.content) as zip_content:
+            # list the files in the zip
+            for file in zip_content.namelist():
+                print(f"  - {file}")
     # Do something with the submissions
 
 
