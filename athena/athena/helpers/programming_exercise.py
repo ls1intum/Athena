@@ -23,7 +23,7 @@ def get_repository_zip(url: str) -> Iterator[zipfile.ZipFile]:
             yield zipfile.ZipFile(temp_file)
 
 @contextlib.contextmanager
-def get_repository_zips(urls: List[str]) -> Iterator[List[zipfile.ZipFile]]:
+def get_repository_zips(*urls: str) -> Iterator[List[zipfile.ZipFile]]:
     """
     Download zip files of code repositories from the given URLs and yield a
     list of ZipFile objects for further processing. Clean up the temporary
@@ -55,7 +55,7 @@ def get_repository(url: str) -> Iterator[git.Repo]:
             yield git.Repo(temp_dir)
 
 @contextlib.contextmanager
-def get_repositories(urls: List[str]) -> Iterator[List[git.Repo]]:
+def get_repositories(*urls: str) -> Iterator[List[git.Repo]]:
     """
     Download zip files of code repositories from the given URLs, extract them
     to temporary directories, and yield a list of git.Repo objects for further

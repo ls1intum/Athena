@@ -15,7 +15,7 @@ from ..feedback_provider_registry import register_feedback_provider
 def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> List[Feedback]:
     chat = PromptLayerChatOpenAI(pl_tags=["basic"])
     
-    with get_repositories(urls=[exercise.solution_repository_url, exercise.template_repository_url, submission.content]) as repositories:
+    with get_repositories(exercise.solution_repository_url, exercise.template_repository_url, submission.content) as repositories:
         solution, template, submission = repositories
         print(solution, template, submission)
 
