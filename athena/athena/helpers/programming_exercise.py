@@ -51,7 +51,9 @@ def get_repository(url: str) -> Iterator[git.Repo]:
     with get_repository_zip(url) as zip_file:
         with extract_zip_to_temp_dir(zip_file) as temp_dir:
             if not os.path.exists(os.path.join(temp_dir, ".git")):
-                git.Repo.init(temp_dir)
+                repo = git.Repo.init(temp_dir)
+                repo.index.add(repo.untracked_files)
+                repo.index.commit("Initial commit")
             yield git.Repo(temp_dir)
 
 @contextlib.contextmanager
