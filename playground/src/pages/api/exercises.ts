@@ -11,9 +11,9 @@ const exampleExercises: Exercise[] = [
         problem_statement: 'Write a program that prints "Hello World" to the console.',
         grading_instructions: 'Check if the program prints "Hello World" to the console. 10 points if it does, 0 points otherwise.',
         programming_language: 'java',
-        solution_repository_url: 'http://localhost:3000/api/example-solutions/1',
-        template_repository_url: 'http://localhost:3000/api/example-template/1',
-        tests_repository_url: 'http://localhost:3000/api/example-tests/1',
+        solution_repository_url: 'http://localhost:3000/api/programming-material/1/solution.zip',
+        template_repository_url: 'http://localhost:3000/api/programming-material/1/template.zip',
+        tests_repository_url: 'http://localhost:3000/api/programming-material/1/tests.zip',
         meta: {}
     },
     {
