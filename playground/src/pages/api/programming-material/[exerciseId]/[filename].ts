@@ -4,14 +4,11 @@ import {join} from 'path';
 import Archiver from 'archiver';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { filename } = req.query as { filename: string };
+  const { exerciseId, filename } = req.query as { exerciseId: string, filename: string };
 
   // Set the folder path based on the filename without the .zip extension
   const folderName = filename.replace('.zip', '');
-  const folderPath = join(process.cwd(), 'exercises', folderName);
-
-  console.log(folderPath)
-  console.log(folderName)
+  const folderPath = join(process.cwd(), 'exercises', exerciseId, folderName);
 
   // Check if the folder exists
   await fs.access(folderPath);
