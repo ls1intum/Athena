@@ -4,6 +4,9 @@
 			"path": "."
 		},
 		{
+			"path": "playground"
+		},
+		{
 			"path": "assessment_module_manager"
 		},
 		{
@@ -11,6 +14,9 @@
 		},
 		{
 			"path": "module_example"
+		},
+		{
+			"path": "module_programming_llm"
 		}
 	]
 }
