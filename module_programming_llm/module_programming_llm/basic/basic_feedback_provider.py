@@ -1,3 +1,4 @@
+import asyncio
 import json
 from typing import List
 
@@ -83,7 +84,9 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
 
     # Completion
     chain = LLMChain(llm=chat, prompt=chat_prompt)
-    result = chain.generate(input_list)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(chain.agenerate(input_list))
 
     # Parse result
     feedback_proposals: List[Feedback] = []
@@ -92,10 +95,11 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
         for generation in generations:
             try:
                 feedbacks = json.loads(generation.text)
+                print(feedbacks)
                 for feedback in feedbacks:
+                    line = feedback.get("line", None)
                     text = f"File {file_path} at line {line}" if line is not None else f"File {file_path}"
                     detail_text = feedback.get("text", "")
-                    line = feedback.get("line", None)
                     reference = f"file://{file_path}_line:{line}" if line is not None else None
                     credits = feedback.get("credits", 0.0)
                     feedback_proposals.append(
