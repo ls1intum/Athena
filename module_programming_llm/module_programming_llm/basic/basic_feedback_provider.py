@@ -95,7 +95,10 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
         for generation in generations:
             try:
                 feedbacks = json.loads(generation.text)
-                print(feedbacks)
+                if not isinstance(feedbacks, list):
+                    print("Failed to parse feedback json:", generation.text)
+                    continue
+
                 for feedback in feedbacks:
                     line = feedback.get("line", None)
                     text = f"File {file_path} at line {line}" if line is not None else f"File {file_path}"
