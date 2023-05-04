@@ -2,22 +2,23 @@ from pathlib import Path
 from os import PathLike
 from contextlib import contextmanager
 from collections.abc import Iterator
-from typing import List, Optional, Callable, Union, Tuple
+from typing import List, Dict, Optional, Callable, Union, Tuple
 
 from git import Repo, Remote
 from langchain.document_loaders import GitLoader
 
-def merge_repos_by_filepath(*repos: List[Repo], file_filter: Optional[Callable[[str], bool]] = None) -> Iterator[Tuple[str, List[Optional[str]]]]:
-    docs = [
-        { 
-          doc.metadata['file_path']: doc
-          for doc in GitLoader(repo_path=repo.working_tree_dir, file_filter=file_filter).load() 
-        } for repo in repos
-    ]
+def load_files_from_repo(repo: Repo, file_filter: Optional[Callable[[str], bool]] = None) -> Dict[str, Optional[str]]:
+    return {
+        doc.metadata['file_path']: doc.page_content
+        for doc in GitLoader(repo_path=repo.working_tree_dir, file_filter=file_filter).load()
+    }
 
-    files = { key for doc in docs for key in doc.keys() }
+def merge_repos_by_filepath(*repos: List[Repo], file_filter: Optional[Callable[[str], bool]] = None) -> Iterator[Tuple[str, List[Optional[str]]]]:
+    docs = [load_files_from_repo(repo, file_filter) for repo in repos]
+    files = {file for doc in docs for file in doc}
+
     for file in files:
-        yield (file, [doc[file] if file in doc else None for doc in docs])
+        yield (file, [doc.get(file) for doc in docs])
 
 def add_line_numbers(content: str) -> str:
     lines = content.splitlines()
