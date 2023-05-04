@@ -95,29 +95,30 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
         for generation in generations:
             try:
                 feedbacks = json.loads(generation.text)
-                if not isinstance(feedbacks, list):
-                    print("Failed to parse feedback json:", generation.text)
-                    continue
-
-                for feedback in feedbacks:
-                    line = feedback.get("line", None)
-                    text = f"File {file_path} at line {line}" if line is not None else f"File {file_path}"
-                    detail_text = feedback.get("text", "")
-                    reference = f"file://{file_path}_line:{line}" if line is not None else None
-                    credits = feedback.get("credits", 0.0)
-                    feedback_proposals.append(
-                        Feedback(
-                            id=1,
-                            exercise_id=exercise.id,
-                            submission_id=submission.id,
-                            detail_text=detail_text,
-                            text=text,
-                            reference=reference,
-                            credits=credits,
-                            meta={},
-                        )
-                    )
             except json.JSONDecodeError:
                 print("Failed to parse feedback json:", generation.text)
+                continue
+            if not isinstance(feedbacks, list):
+                print("Feedback json is not a list:", generation.text)
+                continue
+
+            for feedback in feedbacks:
+                line = feedback.get("line", None)
+                text = f"File {file_path} at line {line}" if line is not None else f"File {file_path}"
+                detail_text = feedback.get("text", "")
+                reference = f"file://{file_path}_line:{line}" if line is not None else None
+                credits = feedback.get("credits", 0.0)
+                feedback_proposals.append(
+                    Feedback(
+                        id=1,
+                        exercise_id=exercise.id,
+                        submission_id=submission.id,
+                        detail_text=detail_text,
+                        text=text,
+                        reference=reference,
+                        credits=credits,
+                        meta={},
+                    )
+                )
 
     return feedback_proposals
