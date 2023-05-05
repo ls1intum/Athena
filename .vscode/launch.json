@@ -19,6 +19,14 @@
             "cwd": "${workspaceFolder}/module_example",
             "module": "module_example",
             "justMyCode": true
+        },
+        {
+            "name": "Module CoFee",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/module_cofee",
+            "module": "module_example",
+            "justMyCode": true
         }
     ]
 }
