@@ -21,6 +21,7 @@ from ..feedback_provider_registry import register_feedback_provider
 def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> List[Feedback]:
     chat = PromptLayerChatOpenAI(pl_tags=["basic"])
     input_list: List[dict] = []
+    # TODO max tokens and temperature
 
     # Feature extraction
     with get_repositories(exercise.solution_repository_url, exercise.template_repository_url, submission.content) as repositories:
@@ -41,6 +42,8 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
                 "solution_to_submission_diff": solution_to_submission_diff,
                 "template_to_submission_diff": template_to_submission_diff
             })
+
+            # TODO Filter long files
 
     # Prompt building
     system_template = (
