@@ -1,17 +1,23 @@
-from module_cofee.src.entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
-from module_cofee.src.errors import invalidAuthorization, invalidJson, missingCallbackUrl, missingSubmissions, missingTaskType,\
-    missingChunkSize, invalidChunkSize, invalidTaskType, taskTypeError, missingJobId, invalidJobId, missingResultType,\
-    invalidResultType, missingTextBlocks, missingEmbeddings, missingTaskId, invalidResults, noUpdateNeeded,\
-    missingClusters, missingDistanceMatrix, missingClusterTree
-from fastapi import BackgroundTasks, FastAPI, Request, Response, status
-from requests.auth import HTTPBasicAuth
-from module_cofee.src.ConfigParser import ConfigParser
 import hashlib
 import logging
 import os
-import requests
 import sys
+
+import requests
+from fastapi import BackgroundTasks, FastAPI, Request, Response, status
+from requests.auth import HTTPBasicAuth
+
+from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
+from athena.text import *
+
 import module_cofee.src.clustering_pb2 as Protobuf
+from module_cofee.src.ConfigParser import ConfigParser
+from module_cofee.src.entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
+from module_cofee.src.errors import invalidAuthorization, invalidJson, missingCallbackUrl, missingSubmissions, \
+    missingTaskType, \
+    missingChunkSize, invalidChunkSize, invalidTaskType, taskTypeError, missingJobId, invalidJobId, missingResultType, \
+    invalidResultType, missingTextBlocks, missingEmbeddings, missingTaskId, invalidResults, noUpdateNeeded, \
+    missingClusters, missingDistanceMatrix, missingClusterTree
 
 logger = logging.getLogger()
 # Set log_level to logging.DEBUG to write log files with json contents (see writeJsonToFile())
@@ -24,7 +30,6 @@ formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(na
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-app = FastAPI()
 queue = list()
 job_counter = 0
 
@@ -459,3 +464,7 @@ def queueStatus():
             "sending_back": sending_back,
             "finished": finished,
             "total": total}
+
+
+if __name__ == "__main__":
+    app.start()
