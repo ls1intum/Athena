@@ -1,0 +1,54 @@
+version: '3'
+
+# This override file mounts all local code-directories into the containers
+# By that, rebuilding the containers is not needed for code changes locally as long as no requirements change
+
+services:
+  # traefik:
+    # This component does not need to be changed
+
+  # Build protobuf client file for load-balancer
+  # In production, this is done using GitHub Actions
+  protobuf:
+    build:
+      context: .
+      dockerfile: ./protobuf/Dockerfile-python
+    container_name: athene-protobuf
+    working_dir: /protobuf
+    volumes:
+      - ./protobuf:/in
+      - ./load-balancer/src:/out
+
+  load-balancer:
+    depends_on:
+      - protobuf
+    environment:
+      # This is needed to rewrite the callback URL in the load-balancer
+      # when running in Docker, if Artemis is running on the host machine
+      - REWRITE_LOCALHOST_CALLBACK_URL_TO=http://host.docker.internal
+    volumes:
+      - ./load-balancer/src:/usr/src/app/src
+
+  segmentation:
+    volumes:
+      - ./segmentation/src:/usr/src/app/src
+      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
+
+  embedding:
+    volumes:
+      - ./embedding/src:/usr/src/app/src
+      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
+      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
+      # This will keep the subdirectory as it is in the container
+      - /usr/src/app/src/resources
+
+  clustering:
+    volumes:
+      - ./clustering/src:/usr/src/app/src
+
+  tracking:
+    volumes:
+      - ./tracking/src:/usr/src/app/src
+
+  # database:
+    # This component does not need to be changed
