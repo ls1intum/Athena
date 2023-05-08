@@ -23,6 +23,11 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
     input_list: List[dict] = []
     # TODO max tokens and temperature
 
+    if exercise.meta['file_grading_instructions'] is None:
+        raise Exception("No file grading instructions found for exercise in meta.")
+    if exercise.meta['file_problem_statements'] is None:
+        raise Exception("No file problem statements found for exercise in meta.")
+
     # Feature extraction
     with get_repositories(exercise.solution_repository_url, exercise.template_repository_url, submission.content) as repositories:
         solution_repo, template_repo, submission_repo = repositories
@@ -32,6 +37,16 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
             if submission_content is None:
                 continue
             
+            problem_statement = exercise.meta['file_problem_statements'][file_path]
+            if problem_statement is None:
+                print(f"No problem statement for {file_path}, skipping.")
+                continue
+
+            grading_instructions = exercise.meta['file_grading_instructions'][file_path]
+            if grading_instructions is None:
+                print(f"No grading instructions for {file_path}, skipping.")
+                continue
+
             submission_content = add_line_numbers(submission_content)
             solution_to_submission_diff = get_diff(src_repo=solution_repo, dst_repo=submission_repo, src_prefix="solution", dst_prefix="submission", file_path=file_path)
             template_to_submission_diff = get_diff(src_repo=template_repo, dst_repo=submission_repo, src_prefix="template", dst_prefix="submission", file_path=file_path)
@@ -40,7 +55,9 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
                 "file_path": file_path,
                 "submission_content": submission_content,
                 "solution_to_submission_diff": solution_to_submission_diff,
-                "template_to_submission_diff": template_to_submission_diff
+                "template_to_submission_diff": template_to_submission_diff,
+                "grading_instructions": grading_instructions,
+                "problem_statement": problem_statement,
             })
 
             # TODO Filter long files
@@ -67,8 +84,6 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
         '{{"text": "Good job implementing the BubbleSort algorithm for sorting Dates. It shows a clear understanding of the sorting process", "credits": 5, "line": null}},'
         '{{"text": "Incorrect use of \'==\' for string comparison, which leads to unexpected results. Use the \'equals\' method for string comparison instead.", "credits": -2, "line": 18}}'
         ']\n'
-        '\n'
-        'The credits\' absolute total should be 10!' # TODO grading instruction
     )
     human_template = (
         'Student\'s submission to grade:\n'
@@ -77,6 +92,13 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
         '{solution_to_submission_diff}\n'
         'Diff between template (deletions) and student\'s submission (additions):\n'
         '{template_to_submission_diff}\n'
+        'Problem statement:\n'
+        '{problem_statement}\n'
+        'Grading instructions:\n'
+        '{grading_instructions}\n'
+        'As said, it should be effective feedback following an extremely high standard.\n'
+        'Critically grade the submission and distribute credits accordingly.\n'
+        'Be liberal with interpreting the grading instructions.\n'
         '\n'
         'JSON response:\n'
     )
