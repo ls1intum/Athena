@@ -19,7 +19,7 @@ from ..feedback_provider_registry import register_feedback_provider
 
 @register_feedback_provider("basic")
 def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> List[Feedback]:
-    chat = PromptLayerChatOpenAI(pl_tags=["basic"])
+    chat = PromptLayerChatOpenAI(pl_tags=["basic"], temperature=0)
     input_list: List[dict] = []
     # TODO max tokens and temperature
 

@@ -14,7 +14,7 @@ from langchain.prompts import (
 )
 
 def generate_file_grading_instructions(exercise: ProgrammingExercise):
-    chat = PromptLayerChatOpenAI(pl_tags=["grading_instructions", "file_grading_instructions"])
+    chat = PromptLayerChatOpenAI(pl_tags=["grading_instructions", "file_grading_instructions"], temperature=0)
     grading_instructions = exercise.grading_instructions
 
     with get_repositories(exercise.solution_repository_url, exercise.template_repository_url) as repositories:
@@ -50,7 +50,7 @@ def generate_file_grading_instructions(exercise: ProgrammingExercise):
     return None
 
 def generate_file_problem_statements(exercise: ProgrammingExercise):
-    chat = PromptLayerChatOpenAI(pl_tags=["problem_statement", "file_problem_statement"])
+    chat = PromptLayerChatOpenAI(pl_tags=["problem_statement", "file_problem_statement"], temperature=0)
     problem_statement = exercise.problem_statement
 
     with get_repositories(exercise.solution_repository_url, exercise.template_repository_url) as repositories:
