@@ -1,27 +1,24 @@
 from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
-from athena.helpers import get_repository_zips
 from athena.storage import *
 
+from module_programming_llm.basic.file_grading_instructions import generate_file_grading_instructions
 from .feedback_provider_registry import FEEDBACK_PROVIDERS
+
 
 @submissions_consumer
 def receive_submissions(exercise: ProgrammingExercise, submissions: List[Submission]):
     print(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
-    with get_repository_zips(urls=[submission.content for submission in submissions]) as zip_contents:
-        for (submission, zip_content) in zip(submissions, zip_contents):
-            print(f"- Submission {submission.id}")
-            # list the files in the zip
-            for file in zip_content.namelist():
-                print(f"  - {file}")
 
-        # Do something with the submissions
+    print("Generating file grading instructions...")
+    file_grading_instructions = generate_file_grading_instructions(exercise)
+    print(file_grading_instructions)
+    exercise.meta['file_grading_instructions'] = file_grading_instructions
+    store_exercise(exercise)
 
 @submission_selector
 def select_submission(exercise: ProgrammingExercise, submissions: List[Submission]) -> Submission:
     print(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
-    for submission in submissions:
-        print(f"- Submission {submission.id}")
-    # Do something with the submissions and return the one that should be assessed next
+    # Always return the first submission
     return submissions[0]
 
 
@@ -36,7 +33,9 @@ def process_incoming_feedback(exercise: ProgrammingExercise, submission: Submiss
 def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> List[Feedback]:
     print(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
     # Do something with the submission and return a list of feedback
-    
+
+    print(exercise)
+
     approach = exercise.meta.get('approach', 'basic')  # Set 'basic' as the default approach
 
     if approach not in FEEDBACK_PROVIDERS:

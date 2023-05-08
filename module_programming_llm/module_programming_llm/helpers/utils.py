@@ -50,6 +50,7 @@ def get_diff(src_repo: Repo,
              src_prefix: str = "a",
              dst_prefix: str = "b",
              file_path: Optional[Union[Path, str]] = None,
+             name_only: bool = False,
              branch: str = "main", 
              remote_name: str = "diff_target") -> str:
     """Get the diff between two branches of two Git repositories.
@@ -59,14 +60,16 @@ def get_diff(src_repo: Repo,
         dst_repo (Repo): The repository to get the diff to
         src_prefix (str, optional): The prefix to use for the source files. Defaults to "a"
         dst_prefix (str, optional): The prefix to use for the destination files. Defaults to "b"
-        file_path (Optional[Union[Path, str]]): The path to the file to get the diff for. Defaults to None
+        file_path (Optional[Union[Path, str]]): The path to the file(s) to get the diff for. Defaults to None
+        name_only (bool, optional): Only show names of changed files. Defaults to False
         branch (str, optional): The branch to get the diff for. Defaults to "main"
         remote_name (str, optional): The name of the remote to use. Defaults to "diff_target"
     """
-    file_path_obj = Path(src_repo.working_tree_dir) / file_path
-    if not file_path_obj.exists():
-        return f"- {src_prefix}/{file_path} does not exist.\n+ {dst_prefix}/{file_path} has been added."
+    if file_path is not None and "*" not in file_path:
+        file_path_obj = Path(src_repo.working_tree_dir) / file_path
+        if not file_path_obj.exists():
+            return f"- {src_prefix}/{file_path} does not exist.\n+ {dst_prefix}/{file_path} has been added."
 
     with temporary_remote(remote_name, src_repo, dst_repo.working_tree_dir):
-        diff = src_repo.git.diff(branch, f"{remote_name}/{branch}", f"--src-prefix={src_prefix}/", f"--dst-prefix={dst_prefix}/", file_path)
+        diff = src_repo.git.diff(branch, f"{remote_name}/{branch}", f"--src-prefix={src_prefix}/", f"--dst-prefix={dst_prefix}/", file_path, name_only=name_only)
     return diff

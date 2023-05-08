@@ -1,5 +1,13 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
-import type { Exercise } from '@/pages/model/exercise';
+import type {Exercise} from '@/pages/model/exercise';
+
+import fs from 'fs';
+import path from 'path';
+
+function readExerciseFile(exerciseId: number, fileName: string) {
+    const filePath = path.join(process.cwd(), 'exercises', "" + exerciseId, fileName);
+    return fs.readFileSync(filePath, 'utf-8');
+  }
 
 const exampleExercises: Exercise[] = [
     {
@@ -8,8 +16,8 @@ const exampleExercises: Exercise[] = [
         type: 'programming',
         max_points: 10,
         bonus_points: 0,
-        problem_statement: 'Write a program that prints "Hello World" to the console.',
-        grading_instructions: 'Check if the program prints "Hello World" to the console. 10 points if it does, 0 points otherwise.',
+        problem_statement: readExerciseFile(1, 'problem-statement.md'),
+        grading_instructions: readExerciseFile(1, 'grading-instructions.md'),
         programming_language: 'java',
         solution_repository_url: 'http://localhost:3000/api/programming-material/1/solution.zip',
         template_repository_url: 'http://localhost:3000/api/programming-material/1/template.zip',

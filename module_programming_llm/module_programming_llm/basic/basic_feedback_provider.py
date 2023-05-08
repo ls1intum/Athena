@@ -47,7 +47,7 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
 
     # Prompt building
     system_template = (
-        'You are a programming tutor AI at a university tasked with grading and providing feedback to homework assignments.\n'
+        'You are a programming tutor AI at a university tasked with grading and providing feedback to programming homework assignments.\n'
         '\n'
         'You receive a submission with some other information and respond with the following JSON format:\n'
         '[{{"text": <feedback_comment>, "credits": <number>, "line": <nullable line number (no range)>}}]\n'
