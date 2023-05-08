@@ -1,7 +1,7 @@
 from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
 from athena.storage import *
 
-from module_programming_llm.basic.file_grading_instructions import generate_file_grading_instructions
+from module_programming_llm.basic.file_instructions import generate_file_grading_instructions, generate_file_problem_statements
 from .feedback_provider_registry import FEEDBACK_PROVIDERS
 
 
@@ -9,11 +9,14 @@ from .feedback_provider_registry import FEEDBACK_PROVIDERS
 def receive_submissions(exercise: ProgrammingExercise, submissions: List[Submission]):
     print(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
 
-    print("Generating file grading instructions...")
-    file_grading_instructions = generate_file_grading_instructions(exercise)
-    print(file_grading_instructions)
-    exercise.meta['file_grading_instructions'] = file_grading_instructions
-    store_exercise(exercise)
+    # TODO Add this later:
+    # print("Generating file grading instructions...")
+    # file_grading_instructions = generate_file_grading_instructions(exercise)
+    # print(file_grading_instructions)
+    # exercise.meta['file_grading_instructions'] = file_grading_instructions
+    # store_exercise(exercise)
+
+    # generate_file_problem_statement(exercise)
 
 @submission_selector
 def select_submission(exercise: ProgrammingExercise, submissions: List[Submission]) -> Submission:
@@ -34,7 +37,9 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
     print(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
     # Do something with the submission and return a list of feedback
 
-    print(exercise)
+    # TODO remove later
+    exercise.meta['file_grading_instructions'] = generate_file_grading_instructions(exercise)
+    exercise.meta['file_problem_statements'] = generate_file_problem_statements(exercise)
 
     approach = exercise.meta.get('approach', 'basic')  # Set 'basic' as the default approach
 
