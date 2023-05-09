@@ -14,8 +14,8 @@ def get_programming_submission_zip(submission: ProgrammingSubmission) -> zipfile
     url = submission.repository_url
     with httpx.stream("GET", url) as response:
         response.raise_for_status()
-        temp_file = NamedTemporaryFile()
-        for chunk in response.iter_bytes():
-            temp_file.write(chunk)
-        temp_file.flush()
+        with NamedTemporaryFile() as temp_file:
+            for chunk in response.iter_bytes():
+                temp_file.write(chunk)
+            temp_file.flush()
     return zipfile.ZipFile(temp_file.name)
