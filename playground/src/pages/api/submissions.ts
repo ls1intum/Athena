@@ -26,7 +26,7 @@ const exampleSubmissions: Submission[] = [
     {
         id: 4,
         exercise_id: 1,
-        content: 'http://localhost:3000/api/programming-submissions/4.zip',
+        repository_url: 'http://localhost:3000/api/programming-submissions/4.zip',
         student_id: 1,
         meta: {},
     }
