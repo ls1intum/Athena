@@ -12,7 +12,7 @@ from langchain.prompts import (
 
 from athena.programming import *
 
-from ..helpers.utils import get_diff, load_files_from_repo, add_line_numbers
+from module_programming_llm.helpers.utils import get_diff, load_files_from_repo, add_line_numbers
 
 
 def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:

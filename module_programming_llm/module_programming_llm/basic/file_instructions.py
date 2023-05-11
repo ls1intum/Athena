@@ -1,16 +1,15 @@
 import json
 
-from athena.programming import Exercise
-
-from module_programming_llm.helpers.utils import get_diff
-
-from langchain.chains import LLMChain
 from langchain.chat_models import PromptLayerChatOpenAI
 from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
+
+from athena.programming import Exercise
+
+from module_programming_llm.helpers.utils import get_diff
 
 def generate_file_grading_instructions(exercise: Exercise):
     chat = PromptLayerChatOpenAI(pl_tags=["grading_instructions", "file_grading_instructions"], temperature=0)
@@ -47,6 +46,7 @@ def generate_file_grading_instructions(exercise: Exercise):
         print("Could not decode JSON response from chatbot:")
         print(result.content)
     return None
+
 
 def generate_file_problem_statements(exercise: Exercise):
     chat = PromptLayerChatOpenAI(pl_tags=["problem_statement", "file_problem_statement"], temperature=0)

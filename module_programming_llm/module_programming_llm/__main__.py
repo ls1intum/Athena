@@ -1,10 +1,10 @@
 from athena.storage import *
 
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
-from athena.programming import *
+from athena.programming import Exercise, Submission, Feedback
 
-from module_programming_llm.basic.file_instructions import generate_file_grading_instructions, generate_file_problem_statements
 from module_programming_llm.basic.basic_feedback_provider import suggest_feedback as suggest_feedback_basic
+from module_programming_llm.basic.file_instructions import generate_file_grading_instructions, generate_file_problem_statements
 
 
 @submission_selector
