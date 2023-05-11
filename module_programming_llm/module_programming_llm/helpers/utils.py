@@ -29,6 +29,22 @@ def add_line_numbers(content: str) -> str:
     return "\n".join([f"{i+1:>{padding}} {line}" for i, line in enumerate(lines)])
 
 
+def get_file_extension(programming_language: str) -> str | None:
+    # JAVA, C, OCAML, HASKELL, PYTHON, SWIFT, VHDL, ASSEMBLER, EMPTY, KOTLIN
+    file_extensions = {
+        "JAVA": ".java",
+        "C": ".c",
+        "OCAML": ".ml",
+        "HASKELL": ".hs",
+        "PYTHON": ".py",
+        "SWIFT": ".swift",
+        "VHDL": ".vhd",
+        "ASSEMBLER": ".asm",
+        "KOTLIN": ".kt",
+    }
+    return file_extensions.get(programming_language.upper())
+
+
 @contextmanager
 def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iterator[Optional[Remote]]:
     """Context manager for temporarily adding a remote to a Git repository.

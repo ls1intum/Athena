@@ -10,12 +10,14 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
 )
 
-from athena.programming import *
+from athena.programming import Exercise, Submission, Feedback
 
-from module_programming_llm.helpers.utils import get_diff, load_files_from_repo, add_line_numbers
+from module_programming_llm.helpers.utils import get_diff, get_file_extension, load_files_from_repo, add_line_numbers
 
 
 def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+    max_prompt_length = 2560
+
     chat = PromptLayerChatOpenAI(pl_tags=["basic"], temperature=0)
     input_list: List[dict] = []
 
@@ -28,9 +30,12 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     solution_repo = exercise.get_solution_repository()
     template_repo = exercise.get_template_repository()
     submission_repo = submission.get_repository()
+    
+    file_extension = get_file_extension(exercise.programming_language)
+    if file_extension is None:
+        raise Exception(f"Could not determine file extension for programming language {exercise.programming_language}.")
 
-    # TODO file_filter
-    for file_path, submission_content in load_files_from_repo(submission_repo, file_filter=lambda x: x.endswith(".java")).items():
+    for file_path, submission_content in load_files_from_repo(submission_repo, file_filter=lambda x: x.endswith(file_extension)).items():
         if submission_content is None:
             continue
             
@@ -56,8 +61,6 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
             "grading_instructions": grading_instructions,
             "problem_statement": problem_statement,
         })
-
-        # TODO Filter long files
 
     # Prompt building
     system_template = (
@@ -103,6 +106,9 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
     chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+
+    # Filter long prompts
+    input_list = [input for input in input_list if chat.get_num_tokens_from_messages(chat_prompt.format_messages(**input)) <= max_prompt_length]
 
     # Completion
     chain = LLMChain(llm=chat, prompt=chat_prompt)

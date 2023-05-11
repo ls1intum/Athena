@@ -9,7 +9,7 @@ from langchain.prompts import (
 
 from athena.programming import Exercise
 
-from module_programming_llm.helpers.utils import get_diff
+from module_programming_llm.helpers.utils import get_diff, get_file_extension
 
 def generate_file_grading_instructions(exercise: Exercise):
     chat = PromptLayerChatOpenAI(pl_tags=["grading_instructions", "file_grading_instructions"], temperature=0)
@@ -17,8 +17,9 @@ def generate_file_grading_instructions(exercise: Exercise):
 
     solution_repo = exercise.get_solution_repository()
     template_repo = exercise.get_template_repository()
-    changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path="*.java", name_only=True)
-        
+    file_extension = get_file_extension(exercise.programming_language) or ""
+    changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path=f"*{file_extension}", name_only=True)
+    
     system_template = (
         'You are a programming tutor AI at a university tasked with grading and providing feedback to programming homework assignments.\n'
         '\n'
@@ -54,7 +55,8 @@ def generate_file_problem_statements(exercise: Exercise):
 
     solution_repo = exercise.get_solution_repository()
     template_repo = exercise.get_template_repository()
-    changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path="*.java", name_only=True)
+    file_extension = get_file_extension(exercise.programming_language) or ""
+    changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path=f"*{file_extension}", name_only=True)
         
     system_template = (
         'You are a programming tutor AI at a university tasked with grading and providing feedback to programming homework assignments.\n'
