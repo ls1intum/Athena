@@ -7,11 +7,13 @@ from typing import List, Dict, Optional, Callable, Union, Tuple
 from git import Repo, Remote
 from langchain.document_loaders import GitLoader
 
+
 def load_files_from_repo(repo: Repo, file_filter: Optional[Callable[[str], bool]] = None) -> Dict[str, Optional[str]]:
     return {
         doc.metadata['file_path']: doc.page_content
         for doc in GitLoader(repo_path=repo.working_tree_dir, file_filter=file_filter).load()
     }
+
 
 def merge_repos_by_filepath(*repos: List[Repo], file_filter: Optional[Callable[[str], bool]] = None) -> Iterator[Tuple[str, List[Optional[str]]]]:
     docs = [load_files_from_repo(repo, file_filter) for repo in repos]
@@ -20,10 +22,12 @@ def merge_repos_by_filepath(*repos: List[Repo], file_filter: Optional[Callable[[
     for file in files:
         yield (file, [doc.get(file) for doc in docs])
 
+
 def add_line_numbers(content: str) -> str:
     lines = content.splitlines()
     padding = len(str(len(lines)))
     return "\n".join([f"{i+1:>{padding}} {line}" for i, line in enumerate(lines)])
+
 
 @contextmanager
 def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iterator[Optional[Remote]]:
@@ -44,6 +48,7 @@ def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iter
         repo.delete_remote(remote)
     else:
         yield remote
+
 
 def get_diff(src_repo: Repo, 
              dst_repo: Repo, 
