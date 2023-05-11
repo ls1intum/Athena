@@ -2,9 +2,6 @@ import asyncio
 import json
 from typing import List
 
-from athena import Feedback, ProgrammingExercise, Submission
-from athena.helpers import get_repositories
-
 from langchain.chains import LLMChain
 from langchain.chat_models import PromptLayerChatOpenAI
 from langchain.prompts import (
@@ -13,15 +10,14 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
 )
 
+from athena.programming import *
+
 from ..helpers.utils import get_diff, load_files_from_repo, add_line_numbers
-from ..feedback_provider_registry import register_feedback_provider
 
 
-@register_feedback_provider("basic")
-def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> List[Feedback]:
+def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     chat = PromptLayerChatOpenAI(pl_tags=["basic"], temperature=0)
     input_list: List[dict] = []
-    # TODO max tokens and temperature
 
     if exercise.meta['file_grading_instructions'] is None:
         raise Exception("No file grading instructions found for exercise in meta.")
@@ -29,38 +25,39 @@ def suggest_feedback(exercise: ProgrammingExercise, submission: Submission) -> L
         raise Exception("No file problem statements found for exercise in meta.")
 
     # Feature extraction
-    with get_repositories(exercise.solution_repository_url, exercise.template_repository_url, submission.content) as repositories:
-        solution_repo, template_repo, submission_repo = repositories
-        
-        # TODO file_filter
-        for file_path, submission_content in load_files_from_repo(submission_repo, file_filter=lambda x: x.endswith(".java")).items():
-            if submission_content is None:
-                continue
+    solution_repo = exercise.get_solution_repository()
+    template_repo = exercise.get_template_repository()
+    submission_repo = submission.get_repository()
+
+    # TODO file_filter
+    for file_path, submission_content in load_files_from_repo(submission_repo, file_filter=lambda x: x.endswith(".java")).items():
+        if submission_content is None:
+            continue
             
-            problem_statement = exercise.meta['file_problem_statements'][file_path]
-            if problem_statement is None:
-                print(f"No problem statement for {file_path}, skipping.")
-                continue
+        problem_statement = exercise.meta['file_problem_statements'][file_path]
+        if problem_statement is None:
+            print(f"No problem statement for {file_path}, skipping.")
+            continue
 
-            grading_instructions = exercise.meta['file_grading_instructions'][file_path]
-            if grading_instructions is None:
-                print(f"No grading instructions for {file_path}, skipping.")
-                continue
+        grading_instructions = exercise.meta['file_grading_instructions'][file_path]
+        if grading_instructions is None:
+            print(f"No grading instructions for {file_path}, skipping.")
+            continue
 
-            submission_content = add_line_numbers(submission_content)
-            solution_to_submission_diff = get_diff(src_repo=solution_repo, dst_repo=submission_repo, src_prefix="solution", dst_prefix="submission", file_path=file_path)
-            template_to_submission_diff = get_diff(src_repo=template_repo, dst_repo=submission_repo, src_prefix="template", dst_prefix="submission", file_path=file_path)
+        submission_content = add_line_numbers(submission_content)
+        solution_to_submission_diff = get_diff(src_repo=solution_repo, dst_repo=submission_repo, src_prefix="solution", dst_prefix="submission", file_path=file_path)
+        template_to_submission_diff = get_diff(src_repo=template_repo, dst_repo=submission_repo, src_prefix="template", dst_prefix="submission", file_path=file_path)
 
-            input_list.append({
-                "file_path": file_path,
-                "submission_content": submission_content,
-                "solution_to_submission_diff": solution_to_submission_diff,
-                "template_to_submission_diff": template_to_submission_diff,
-                "grading_instructions": grading_instructions,
-                "problem_statement": problem_statement,
-            })
+        input_list.append({
+            "file_path": file_path,
+            "submission_content": submission_content,
+            "solution_to_submission_diff": solution_to_submission_diff,
+            "template_to_submission_diff": template_to_submission_diff,
+            "grading_instructions": grading_instructions,
+            "problem_statement": problem_statement,
+        })
 
-            # TODO Filter long files
+        # TODO Filter long files
 
     # Prompt building
     system_template = (

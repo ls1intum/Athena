@@ -1,7 +1,6 @@
 import json
 
-from athena import ProgrammingExercise
-from athena.helpers import get_repositories
+from athena.programming import Exercise
 
 from module_programming_llm.helpers.utils import get_diff
 
@@ -13,13 +12,13 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
 )
 
-def generate_file_grading_instructions(exercise: ProgrammingExercise):
+def generate_file_grading_instructions(exercise: Exercise):
     chat = PromptLayerChatOpenAI(pl_tags=["grading_instructions", "file_grading_instructions"], temperature=0)
     grading_instructions = exercise.grading_instructions
 
-    with get_repositories(exercise.solution_repository_url, exercise.template_repository_url) as repositories:
-        solution_repo, template_repo = repositories
-        changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path="*.java", name_only=True)
+    solution_repo = exercise.get_solution_repository()
+    template_repo = exercise.get_template_repository()
+    changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path="*.java", name_only=True)
         
     system_template = (
         'You are a programming tutor AI at a university tasked with grading and providing feedback to programming homework assignments.\n'
@@ -49,13 +48,13 @@ def generate_file_grading_instructions(exercise: ProgrammingExercise):
         print(result.content)
     return None
 
-def generate_file_problem_statements(exercise: ProgrammingExercise):
+def generate_file_problem_statements(exercise: Exercise):
     chat = PromptLayerChatOpenAI(pl_tags=["problem_statement", "file_problem_statement"], temperature=0)
     problem_statement = exercise.problem_statement
 
-    with get_repositories(exercise.solution_repository_url, exercise.template_repository_url) as repositories:
-        solution_repo, template_repo = repositories
-        changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path="*.java", name_only=True)
+    solution_repo = exercise.get_solution_repository()
+    template_repo = exercise.get_template_repository()
+    changed_files = get_diff(src_repo=template_repo, dst_repo=solution_repo, file_path="*.java", name_only=True)
         
     system_template = (
         'You are a programming tutor AI at a university tasked with grading and providing feedback to programming homework assignments.\n'
