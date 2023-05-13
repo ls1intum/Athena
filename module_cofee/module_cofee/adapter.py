@@ -8,13 +8,16 @@ from fastapi import Request
 import requests
 
 from athena import app
-from athena.text import Exercise, Submission, Feedback
-from athena.storage import store_submission
+from athena.text import Exercise, Submission
 from athena.logger import logger
+
 try:
-    from .protobuf import cofee_pb2
-except ImportError:
-    raise ImportError("Could not import protobuf module. Please run `make protobuf` to generate it.")
+    from module_cofee.protobuf import cofee_pb2
+except ImportError as e:
+    if "cofee_pb2" in str(e):
+        raise ImportError("Could not import protobuf module. Please run `make protobuf` to generate it.")
+    else:
+        raise e
 
 
 def get_cofee_url() -> str:
@@ -45,7 +48,7 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
 
 
 @app.post("/cofee_callback/{exercise_id}")
-def save_athene_result(exercise_id: int, request: Request):
+async def save_athene_result(exercise_id: int, request: Request):
     """
     Saves automatic textAssessments of Athena.
     """
