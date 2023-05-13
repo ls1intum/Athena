@@ -4,6 +4,7 @@ import type { Exercise } from '@/pages/model/exercise';
 const exampleExercises: Exercise[] = [
     {
         id: 1,
+        course_id: 1,
         title: 'Hello World',
         type: 'programming',
         max_points: 10,
@@ -18,6 +19,7 @@ const exampleExercises: Exercise[] = [
     },
     {
         id: 2,
+        course_id: 1,
         title: 'What is your name?',
         type: 'text',
         max_points: 10,

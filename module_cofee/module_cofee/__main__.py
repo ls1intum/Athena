@@ -6,33 +6,29 @@ from typing import List
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.text import Exercise, Submission, Feedback
 
+from module_cofee import adapter
+
 
 @submission_selector
 def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
     print(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
     for submission in submissions:
         print(f"- Submission {submission.id}")
-    # Do something with the submissions and return the one that should be assessed next
+    # TODO: select submission with highest information gain
+    # For now, just return the first one:
     return submissions[0]
 
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     print(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
-    for submission in submissions:
-        print(f"- Submission {submission.id}")
-        zip_content = submission.get_zip()
-        # list the files in the zip
-        for file in zip_content.namelist():
-            print(f"  - {file}")
-    # Do something with the submissions
+    adapter.send_submissions(exercise, submissions)
 
 
 @feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
-    print(f"process_feedback: Received feedback for submission {submission.id} of exercise {exercise.id}.")
-    print(f"process_feedback: Feedback: {feedback}")
-    # Do something with the feedback
+    # no need to do anything here, the feedback is automatically stored in the database
+    pass
 
 
 @feedback_provider
