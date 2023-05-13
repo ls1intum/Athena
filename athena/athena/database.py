@@ -35,6 +35,21 @@ def create_tables(exercise_type: str):
             if not inspector.has_table(model_class.__tablename__):
                 model_class.__table__.create(bind=engine)
 
+
+def create_additional_table_if_not_exists(model_class: Base):
+    """
+    Create and additional table for a model if it does not exist.
+    To create a custom model to create it:
+    - Create a class that inherits from `athena.database.Base`. It will be an SQLAlchemy model.
+    - Create a table name for the model by setting `__tablename__` on the model class.
+    - Create the columns of the table by setting class attributes on the model class.
+    - Call this function with the model class as the argument.
+    """
+    inspector = inspect(engine)
+    if not inspector.has_table(model_class.__tablename__):
+        model_class.__table__.create(bind=engine)
+
+
 @contextmanager
 def get_db():
     db = SessionLocal()
