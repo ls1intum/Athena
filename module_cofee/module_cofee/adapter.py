@@ -30,7 +30,7 @@ def get_cofee_url() -> str:
 def send_submissions(exercise: Exercise, submissions: List[Submission]):
     """Send submissions to old Athena-CoFee server."""
     logger.info(f"Sending {len(submissions)} submissions to CoFee")
-    requests.post(
+    resp = requests.post(
         f"{get_cofee_url()}/submit",
         json={
             "courseId": exercise.course_id,
@@ -44,7 +44,13 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
                 for submission in submissions
             ],
         },
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": os.environ["COFEE_AUTH_TOKEN"],
+        },
     )
+    resp.raise_for_status()
+    logger.info("Submissions sent to CoFee")
 
 
 @app.post("/cofee_callback/{exercise_id}")
