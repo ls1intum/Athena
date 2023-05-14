@@ -8,6 +8,7 @@ from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
 from module_cofee import adapter
+from module_cofee.suggest_feedback import suggest_feedback_from_cluster
 
 
 @submission_selector
@@ -39,19 +40,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 @feedback_provider
 def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     logger.info(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
-    # Do something with the submission and return a list of feedback
-    return [
-        Feedback(
-            id=10,
-            exercise_id=exercise.id,
-            submission_id=submission.id,
-            detail_text="There is something wrong here.",
-            text="Correct",
-            reference=None,
-            credits=-1.0,
-            meta={},
-        )
-    ]
+    return suggest_feedback_from_cluster(submission)
 
 
 if __name__ == "__main__":

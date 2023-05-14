@@ -17,6 +17,13 @@ class DBTextBlock(Base):
     cluster_id = Column(Integer, ForeignKey("text_clusters.id"))  # FK to custom table
 
     submission = relationship("DBTextSubmission")
+    cluster = relationship("DBTextCluster")
+
+    def distance_to(self, other):
+        """
+        Returns the distance between this block and another block.
+        """
+        return self.cluster.distance_between_blocks(self, other)
 
     def __str__(self):
         return f"TextBlock{{id={self.id}, submission_id={self.submission_id} text='{self.text}', start='{self.start}', end='{self.end}', added_distance='{self.added_distance}', cluster_id='{self.cluster_id}'}}"

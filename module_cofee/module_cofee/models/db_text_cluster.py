@@ -13,7 +13,7 @@ class DBTextCluster(Base):
     disabled = Column(Boolean, default=False)
 
     # Define the relationship to TextBlock
-    blocks = relationship("DBTextBlock", backref="cluster")
+    blocks = relationship("DBTextBlock", back_populates="cluster")
 
     # Define the relationship to TextExercise
     exercise_id = Column(Integer, ForeignKey('text_exercises.id'))
