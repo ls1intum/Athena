@@ -5,15 +5,16 @@ from typing import List
 
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.text import Exercise, Submission, Feedback
+from athena.logger import logger
 
 from module_cofee import adapter
 
 
 @submission_selector
 def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
-    print(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
+    logger.info(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
     for submission in submissions:
-        print(f"- Submission {submission.id}")
+        logger.info(f"- Submission {submission.id}")
     # TODO: select submission with highest information gain
     # For now, just return the first one:
     return submissions[0]
@@ -21,7 +22,11 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
-    print(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
+    logger.info(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
+    if len(submissions) < 10:
+        # CoFee needs at least 10 submissions to work
+        logger.info("receive_submissions: Not enough submissions, not sending to CoFee")
+        return
     adapter.send_submissions(exercise, submissions)
 
 
@@ -33,7 +38,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 @feedback_provider
 def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
-    print(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
+    logger.info(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
     # Do something with the submission and return a list of feedback
     return [
         Feedback(
