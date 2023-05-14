@@ -1,16 +1,16 @@
 from typing import List, Iterable
 
 from athena.logger import logger
-from module_cofee.models.text_cluster import TextCluster
+from module_cofee.models.db_text_cluster import DBTextCluster
 from module_cofee.protobuf import cofee_pb2
-from module_cofee.models.text_block import TextBlock
+from module_cofee.models.db_text_block import DBTextBlock
 
 
 def store_text_blocks(segments: List[cofee_pb2.Segment]):
     """Convert segments to text blocks and store them in the DB."""
     for segment in segments:
         # store text block in DB
-        TextBlock(
+        DBTextBlock(
             id=segment.id,
             submission_id=segment.submissionId,
             text=segment.text,
@@ -24,7 +24,7 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
     for cluster in clusters:
         distance_matrix = [[entry.value for entry in row] for row in cluster.distanceMatrix]
         # store text cluster in DB
-        TextCluster(
+        DBTextCluster(
             id=cluster.id,
             exercise_id=exercise_id,
             distance_matrix=distance_matrix,
