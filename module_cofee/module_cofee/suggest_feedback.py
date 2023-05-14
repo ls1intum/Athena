@@ -20,14 +20,16 @@ def suggest_feedback_from_cluster(submission: Submission) -> List[Feedback]:
         exercise_feedbacks = (f for s in exercise_submissions for f in s.feedbacks)
         suggestions: List[Feedback] = []
         for block in blocks:
-            # if TextBlock is part of a cluster and the cluster is not disabled, we try to find an existing Feedback Element
+            # if TextBlock is part of a cluster and the cluster is not disabled,
+            # we try to find an existing Feedback element
             if block.cluster and not block.cluster.disabled:
                 all_blocks_in_cluster = block.cluster.blocks
-                ids_of_blocks_in_cluster = (b.id for b in all_blocks_in_cluster)
-                cluster_feedbacks = [  # all feedback given on text blocks in the cluster
-                    f for f in exercise_feedbacks
-                    if f.reference in ids_of_blocks_in_cluster
-                ]
+                cluster_feedbacks = []  # all feedback given on text blocks in the cluster
+                for f in exercise_feedbacks:
+                    for b in all_blocks_in_cluster:
+                        if b.includes_feedback(f):
+                            cluster_feedbacks.append(f)
+                            break
                 if cluster_feedbacks:
                     # find the closest block that has feedback
                     all_blocks_in_cluster_with_feedback = (

@@ -2,6 +2,8 @@ from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
+from athena.text import Feedback
+
 
 class DBTextBlock(Base):
     __tablename__ = "text_blocks"
@@ -18,6 +20,20 @@ class DBTextBlock(Base):
 
     submission = relationship("DBTextSubmission")
     cluster = relationship("DBTextCluster")
+
+    def includes_feedback(self, feedback: Feedback) -> bool:
+        """
+        Whether the given feedback is included in this block.
+        Example:
+        - The submission is "Hello world! This is a test.".
+        - The text block within that submission is "This is a test." (index 13 to 27).
+        - The feedback is given on "test" (index 22 to 26). => True
+        - The feedback is given on "This is a test." (index 13 to 27). => True
+        - The feedback is given on "Hello world!" (index 0 to 12). => False
+
+        This is used to match feedbacks to text blocks, even if the feedback is not given on the exact text block.
+        """
+        return self.start_index <= feedback.get_start_index() and feedback.get_end_index() <= self.end_index
 
     def distance_to(self, other):
         """
