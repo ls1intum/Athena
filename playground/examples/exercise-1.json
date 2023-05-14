@@ -16,7 +16,6 @@
     "submissions": [
         {
             "id": 1,
-            "exercise_id": 1,
             "repository_url": "http://localhost:3000/api/programming-submissions/1.zip",
             "student_id": 1,
             "meta": {},
