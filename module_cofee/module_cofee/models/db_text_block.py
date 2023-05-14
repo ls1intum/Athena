@@ -19,7 +19,7 @@ class DBTextBlock(Base):
     cluster_id = Column(Integer, ForeignKey("text_clusters.id"))  # FK to custom table
 
     submission = relationship("DBTextSubmission")
-    cluster = relationship("DBTextCluster")
+    cluster = relationship("DBTextCluster", back_populates="blocks")
 
     def includes_feedback(self, feedback: Feedback) -> bool:
         """
@@ -46,4 +46,4 @@ class DBTextBlock(Base):
         return self.cluster.distance_between_blocks(self, other)
 
     def __str__(self):
-        return f"TextBlock{{id={self.id}, submission_id={self.submission_id} text='{self.text}', start='{self.start}', end='{self.end}', added_distance='{self.added_distance}', cluster_id='{self.cluster_id}'}}"
+        return f"TextBlock{{id={self.id}, submission_id={self.submission_id} text='{self.text}', start_index='{self.start_index}', end_index='{self.end_index}', added_distance='{self.added_distance}', cluster_id='{self.cluster_id}'}}"

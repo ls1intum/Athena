@@ -128,7 +128,7 @@ export default function SendFeedback({ athenaUrl, module }: { athenaUrl: string,
                 <div className="bg-yellow-200 rounded-md p-2 mb-4 mt-2">
                     <p className="text-yellow-800">
                         You are about to send feedback for all submissions of this exercise.
-                        This will send a request for each submission.
+                        This will send a request for each feedback of each submission.
                     </p>
                 </div>
             }

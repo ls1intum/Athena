@@ -1,7 +1,8 @@
 from typing import List, Iterable
 
 from athena.database import get_db
-from athena.models import DBTextSubmission
+from athena.logger import logger
+from athena.models import DBTextFeedback
 from athena.text import Submission, Feedback
 from module_cofee.models.db_text_block import DBTextBlock
 
@@ -14,7 +15,7 @@ def get_exercise_feedbacks(exercise_id: int) -> List[Feedback]:
     Get all feedback on a given exercise.
     """
     with get_db() as db:
-        return db.query(Feedback).filter_by(exercise_id=exercise_id).all()
+        return db.query(DBTextFeedback).filter_by(exercise_id=exercise_id).all()
 
 
 def filter_feedbacks_by_block(feedbacks: List[Feedback], block: DBTextBlock) -> Iterable[Feedback]:
@@ -33,6 +34,9 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
     """
     # Find the cluster that this block belongs to
     cluster = block.cluster
+    if not cluster:
+        logger.warning(f"Block {block.id} has no cluster")
+        return []
     # If the cluster is disabled, there should be no suggestions
     if cluster.disabled:
         return []
@@ -40,11 +44,14 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
     blocks = cluster.blocks
     # Only consider blocks for which there is feedback available at all
     exercise_feedbacks = get_exercise_feedbacks(submission.exercise_id)
-    blocks_with_feedback = (
+    blocks_with_feedback = [
         block
         for block in blocks
         if any(filter_feedbacks_by_block(exercise_feedbacks, block))
-    )
+    ]
+    if not blocks_with_feedback:
+        logger.info(f"No feedback available for cluster {cluster.id}")
+        return []
     # Find the closest block to this block
     closest_block = min(
         blocks_with_feedback,
