@@ -2,7 +2,7 @@ import importlib
 import os
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///../data/data.sqlite")
