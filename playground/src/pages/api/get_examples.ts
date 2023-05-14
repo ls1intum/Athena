@@ -53,13 +53,16 @@ function jsonToFeedbacks(json: any): Feedback[] {
 
     json.submissions.forEach((submissionJson: any) => {
         if (submissionJson.feedbacks) {
-            feedbacks = [...feedbacks, ...submissionJson.feedbacks];
+            const additionalFeedbacks = submissionJson.feedbacks.map((feedbackJson: any) => {
+                const feedback = feedbackJson as Feedback;
+                // exercise_id is not provided in the json for convenience, so we add it here
+                feedback.exercise_id = json.id;
+                // submission_id is not provided in the json for convenience, so we add it here
+                feedback.submission_id = submissionJson.id;
+                return feedback;
+            });
+            feedbacks = [...feedbacks, ...additionalFeedbacks];
         }
-    });
-
-    // add exercise_id to feedbacks
-    feedbacks.forEach((feedback: Feedback) => {
-        feedback.exercise_id = json.id;
     });
 
     return feedbacks;
