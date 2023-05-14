@@ -35,6 +35,10 @@ class DBTextBlock(Base):
         """
         return self.start_index <= feedback.get_start_index() and feedback.get_end_index() <= self.end_index
 
+    def feedback_is_linked_to_block(self, feedback: Feedback) -> bool:
+        """The info whether the feedback is linked to the block is stored in the metadata of the feedback."""
+        return feedback.meta.get("block_id") == self.id
+
     def distance_to(self, other):
         """
         Returns the distance between this block and another block.
