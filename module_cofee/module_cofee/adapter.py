@@ -10,6 +10,7 @@ import requests
 from athena import app
 from athena.text import Exercise, Submission
 from athena.logger import logger
+from module_cofee.process_results import process_results
 
 try:
     from module_cofee.protobuf import cofee_pb2
@@ -35,7 +36,7 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
         json={
             "courseId": exercise.course_id,
             # TODO: maybe make this more flexible?
-            "callbackUrl": f"http://localhost:{os.environ['PORT']}/cofee_callback",
+            "callbackUrl": f"http://localhost:{os.environ['PORT']}/cofee_callback/{exercise.id}",
             "submissions": [
                 {
                     "id": submission.id,
@@ -62,3 +63,4 @@ async def save_athene_result(exercise_id: int, request: Request):
     cofee_resp = cofee_pb2.AtheneResponse.FromString(await request.body())
     clusters = cofee_resp.clusters
     segments = cofee_resp.segments
+    process_results(clusters, segments, exercise_id)
