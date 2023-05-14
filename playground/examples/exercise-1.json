@@ -15,21 +15,21 @@
 
     "submissions": [
         {
-            "id": 1,
+            "id": 101,
             "repository_url": "http://localhost:3000/api/programming-submissions/1.zip",
             "student_id": 1,
             "meta": {},
 
             "feedbacks": [
                 {
-                    "id": 1,
+                    "id": 101,
                     "detail_text": "Your program does not print \"Hello World\" to the console.",
                     "text": "Your program does not print \"Hello World\" to the console.",
                     "credits": -2.0,
                     "meta": {}
                 },
                 {
-                    "id": 2,
+                    "id": 102,
                     "detail_text": "You're missing a semicolon at the end of the line.",
                     "text": "You're missing a semicolon at the end of the line.",
                     "credits": -2.0,
@@ -38,7 +38,7 @@
             ]
         },
         {
-            "id": 2,
+            "id": 102,
             "exercise_id": 1,
             "repository_url": "http://localhost:3000/api/programming-submissions/2.zip",
             "student_id": 2,
