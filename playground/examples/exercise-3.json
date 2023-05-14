@@ -14,13 +14,42 @@
             "id": 301,
             "content": "Hello world\nThis is a test\nPlease cluster me into cluster one\none one one",
             "student_id": 1,
-            "meta": {}
+            "meta": {},
+            "feedbacks": [
+                {
+                    "id": 301,
+                    "detail_text": "This is a test",
+                    "reference": -1234,
+                    "text": "This is a test",
+                    "credits": 80,
+                    "meta": {}
+                }
+            ]
         },
         {
             "id": 302,
             "content": "Hello world\nThis is a test\nPlease cluster me into cluster one\none one one",
             "student_id": 1,
-            "meta": {}
+            "meta": {},
+
+            "feedbacks": [
+                {
+                    "id": 302,
+                    "detail_text": "This is a test",
+                    "reference": -1234,
+                    "text": "This is a test",
+                    "credits": 80,
+                    "meta": {}
+                },
+                {
+                    "id": 303,
+                    "detail_text": "This is a test",
+                    "reference": -1234,
+                    "text": "This is a test",
+                    "credits": 80,
+                    "meta": {}
+                }
+            ]
         },
         {
             "id": 303,

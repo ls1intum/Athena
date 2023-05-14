@@ -1,6 +1,6 @@
 import {useState} from "react";
-import Submission from "@/pages/model/submission";
-import { Exercise } from "@/pages/model/exercise";
+import {Submission} from "@/pages/model/submission";
+import {Exercise} from "@/pages/model/exercise";
 import ExerciseSelect from "@/pages/components/exercise_select";
 import SubmissionSelect from "@/pages/components/submission_select";
 import FeedbackSelect from "@/pages/components/feedback_select";
@@ -9,7 +9,14 @@ import ModuleResponse from "@/pages/model/module_response";
 import ModuleResponseView from "@/pages/components/module_response_view";
 import {ModuleMeta} from "@/pages/model/health_response";
 
-async function sendFeedback(athenaUrl: string, module: ModuleMeta, exercise: Exercise | null, submission: Submission | null, feedback: Feedback | null): Promise<ModuleResponse | undefined> {
+async function sendFeedback(
+    athenaUrl: string,
+    module: ModuleMeta,
+    exercise: Exercise | null,
+    submission: Submission | null,
+    feedback: Feedback | null,
+    alertAfterSuccess: boolean = true
+): Promise<ModuleResponse | undefined> {
     if (!exercise) {
         alert("Please select an exercise");
         return;
@@ -40,7 +47,9 @@ async function sendFeedback(athenaUrl: string, module: ModuleMeta, exercise: Exe
                 data: await response.text()
             };
         }
-        alert("Feedback sent successfully!");
+        if (alertAfterSuccess) {
+            alert("Feedback sent successfully!");
+        }
         return await response.json();
     } catch (e) {
         console.error(e);
@@ -48,31 +57,100 @@ async function sendFeedback(athenaUrl: string, module: ModuleMeta, exercise: Exe
     }
 }
 
+async function sendAllExerciseFeedbacks(
+    athenaUrl: string,
+    module: ModuleMeta,
+    exercise?: Exercise
+): Promise<ModuleResponse[] | undefined> {
+    if (!exercise) {
+        alert("Please select an exercise");
+        return;
+    }
+    // fetch submissions for exercise from /api/submissions
+    const submissionResponse = await fetch(`/api/submissions?${new URLSearchParams({ exercise_id: exercise.id.toString() })}`);
+    if (submissionResponse.status !== 200) {
+        console.error(submissionResponse);
+        alert(`Failed to fetch submissions for exercise ${exercise.id}`);
+        return;
+    }
+    const submissions: Submission[] = await submissionResponse.json();
+    // fetch feedbacks for exercise from /api/feedbacks
+    const feedbackResponse = await fetch(`/api/feedbacks?${new URLSearchParams({ exercise_id: exercise.id.toString() })}`);
+    if (feedbackResponse.status !== 200) {
+        console.error(feedbackResponse);
+        alert(`Failed to fetch feedbacks for exercise ${exercise.id}`);
+        return;
+    }
+    const feedbacks: Feedback[] = await feedbackResponse.json();
+    if (feedbacks.length === 0) {
+        alert("No feedbacks found for exercise");
+        return;
+    }
+    const responses: ModuleResponse[] = [];
+    for (const feedback of feedbacks) {
+        const submission = submissions.find(s => s.id === feedback.submission_id);
+        const response = await sendFeedback(athenaUrl, module, exercise, submission!, feedback, false);
+        if (response) {
+            responses.push(response);
+        } else {
+            // something went wrong, abort
+            return;
+        }
+    }
+    alert(`${feedbacks.length} feedbacks sent`);
+    return responses;
+}
+
 export default function SendFeedback({ athenaUrl, module }: { athenaUrl: string, module: ModuleMeta }) {
     const [exercise, setExercise] = useState<Exercise | null>(null);
+    const [isAllSubmissions, setIsAllSubmissions] = useState<boolean>(true);
     const [submission, setSubmission] = useState<Submission | null>(null);
     const [feedback, setFeedback] = useState<Feedback | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [response, setResponse] = useState<ModuleResponse | undefined>(undefined);
+    const [responses, setResponses] = useState<ModuleResponse[] | undefined>(undefined);
 
     return (
         <div className="bg-white rounded-md p-4 mt-8">
             <h1 className="text-2xl font-bold mb-4">Send Feedback to Athena</h1>
             <p className="text-gray-500 mb-4">
-                Send a single given feedback to Athena.
+                Send a single given feedback to Athena, or all feedback for the whole exercise.
                 This usually happens when someone gives feedback on the submission in the LMS.
                 The matching module for the exercise will receive the feedback at the function annotated with <code>@feedback_consumer</code>.
             </p>
             <ExerciseSelect exerciseType={module.type} exercise={exercise} onChange={setExercise} />
-            <SubmissionSelect exercise_id={exercise?.id} submission={submission} onChange={setSubmission} />
-            <FeedbackSelect exercise_id={exercise?.id} submission_id={submission?.id} feedback={feedback} onChange={setFeedback} />
-            <ModuleResponseView response={response} />
+            <SubmissionSelect
+                exercise_id={exercise?.id}
+                submission={submission} onChange={setSubmission}
+                isAllSubmissions={isAllSubmissions} setIsAllSubmissions={setIsAllSubmissions}
+            />
+            {
+                isAllSubmissions &&
+                <div className="bg-yellow-200 rounded-md p-2 mb-4 mt-2">
+                    <p className="text-yellow-800">
+                        You are about to send feedback for all submissions of this exercise.
+                        This will send a request for each submission.
+                    </p>
+                </div>
+            }
+            {
+                !isAllSubmissions &&
+                <FeedbackSelect exercise_id={exercise?.id} submission_id={submission?.id} feedback={feedback} onChange={setFeedback} />
+            }
+            {
+                responses?.map((response, i) => <ModuleResponseView key={i} response={response} />)
+            }
             <button
                 className="bg-blue-500 text-white rounded-md p-2 mt-4"
                 onClick={() => {
                     setLoading(true);
+                    if (isAllSubmissions) {
+                        sendAllExerciseFeedbacks(athenaUrl, module, exercise!)
+                            .then(setResponses)
+                            .finally(() => setLoading(false));
+                        return;
+                    }
                     sendFeedback(athenaUrl, module, exercise, submission, feedback)
-                        .then(setResponse)
+                        .then(resp => setResponses(resp ? [resp] : undefined))
                         .finally(() => setLoading(false));
                 }}
                 disabled={loading}

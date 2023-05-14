@@ -7,5 +7,9 @@ export default function handler(
     req: NextApiRequest,
     res: NextApiResponse<Feedback[]>
 ) {
-    res.status(200).json(getExampleFeedbacks());
+    let exerciseId: number | undefined = undefined;
+    if (req.query.exercise_id) {
+        exerciseId = parseInt(req.query.exercise_id as string);
+    }
+    res.status(200).json(getExampleFeedbacks(exerciseId));
 }
