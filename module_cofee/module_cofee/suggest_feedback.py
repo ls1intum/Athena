@@ -15,7 +15,10 @@ def get_exercise_feedbacks(exercise_id: int) -> List[Feedback]:
     Get all feedback on a given exercise.
     """
     with get_db() as db:
-        return db.query(DBTextFeedback).filter_by(exercise_id=exercise_id).all()
+        return [
+            f.to_schema()
+            for f in db.query(DBTextFeedback).filter_by(exercise_id=exercise_id).all()
+        ]
 
 
 def filter_feedbacks_by_block(feedbacks: List[Feedback], block: DBTextBlock) -> Iterable[Feedback]:
@@ -61,20 +64,19 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
     if block.distance_to(closest_block) >= DISTANCE_THRESHOLD:
         return []
     # Get all feedbacks on the closest block
-    suggested_feedback = filter_feedbacks_by_block(exercise_feedbacks, closest_block)
+    closest_block_feedback = filter_feedbacks_by_block(exercise_feedbacks, closest_block)
     # add new submission ID, link the feedback to the block and add meta information for debugging
-    suggested_feedback = [
-        f.copy(
-            submission_id=submission.id,
-            meta={
-                **f.meta,
-                "block_id": block.id,
-                "original_submission_id": submission.id,
-                "original_block_id": closest_block.id,
-            },
-        )
-        for f in suggested_feedback
-    ]
+    suggested_feedback: List[Feedback] = []
+    for f in closest_block_feedback:
+        copy = f.copy()
+        copy.submission_id = submission.id
+        copy.meta = {
+            **copy.meta,
+            "block_id": block.id,
+            "original_submission_id": submission.id,
+            "original_block_id": closest_block.id,
+        }
+        suggested_feedback.append(copy)
     return suggested_feedback
 
 
