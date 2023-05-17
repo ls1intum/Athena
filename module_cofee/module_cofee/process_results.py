@@ -8,7 +8,7 @@ from module_cofee.protobuf import cofee_pb2
 from module_cofee.models.db_text_block import DBTextBlock
 
 
-def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb2.Cluster]):
+def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb2.Cluster]): # type: ignore
     """Convert segments to text blocks and store them in the DB."""
     for segment in segments:
         cluster_id = None
@@ -18,7 +18,7 @@ def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb
                     cluster_id = cluster.treeId
                     break
         if cluster_id is None:
-            logger.warning(f"Segment {segment.id} has no cluster")
+            logger.warning("Segment %d has no cluster", segment.id)
         # store text block in DB
         with get_db() as db:
             model = DBTextBlock(
@@ -38,7 +38,7 @@ def float_matrix_to_bytes(floats: List[List[float]]) -> bytes:
     return struct.pack(f"{len(floats) * len(floats[0])}f", *sum(floats, []))
 
 
-def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster]):
+def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster]): # type: ignore
     """"""
     for cluster in clusters:
         distance_matrix: List[List[float]] = [[0.0 for _ in range(len(cluster.segments))] for _ in range(len(cluster.segments))]
@@ -56,9 +56,9 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
             db.commit()
 
 
-def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.Segment], exercise_id):
+def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.Segment], exercise_id): # type: ignore
     """Processes results coming back from the CoFee system via callbackUrl"""
-    logger.debug(f"Received {len(clusters)} clusters and {len(segments)} segments from CoFee")
+    logger.debug("Received %d clusters and %d segments from CoFee", len(clusters), len(segments))
     store_text_blocks(segments, clusters)
     store_text_clusters(exercise_id, clusters)
     logger.debug("Finished processing CoFee results")

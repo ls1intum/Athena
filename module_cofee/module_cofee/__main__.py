@@ -8,16 +8,16 @@ from athena.storage import store_feedback
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_cofee import adapter
+from module_cofee import adapter # type: ignore
 from module_cofee.link_feedback_to_block import link_feedback_to_block
 from module_cofee.suggest_feedback import suggest_feedback_for_submission
 
 
 @submission_selector
 def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
-    logger.info(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
+    logger.info("select_submission: Received %d submissions for exercise %d", len(submissions), exercise.id)
     for submission in submissions:
-        logger.info(f"- Submission {submission.id}")
+        logger.info("- Submission %d", submission.id)
     # TODO: select submission with highest information gain
     # For now, just return the first one:
     return submissions[0]
@@ -25,7 +25,7 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
-    logger.info(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
+    logger.info("receive_submissions: Received %d submissions for exercise %d", len(submissions), exercise.id)
     if len(submissions) < 10:
         # CoFee needs at least 10 submissions to work
         logger.info("receive_submissions: Not enough submissions, not sending to CoFee")
@@ -41,7 +41,10 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 @feedback_provider
 def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
-    logger.info(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
+    logger.info(
+        "suggest_feedback: Suggestions for submission %d of exercise %d were requested",
+        submission.id, exercise.id
+    )
     return suggest_feedback_for_submission(submission)
 
 

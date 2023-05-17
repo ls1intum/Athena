@@ -2,6 +2,7 @@ strictness: low
 
 ignore-paths:
   - docs
+  - module_cofee/module_cofee/protobuf
 
 pycodestyle:
   disable:

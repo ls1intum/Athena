@@ -16,9 +16,8 @@ try:
     from module_cofee.protobuf import cofee_pb2
 except ImportError as e:
     if "cofee_pb2" in str(e):
-        raise ImportError("Could not import protobuf module. Please run `make protobuf` to generate it.")
-    else:
-        raise e
+        raise ImportError("Could not import protobuf module. Please run `make protobuf` to generate it.") from e
+    raise e
 
 
 def get_cofee_url() -> str:
@@ -30,7 +29,7 @@ def get_cofee_url() -> str:
 
 def send_submissions(exercise: Exercise, submissions: List[Submission]):
     """Send submissions to old Athena-CoFee server."""
-    logger.info(f"Sending {len(submissions)} submissions to CoFee")
+    logger.info("Sending %d submissions to CoFee", len(submissions))
     resp = requests.post(
         f"{get_cofee_url()}/submit",
         json={
@@ -49,6 +48,7 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
             "Content-Type": "application/json",
             "Authorization": os.environ["COFEE_AUTH_TOKEN"],
         },
+        timeout=60,
     )
     resp.raise_for_status()
     logger.info("Submissions sent to CoFee")
@@ -60,7 +60,7 @@ async def save_athene_result(exercise_id: int, request: Request):
     Saves automatic textAssessments of Athena.
     """
     logger.info("Received callback from CoFee")
-    cofee_resp = cofee_pb2.AtheneResponse.FromString(await request.body())
+    cofee_resp = cofee_pb2.AtheneResponse.FromString(await request.body()) # type: ignore
     clusters = cofee_resp.clusters
     segments = cofee_resp.segments
     process_results(clusters, segments, exercise_id)

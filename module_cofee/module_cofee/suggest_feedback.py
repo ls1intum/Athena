@@ -1,4 +1,4 @@
-from typing import List, Iterable
+from typing import List, Iterable, cast
 
 from athena.database import get_db
 from athena.logger import logger
@@ -16,7 +16,7 @@ def get_exercise_feedbacks(exercise_id: int) -> List[Feedback]:
     """
     with get_db() as db:
         return [
-            f.to_schema()
+            cast(Feedback, f.to_schema())
             for f in db.query(DBTextFeedback).filter_by(exercise_id=exercise_id).all()
         ]
 
@@ -38,7 +38,7 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
     # Find the cluster that this block belongs to
     cluster = block.cluster
     if not cluster:
-        logger.warning(f"Block {block.id} has no cluster")
+        logger.warning("Block %d has no cluster", block.id)
         return []
     # If the cluster is disabled, there should be no suggestions
     if cluster.disabled:
@@ -53,7 +53,7 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
         if any(filter_feedbacks_by_block(exercise_feedbacks, block))
     ]
     if not blocks_with_feedback:
-        logger.info(f"No feedback available for cluster {cluster.id}")
+        logger.info("No feedback available for cluster %d", cluster.id)
         return []
     # Find the closest block to this block
     closest_block = min(
