@@ -1,5 +1,7 @@
 strictness: low
 
+autodetect: false
+
 ignore-paths:
   - docs
   - module_cofee/module_cofee/protobuf
