@@ -9,6 +9,7 @@ license = "MIT"
 python = "^3.10"
 athena = {path = "../athena", develop = true}
 protobuf = "^4.23.0"
+requests = "^2.30.0"
 
 [tool.poetry.scripts]
 module = "athena:run_module"
