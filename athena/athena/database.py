@@ -17,13 +17,11 @@ if is_sqlite:
 else:
     connect_args = {}
 
-Base = declarative_base()
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args=connect_args
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
 
 def create_tables(exercise_type: str):
