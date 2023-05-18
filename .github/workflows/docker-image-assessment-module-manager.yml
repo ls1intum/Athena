@@ -8,6 +8,10 @@ on:
         description: 'Branch name'
         required: true
         default: ''
+      push:
+        description: 'Push to GitHub Container Registry'
+        required: true
+        default: 'false'
 
 jobs:
   prepare:
@@ -39,5 +43,5 @@ jobs:
         with:
           context: .
           file: ./assessment_module_manager/Dockerfile
-          push: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.base.ref == 'develop' }}
+          push: ${{ github.event.pull_request.base.ref == 'develop' || github.event.inputs.push == 'true' }}
           tags: ghcr.io/${{ github.repository_owner }}/athena_assessment_module_manager:latest
