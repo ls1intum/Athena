@@ -5,4 +5,3 @@ version: '3.8'
 services:
   athena_assessment_module_manager:
     image: ghcr.io/pal03377/athena_assessment_module_manager:latest
-    build: .

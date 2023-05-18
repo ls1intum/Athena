@@ -1,0 +1,7 @@
+version: '3.8'
+
+# local module configuration
+
+services:
+  main:
+    image: ghcr.io/pal03377/athena_module_example:latest
