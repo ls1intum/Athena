@@ -4,82 +4,64 @@ Helper script to start all docker-compose files
 for the assessment module manager and all assessment modules.
 """
 
+import argparse
 import os
 import subprocess
-import sys
-from logging import getLogger
-from pathlib import Path
+import glob
 
-logger = getLogger(__name__)
+def get_docker_compose_files(production_mode, modules):
+    # Get the docker files for the main and the modules
+    compose_files = []
 
-
-def get_module_folders(args):
-    """
-    Get all module folders from the command line arguments.
-    """
-    if not args:
-        return [
-            dir_name
-            for dir_name in os.listdir()
-            if os.path.isdir(dir_name) and dir_name.startswith('module_')
-        ]
-    return args
-
-
-def filter_valid_modules(modules):
-    """
-    Filter out all modules that are not valid.
-    """
-    valid_modules = []
-    for module in modules:
-        if os.path.isdir(module) and os.path.isfile(os.path.join(module, "docker-compose.yml")):
-            valid_modules.append(module)
+    # add assessment module manager + module docker-compose files
+    for folder in ["assessment_module_manager"] + modules:
+        module_files = [f'./{folder}/docker-compose.yml']
+        if not production_mode:
+            module_files.append(f'./{folder}/docker-compose.override.yml')
         else:
-            logger.warning("Skipping module '%s' because it is not a valid module folder", module)
-    return valid_modules
+            module_files.append(f'./{folder}/docker-compose.prod.yml')
+        compose_files.append(module_files)
 
+    # Return compose files
+    return compose_files
 
-def build_docker_compose_files(compose_files):
-    """
-    Build all the docker-compose files.
-    """
-    subprocess.run(["docker-compose"] + compose_files + ["build"], check=True)
+def build_and_start_docker_compose_files(compose_files, env_file_path, production_mode):
+    # Start docker-compose for each set of files
+    for files in compose_files:
+        # Change to directory of the compose files
+        directory = os.path.dirname(files[0])
 
+        # Set env-file path
+        env_file = os.path.join(env_file_path, directory, '.env')
 
-def start_docker_compose_files(compose_files, env_files):
-    """
-    Start all the docker-compose files.
-    """
-    processes = []
-    for compose_file, env_file in zip(compose_files, env_files):
-        with subprocess.Popen(["docker-compose", "-f", compose_file, "--env-file", env_file, "up"]) as process:
-            processes.append(process)
+        # Build docker-compose command
+        cmd = ['docker-compose'] + ['-f ' + file for file in files]
 
-    # Wait for all processes to complete
-    for process in processes:
-        process.wait()
+        # Run the build command in non-production mode
+        if not production_mode:
+            build_cmd = cmd + ['build']
+            subprocess.run(' '.join(build_cmd), shell=True)
 
+        # Run the up command
+        up_cmd = cmd + ['--env-file', env_file, 'up']
+
+        subprocess.run(' '.join(up_cmd), shell=True)
 
 def main():
-    """
-    Actually start the docker-compose files
-    """
-    modules = get_module_folders(sys.argv[1:])
-    valid_modules = filter_valid_modules(modules)
+    # Setup argument parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--production', action='store_true', help='Run in production mode')
+    parser.add_argument('--env_file_path', default='.', help='Path to .env file dir')
+    parser.add_argument('--modules', nargs='*', default=glob.glob('module_*'), help='Modules to run')
 
-    compose_files = ["docker-compose.yml"]
-    compose_files += [str(Path(module, "docker-compose.yml")) for module in valid_modules]
-    env_files = [str(Path("assessment_module_manager") / ".env")]
-    env_files += [str(Path(module, ".env")) for module in valid_modules]
+    # Parse arguments
+    args = parser.parse_args()
 
-    logger.info("Building docker-compose file for assessment module manager...")
-    for module, compose_file in zip(valid_modules, compose_files):
-        logger.info("Building docker-compose.yml for '%s'...", module)
-        build_docker_compose_files(["-f", compose_file])
+    # Get docker compose files
+    compose_files = get_docker_compose_files(args.production, args.modules)
 
-    logger.info("Starting docker-compose files...")
-    start_docker_compose_files(compose_files, env_files)
+    # Build and start docker compose files
+    build_and_start_docker_compose_files(compose_files, args.env_file_path, args.production)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
