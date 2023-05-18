@@ -2,6 +2,11 @@ name: Docker Image for Assessment Module Manager
 
 on:
   pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
   workflow_dispatch:
     inputs:
       branch:

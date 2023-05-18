@@ -2,6 +2,11 @@ name: Docker Images for Modules
 
 on:
   pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
   workflow_dispatch:
     inputs:
       branch:
