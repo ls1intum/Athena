@@ -1,4 +1,4 @@
-name: Build and Push Docker Images for Modules
+name: Build and Push Docker Image for Assessment Module Manager
 
 on:
   push:
@@ -17,18 +17,9 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch }}
 
-      - name: Set Matrix
-        id: set-matrix
-        run: |
-          MODULE_NAMES=$(ls -d module_* | jq -R -s -c 'split("\n")[:-1]')
-          echo "matrix=${MODULE_NAMES}" >> $GITHUB_OUTPUT
-
   build:
     needs: prepare
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        module: ${{fromJson(needs.prepare.outputs.matrix)}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,7 +35,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile
-          build-args: MODULE_NAME=${{ matrix.module }}
+          file: ./assessment_module_manager/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.module }}:latest
+          tags: ghcr.io/${{ github.repository_owner }}/athena_assessment_module_manager:latest
