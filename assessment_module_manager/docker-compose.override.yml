@@ -5,7 +5,7 @@ version: '3.8'
 services:
   athena_assessment_module_manager:
     build:
-      context: .
+      context: ..
       dockerfile: ./assessment_module_manager/Dockerfile
     ports:
       - "5000:5000"

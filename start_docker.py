@@ -42,7 +42,7 @@ def build_and_start_docker_compose_files(compose_files, env_file_path, productio
             logger.info(f'Building docker containers using command: {" ".join(build_cmd)}')
             subprocess.run(' '.join(build_cmd), shell=True)
 
-        up_cmd = cmd + ['--env-file', env_file, 'up']
+        up_cmd = cmd + ['--env-file', env_file, 'up', '-d']
         logger.info(f'Starting docker containers using command: {" ".join(up_cmd)}')
         subprocess.run(' '.join(up_cmd), shell=True)
     logger.info('Docker-compose files have been built and started.')
