@@ -4,7 +4,7 @@ from typing import List, Iterable
 from athena.database import get_db
 from athena.logger import logger
 from module_cofee.models.db_text_cluster import DBTextCluster
-from module_cofee.protobuf import cofee_pb2
+from module_cofee.protobuf import cofee_pb2  # type: ignore
 from module_cofee.models.db_text_block import DBTextBlock
 
 
