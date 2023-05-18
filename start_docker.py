@@ -39,12 +39,12 @@ def build_and_start_docker_compose_files(compose_files, env_file_path, productio
         # run the build in non-production mode only
         if not production_mode:
             build_cmd = cmd + ['build']
-            logger.info(f'Building docker containers using command: {" ".join(build_cmd)}')
-            subprocess.run(' '.join(build_cmd), shell=True)
+            logger.info('Building docker containers using command: %s', " ".join(build_cmd))
+            subprocess.run(' '.join(build_cmd), shell=True, check=True)
 
         up_cmd = cmd + ['--env-file', env_file, 'up', '-d']
-        logger.info(f'Starting docker containers using command: {" ".join(up_cmd)}')
-        subprocess.run(' '.join(up_cmd), shell=True)
+        logger.info('Starting docker containers using command: %s', " ".join(up_cmd))
+        subprocess.run(' '.join(up_cmd), shell=True, check=True)
     logger.info('Docker-compose files have been built and started.')
 
 def main():
@@ -60,6 +60,7 @@ def main():
     compose_files = get_docker_compose_files(args.production, args.modules)
 
     build_and_start_docker_compose_files(compose_files, args.env_file_path, args.production)
+
 
 if __name__ == '__main__':
     main()
