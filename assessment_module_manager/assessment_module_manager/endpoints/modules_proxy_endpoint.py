@@ -1,6 +1,7 @@
 from typing import Dict, Any
 
-from fastapi import HTTPException
+from athena.authenticate import api_key_header, verify_secret
+from fastapi import HTTPException, Depends
 from starlette.responses import JSONResponse
 
 from assessment_module_manager.app import app
@@ -15,6 +16,10 @@ from athena.schemas import ExerciseType
         400: {
             "description": "Module is not of the requested type",
         },
+        403: {
+            "description": "API secret is invalid - set the environment variable SECRET and the X-API-Secret header "
+                           "to the same value",
+        },
         404: {
             "description": "Module is not found (not listed in modules.ini)",
         },
@@ -25,13 +30,15 @@ from athena.schemas import ExerciseType
     response_model=ModuleResponse[Any],
 )
 async def proxy_to_module(
-    module_type: ExerciseType, module_name: AvailableModuleNames, path: str, data: Dict[Any, Any]
+    module_type: ExerciseType, module_name: AvailableModuleNames, path: str, data: Dict[Any, Any],
+    secret=Depends(api_key_header)
 ) -> JSONResponse:
     """
     This endpoint is called by the LMS to proxy requests to modules.
     See the module documentation for the possible choices for paths.
     Example module documentation on this: [http://localhost:5001/docs](http://localhost:5001/docs).
     """
+    verify_secret(secret)
     module = await find_module_by_name(module_name)
     if module is None:
         raise HTTPException(status_code=404, detail=f"Module {module_name} not found. Is it listed in modules.ini?")

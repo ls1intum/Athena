@@ -1,8 +1,10 @@
 import inspect
-from functools import wraps
 from typing import TypeVar, Callable, List, Annotated
 
+from fastapi import Depends
+
 from athena.app import app
+from athena.authenticate import api_key_header, verify_secret
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
 from athena.storage import store_feedback, get_stored_submissions, store_exercise, store_submissions
@@ -11,16 +13,13 @@ E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
 F = TypeVar('F', bound=Feedback)
 
-def wraps_except_annotations(func: Callable) -> Callable:
-    """
-    This is a replacement for functools.wraps that ignores annotations.
-    This is necessary when the signature of the wrapper function is different from the signature of the wrapped function
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    wrapper.__signature__ = inspect.signature(func)
-    return wrapper
+
+module_responses = {
+    403: {
+        "description": "API secret is invalid - set the environment variable SECRET and the X-API-Secret header "
+                       "to the same value",
+    }
+}
 
 
 def submission_selector(func: Callable[[E, List[S]], S]):
@@ -32,9 +31,12 @@ def submission_selector(func: Callable[[E, List[S]], S]):
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
 
-    @app.post("/select_submission")
-    @wraps_except_annotations
-    def wrapper(exercise: Annotated[E, exercise_type], submission_ids: List[int]) -> int:
+    @app.post("/select_submission", responses=module_responses)
+    def wrapper(
+            exercise: Annotated[E, exercise_type],
+            submission_ids: List[int],
+            secret=Depends(api_key_header)) -> int:
+        verify_secret(secret)
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
 
@@ -62,9 +64,15 @@ def submissions_consumer(func: Callable[[E, List[S]], None]):
     The submissions consumer is usually called whenever the deadline for an exercise is reached.
     """
 
-    @app.post("/submissions")
-    @wraps(func)
-    def wrapper(exercise, submissions):
+    exercise_type = inspect.signature(func).parameters["exercise"].annotation
+    submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
+
+    @app.post("/submissions", responses=module_responses)
+    def wrapper(
+            exercise: Annotated[E, exercise_type],
+            submissions: List[Annotated[S, submission_type]],
+            secret=Depends(api_key_header)):
+        verify_secret(secret)
         store_exercise(exercise)
         store_submissions(submissions)
         return func(exercise, submissions)
@@ -78,9 +86,17 @@ def feedback_consumer(func: Callable[[E, S, F], None]):
     The feedback consumer is usually called whenever the LMS gets feedback from a tutor.
     """
 
-    @app.post("/feedback")
-    @wraps(func)
-    def wrapper(exercise, submission, feedback):
+    exercise_type = inspect.signature(func).parameters["exercise"].annotation
+    submission_type = inspect.signature(func).parameters["submission"].annotation
+    feedback_type = inspect.signature(func).parameters["feedback"].annotation
+
+    @app.post("/feedback", responses=module_responses)
+    def wrapper(
+            exercise: Annotated[E, exercise_type],
+            submission: Annotated[S, submission_type],
+            feedback: Annotated[F, feedback_type],
+            secret=Depends(api_key_header)):
+        verify_secret(secret)
         store_feedback(feedback)
         return func(exercise, submission, feedback)
 
@@ -92,9 +108,16 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
     Provide feedback to the Assessment Module Manager.
     The feedback provider is usually called whenever the tutor requests feedback for a submission in the LMS.
     """
-    @app.post("/feedback_suggestions")
-    @wraps(func)
-    def wrapper(exercise, submission):
+
+    exercise_type = inspect.signature(func).parameters["exercise"].annotation
+    submission_type = inspect.signature(func).parameters["submission"].annotation
+
+    @app.post("/feedback_suggestions", responses=module_responses)
+    def wrapper(
+            exercise: Annotated[E, exercise_type],
+            submission: Annotated[S, submission_type],
+            secret=Depends(api_key_header)):
+        verify_secret(secret)
         return func(exercise, submission)
 
     return wrapper
