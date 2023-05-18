@@ -21,7 +21,7 @@ jobs:
         id: set-matrix
         run: |
           MODULE_NAMES=$(ls -d module_* | jq -R -s -c 'split("\n")[:-1]')
-          echo "module=${MODULE_NAMES}" >> $GITHUB_OUTPUT
+          echo "matrix=${MODULE_NAMES}" >> $GITHUB_OUTPUT
 
   build:
     needs: prepare
