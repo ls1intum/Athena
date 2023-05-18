@@ -5,7 +5,6 @@ version: '3.8'
 services:
   main:
     tty: true
-    hostname: ${MODULE_NAME}
     networks:
       - athena_network
 

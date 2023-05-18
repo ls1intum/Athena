@@ -4,6 +4,7 @@ version: '3.8'
 
 services:
   main:
+    hostname: ${MODULE_NAME}
     build:
       context: ..
       dockerfile: Dockerfile

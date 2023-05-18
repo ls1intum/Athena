@@ -4,4 +4,5 @@ version: '3.8'
 
 services:
   main:
+    hostname: module_example
     image: ghcr.io/pal03377/athena_module_example:latest
