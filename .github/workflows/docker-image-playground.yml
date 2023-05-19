@@ -9,10 +9,6 @@ on:
       - develop
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch name'
-        required: true
-        default: ''
       push:
         description: 'Push to GitHub Container Registry'
         required: true
@@ -26,8 +22,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.inputs.branch }}
 
   build:
     needs: prepare
