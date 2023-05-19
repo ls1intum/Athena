@@ -1,3 +1,0 @@
-athenetest1-03.ase.cit.tum.de { # TODO: change URL
-  reverse_proxy athena_assessment_module_manager:5000
-}

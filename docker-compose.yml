@@ -1,0 +1,25 @@
+version: '3.8'
+
+# Development version of docker-compose.yml
+
+services:
+  assessment_module_manager:
+    env_file:
+      - ./assessment_module_manager/.env
+    build:
+      context: .
+      dockerfile: ./assessment_module_manager/Dockerfile
+    ports:
+      - "5000:5000"
+
+  module_example:
+    hostname: module_example
+    env_file:
+      - ./module_example/.env
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - MODULE_NAME=module_example
+    ports:
+      - "5001:5001"
