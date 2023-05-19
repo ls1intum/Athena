@@ -1,7 +1,7 @@
 import configparser
 from dataclasses import dataclass
 
-from athena import ExerciseType
+from .schemas.exercise_type import ExerciseType
 
 
 @dataclass

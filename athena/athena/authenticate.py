@@ -6,7 +6,7 @@ from typing import Callable
 from fastapi import HTTPException, Depends
 from fastapi.security import APIKeyHeader
 
-from assessment_module_manager import env
+from athena import env
 from athena.logger import logger
 
 SECRET = os.getenv("SECRET")
