@@ -18,8 +18,7 @@ def verify_secret(secret: str):
     if secret != SECRET:
         if env.PRODUCTION:
             raise HTTPException(status_code=401, detail="Invalid API secret.")
-        else:
-            logger.warning("DEBUG MODE: Ignoring invalid API secret.")
+        logger.warning("DEBUG MODE: Ignoring invalid API secret.")
 
 
 def authenticated(func: Callable) -> Callable:
