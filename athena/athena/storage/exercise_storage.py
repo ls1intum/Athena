@@ -21,12 +21,11 @@ def get_stored_exercises(exercise_cls: Type[Exercise], only_ids: Optional[List[i
 
 def get_stored_exercise_meta(exercise: E) -> Optional[dict]:
     """Returns the stored metadata associated with the exercise."""
-    try: 
-        stored_exercise = next(get_stored_exercises(exercise.__class__, [exercise.id]))
+    db_exercise_cls = exercise.__class__.get_model_class()
+    with get_db() as db:
+        stored_exercise = db.query(db_exercise_cls).filter_by(id=exercise.id).first()
         if stored_exercise is not None:
-            return stored_exercise.meta
-    except StopIteration:
-        pass
+            return stored_exercise.to_schema().meta
     return None
 
 
