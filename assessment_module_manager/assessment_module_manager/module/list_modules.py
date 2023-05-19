@@ -12,8 +12,7 @@ def list_modules() -> List[Module]:
         Module(
             name=module,
             url=modules_config[module]["url"],
-            type=modules_config[module]["type"],
-            secret=modules_config[module]["secret"]
+            type=modules_config[module]["type"]
         )
         for module in modules_config.sections()
     ]
