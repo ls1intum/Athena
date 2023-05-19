@@ -20,6 +20,27 @@ module_responses = {
 }
 
 
+def submissions_consumer(func: Callable[[E, List[S]], None]):
+    """
+    Receive submissions from the Assessment Module Manager and automatically store them in the database.
+    The submissions consumer is usually called whenever the deadline for an exercise is reached.
+    """
+
+    exercise_type = inspect.signature(func).parameters["exercise"].annotation
+    submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
+
+    @app.post("/submissions", responses=module_responses)
+    @authenticated
+    def wrapper(
+            exercise: exercise_type,
+            submissions: List[submission_type]):
+        store_exercise(exercise)
+        store_submissions(submissions)
+        return func(exercise, submissions)
+
+    return wrapper
+
+
 def submission_selector(func: Callable[[E, List[S]], S]):
     """
     Receive an exercise and some (not necessarily all!) submissions from the Assessment Module Manager and
@@ -32,7 +53,7 @@ def submission_selector(func: Callable[[E, List[S]], S]):
     @app.post("/select_submission", responses=module_responses)
     @authenticated
     def wrapper(
-            exercise: Annotated[E, exercise_type],
+            exercise: exercise_type,
             submission_ids: List[int]) -> int:
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
@@ -55,27 +76,6 @@ def submission_selector(func: Callable[[E, List[S]], S]):
     return wrapper
 
 
-def submissions_consumer(func: Callable[[E, List[S]], None]):
-    """
-    Receive submissions from the Assessment Module Manager and automatically store them in the database.
-    The submissions consumer is usually called whenever the deadline for an exercise is reached.
-    """
-
-    exercise_type = inspect.signature(func).parameters["exercise"].annotation
-    submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
-
-    @app.post("/submissions", responses=module_responses)
-    @authenticated
-    def wrapper(
-            exercise: Annotated[E, exercise_type],
-            submissions: List[Annotated[S, submission_type]]):
-        store_exercise(exercise)
-        store_submissions(submissions)
-        return func(exercise, submissions)
-
-    return wrapper
-
-
 def feedback_consumer(func: Callable[[E, S, F], None]):
     """
     Receive feedback from the Assessment Module Manager and automatically store it in the database.
@@ -89,9 +89,9 @@ def feedback_consumer(func: Callable[[E, S, F], None]):
     @app.post("/feedback", responses=module_responses)
     @authenticated
     def wrapper(
-            exercise: Annotated[E, exercise_type],
-            submission: Annotated[S, submission_type],
-            feedback: Annotated[F, feedback_type]):
+            exercise: exercise_type,
+            submission: submission_type,
+            feedback: feedback_type):
         store_feedback(feedback)
         return func(exercise, submission, feedback)
 
@@ -110,8 +110,8 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
     @app.post("/feedback_suggestions", responses=module_responses)
     @authenticated
     def wrapper(
-            exercise: Annotated[E, exercise_type],
-            submission: Annotated[S, submission_type]):
+            exercise: exercise_type,
+            submission: submission_type):
         return func(exercise, submission)
 
     return wrapper

@@ -37,7 +37,9 @@ def authenticated(func: Callable) -> Callable:
     @wraps(func)
     async def wrapper(*args, secret: str = Depends(api_key_header), **kwargs):
         verify_secret(secret)
-        return await func(*args, **kwargs)
+        if inspect.iscoroutinefunction(func):
+            return await func(*args, **kwargs)
+        return func(*args, **kwargs)
 
     # Update the function signature with the 'secret' parameter, but otherwise keep the annotations intact
     sig = inspect.signature(func)
