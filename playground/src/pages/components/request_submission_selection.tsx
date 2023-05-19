@@ -3,7 +3,7 @@ import { Exercise } from "@/pages/model/exercise";
 import ExerciseSelect from "@/pages/components/exercise_select";
 import ModuleResponse from "@/pages/model/module_response";
 import ModuleResponseView from "@/pages/components/module_response_view";
-import Submission from "@/pages/model/submission";
+import { Submission } from "@/pages/model/submission";
 import {ModuleMeta} from "@/pages/model/health_response";
 
 async function requestSubmissionSelection(athenaUrl: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {

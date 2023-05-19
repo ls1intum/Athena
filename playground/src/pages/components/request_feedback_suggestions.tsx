@@ -1,5 +1,5 @@
 import {useState} from "react";
-import Submission from "@/pages/model/submission";
+import { Submission } from "@/pages/model/submission";
 import { Exercise } from "@/pages/model/exercise";
 import ExerciseSelect from "@/pages/components/exercise_select";
 import SubmissionSelect from "@/pages/components/submission_select";
