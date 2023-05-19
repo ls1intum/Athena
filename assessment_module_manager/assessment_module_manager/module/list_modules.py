@@ -1,7 +1,7 @@
 import configparser
 from typing import List
 
-from .module import Module
+from athena.module import Module
 
 
 def list_modules() -> List[Module]:

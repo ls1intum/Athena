@@ -3,15 +3,12 @@ import os
 from functools import wraps
 from typing import Callable
 
-from dotenv import load_dotenv
 from fastapi import HTTPException, Depends
 from fastapi.security import APIKeyHeader
 
 from athena.logger import logger
 
-load_dotenv(".env")
 SECRET = os.getenv("SECRET")
-DEBUG = os.environ["PRODUCTION"] == "0"
 
 api_key_header = APIKeyHeader(name='X-API-Secret', auto_error=False)
 

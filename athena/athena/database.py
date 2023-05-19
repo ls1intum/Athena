@@ -5,20 +5,21 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///../data/data.sqlite")
+from athena import env
+
 
 # SQLite specific configuration
-is_sqlite = SQLALCHEMY_DATABASE_URL.startswith("sqlite:///")
+is_sqlite = env.DATABASE_URL.startswith("sqlite:///")
 if is_sqlite:
     connect_args = {"check_same_thread": False}
     # create the data directory if it does not exist
-    data_dir = os.path.dirname(SQLALCHEMY_DATABASE_URL[10:])
+    data_dir = os.path.dirname(env.DATABASE_URL[10:])
     os.makedirs(data_dir, exist_ok=True)
 else:
     connect_args = {}
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args=connect_args
+    env.DATABASE_URL, connect_args=connect_args
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
