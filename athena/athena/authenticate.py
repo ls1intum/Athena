@@ -6,6 +6,7 @@ from typing import Callable
 from fastapi import HTTPException, Depends
 from fastapi.security import APIKeyHeader
 
+from assessment_module_manager import env
 from athena.logger import logger
 
 SECRET = os.getenv("SECRET")
@@ -15,10 +16,10 @@ api_key_header = APIKeyHeader(name='X-API-Secret', auto_error=False)
 
 def verify_secret(secret: str):
     if secret != SECRET:
-        if DEBUG:
-            logger.warning("DEBUG MODE: Ignoring invalid API secret.")
-        else:
+        if env.PRODUCTION:
             raise HTTPException(status_code=401, detail="Invalid API secret.")
+        else:
+            logger.warning("DEBUG MODE: Ignoring invalid API secret.")
 
 
 def authenticated(func: Callable) -> Callable:

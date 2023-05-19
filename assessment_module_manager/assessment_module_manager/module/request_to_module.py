@@ -5,10 +5,10 @@ import httpx
 from fastapi import HTTPException
 from pydantic.generics import GenericModel
 
-from athena.module import Module
+from .module import Module
 from .available_module_enum import AvailableModuleNames
 from .list_modules import list_modules
-from .. import env
+from assessment_module_manager import env
 
 T = TypeVar('T')
 class ModuleResponse(GenericModel, Generic[T]):
