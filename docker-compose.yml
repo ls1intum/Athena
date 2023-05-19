@@ -11,6 +11,7 @@ services:
       - "5000:5000"
 
   playground:
+    hostname: playground
     build:
       context: ./playground
       dockerfile: Dockerfile
