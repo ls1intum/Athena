@@ -5,7 +5,7 @@ from typing import TypeVar, Callable, List, Annotated
 from athena.app import app
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
-from athena.storage import store_feedback, get_stored_submissions, store_exercise, store_submissions
+from athena.storage import *
 
 E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
@@ -38,6 +38,8 @@ def submission_selector(func: Callable[[E, List[S]], S]):
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
 
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+
         # Get the full submission objects
         submissions = list(get_stored_submissions(submission_type, exercise.id, submission_ids))
         if len(submission_ids) != len(submissions):
@@ -46,8 +48,13 @@ def submission_selector(func: Callable[[E, List[S]], S]):
         if not submissions:
             # Nothing to select from
             return -1
+
         # Select the submission
         submission = func(exercise, submissions)
+
+        # Store exercise and submissions with potentially changed metadata
+        store_exercise(exercise)
+        store_submissions(submissions)
 
         if submission is None:
             return -1
@@ -65,9 +72,22 @@ def submissions_consumer(func: Callable[[E, List[S]], None]):
     @app.post("/submissions")
     @wraps(func)
     def wrapper(exercise, submissions):
+        # Retrieve existing metadata for the exercise and submissions
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submissions_dict = {s.id: s for s in submissions}
+        if submissions:
+            stored_submissions = get_stored_submissions(submissions[0].__class__, exercise.id, [s.id for s in submissions])
+            for stored_submission in stored_submissions:
+                if stored_submission.id in submissions_dict:
+                    submissions_dict[stored_submission.id].meta.update(stored_submission.meta)
+        submissions = list(submissions_dict.values())
+
+        # Call the actual consumer
+        func(exercise, submissions)
+
+        # Store exercise and submissions (with potentially changed metadata)
         store_exercise(exercise)
         store_submissions(submissions)
-        return func(exercise, submissions)
 
     return wrapper
 
@@ -81,8 +101,18 @@ def feedback_consumer(func: Callable[[E, S, F], None]):
     @app.post("/feedback")
     @wraps(func)
     def wrapper(exercise, submission, feedback):
+        # Retrieve existing metadata for the exercise, submission and feedback
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submission.meta.update(get_stored_submission_meta(submission) or {})
+        feedback.meta.update(get_stored_feedback_meta(feedback) or {})
+
+        # Call the actual consumer
+        func(exercise, submission, feedback)
+
+        # Store feedback, exercise, and submission with potentially changed metadata
         store_feedback(feedback)
-        return func(exercise, submission, feedback)
+        store_exercise(exercise)
+        store_submissions([submission])
 
     return wrapper
 
@@ -95,6 +125,17 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
     @app.post("/feedback_suggestions")
     @wraps(func)
     def wrapper(exercise, submission):
-        return func(exercise, submission)
+        # Retrieve existing metadata for the exercise, submission and feedback
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submission.meta.update(get_stored_submission_meta(submission) or {})
 
+        # Call the actual provider
+        feedbacks = func(exercise, submission)
+
+        # Store exercise and submission potentially changed metadata
+        store_feedback_suggestions(feedbacks)
+        store_exercise(exercise)
+        store_submissions([submission])
+
+        return feedbacks
     return wrapper

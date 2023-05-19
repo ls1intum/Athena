@@ -26,6 +26,18 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
         for file in zip_content.namelist():
             print(f"  - {file}")
     # Do something with the submissions
+    print("Doing stuff")
+
+    # Add data to exercise
+    exercise.meta["some_data"] = "some_value"
+    print(f"- Exercise meta: {exercise.meta}")
+
+    # Add data to submission
+    for submission in submissions:
+        submission.meta["some_data"] = "some_value"
+        print(f"- Submission {submission.id} meta: {submission.meta}")
+    
+    # Automatically stores the exercise and submissions together with the added metadata
 
 
 @feedback_consumer
@@ -34,6 +46,11 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     print(f"process_feedback: Feedback: {feedback}")
     # Do something with the feedback
 
+    # Add data to feedback
+    feedback.meta["some_data"] = "some_value"
+
+    # Automatically stores the feedback together with the added metadata
+
 
 @feedback_provider
 def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
@@ -41,7 +58,6 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     # Do something with the submission and return a list of feedback
     return [
         Feedback(
-            id=10,
             exercise_id=exercise.id,
             submission_id=submission.id,
             detail_text="There is something wrong here.",
