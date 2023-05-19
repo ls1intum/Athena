@@ -54,10 +54,6 @@ def submission_selector(func: Callable[[E, List[S]], S]):
         # Select the submission
         submission = func(exercise, submissions)
 
-        # Store exercise and submissions with potentially changed metadata
-        store_exercise(exercise)
-        store_submissions(submissions)
-
         if submission is None:
             return -1
         return submission.id
@@ -67,7 +63,7 @@ def submission_selector(func: Callable[[E, List[S]], S]):
 
 def submissions_consumer(func: Callable[[E, List[S]], None]):
     """
-    Receive submissions from the Assessment Module Manager and automatically store them in the database.
+    Receive submissions from the Assessment Module Manager.
     The submissions consumer is usually called whenever the deadline for an exercise is reached.
     """
 
@@ -87,16 +83,12 @@ def submissions_consumer(func: Callable[[E, List[S]], None]):
         # Call the actual consumer
         func(exercise, submissions)
 
-        # Store exercise and submissions (with potentially changed metadata)
-        store_exercise(exercise)
-        store_submissions(submissions)
-
     return wrapper
 
 
 def feedback_consumer(func: Callable[[E, S, F], None]):
     """
-    Receive feedback from the Assessment Module Manager and automatically store it in the database.
+    Receive feedback from the Assessment Module Manager.
     The feedback consumer is usually called whenever the LMS gets feedback from a tutor.
     """
 
@@ -108,13 +100,10 @@ def feedback_consumer(func: Callable[[E, S, F], None]):
         submission.meta.update(get_stored_submission_meta(submission) or {})
         feedback.meta.update(get_stored_feedback_meta(feedback) or {})
 
+        store_feedback(feedback)
+
         # Call the actual consumer
         func(exercise, submission, feedback)
-
-        # Store feedback, exercise, and submission with potentially changed metadata
-        store_feedback(feedback)
-        store_exercise(exercise)
-        store_submissions([submission])
 
     return wrapper
 
@@ -131,13 +120,12 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         submission.meta.update(get_stored_submission_meta(submission) or {})
 
-        # Call the actual provider
-        feedbacks = func(exercise, submission)
-
-        # Store exercise and submission potentially changed metadata
-        store_feedback_suggestions(feedbacks)
         store_exercise(exercise)
         store_submissions([submission])
+
+        # Call the actual provider
+        feedbacks = func(exercise, submission)
+        store_feedback_suggestions(feedbacks)
 
         return feedbacks
     return wrapper
