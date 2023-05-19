@@ -4,8 +4,9 @@ FROM node:18.16.0-alpine
 WORKDIR /app
 
 # install packages
-COPY package*.json ./
-RUN npm install --omit=dev
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --omit=dev
 
 # Copy the local code to the container's workspace
 COPY . ./

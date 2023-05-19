@@ -46,7 +46,7 @@ jobs:
       - name: Build (and push) Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: ./playground/Dockerfile
+          context: ./playground
+          file: ./Dockerfile
           push: ${{ github.event.pull_request.base.ref == 'develop' || github.event.inputs.push == 'true' }}
           tags: ghcr.io/${{ github.repository_owner }}/athena_playground:latest
