@@ -16,6 +16,9 @@ services:
       - ${ATHENA_ENV_DIR}/assessment_module_manager.env
     image: ghcr.io/pal03377/athena_assessment_module_manager:latest
 
+  playground:
+    image: ghcr.io/pal03377/athena_playground:latest
+
   module_example:
     hostname: module_example
     env_file:

@@ -4,21 +4,24 @@ version: '3.8'
 
 services:
   assessment_module_manager:
-    env_file:
-      - ./assessment_module_manager/.env
     build:
       context: .
       dockerfile: ./assessment_module_manager/Dockerfile
     ports:
       - "5000:5000"
 
+  playground:
+    build:
+      context: ./playground
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+
   module_example:
     hostname: module_example
-    env_file:
-      - ./module_example/.env
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
       args:
         - MODULE_NAME=module_example
     ports:
