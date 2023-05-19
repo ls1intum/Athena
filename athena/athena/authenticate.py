@@ -41,9 +41,9 @@ def authenticated(func: Callable) -> Callable:
 
     # Update the function signature with the 'secret' parameter, but otherwise keep the annotations intact
     sig = inspect.signature(func)
-    # params = list(sig.parameters.values())
-    # params.append(inspect.Parameter('secret', inspect.Parameter.KEYWORD_ONLY, default=Depends(api_key_header)))
-    # new_sig = sig.replace(parameters=params)
-    wrapper.__signature__ = sig  # new_sig
+    params = list(sig.parameters.values())
+    params.append(inspect.Parameter('secret', inspect.Parameter.POSITIONAL_OR_KEYWORD, default=Depends(api_key_header)))
+    new_sig = sig.replace(parameters=params)
+    wrapper.__signature__ = new_sig
 
     return wrapper
