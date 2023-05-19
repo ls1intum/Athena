@@ -1,5 +1,5 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
-import type Feedback from "@/pages/model/feedback";
+import type Feedback from "@/model/feedback";
 import {getExampleFeedbacks} from "@/pages/api/get_examples";
 
 
