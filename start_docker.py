@@ -25,6 +25,10 @@ def get_docker_compose_files(production_mode, modules):
             module_files.append(f'./{folder}/docker-compose.prod.yml')
         compose_files.append(module_files)
 
+    if production_mode:
+        # in production, we also need to start the nginx container
+        compose_files.append(['./nginx/docker-compose.yml'])
+
     logger.info('Docker-compose files collected.')
     return compose_files
 
