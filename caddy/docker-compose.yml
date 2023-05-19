@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  nginx:
-    image: nginx:1
+  caddy:
+    image: caddy:2
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./Caddyfile:/etc/caddy/Caddyfile
     networks:
       - athena_network
 
