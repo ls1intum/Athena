@@ -1,13 +1,12 @@
 from typing import Dict, Any
 
-from athena.authenticate import api_key_header, verify_secret
-from fastapi import HTTPException, Depends
-from starlette.responses import JSONResponse
-
 from assessment_module_manager.app import app
 from assessment_module_manager.module import ModuleResponse, AvailableModuleNames, find_module_by_name, \
     request_to_module
+from athena.authenticate import authenticated
 from athena.schemas import ExerciseType
+from fastapi import HTTPException
+from starlette.responses import JSONResponse
 
 
 @app.post(
@@ -29,16 +28,15 @@ from athena.schemas import ExerciseType
     },
     response_model=ModuleResponse[Any],
 )
+@authenticated
 async def proxy_to_module(
     module_type: ExerciseType, module_name: AvailableModuleNames, path: str, data: Dict[Any, Any],
-    secret=Depends(api_key_header)
 ) -> JSONResponse:
     """
     This endpoint is called by the LMS to proxy requests to modules.
     See the module documentation for the possible choices for paths.
     Example module documentation on this: [http://localhost:5001/docs](http://localhost:5001/docs).
     """
-    verify_secret(secret)
     module = await find_module_by_name(module_name)
     if module is None:
         raise HTTPException(status_code=404, detail=f"Module {module_name} not found. Is it listed in modules.ini?")

@@ -1,9 +1,13 @@
+import inspect
 import os
+from functools import wraps
+from typing import Callable
 
-from athena.logger import logger
 from dotenv import load_dotenv
 from fastapi import HTTPException, Depends
 from fastapi.security import APIKeyHeader
+
+from athena.logger import logger
 
 load_dotenv(".env")
 SECRET = os.getenv("SECRET")
@@ -13,12 +17,33 @@ api_key_header = APIKeyHeader(name='X-API-Secret', auto_error=False)
 
 
 def verify_secret(secret: str):
-    """
-    To use this function, add this param to your FastAPI route:
-    auth=Depends(authenticate)
-    """
     if secret != SECRET:
         if DEBUG:
             logger.warning("DEBUG MODE: Ignoring invalid API secret.")
         else:
             raise HTTPException(status_code=401, detail="Invalid API secret.")
+
+
+def authenticated(func: Callable) -> Callable:
+    """
+        Decorator for endpoints that require authentication.
+        Usage:
+        @app.post("/endpoint")
+        @authenticated
+        def endpoint():
+            ...
+        """
+
+    @wraps(func)
+    async def wrapper(*args, secret: str = Depends(api_key_header), **kwargs):
+        verify_secret(secret)
+        return await func(*args, **kwargs)
+
+    # Update the function signature with the 'secret' parameter, but otherwise keep the annotations intact
+    sig = inspect.signature(func)
+    # params = list(sig.parameters.values())
+    # params.append(inspect.Parameter('secret', inspect.Parameter.KEYWORD_ONLY, default=Depends(api_key_header)))
+    # new_sig = sig.replace(parameters=params)
+    wrapper.__signature__ = sig  # new_sig
+
+    return wrapper

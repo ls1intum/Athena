@@ -1,10 +1,8 @@
 import inspect
 from typing import TypeVar, Callable, List, Annotated
 
-from fastapi import Depends
-
 from athena.app import app
-from athena.authenticate import api_key_header, verify_secret
+from athena.authenticate import authenticated
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
 from athena.storage import store_feedback, get_stored_submissions, store_exercise, store_submissions
@@ -32,11 +30,10 @@ def submission_selector(func: Callable[[E, List[S]], S]):
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
 
     @app.post("/select_submission", responses=module_responses)
+    @authenticated
     def wrapper(
             exercise: Annotated[E, exercise_type],
-            submission_ids: List[int],
-            secret=Depends(api_key_header)) -> int:
-        verify_secret(secret)
+            submission_ids: List[int]) -> int:
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
 
@@ -68,11 +65,10 @@ def submissions_consumer(func: Callable[[E, List[S]], None]):
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
 
     @app.post("/submissions", responses=module_responses)
+    @authenticated
     def wrapper(
             exercise: Annotated[E, exercise_type],
-            submissions: List[Annotated[S, submission_type]],
-            secret=Depends(api_key_header)):
-        verify_secret(secret)
+            submissions: List[Annotated[S, submission_type]]):
         store_exercise(exercise)
         store_submissions(submissions)
         return func(exercise, submissions)
@@ -91,12 +87,11 @@ def feedback_consumer(func: Callable[[E, S, F], None]):
     feedback_type = inspect.signature(func).parameters["feedback"].annotation
 
     @app.post("/feedback", responses=module_responses)
+    @authenticated
     def wrapper(
             exercise: Annotated[E, exercise_type],
             submission: Annotated[S, submission_type],
-            feedback: Annotated[F, feedback_type],
-            secret=Depends(api_key_header)):
-        verify_secret(secret)
+            feedback: Annotated[F, feedback_type]):
         store_feedback(feedback)
         return func(exercise, submission, feedback)
 
@@ -113,11 +108,10 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
     submission_type = inspect.signature(func).parameters["submission"].annotation
 
     @app.post("/feedback_suggestions", responses=module_responses)
+    @authenticated
     def wrapper(
             exercise: Annotated[E, exercise_type],
-            submission: Annotated[S, submission_type],
-            secret=Depends(api_key_header)):
-        verify_secret(secret)
+            submission: Annotated[S, submission_type]):
         return func(exercise, submission)
 
     return wrapper
