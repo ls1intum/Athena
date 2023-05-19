@@ -5,6 +5,7 @@
 
 reverse_proxy http://assessment_module_manager:5000
 
+rewrite /playground /playground/
 handle_path /playground/* {
     uri strip_prefix /playground
     reverse_proxy http://playground:3000
