@@ -1,4 +1,4 @@
-from typing import List, Iterable, Optional, Type, TypeVar, Optional
+from typing import List, Iterable, Optional, Type, TypeVar
 
 from athena.database import get_db
 from athena.schemas import Exercise

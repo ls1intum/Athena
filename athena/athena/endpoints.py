@@ -5,7 +5,9 @@ from typing import TypeVar, Callable, List, Annotated
 from athena.app import app
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
-from athena.storage import *
+from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
+    store_exercise, store_feedback, store_feedback_suggestions, store_submissions, get_stored_submissions
+    
 
 E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
