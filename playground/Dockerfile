@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM node:18.16.0-alpine
 
+LABEL org.opencontainers.image.source=https://github.com/pal03377/Athena-New
+
 WORKDIR /app
 
 # install packages
