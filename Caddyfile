@@ -5,6 +5,6 @@
 
 reverse_proxy http://assessment_module_manager:5000
 
-handle /playground/* {
+handle /playground* {
     reverse_proxy http://playground:3000
 }
