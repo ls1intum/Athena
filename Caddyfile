@@ -7,5 +7,5 @@ reverse_proxy http://assessment_module_manager:5000
 
 handle_path /playground/* {
     uri strip_prefix /playground
-    reverse_proxy http://playground:5000
+    reverse_proxy http://playground:3000
 }
