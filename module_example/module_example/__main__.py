@@ -5,6 +5,7 @@ from typing import List
 
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.programming import Exercise, Submission, Feedback
+from athena.storage import store_exercise, store_submissions, store_feedback
 
 
 @submission_selector
@@ -37,7 +38,8 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
         submission.meta["some_data"] = "some_value"
         print(f"- Submission {submission.id} meta: {submission.meta}")
     
-    # Automatically stores the exercise and submissions together with the added metadata
+    store_exercise(exercise)
+    store_submissions(submissions)
 
 
 @feedback_consumer
@@ -49,7 +51,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     # Add data to feedback
     feedback.meta["some_data"] = "some_value"
 
-    # Automatically stores the feedback together with the added metadata
+    store_feedback(feedback)
 
 
 @feedback_provider
