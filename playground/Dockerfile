@@ -6,7 +6,7 @@ WORKDIR /app
 # install packages
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # Copy the local code to the container's workspace
 COPY . ./
