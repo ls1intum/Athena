@@ -2,7 +2,7 @@ import {useState} from "react";
 import { Submission } from "@/pages/model/submission";
 import { Exercise } from "@/pages/model/exercise";
 import ExerciseSelect from "@/pages/components/exercise_select";
-import { Submission }Select from "@/pages/components/submission_select";
+import SubmissionSelect from "@/pages/components/submission_select";
 import FeedbackSelect from "@/pages/components/feedback_select";
 import Feedback from "@/pages/model/feedback";
 import ModuleResponse from "@/pages/model/module_response";
