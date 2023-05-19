@@ -1,9 +1,9 @@
 import path from "path";
 import fs from "fs";
 
-import {Exercise} from "@/pages/model/exercise";
-import {Submission} from "@/pages/model/submission";
-import Feedback from "@/pages/model/feedback";
+import {Exercise} from "@/model/exercise";
+import {Submission} from "@/model/submission";
+import Feedback from "@/model/feedback";
 
 
 function getExampleExerciseJSON(exerciseId: number): any {
