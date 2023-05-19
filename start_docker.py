@@ -38,7 +38,7 @@ def build_and_start_docker_compose_files(compose_files, env_file_path, productio
         directory = os.path.dirname(files[0])
         env_file = os.path.join(env_file_path, directory, '.env')
 
-        cmd = ['docker-compose'] + ['-f ' + file for file in files]
+        cmd = ['docker', 'compose'] + ['-f ' + file for file in files]
 
         # run the build in non-production mode only
         if not production_mode:
