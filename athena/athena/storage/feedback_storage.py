@@ -50,7 +50,7 @@ def get_stored_feedback_suggestions(
         return (f.to_schema() for f in query.all())
 
 
-def store_feedback_suggestions(feedbacks: List[Feedback]):
+def store_feedback_suggestions(feedbacks: List[F]):
     """Stores the given feedbacks as a suggestions."""
     with get_db() as db:
         for feedback in feedbacks:
@@ -58,6 +58,6 @@ def store_feedback_suggestions(feedbacks: List[Feedback]):
         db.commit()
 
 
-def store_feedback_suggestion(feedback: Feedback):
+def store_feedback_suggestion(feedback: F):
     """Stores the given feedback as a suggestion."""
     store_feedback_suggestions([feedback])
