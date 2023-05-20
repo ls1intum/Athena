@@ -16,10 +16,11 @@ RUN pip install --no-cache-dir poetry==1.5.0
 # Dependencies
 COPY pyproject.toml poetry.lock ./
 # athena module (from the Dockerfile in the athena folder)
-COPY --from=athena /code/dist ./
+COPY --from=athena /code /athena
 # install dependencies
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --without dev --with docker
+RUN poetry config virtualenvs.create true \
+    && poetry config virtualenvs.in-project true \
+    && poetry install --no-interaction --no-ansi
 
 # Project files
 COPY . ./
@@ -27,4 +28,5 @@ COPY . ./
 # Use modules configuration file for docker
 RUN mv ./modules.docker.ini ./modules.ini
 
-CMD poetry run assessment_module_manager
+# poetry scripts don't work here
+CMD poetry run python -m assessment_module_manager

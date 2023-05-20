@@ -7,15 +7,10 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+athena = {path = "../athena", develop = true}
 fastapi = "^0.95.1"
 uvicorn = "^0.21.1"
 httpx = "^0.24.0"
-
-[tool.poetry.group.dev.dependencies]
-athena = {path = "../athena", develop = true}
-
-[tool.poetry.group.docker.dependencies]
-athena = {file = "athena-1.0.0-py3-none-any.whl"}
 
 [tool.poetry.scripts]
 assessment_module_manager = "assessment_module_manager.__main__:main"
