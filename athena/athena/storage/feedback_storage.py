@@ -1,4 +1,4 @@
-from typing import Iterable, Union, Type, TypeVar, Optional, List
+from typing import Iterable, Union, Type, Optional, List
 
 from athena.database import get_db
 from athena.schemas import Feedback
