@@ -1,3 +1,6 @@
 docker_nodes:
   - traefik_service_api: http://module_cofee_old:8080/api/http/services/
+    segmentation_service_name: segmentation-athena@docker
+    embedding_service_name: embedding-athena@docker
+    clustering_service_name: clustering-athena@docker
     trigger_route: /trigger
