@@ -1,25 +1,54 @@
 import inspect
-from functools import wraps
 from typing import TypeVar, Callable, List, Annotated
+from functools import wraps
 
 from athena.app import app
+from athena.authenticate import authenticated
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
-from athena.storage import store_feedback, get_stored_submissions, store_exercise, store_submissions
+from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
+    store_exercise, store_feedback, store_feedback_suggestions, store_submissions, get_stored_submissions
+    
 
 E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
 F = TypeVar('F', bound=Feedback)
 
-def wraps_except_annotations(func: Callable) -> Callable:
+
+module_responses = {
+    403: {
+        "description": "API secret is invalid - set the environment variable SECRET and the X-API-Secret header "
+                       "to the same value",
+    }
+}
+
+
+def submissions_consumer(func: Callable[[E, List[S]], None]):
     """
-    This is a replacement for functools.wraps that ignores annotations.
-    This is necessary when the signature of the wrapper function is different from the signature of the wrapped function
+    Receive submissions from the Assessment Module Manager.
+    The submissions consumer is usually called whenever the deadline for an exercise is reached.
     """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    wrapper.__signature__ = inspect.signature(func)
+    exercise_type = inspect.signature(func).parameters["exercise"].annotation
+    submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
+
+    @app.post("/submissions", responses=module_responses)
+    @authenticated
+    def wrapper(
+            exercise: exercise_type,
+            submissions: List[submission_type]):
+        # Retrieve existing metadata for the exercise and submissions
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submissions_dict = {s.id: s for s in submissions}
+        if submissions:
+            stored_submissions = get_stored_submissions(submissions[0].__class__, exercise.id, [s.id for s in submissions])
+            for stored_submission in stored_submissions:
+                if stored_submission.id in submissions_dict:
+                    submissions_dict[stored_submission.id].meta.update(stored_submission.meta)
+        submissions = list(submissions_dict.values())
+
+        # Call the actual consumer
+        func(exercise, submissions)
+
     return wrapper
 
 
@@ -32,11 +61,15 @@ def submission_selector(func: Callable[[E, List[S]], S]):
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
 
-    @app.post("/select_submission")
-    @wraps_except_annotations
-    def wrapper(exercise: Annotated[E, exercise_type], submission_ids: List[int]) -> int:
+    @app.post("/select_submission", responses=module_responses)
+    @authenticated
+    def wrapper(
+            exercise: exercise_type,
+            submission_ids: List[int]) -> int:
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
+
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
 
         # Get the full submission objects
         submissions = list(get_stored_submissions(submission_type, exercise.id, submission_ids))
@@ -46,6 +79,7 @@ def submission_selector(func: Callable[[E, List[S]], S]):
         if not submissions:
             # Nothing to select from
             return -1
+
         # Select the submission
         submission = func(exercise, submissions)
 
@@ -56,33 +90,30 @@ def submission_selector(func: Callable[[E, List[S]], S]):
     return wrapper
 
 
-def submissions_consumer(func: Callable[[E, List[S]], None]):
-    """
-    Receive submissions from the Assessment Module Manager and automatically store them in the database.
-    The submissions consumer is usually called whenever the deadline for an exercise is reached.
-    """
-
-    @app.post("/submissions")
-    @wraps(func)
-    def wrapper(exercise, submissions):
-        store_exercise(exercise)
-        store_submissions(submissions)
-        return func(exercise, submissions)
-
-    return wrapper
-
-
 def feedback_consumer(func: Callable[[E, S, F], None]):
     """
-    Receive feedback from the Assessment Module Manager and automatically store it in the database.
+    Receive feedback from the Assessment Module Manager.
     The feedback consumer is usually called whenever the LMS gets feedback from a tutor.
     """
+    exercise_type = inspect.signature(func).parameters["exercise"].annotation
+    submission_type = inspect.signature(func).parameters["submission"].annotation
+    feedback_type = inspect.signature(func).parameters["feedback"].annotation
 
-    @app.post("/feedback")
-    @wraps(func)
-    def wrapper(exercise, submission, feedback):
+    @app.post("/feedback", responses=module_responses)
+    @authenticated
+    def wrapper(
+            exercise: exercise_type,
+            submission: submission_type,
+            feedback: feedback_type):
+        # Retrieve existing metadata for the exercise, submission and feedback
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submission.meta.update(get_stored_submission_meta(submission) or {})
+        feedback.meta.update(get_stored_feedback_meta(feedback) or {})
+
         store_feedback(feedback)
-        return func(exercise, submission, feedback)
+
+        # Call the actual consumer
+        func(exercise, submission, feedback)
 
     return wrapper
 
@@ -92,9 +123,24 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
     Provide feedback to the Assessment Module Manager.
     The feedback provider is usually called whenever the tutor requests feedback for a submission in the LMS.
     """
-    @app.post("/feedback_suggestions")
-    @wraps(func)
-    def wrapper(exercise, submission):
-        return func(exercise, submission)
+    exercise_type = inspect.signature(func).parameters["exercise"].annotation
+    submission_type = inspect.signature(func).parameters["submission"].annotation
 
+    @app.post("/feedback_suggestions", responses=module_responses)
+    @authenticated
+    def wrapper(
+            exercise: exercise_type,
+            submission: submission_type):
+        # Retrieve existing metadata for the exercise, submission and feedback
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submission.meta.update(get_stored_submission_meta(submission) or {})
+
+        store_exercise(exercise)
+        store_submissions([submission])
+
+        # Call the actual provider
+        feedbacks = func(exercise, submission)
+        store_feedback_suggestions(feedbacks)
+
+        return feedbacks
     return wrapper

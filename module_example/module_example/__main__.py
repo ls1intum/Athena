@@ -1,16 +1,11 @@
+"""
+Entry point for the module_example module.
+"""
 from typing import List
 
-from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
-from athena.programming import *
-
-
-@submission_selector
-def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
-    print(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
-    for submission in submissions:
-        print(f"- Submission {submission.id}")
-    # Do something with the submissions and return the one that should be assessed next
-    return submissions[0]
+from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
+from athena.programming import Exercise, Submission, Feedback
+from athena.storage import store_exercise, store_submissions, store_feedback
 
 
 @submissions_consumer
@@ -23,6 +18,28 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
         for file in zip_content.namelist():
             print(f"  - {file}")
     # Do something with the submissions
+    print("Doing stuff")
+
+    # Add data to exercise
+    exercise.meta["some_data"] = "some_value"
+    print(f"- Exercise meta: {exercise.meta}")
+
+    # Add data to submission
+    for submission in submissions:
+        submission.meta["some_data"] = "some_value"
+        print(f"- Submission {submission.id} meta: {submission.meta}")
+    
+    store_exercise(exercise)
+    store_submissions(submissions)
+
+
+@submission_selector
+def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
+    print(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
+    for submission in submissions:
+        print(f"- Submission {submission.id}")
+    # Do something with the submissions and return the one that should be assessed next
+    return submissions[0]
 
 
 @feedback_consumer
@@ -31,6 +48,11 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     print(f"process_feedback: Feedback: {feedback}")
     # Do something with the feedback
 
+    # Add data to feedback
+    feedback.meta["some_data"] = "some_value"
+
+    store_feedback(feedback)
+
 
 @feedback_provider
 def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
@@ -38,7 +60,6 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     # Do something with the submission and return a list of feedback
     return [
         Feedback(
-            id=10,
             exercise_id=exercise.id,
             submission_id=submission.id,
             detail_text="There is something wrong here.",
