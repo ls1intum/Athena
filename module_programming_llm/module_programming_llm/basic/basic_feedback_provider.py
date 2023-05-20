@@ -21,9 +21,9 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     input_list: List[dict] = []
 
     if exercise.meta['file_grading_instructions'] is None:
-        raise Exception("No file grading instructions found for exercise in meta.")
+        raise ValueError("No file grading instructions found for exercise in meta.")
     if exercise.meta['file_problem_statements'] is None:
-        raise Exception("No file problem statements found for exercise in meta.")
+        raise ValueError("No file problem statements found for exercise in meta.")
 
     # Feature extraction
     solution_repo = exercise.get_solution_repository()
@@ -32,7 +32,7 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     
     file_extension = get_file_extension(exercise.programming_language)
     if file_extension is None:
-        raise Exception(f"Could not determine file extension for programming language {exercise.programming_language}.")
+        raise ValueError(f"Could not determine file extension for programming language {exercise.programming_language}.")
 
     for file_path, submission_content in load_files_from_repo(submission_repo, file_filter=lambda x: x.endswith(file_extension)).items():
         if submission_content is None:

@@ -1,6 +1,6 @@
 from typing import List
 
-from athena.storage import store_exercise, 
+from athena.storage import store_exercise
 
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.programming import Exercise, Submission, Feedback
