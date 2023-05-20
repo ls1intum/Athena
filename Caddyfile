@@ -3,5 +3,5 @@
 }
 {$ATHENA_DOMAIN}
 
-reverse_proxy http://assessment_module_manager:5000
 reverse_proxy /traefik http://module_cofee_old:8080
+reverse_proxy http://assessment_module_manager:5000
