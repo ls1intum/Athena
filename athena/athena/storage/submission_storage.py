@@ -3,8 +3,6 @@ from typing import List, Iterable, Union, Type, TypeVar, Optional
 from athena.database import get_db
 from athena.schemas import Submission
 
-S = TypeVar('S', bound=Submission)
-
 
 def get_stored_submissions(
         submission_cls: Type[Submission], exercise_id: int, only_ids: Union[List[int], None] = None
@@ -21,14 +19,11 @@ def get_stored_submissions(
         return (s.to_schema() for s in query.all())
 
 
-def get_stored_submission_meta(submission: S) -> Optional[dict]:
+def get_stored_submission_meta(submission: Submission) -> Optional[dict]:
     """Returns the stored metadata associated with the submission."""
     db_submission_cls = submission.__class__.get_model_class()
     with get_db() as db:
-        stored_submission = db.query(db_submission_cls).filter_by(id=submission.id).first()
-        if stored_submission is not None:
-            return stored_submission.to_schema().meta
-    return None
+        return db.query(db_submission_cls.meta).filter_by(id=submission.id).scalar()
 
 
 def store_submissions(submissions: List[Submission]):

@@ -3,8 +3,6 @@ from typing import List, Iterable, Optional, Type, TypeVar
 from athena.database import get_db
 from athena.schemas import Exercise
 
-E = TypeVar('E', bound=Exercise)
-
 
 def get_stored_exercises(exercise_cls: Type[Exercise], only_ids: Optional[List[int]] = None) -> Iterable[Exercise]:
     """
@@ -19,14 +17,11 @@ def get_stored_exercises(exercise_cls: Type[Exercise], only_ids: Optional[List[i
         return (e.to_schema() for e in query.all())
 
 
-def get_stored_exercise_meta(exercise: E) -> Optional[dict]:
+def get_stored_exercise_meta(exercise: Exercise) -> Optional[dict]:
     """Returns the stored metadata associated with the exercise."""
     db_exercise_cls = exercise.__class__.get_model_class()
     with get_db() as db:
-        stored_exercise = db.query(db_exercise_cls).filter_by(id=exercise.id).first()
-        if stored_exercise is not None:
-            return stored_exercise.to_schema().meta
-    return None
+        return db.query(db_exercise_cls.meta).filter_by(id=exercise.id).scalar()
 
 
 def store_exercises(exercises: List[Exercise]):
