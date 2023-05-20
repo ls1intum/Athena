@@ -1,4 +1,6 @@
-from athena.storage import *
+from typing import List
+
+from athena.storage import store_exercise, 
 
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.programming import Exercise, Submission, Feedback
@@ -42,9 +44,8 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     # Check if file based grading instructions and problem statements are available
     if 'file_grading_instructions' in exercise.meta and 'file_problem_statements' in exercise.meta:
         return await suggest_feedback_basic(exercise, submission)
-    else:
-        print("suggest_feedback: No file based grading instructions and problem statements available. Skipping feedback generation.")
-        return []
+    print("suggest_feedback: No file based grading instructions and problem statements available. Skipping feedback generation.")
+    return []
 
 if __name__ == "__main__":
     app.start()
