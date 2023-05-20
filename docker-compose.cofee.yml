@@ -43,9 +43,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
       - traefik.http.routers.balancer.entrypoints=web
-      - traefik.http.routers.balancer-tls.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
-      - traefik.http.routers.balancer-tls.entrypoints=websecure
-      - traefik.http.routers.balancer-tls.tls=true
 
   segmentation:
     image: ghcr.io/ls1intum/athene/athene-segmentation:latest
@@ -83,9 +80,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.upload.rule=Path(`/upload`,`/feedback_consistency`)
       - traefik.http.routers.upload.entrypoints=web
-      - traefik.http.routers.upload-tls.rule=Path(`/upload`,`/feedback_consistency`)
-      - traefik.http.routers.upload-tls.entrypoints=websecure
-      - traefik.http.routers.upload-tls.tls=true
 
   clustering:
     image: ghcr.io/ls1intum/athene/athene-clustering:latest
