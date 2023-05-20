@@ -8,8 +8,8 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.10"
 
-[tool.poetry.dev-dependencies]
-athena = {path = "../athena", develop = true}
+#[tool.poetry.dev-dependencies]
+#athena = {path = "../athena", develop = true}
 
 [tool.poetry.scripts]
 module = "athena:run_module"
