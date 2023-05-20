@@ -15,13 +15,11 @@ RUN pip install --no-cache-dir poetry==1.5.0
 
 # Dependencies
 COPY pyproject.toml poetry.lock ./
+# athena module (from the Dockerfile in the athena folder)
+COPY --from=athena /code/dist ./
 # install dependencies
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi # --without dev
-
-# athena module (from the Dockerfile in the athena folder)
-COPY --from=athena /code/dist /tmp/
-RUN poetry add /tmp/athena-1.0.0-py3-none-any.whl
+    && poetry install --no-interaction --no-ansi --without dev --with docker
 
 # Project files
 COPY . ./
