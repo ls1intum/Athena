@@ -1,6 +1,5 @@
 import inspect
-from typing import TypeVar, Callable, List, Annotated
-from functools import wraps
+from typing import TypeVar, Callable, List
 
 from athena.app import app
 from athena.authenticate import authenticated
@@ -47,7 +46,10 @@ def submissions_consumer(func: Callable[[E, List[S]], None]):
         submissions = list(submissions_dict.values())
 
         # Call the actual consumer
-        func(exercise, submissions)
+        if inspect.iscoroutinefunction(func):
+            await func(exercise, submissions)
+        else:
+            func(exercise, submissions)
 
     return wrapper
 
@@ -81,7 +83,10 @@ def submission_selector(func: Callable[[E, List[S]], S]):
             return -1
 
         # Select the submission
-        submission = func(exercise, submissions)
+        if inspect.iscoroutinefunction(func):
+            submission = await func(exercise, submissions)
+        else:
+            submission = func(exercise, submissions)
 
         if submission is None:
             return -1
@@ -113,7 +118,10 @@ def feedback_consumer(func: Callable[[E, S, F], None]):
         store_feedback(feedback)
 
         # Call the actual consumer
-        func(exercise, submission, feedback)
+        if inspect.iscoroutinefunction(func):
+            await func(exercise, submission, feedback)
+        else:
+            func(exercise, submission, feedback)
 
     return wrapper
 
@@ -139,7 +147,11 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
         store_submissions([submission])
 
         # Call the actual provider
-        feedbacks = await func(exercise, submission)
+        if inspect.iscoroutinefunction(func):
+            feedbacks = await func(exercise, submission)
+        else:
+            feedbacks = func(exercise, submission)
+    
         store_feedback_suggestions(feedbacks)
 
         return feedbacks
