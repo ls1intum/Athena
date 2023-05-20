@@ -31,19 +31,23 @@ jobs:
           IMAGE_NAMES=$(ls -d assessment_module_manager module_* playground | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=${IMAGE_NAMES}" > $GITHUB_OUTPUT
 
-  build_athena_package:
+  build_athena_image:
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.tag-image.outputs.image_tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Build athena image
+        id: tag-image
         run: |
           cd athena
-          docker build -t athena .
+          IMAGE_TAG=$(docker build -t athena . | awk '/Successfully built/{print $NF}')
+          echo "name=image_tag::$IMAGE_TAG" > $GITHUB_OUTPUT
 
-  build_other_images:
-    needs: [find_images_to_build, build_athena_package]
+  build_image:
+    needs: [find_images_to_build, build_athena_image]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -64,4 +68,4 @@ jobs:
         with:
           context: ${{ matrix.image }}
           push: ${{ github.event.pull_request.base.ref == 'develop' || github.event.inputs.push == 'true' }}
-          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}:latest
+          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}:${{ needs.build_athena_image.outputs.image_tag }}
