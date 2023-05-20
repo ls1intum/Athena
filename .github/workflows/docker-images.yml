@@ -19,7 +19,6 @@ on:
 
 jobs:
   find_images_to_build:
-    needs: checkout
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -38,7 +37,6 @@ jobs:
           echo "matrix=playground" >> $GITHUB_OUTPUT
 
   build_athena_package:
-    needs: checkout
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
