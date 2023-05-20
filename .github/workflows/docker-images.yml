@@ -12,6 +12,10 @@ on:
       - develop
   workflow_dispatch:
     inputs:
+      ref:
+        description: 'The branch to checkout'
+        required: true
+        default: 'main'
       push:
         description: 'Push to GitHub Container Registry'
         required: true
@@ -19,7 +23,6 @@ on:
 
 jobs:
   find_images_to_build:
-    needs: checkout
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -29,34 +32,25 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
-          # assessment_module_manager
-          echo "matrix=assessment_module_manager\n" > $GITHUB_OUTPUT
-          # modules
-          MODULE_NAMES=$(ls -d module_* | jq -R -s -c 'split("\n")[:-1]')
-          echo "matrix=${MODULE_NAMES}" >> $GITHUB_OUTPUT
-          # playground
-          echo "matrix=playground" >> $GITHUB_OUTPUT
+          IMAGE_NAMES=$(ls -d assessment_module_manager module_* playground | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix=${IMAGE_NAMES}" > $GITHUB_OUTPUT
 
-  build_athena_package:
-    needs: checkout
+  build_image:
+    needs: find_images_to_build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ${{fromJson(needs.find_images_to_build.outputs.matrix)}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Build athena image
+        id: set-image
         run: |
+          cd athena
           docker build -t athena .
-
-  build_other_images:
-    needs: [find_images_to_build, build_athena_package]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        module: ${{fromJson(needs.prepare.outputs.matrix)}}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+          cd ..
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -68,8 +62,6 @@ jobs:
       - name: Build (and push) Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: ./Dockerfile
-          build-args: MODULE_NAME=${{ matrix.module }}
+          context: ${{ matrix.image }}
           push: ${{ github.event.pull_request.base.ref == 'develop' || github.event.inputs.push == 'true' }}
-          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.module }}:latest
+          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}:latest
