@@ -16,10 +16,8 @@ services:
       # These components have API endpoints managed by traefik
       - load-balancer
       - embedding
-    ports:
-      - 4999:80
-    networks:
-      - cofee
+    expose:
+      - 4999
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./module_cofee/traefik.docker.yml:/etc/traefik/traefik.yml
@@ -37,8 +35,6 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR}/cofee.env
     working_dir: /usr/src/app
-    networks:
-      - cofee
     labels:
       - traefik.enable=true
       - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
@@ -55,8 +51,6 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR}/cofee.env
     working_dir: /usr/src/app
-    networks:
-      - cofee
     labels:
       - traefik.enable=true
 
@@ -74,8 +68,6 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR}/cofee.env
     working_dir: /usr/src/app
-    networks:
-      - cofee
     labels:
       - traefik.enable=true
       - traefik.http.routers.upload.rule=Path(`/upload`,`/feedback_consistency`)
@@ -93,8 +85,6 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR}/cofee.env
     working_dir: /usr/src/app
-    networks:
-      - cofee
     labels:
       - traefik.enable=true
 
@@ -109,9 +99,3 @@ services:
     volumes:
       - ./module_cofee/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./data/cofee_db:/data/db
-    networks:
-      - cofee
-
-networks:
-  cofee:
-    driver: bridge
