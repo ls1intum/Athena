@@ -12,14 +12,14 @@ on:
       - develop
   workflow_dispatch:
     inputs:
-      push:
-        description: 'Push to GitHub Container Registry'
-        required: true
-        default: 'false'
       ref:
         description: 'The branch to checkout'
         required: true
         default: 'main'
+      push:
+        description: 'Push to GitHub Container Registry'
+        required: true
+        default: 'false'
 
 jobs:
   find_images_to_build:
