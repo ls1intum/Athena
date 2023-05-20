@@ -7,7 +7,7 @@ import path from 'path';
 function readExerciseFile(exerciseId: number, fileName: string) {
     const filePath = path.join(process.cwd(), 'exercises', "" + exerciseId, fileName);
     return fs.readFileSync(filePath, 'utf-8');
-  }
+}
 
 const exampleExercises: Exercise[] = [
     {
