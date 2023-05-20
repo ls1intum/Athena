@@ -31,8 +31,12 @@ jobs:
           IMAGE_NAMES=$(ls -d assessment_module_manager module_* playground | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=${IMAGE_NAMES}" > $GITHUB_OUTPUT
 
-  build_athena_image:
+  build_image:
+    needs: find_images_to_build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ${{fromJson(needs.find_images_to_build.outputs.matrix)}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,36 +46,7 @@ jobs:
         run: |
           cd athena
           docker build -t athena .
-
-      - name: Save athena image
-        run: |
-          docker save athena > athena.tar
-
-      - name: Upload athena image
-        uses: actions/upload-artifact@v3
-        with:
-          name: athena
-          path: athena.tar
-
-  build_image:
-    needs: [find_images_to_build, build_athena_image]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image: ${{fromJson(needs.find_images_to_build.outputs.matrix)}}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Download athena image
-        uses: actions/download-artifact@v3
-        with:
-          name: athena
-          path: athena.tar
-
-      - name: Load athena image
-        run: |
-          docker load < athena.tar
+          cd ..
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
