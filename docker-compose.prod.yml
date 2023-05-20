@@ -24,3 +24,9 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR}/module_example.env
     image: ghcr.io/pal03377/athena_module_example:latest
+
+  module_cofee:
+    hostname: module_cofee
+    env_file:
+      - ${ATHENA_ENV_DIR}/module_cofee.env
+    image: ghcr.io/pal03377/athena_module_cofee:latest
