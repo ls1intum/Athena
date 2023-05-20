@@ -16,6 +16,10 @@ on:
         description: 'Push to GitHub Container Registry'
         required: true
         default: 'false'
+      ref:
+        description: 'The branch to checkout'
+        required: true
+        default: 'main'
 
 jobs:
   find_images_to_build:
