@@ -56,7 +56,7 @@ services:
     working_dir: /usr/src/app
     labels:
       - traefik.enable=true
-      - traefik.http.services.segmentation-athena.server.port=80 # set service name this way
+      - traefik.http.services.cofee-segmentation.loadbalancer.server.port=80 # set service name this way
 
   # http://localhost/upload
   # http://localhost/feedback_consistency
@@ -76,7 +76,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.upload.rule=Path(`/upload`,`/feedback_consistency`)
       - traefik.http.routers.upload.entrypoints=web
-      - traefik.http.services.embedding-athena.server.port=80 # set service name this way
+      - traefik.http.services.cofee-embedding.loadbalancer.server.port=80 # set service name this way
 
   clustering:
     image: ghcr.io/ls1intum/athene/athene-clustering:latest
@@ -92,7 +92,7 @@ services:
     working_dir: /usr/src/app
     labels:
       - traefik.enable=true
-      - traefik.http.services.cofee-clustering.server.port=80 # set service name this way
+      - traefik.http.services.cofee-clustering.loadbalancer.server.port=80 # set service name this way
 
   database:
     image: mongo:latest
