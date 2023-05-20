@@ -1,6 +1,7 @@
 version: '3.8'
 
 # Development version of docker-compose.yml
+# To run: docker-compose up
 
 services:
   athena:
