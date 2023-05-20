@@ -4,3 +4,4 @@
 {$ATHENA_DOMAIN}
 
 reverse_proxy http://assessment_module_manager:5000
+reverse_proxy /traefik http://traefik:8080
