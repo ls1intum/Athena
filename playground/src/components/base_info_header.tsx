@@ -24,7 +24,7 @@ export default function BaseInfoHeader(
                 <span className="text-lg font-bold">Secret</span>
                 <p className="text-gray-500 mb-2">
                     This is the secret that you configured in Athena.
-                    It's optional for local development, but required for production setups.
+                    It&apos;s optional for local development, but required for production setups.
                 </p>
                 <input className="border border-gray-300 rounded-md p-2" value={athenaSecret}
                         placeholder="Optional, only required for production setups"
