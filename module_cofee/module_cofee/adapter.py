@@ -10,6 +10,7 @@ import requests
 from athena import app
 from athena.text import Exercise, Submission
 from athena.logger import logger
+from athena.module_config import get_module_config
 from module_cofee.process_results import process_results
 
 try:
@@ -30,12 +31,13 @@ def get_cofee_url() -> str:
 def send_submissions(exercise: Exercise, submissions: List[Submission]):
     """Send submissions to old Athena-CoFee server."""
     logger.info("Sending %d submissions to CoFee", len(submissions))
+    module_url = os.environ.get("MODULE_URL", f"http://localhost:{get_module_config().port}")
     resp = requests.post(
         f"{get_cofee_url()}/submit",
         json={
             "courseId": exercise.course_id,
             # TODO: maybe make this more flexible?
-            "callbackUrl": f"http://localhost:{os.environ['PORT']}/cofee_callback/{exercise.id}",
+            "callbackUrl": f"{module_url}/cofee_callback/{exercise.id}",
             "submissions": [
                 {
                     "id": submission.id,
