@@ -11,6 +11,7 @@ import {ModuleMeta} from "@/model/health_response";
 
 async function sendFeedback(
     athenaUrl: string,
+    athenaSecret: string,
     module: ModuleMeta,
     exercise: Exercise | null,
     submission: Submission | null,
@@ -34,7 +35,8 @@ async function sendFeedback(
         const response = await fetch(`/api/athena_request?${new URLSearchParams({ url: athenaFeedbackUrl })}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-Secret': athenaSecret
             },
             body: JSON.stringify({ exercise, submission, feedback })
         });
@@ -59,6 +61,7 @@ async function sendFeedback(
 
 async function sendAllExerciseFeedbacks(
     athenaUrl: string,
+    athenaSecret: string,
     module: ModuleMeta,
     exercise?: Exercise
 ): Promise<ModuleResponse[] | undefined> {
@@ -89,7 +92,7 @@ async function sendAllExerciseFeedbacks(
     const responses: ModuleResponse[] = [];
     for (const feedback of feedbacks) {
         const submission = submissions.find(s => s.id === feedback.submission_id);
-        const response = await sendFeedback(athenaUrl, module, exercise, submission!, feedback, false);
+        const response = await sendFeedback(athenaUrl, athenaSecret, module, exercise, submission!, feedback, false);
         if (response) {
             responses.push(response);
         } else {
@@ -101,7 +104,9 @@ async function sendAllExerciseFeedbacks(
     return responses;
 }
 
-export default function SendFeedback({ athenaUrl, module }: { athenaUrl: string, module: ModuleMeta }) {
+export default function SendFeedback(
+    { athenaUrl, athenaSecret, module }: { athenaUrl: string, athenaSecret: string, module: ModuleMeta }
+) {
     const [exercise, setExercise] = useState<Exercise | null>(null);
     const [isAllSubmissions, setIsAllSubmissions] = useState<boolean>(true);
     const [submission, setSubmission] = useState<Submission | null>(null);
@@ -144,12 +149,12 @@ export default function SendFeedback({ athenaUrl, module }: { athenaUrl: string,
                 onClick={() => {
                     setLoading(true);
                     if (isAllSubmissions) {
-                        sendAllExerciseFeedbacks(athenaUrl, module, exercise!)
+                        sendAllExerciseFeedbacks(athenaUrl, athenaSecret, module, exercise!)
                             .then(setResponses)
                             .finally(() => setLoading(false));
                         return;
                     }
-                    sendFeedback(athenaUrl, module, exercise, submission, feedback)
+                    sendFeedback(athenaUrl, athenaSecret, module, exercise, submission, feedback)
                         .then(resp => setResponses(resp ? [resp] : undefined))
                         .finally(() => setLoading(false));
                 }}

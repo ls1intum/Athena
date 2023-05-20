@@ -15,7 +15,7 @@ on:
       ref:
         description: 'The branch to checkout'
         required: true
-        default: 'main'
+        default: 'develop'
       push:
         description: 'Push to GitHub Container Registry'
         required: true
