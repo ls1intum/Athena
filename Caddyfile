@@ -3,7 +3,10 @@
 }
 {$ATHENA_DOMAIN}
 
-handle_path /traefik/* /api/* {
+handle_path /traefik/* {
+    reverse_proxy http://module_cofee_old:8080
+}
+handle_path /api/* {
     reverse_proxy http://module_cofee_old:8080
 }
 
