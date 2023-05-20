@@ -51,6 +51,8 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
             "Authorization": os.environ["COFEE_AUTH_TOKEN"],
         },
         timeout=60,
+        # TODO: remove this again:
+        verify=False,  # Ignore SSL errors for now, because athenetest1-01 has an invalid certificate
     )
     resp.raise_for_status()
     logger.info("Submissions sent to CoFee")
