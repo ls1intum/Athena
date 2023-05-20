@@ -1,4 +1,7 @@
-name: Docker Images for Modules
+name: Docker Image
+
+# Build the Docker images for the the assessment module manager, the modules and the playground.
+# Because the Python images depend on the athena Python package, the package is built first.
 
 on:
   pull_request:
@@ -15,22 +18,38 @@ on:
         default: 'false'
 
 jobs:
-  prepare:
+  find_images_to_build:
+    needs: checkout
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Set Matrix
         id: set-matrix
         run: |
+          # assessment_module_manager
+          echo "matrix=assessment_module_manager\n" > $GITHUB_OUTPUT
+          # modules
           MODULE_NAMES=$(ls -d module_* | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=${MODULE_NAMES}" >> $GITHUB_OUTPUT
+          # playground
+          echo "matrix=playground" >> $GITHUB_OUTPUT
 
-  build:
-    needs: prepare
+  build_athena_package:
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build athena image
+        run: |
+          docker build -t athena .
+
+  build_other_images:
+    needs: [find_images_to_build, build_athena_package]
     runs-on: ubuntu-latest
     strategy:
       matrix:

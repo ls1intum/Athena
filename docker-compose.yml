@@ -3,19 +3,21 @@ version: '3.8'
 # Development version of docker-compose.yml
 
 services:
+  athena:
+    build: ./athena
+    image: athena
+
   assessment_module_manager:
-    build:
-      context: .
-      dockerfile: ./assessment_module_manager/Dockerfile
+    build: ./assessment_module_manager
+    depends_on:
+      - athena
     ports:
       - "5000:5000"
 
   module_example:
     hostname: module_example
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - MODULE_NAME=module_example
+    build: ./module_example
+    depends_on:
+      - athena
     ports:
       - "5001:5001"

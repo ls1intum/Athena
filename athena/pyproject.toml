@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "athena"
-version = "0.1.0"
+version = "1.0.0"
 description = "This is a helper module for easier development of Athena modules. It provides communication functionality with the Assessment Module manager, as well as helper functions for storage."
-authors = ["Paul Schwind <git@pschwind.de>"]
+authors = ["Paul Schwind <paul.schwind@tum.de>"]
 license = "MIT"
 
 [tool.poetry.dependencies]

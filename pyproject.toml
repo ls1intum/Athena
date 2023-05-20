@@ -2,7 +2,7 @@
 name = "athena-modularized"
 version = "0.1.0"
 description = ""
-authors = ["Paul Schwind <git@pschwind.de>"]
+authors = ["Paul Schwind <paul.schwind@tum.de>"]
 license = "MIT"
 readme = "README.md"
 packages = []
@@ -16,7 +16,6 @@ module_example = {path = "./module_example", develop = true}
 module_cofee = {path = "./module_cofee", develop = true}
 
 # start linter with `poetry run prospector`
-requests = "^2.30.0"
 
 [build-system]
 requires = ["poetry-core"]

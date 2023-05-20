@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# This is the Dockerfile for the assessment module manager.
+# This is the Dockerfile for the module_example.
 
 FROM python:3.11
 LABEL org.opencontainers.image.source=https://github.com/pal03377/Athena-New
@@ -26,7 +26,4 @@ RUN poetry add /athena
 # Project files
 COPY . ./
 
-# Use modules configuration file for docker
-RUN mv ./modules.docker.ini ./modules.ini
-
-CMD poetry run assessment_module_manager
+CMD poetry run module
