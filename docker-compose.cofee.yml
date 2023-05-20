@@ -92,7 +92,7 @@ services:
     working_dir: /usr/src/app
     labels:
       - traefik.enable=true
-      - traefik.http.services.clustering-athena.server.port=80 # set service name this way
+      - traefik.http.services.cofee-clustering.server.port=80 # set service name this way
 
   database:
     image: mongo:latest
