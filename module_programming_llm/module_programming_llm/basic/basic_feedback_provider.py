@@ -15,7 +15,7 @@ from athena.programming import Exercise, Submission, Feedback
 from module_programming_llm.helpers.utils import get_diff, get_file_extension, load_files_from_repo, add_line_numbers
 
 
-def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     max_prompt_length = 2560
 
     chat = PromptLayerChatOpenAI(pl_tags=["basic"], temperature=0)
@@ -112,10 +112,8 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
 
     # Completion
     chain = LLMChain(llm=chat, prompt=chat_prompt)
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(chain.agenerate(input_list))
-
+    result = await chain.agenerate(input_list)
+    
     # Parse result
     feedback_proposals: List[Feedback] = []
     for input, generations in zip(input_list, result.generations):
@@ -138,7 +136,6 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
                 credits = feedback.get("credits", 0.0)
                 feedback_proposals.append(
                     Feedback(
-                        id=1,
                         exercise_id=exercise.id,
                         submission_id=submission.id,
                         detail_text=detail_text,

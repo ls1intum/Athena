@@ -33,7 +33,7 @@ def submissions_consumer(func: Callable[[E, List[S]], None]):
 
     @app.post("/submissions", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submissions: List[submission_type]):
         # Retrieve existing metadata for the exercise and submissions
@@ -63,7 +63,7 @@ def submission_selector(func: Callable[[E, List[S]], S]):
 
     @app.post("/select_submission", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submission_ids: List[int]) -> int:
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
@@ -101,7 +101,7 @@ def feedback_consumer(func: Callable[[E, S, F], None]):
 
     @app.post("/feedback", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
             feedback: feedback_type):
@@ -128,7 +128,7 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
 
     @app.post("/feedback_suggestions", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submission: submission_type):
         # Retrieve existing metadata for the exercise, submission and feedback
@@ -139,7 +139,7 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
         store_submissions([submission])
 
         # Call the actual provider
-        feedbacks = func(exercise, submission)
+        feedbacks = await func(exercise, submission)
         store_feedback_suggestions(feedbacks)
 
         return feedbacks

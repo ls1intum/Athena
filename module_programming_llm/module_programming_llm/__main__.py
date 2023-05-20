@@ -18,14 +18,13 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     print(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
 
-    # TODO Add this later:
-    # print("Generating file grading instructions...")
-    # file_grading_instructions = generate_file_grading_instructions(exercise)
-    # print(file_grading_instructions)
-    # exercise.meta['file_grading_instructions'] = file_grading_instructions
-    # store_exercise(exercise)
+    # Split problem statements and grading instructions 
+    exercise.meta['file_grading_instructions'] = generate_file_grading_instructions(exercise)
+    exercise.meta['file_problem_statements'] = generate_file_problem_statements(exercise)
+    print(exercise.meta['file_grading_instructions'])
+    print(exercise.meta['file_problem_statements'])
 
-    # generate_file_problem_statement(exercise)
+    store_exercise(exercise)
 
 
 @feedback_consumer
@@ -36,15 +35,16 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 
 @feedback_provider
-def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     print(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
     # Do something with the submission and return a list of feedback
 
-    # TODO remove later
-    exercise.meta['file_grading_instructions'] = generate_file_grading_instructions(exercise)
-    exercise.meta['file_problem_statements'] = generate_file_problem_statements(exercise)
-
-    return suggest_feedback_basic(exercise, submission)
+    # Check if file based grading instructions and problem statements are available
+    if 'file_grading_instructions' in exercise.meta and 'file_problem_statements' in exercise.meta:
+        return await suggest_feedback_basic(exercise, submission)
+    else:
+        print("suggest_feedback: No file based grading instructions and problem statements available. Skipping feedback generation.")
+        return []
 
 if __name__ == "__main__":
     app.start()
