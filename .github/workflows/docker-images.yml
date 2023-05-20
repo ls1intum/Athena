@@ -28,13 +28,8 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
-          # assessment_module_manager
-          echo "matrix=assessment_module_manager\n" > $GITHUB_OUTPUT
-          # modules
-          MODULE_NAMES=$(ls -d module_* | jq -R -s -c 'split("\n")[:-1]')
-          echo "matrix=${MODULE_NAMES}" >> $GITHUB_OUTPUT
-          # playground
-          echo "matrix=playground" >> $GITHUB_OUTPUT
+          IMAGE_NAMES=$(ls -d assessment_module_manager module_* playground | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix=${IMAGE_NAMES}" > $GITHUB_OUTPUT
 
   build_athena_package:
     runs-on: ubuntu-latest
