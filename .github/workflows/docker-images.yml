@@ -42,10 +42,13 @@ jobs:
         run: |
           cd athena
           docker build -t athena .
+
+      - name: Save athena image
+        run: |
           docker save athena > athena.tar
 
       - name: Upload athena image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: athena
           path: athena.tar
@@ -61,7 +64,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download athena image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: athena
           path: athena.tar
