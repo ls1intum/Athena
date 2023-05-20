@@ -44,6 +44,7 @@ jobs:
 
       - name: Build athena image
         run: |
+          cd athena
           docker build -t athena .
 
   build_other_images:
