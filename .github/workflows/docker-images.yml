@@ -44,7 +44,7 @@ jobs:
         run: |
           cd athena
           IMAGE_TAG=$(docker build -t athena . | awk '/Successfully built/{print $NF}')
-          echo "name=image_tag::$IMAGE_TAG" > $GITHUB_OUTPUT
+          echo "::set-output name=image_tag::$IMAGE_TAG"
 
   build_image:
     needs: [find_images_to_build, build_athena_image]
