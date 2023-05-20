@@ -25,8 +25,5 @@ RUN poetry config virtualenvs.create true \
 # Project files
 COPY . ./
 
-# Use modules configuration file for docker
-RUN mv ./modules.docker.ini ./modules.ini
-
 # poetry scripts don't work here
-CMD poetry run python -m assessment_module_manager
+CMD poetry run python -m module_*
