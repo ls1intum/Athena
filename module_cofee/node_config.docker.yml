@@ -1,0 +1,3 @@
+docker_nodes:
+  - traefik_service_api: http://module_cofee_old:8080/api/http/services/
+    trigger_route: /trigger
