@@ -9,7 +9,7 @@ It implements the approach described in the following master's thesis:
 ## Setup
 
 
-1. Fill in the following environment variables in the `.env` file of the module:
+1. Fill in the following environment variables in the `module_programming_llm.env` file for the module:
 
 ```
 OPENAI_API_KEY= # openai api key (!)

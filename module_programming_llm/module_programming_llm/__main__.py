@@ -1,4 +1,5 @@
 from typing import List
+import os
 
 from athena.storage import store_exercise
 
@@ -7,6 +8,10 @@ from athena.programming import Exercise, Submission, Feedback
 
 from module_programming_llm.basic.basic_feedback_provider import suggest_feedback as suggest_feedback_basic
 from module_programming_llm.basic.file_instructions import generate_file_grading_instructions, generate_file_problem_statements
+
+
+if "OPENAI_API_KEY" not in os.environ:
+    raise Exception("OPENAI_API_KEY environment variable not set. Please set it to your OpenAI API key.")
 
 
 @submission_selector
