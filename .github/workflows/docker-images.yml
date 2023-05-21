@@ -4,23 +4,18 @@ name: Docker Image
 # Because the Python images depend on the athena Python package, the package is built first.
 
 on:
-  pull_request:
-    branches:
-      - develop
   push:
     branches:
       - develop
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: 'The branch to checkout'
-        required: true
-        default: 'develop'
-      push:
-        description: 'Push to GitHub Container Registry'
-        required: true
-        default: 'false'
+  pull_request:
+    branches:
+      - develop
 
+# prevent Docker image push conflicts
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+ 
 jobs:
   find_images_to_build:
     runs-on: ubuntu-latest
@@ -58,10 +53,17 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
+      
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}
 
-      - name: Build (and push) Docker image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: ${{ matrix.image }}
-          push: ${{ github.event.pull_request.base.ref == 'develop' || github.event.inputs.push == 'true' }}
-          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}:latest
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
