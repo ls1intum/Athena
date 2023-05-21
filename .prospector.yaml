@@ -1,6 +1,6 @@
 strictness: low
 
-auto-detect: false
+autodetect: false
 
 ignore-paths:
   - docs
