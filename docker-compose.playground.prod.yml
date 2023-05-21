@@ -7,6 +7,4 @@ services:
 
   playground:
     hostname: playground
-    image: ghcr.io/pal03377/athena_playground:pr-19
-    environment:
-      - NEXT_PUBLIC_ATHENA_DOMAIN=${ATHENA_DOMAIN}
+    image: ghcr.io/pal03377/athena_playground:latest

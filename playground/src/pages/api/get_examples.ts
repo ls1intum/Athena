@@ -7,16 +7,14 @@ import Feedback from "@/model/feedback";
 import baseUrl from "@/helpers/base_url";
 
 
-const jsonPlaceholders: { [key: string]: string } = {
-    "baseUrl": baseUrl,
-};
-
-
-function replaceJsonPlaceholders(json: any, exerciseId: number) {
+function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: string) {
     // 1. Replace all file references found anywhere in the json with the file contents from examples/<reference>
     //    File references look like this: `-> file:example.txt`
-    // 2. Replace placeholders from the jsonPlaceholders object.
+    // 2. Replace a few placeholders.
     //    Placeholders look like this: `{{placeholder}}`
+    const jsonPlaceholders: { [key: string]: string } = {
+        materialUrl: `${athenaOrigin}${baseUrl}/api/material`,
+    };
     const result: any = {};
     for (const key in json) {
         if (json.hasOwnProperty(key)) {
@@ -40,9 +38,9 @@ function replaceJsonPlaceholders(json: any, exerciseId: number) {
                 }
                 result[key] = value;
             } else if (Array.isArray(value)) {
-                result[key] = value.map((item) => replaceJsonPlaceholders(item, exerciseId));
+                result[key] = value.map((item) => replaceJsonPlaceholders(item, exerciseId, athenaOrigin));
             } else if (typeof value === 'object') {
-                result[key] = replaceJsonPlaceholders(value, exerciseId);
+                result[key] = replaceJsonPlaceholders(value, exerciseId, athenaOrigin);
             } else {
                 result[key] = value;
             }
@@ -51,17 +49,17 @@ function replaceJsonPlaceholders(json: any, exerciseId: number) {
     return result;
 }
 
-function getExampleExerciseJSON(exerciseId: number): any {
+function getExampleExerciseJSON(exerciseId: number, athenaOrigin: string): any {
     // find in cwd/examples/submissions/<exerciseId>.json
     const submissionsPath = path.join(process.cwd(), 'examples', `exercise-${exerciseId}.json`);
     if (fs.existsSync(submissionsPath)) {
         const exerciseJson = JSON.parse(fs.readFileSync(submissionsPath, 'utf8'));
-        return replaceJsonPlaceholders(exerciseJson, exerciseId);
+        return replaceJsonPlaceholders(exerciseJson, exerciseId, athenaOrigin);
     }
     throw new Error(`No example submissions found for exercise ${exerciseId}`);
 }
 
-function getAllExampleExerciseJSON(): any[] {
+function getAllExampleExerciseJSON(athenaOrigin: string): any[] {
     // find in cwd/examples/submissions/*.json
     const submissionsPath = path.join(process.cwd(), 'examples');
     const exerciseIds = fs.readdirSync(submissionsPath)
@@ -70,7 +68,7 @@ function getAllExampleExerciseJSON(): any[] {
             // filename looks like `exercise-<exerciseId>.json`
             return parseInt(fileName.split('.')[0].split('-')[1]);
         });
-    return exerciseIds.map(getExampleExerciseJSON);
+    return exerciseIds.map(id => getExampleExerciseJSON(id, athenaOrigin));
 }
 
 
@@ -115,20 +113,20 @@ function jsonToFeedbacks(json: any): Feedback[] {
 }
 
 
-export function getExampleExercises(): Exercise[] {
-    return getAllExampleExerciseJSON().map(jsonToExercise);
+export function getExampleExercises(athenaOrigin: string): Exercise[] {
+    return getAllExampleExerciseJSON(athenaOrigin).map(jsonToExercise);
 }
 
-export function getExampleSubmissions(exerciseId?: number): Submission[] {
+export function getExampleSubmissions(exerciseId: number | undefined, athenaOrigin: string): Submission[] {
     if (exerciseId !== undefined) {
-        return jsonToSubmissions(getExampleExerciseJSON(exerciseId));
+        return jsonToSubmissions(getExampleExerciseJSON(exerciseId, athenaOrigin));
     }
-    return getAllExampleExerciseJSON().flatMap(jsonToSubmissions);
+    return getAllExampleExerciseJSON(athenaOrigin).flatMap(jsonToSubmissions);
 }
 
-export function getExampleFeedbacks(exerciseId?: number): Feedback[] {
+export function getExampleFeedbacks(exerciseId: number | undefined, athenaOrigin: string): Feedback[] {
     if (exerciseId !== undefined) {
-        return jsonToFeedbacks(getExampleExerciseJSON(exerciseId));
+        return jsonToFeedbacks(getExampleExerciseJSON(exerciseId, athenaOrigin));
     }
-    return getAllExampleExerciseJSON().flatMap(jsonToFeedbacks);
+    return getAllExampleExerciseJSON(athenaOrigin).flatMap(jsonToFeedbacks);
 }
