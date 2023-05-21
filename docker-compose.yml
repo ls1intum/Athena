@@ -6,6 +6,7 @@ services:
   athena:
     build: ./athena
     image: athena
+    command: echo "Athena build succeeded, exiting (this is normal)"
 
   assessment_module_manager:
     build: ./assessment_module_manager
