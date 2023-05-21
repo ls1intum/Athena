@@ -12,6 +12,8 @@ from module_programming_llm.basic.file_instructions import generate_file_grading
 
 if "OPENAI_API_KEY" not in os.environ:
     raise Exception("OPENAI_API_KEY environment variable not set. Please set it to your OpenAI API key.")
+if "PROMPTLAYER_API_KEY" not in os.environ:
+    raise Exception("PROMPTLAYER_API_KEY environment variable not set. Please set it to your PromptLayer API key.")
 
 
 @submission_selector
