@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   path[path.length - 1] = filename;
 
   // Get the folder path
-  const folderPath = join(process.cwd(), 'exercises', exerciseId, ...path);
+  const folderPath = join(process.cwd(), 'examples', 'exercise-' + exerciseId, ...path);
 
   // Check if the folder exists
   await fs.access(folderPath);
