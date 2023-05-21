@@ -152,6 +152,7 @@ files = []
 develop = true
 
 [package.dependencies]
+athena = {path = "../athena", develop = true}
 fastapi = "^0.95.1"
 httpx = "^0.24.0"
 uvicorn = "^0.21.1"
@@ -266,10 +267,6 @@ files = [
 name = "charset-normalizer"
 version = "3.1.0"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
-<<<<<<< HEAD
-=======
-category = "main"
->>>>>>> feature/cofee-adapter
 optional = false
 python-versions = ">=3.7.0"
 files = [
@@ -900,7 +897,6 @@ files = [
 name = "module-cofee"
 version = "0.1.0"
 description = "An adapter to the original [Athena](https://github.com/ls1intum/Athena), an implementation of CoFee (text exercise assessment)."
-category = "main"
 optional = false
 python-versions = "^3.10"
 files = []
@@ -923,12 +919,14 @@ python-versions = "^3.10"
 files = []
 develop = true
 
+[package.dependencies]
+athena = {path = "../athena", develop = true}
+
 [package.source]
 type = "directory"
 url = "module_example"
 
 [[package]]
-<<<<<<< HEAD
 name = "module-programming-llm"
 version = "0.1.0"
 description = "Programming assessment LLM module."
@@ -1039,15 +1037,6 @@ description = "Optional static typing for Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-=======
-name = "mypy"
-version = "1.3.0"
-description = "Optional static typing for Python"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
->>>>>>> feature/cofee-adapter
     {file = "mypy-1.3.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c1eb485cea53f4f5284e5baf92902cd0088b24984f4209e25981cc359d64448d"},
     {file = "mypy-1.3.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:4c99c3ecf223cf2952638da9cd82793d8f3c0c5fa8b6ae2b2d9ed1e1ff51ba85"},
     {file = "mypy-1.3.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:550a8b3a19bb6589679a7c3c31f64312e7ff482a816c96e0cecec9ad3a7564dd"},
@@ -1276,25 +1265,13 @@ docs = ["furo (>=2023.3.27)", "proselint (>=0.13)", "sphinx (>=6.2.1)", "sphinx-
 test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.3.1)", "pytest-cov (>=4)", "pytest-mock (>=3.10)"]
 
 [[package]]
-<<<<<<< HEAD
 name = "promptlayer"
 version = "0.1.81"
 description = "PromptLayer is a package to keep track of your GPT models training"
-=======
-name = "prospector"
-version = "1.10.0"
-description = "Prospector is a tool to analyse Python code by aggregating the result of other tools."
-category = "main"
->>>>>>> feature/cofee-adapter
 optional = false
 python-versions = "*"
 files = [
-<<<<<<< HEAD
     {file = "promptlayer-0.1.81.tar.gz", hash = "sha256:75b743977dbe646d9e7365ac7b6dc033886253515f9f88c748481e7a0e9090c2"},
-=======
-    {file = "prospector-1.10.0-py3-none-any.whl", hash = "sha256:ee7faf1fefcb3535212ae57b53c6cb3a10fc8ca70c9c605d24b6b3a61a5132aa"},
-    {file = "prospector-1.10.0.tar.gz", hash = "sha256:25a58b5b843d25c2c6710e2811472a8a2ac43a22dddcb5a375490c8b974e5c77"},
->>>>>>> feature/cofee-adapter
 ]
 
 [package.dependencies]
@@ -1347,7 +1324,6 @@ with-vulture = ["vulture (>=1.5)"]
 name = "protobuf"
 version = "4.23.1"
 description = ""
-category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1610,7 +1586,6 @@ files = [
 ]
 
 [[package]]
-<<<<<<< HEAD
 name = "regex"
 version = "2023.5.5"
 description = "Alternative regular expression module, to replace re."
@@ -1711,12 +1686,6 @@ files = [
 name = "requests"
 version = "2.30.0"
 description = "Python HTTP for Humans."
-=======
-name = "requests"
-version = "2.30.0"
-description = "Python HTTP for Humans."
-category = "main"
->>>>>>> feature/cofee-adapter
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2040,7 +2009,6 @@ files = [
 ]
 
 [[package]]
-<<<<<<< HEAD
 name = "typing-inspect"
 version = "0.8.0"
 description = "Runtime inspection utilities for typing module."
@@ -2059,12 +2027,6 @@ typing-extensions = ">=3.7.4"
 name = "urllib3"
 version = "2.0.2"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
-=======
-name = "urllib3"
-version = "2.0.2"
-description = "HTTP library with thread-safe connection pooling, file post, and more."
-category = "main"
->>>>>>> feature/cofee-adapter
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2270,8 +2232,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-<<<<<<< HEAD
-content-hash = "d971750cc8a9c5f2a977067304c7ecddda64fb763d9e99514fb86b9f35b84992"
-=======
-content-hash = "c1104f74082f081e43b5294e1fe11a6c2ff471728d7d60f3de1d0cff3b3d6193"
->>>>>>> feature/cofee-adapter
+content-hash = "a15fc4e76d48a7ad7ad94ba7c3b4ea8de36189299c4f11b4f6afe00bda053d54"
