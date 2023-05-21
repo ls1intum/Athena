@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# This is the Dockerfile for the assessment module manager.
+# This is the Dockerfile for the module_cofee.
 
 # Protobuf build
 FROM golang:alpine AS cofee_protobuf

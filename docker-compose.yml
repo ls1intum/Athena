@@ -1,12 +1,12 @@
 version: '3.8'
 
 # Development version of docker-compose.yml
-# To run: docker-compose up
 
 services:
   athena:
     build: ./athena
     image: athena
+    command: echo "Athena build succeeded, exiting (this is normal)"
 
   assessment_module_manager:
     build: ./assessment_module_manager

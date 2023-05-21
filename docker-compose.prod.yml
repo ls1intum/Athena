@@ -1,7 +1,6 @@
 version: '3.8'
 
 # The production version directly uses the Docker images from the registry.
-# To run: docker-compose -f docker-compose.prod.yml up
 
 services:
   caddy:
