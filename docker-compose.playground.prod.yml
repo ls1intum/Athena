@@ -8,3 +8,5 @@ services:
   playground:
     hostname: playground
     image: ghcr.io/pal03377/athena_playground:pr-19
+    environment:
+      - ATHENA_DOMAIN
