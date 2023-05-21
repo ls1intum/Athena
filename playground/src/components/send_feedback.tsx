@@ -8,6 +8,7 @@ import Feedback from "@/model/feedback";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import {ModuleMeta} from "@/model/health_response";
+import baseUrl from "@/helpers/baseUrl";
 
 async function sendFeedback(athenaUrl: string, module: ModuleMeta, exercise: Exercise | null, submission: Submission | null, feedback: Feedback | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {
@@ -24,7 +25,7 @@ async function sendFeedback(athenaUrl: string, module: ModuleMeta, exercise: Exe
     }
     try {
         const athenaFeedbackUrl = `${athenaUrl}/modules/${module.type}/${module.name}/feedback`;
-        const response = await fetch(`/api/athena_request?${new URLSearchParams({ url: athenaFeedbackUrl })}`, {
+        const response = await fetch(`${baseUrl}/api/athena_request?${new URLSearchParams({ url: athenaFeedbackUrl })}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
