@@ -4,6 +4,7 @@ auto-detect: false
 
 ignore-paths:
   - docs
+  - module_cofee/module_cofee/protobuf
 
 pycodestyle:
   disable:

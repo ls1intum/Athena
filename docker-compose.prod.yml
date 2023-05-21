@@ -1,6 +1,7 @@
 version: '3.8'
 
 # The production version directly uses the Docker images from the registry.
+# To run: docker-compose -f docker-compose.prod.yml up
 
 services:
   caddy:
@@ -24,3 +25,9 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR}/module_example.env
     image: ghcr.io/pal03377/athena_module_example:latest
+
+  module_cofee:
+    hostname: module_cofee
+    env_file:
+      - ${ATHENA_ENV_DIR}/module_cofee.env
+    image: ghcr.io/pal03377/athena_module_cofee:latest

@@ -1,6 +1,7 @@
 version: '3.8'
 
 # Development version of docker-compose.yml
+# To run: docker-compose up
 
 services:
   athena:
@@ -21,3 +22,11 @@ services:
       - athena
     ports:
       - "5001:5001"
+  
+  module_cofee:
+    hostname: module_cofee
+    build: ./module_cofee
+    depends_on:
+      - athena
+    ports:
+      - "5003:5003"
