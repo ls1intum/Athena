@@ -7,7 +7,7 @@ import { Submission } from "@/model/submission";
 import {ModuleMeta} from "@/model/health_response";
 import baseUrl from "@/helpers/baseUrl";
 
-async function requestSubmissionSelection(athenaUrl: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
+async function requestSubmissionSelection(athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {
         alert("Please select an exercise");
         return;
@@ -19,7 +19,8 @@ async function requestSubmissionSelection(athenaUrl: string, module: ModuleMeta,
         const response = await fetch(`${baseUrl}/api/athena_request?${new URLSearchParams({ url: athenaSubmissionSelectUrl })}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-Secret': athenaSecret
             },
             body: JSON.stringify({
                 exercise,
@@ -43,7 +44,9 @@ async function requestSubmissionSelection(athenaUrl: string, module: ModuleMeta,
     }
 }
 
-export default function SelectSubmission({ athenaUrl, module }: { athenaUrl: string, module: ModuleMeta }) {
+export default function SelectSubmission(
+    { athenaUrl, athenaSecret, module }: { athenaUrl: string, athenaSecret: string, module: ModuleMeta }
+) {
     const [exercise, setExercise] = useState<Exercise | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [response, setResponse] = useState<ModuleResponse | undefined>(undefined);
@@ -64,7 +67,7 @@ export default function SelectSubmission({ athenaUrl, module }: { athenaUrl: str
                 className="bg-blue-500 text-white rounded-md p-2 mt-4"
                 onClick={() => {
                     setLoading(true);
-                    requestSubmissionSelection(athenaUrl, module, exercise)
+                    requestSubmissionSelection(athenaUrl, athenaSecret, module, exercise)
                         .then(setResponse)
                         .finally(() => setLoading(false));
                 }}
