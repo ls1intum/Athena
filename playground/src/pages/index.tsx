@@ -7,7 +7,11 @@ import SelectSubmission from "@/components/request_submission_selection";
 import {ModuleMeta} from "@/model/health_response";
 
 export default function Home() {
-    const [athenaUrl, setAthenaUrl] = useState<string>("http://127.0.0.1:5000");
+    let defaultUrl = location.origin;
+    if (location.hostname === "localhost") {
+        defaultUrl = "http://127.0.0.1:5000";
+    }
+    const [athenaUrl, setAthenaUrl] = useState<string>(defaultUrl);
     const [athenaSecret, setAthenaSecret] = useState<string>("");
     const [module, setModule] = useState<ModuleMeta | undefined>(undefined);
 
