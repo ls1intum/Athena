@@ -4,6 +4,13 @@ auto-detect: false
 
 ignore-paths:
   - docs
+  - module_cofee/module_cofee/protobuf
+
+mypy:
+    run: true
+    options:
+         ignore-missing-imports: true
+         follow-imports: skip
 
 pycodestyle:
   disable:
