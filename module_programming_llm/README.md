@@ -6,14 +6,12 @@ It implements the approach described in the following master's thesis:
 > **An LLM-Enabled Approach for Automated Feedback Generation on Programming Exercises**  
 > Felix T.J. Dietrich
 
-## Setup
+## Development Setup
 
-
-1. Fill in the following environment variables in the `module_programming_llm.env` file for the module:
+1. Copy the `.env.example` file to `.env` and fill in the environment in `.env`:
 
 ```
-OPENAI_API_KEY= # openai api key (!)
-PROMPTLAYER_API_KEY= # promptlayer api key (optional)
+cp .env.example .env
 ```
 
 2. Install dependencies with poetry:

@@ -2,7 +2,6 @@ import json
 from typing import List
 
 from langchain.chains import LLMChain
-from langchain.chat_models import PromptLayerChatOpenAI
 from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
@@ -12,12 +11,10 @@ from langchain.prompts import (
 from athena.programming import Exercise, Submission, Feedback
 
 from module_programming_llm.helpers.utils import get_diff, get_file_extension, load_files_from_repo, add_line_numbers
-
+from module_programming_llm.helpers.models import chat
 
 async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     max_prompt_length = 2560
-
-    chat = PromptLayerChatOpenAI(pl_tags=["basic"], temperature=0)
     input_list: List[dict] = []
 
     if exercise.meta['file_grading_instructions'] is None:
