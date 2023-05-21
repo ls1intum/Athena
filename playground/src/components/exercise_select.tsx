@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import { Exercise } from "@/model/exercise";
 import fetcher from "@/helpers/fetcher";
-import baseUrl from "@/helpers/baseUrl";
+import baseUrl from "@/helpers/base_url";
 
 export default function ExerciseSelect(
     {exercise, exerciseType, onChange}: { exercise: Exercise | null, exerciseType: string, onChange: (exercise: Exercise) => void}

@@ -6,7 +6,7 @@ import SubmissionSelect from "@/components/submission_select";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import {ModuleMeta} from "@/model/health_response";
-import baseUrl from "@/helpers/baseUrl";
+import baseUrl from "@/helpers/base_url";
 
 async function requestFeedbackSuggestions(athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null, submission: Submission | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {

@@ -8,7 +8,7 @@ import Feedback from "@/model/feedback";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import {ModuleMeta} from "@/model/health_response";
-import baseUrl from "@/helpers/baseUrl";
+import baseUrl from "@/helpers/base_url";
 
 async function sendFeedback(
     athenaUrl: string,

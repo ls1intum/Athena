@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import {ProgrammingSubmission, Submission, TextSubmission} from "@/model/submission";
 import fetcher from "@/helpers/fetcher";
-import baseUrl from "@/helpers/baseUrl";
+import baseUrl from "@/helpers/base_url";
 
 export default function SubmissionSelect(
     { exercise_id, submission, onChange, isAllSubmissions, setIsAllSubmissions }: { exercise_id?: number, submission: Submission | null, onChange: (submission: Submission) => void, isAllSubmissions?: boolean, setIsAllSubmissions?: (isAllSubmissions: boolean) => void }
