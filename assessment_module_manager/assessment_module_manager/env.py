@@ -11,4 +11,4 @@ for module in list_modules():
     if secret is None and PRODUCTION:
         raise ValueError(f"Missing secret for module {module.name}. "
                          f"Set the {module.name.upper()}_SECRET environment variable.")
-    MODULE_SECRETS[module.name] = secret or ""
+    MODULE_SECRETS[module.name] = secret
