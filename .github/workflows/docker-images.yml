@@ -58,4 +58,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ${{ matrix.image }}
-          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}:${{ github.ref == 'refs/heads/develop' && 'latest' || github.ref_name }}
+          tags: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}:${{ github.ref == 'refs/heads/develop' && 'latest' || github.sha.short }}
