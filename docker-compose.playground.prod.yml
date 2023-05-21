@@ -9,4 +9,4 @@ services:
     hostname: playground
     image: ghcr.io/pal03377/athena_playground:latest
     environment:
-      - ATHENA_DOMAIN
+      - NEXT_PUBLIC_ATHENA_DOMAIN=${ATHENA_DOMAIN}
