@@ -37,7 +37,7 @@ async def request_to_module(module: Module, path: str, data: dict) -> ModuleResp
     module_secret = env.MODULE_SECRETS[module.name]
     try:
         async with httpx.AsyncClient(base_url=module.url, timeout=600) as client:
-            response = await client.post(path, json=data, headers={'X-API-Secret': module_secret})
+            response = await client.post(path, json=data, headers={'X-API-Secret': module_secret} if module_secret else None)
     except httpx.ConnectError as exc:
         raise HTTPException(status_code=503, detail=f"Module {module.name} is not available") from exc
     try:
