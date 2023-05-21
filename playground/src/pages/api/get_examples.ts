@@ -15,7 +15,7 @@ function replaceFileReferences(json: any, exerciseId: number) {
             const value = json[key];
             if (typeof value === 'string') {
                 if (value.startsWith('-> file:')) {
-                    const filePath = path.join(process.cwd(), 'examples', value.split(':')[1]);
+                    const filePath = path.join(process.cwd(), 'examples', 'exercise-' + exerciseId, value.split(':')[1]);
                     if (fs.existsSync(filePath)) {
                         result[key] = fs.readFileSync(filePath, 'utf8');
                     } else {
@@ -24,6 +24,8 @@ function replaceFileReferences(json: any, exerciseId: number) {
                 } else {
                     result[key] = value;
                 }
+            } else if (Array.isArray(value)) {
+                result[key] = value.map((item) => replaceFileReferences(item, exerciseId));
             } else if (typeof value === 'object') {
                 result[key] = replaceFileReferences(value, exerciseId);
             } else {
