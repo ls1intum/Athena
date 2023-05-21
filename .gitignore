@@ -7,4 +7,4 @@ dist
 data/*
 !data/.gitkeep
 .idea
-.env # for more convenient production deployment with docker compose, this is the only gitignored env file
+.env
