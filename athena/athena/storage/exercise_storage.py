@@ -19,7 +19,7 @@ def get_stored_exercises(exercise_cls: Type[Exercise], only_ids: Optional[List[i
 
 def get_stored_exercise_meta(exercise: Exercise) -> Optional[dict]:
     """Returns the stored metadata associated with the exercise."""
-    db_exercise_cls = exercise.__class__.get_model_class()
+    db_exercise_cls: Type[Exercise] = exercise.__class__.get_model_class()
     with get_db() as db:
         return db.query(db_exercise_cls.meta).filter_by(id=exercise.id).scalar()
 
