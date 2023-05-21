@@ -11,6 +11,11 @@ on:
     branches:
       - develop
 
+# prevent Docker image push conflicts
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+ 
 jobs:
   find_images_to_build:
     runs-on: ubuntu-latest
