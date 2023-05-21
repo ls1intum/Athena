@@ -1,11 +1,13 @@
 import inspect
-from typing import TypeVar, Callable, List, Annotated
+from typing import TypeVar, Callable, List
 
 from athena.app import app
 from athena.authenticate import authenticated
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
-from athena.storage import store_feedback, get_stored_submissions, store_exercise, store_submissions
+from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
+    store_exercise, store_feedback, store_feedback_suggestions, store_submissions, get_stored_submissions
+    
 
 E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
@@ -22,21 +24,32 @@ module_responses = {
 
 def submissions_consumer(func: Callable[[E, List[S]], None]):
     """
-    Receive submissions from the Assessment Module Manager and automatically store them in the database.
+    Receive submissions from the Assessment Module Manager.
     The submissions consumer is usually called whenever the deadline for an exercise is reached.
     """
-
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
 
     @app.post("/submissions", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submissions: List[submission_type]):
-        store_exercise(exercise)
-        store_submissions(submissions)
-        return func(exercise, submissions)
+        # Retrieve existing metadata for the exercise and submissions
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submissions_dict = {s.id: s for s in submissions}
+        if submissions:
+            stored_submissions = get_stored_submissions(submissions[0].__class__, exercise.id, [s.id for s in submissions])
+            for stored_submission in stored_submissions:
+                if stored_submission.id in submissions_dict:
+                    submissions_dict[stored_submission.id].meta.update(stored_submission.meta)
+        submissions = list(submissions_dict.values())
+
+        # Call the actual consumer
+        if inspect.iscoroutinefunction(func):
+            await func(exercise, submissions)
+        else:
+            func(exercise, submissions)
 
     return wrapper
 
@@ -52,11 +65,13 @@ def submission_selector(func: Callable[[E, List[S]], S]):
 
     @app.post("/select_submission", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submission_ids: List[int]) -> int:
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
+
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
 
         # Get the full submission objects
         submissions = list(get_stored_submissions(submission_type, exercise.id, submission_ids))
@@ -66,8 +81,12 @@ def submission_selector(func: Callable[[E, List[S]], S]):
         if not submissions:
             # Nothing to select from
             return -1
+
         # Select the submission
-        submission = func(exercise, submissions)
+        if inspect.iscoroutinefunction(func):
+            submission = await func(exercise, submissions)
+        else:
+            submission = func(exercise, submissions)
 
         if submission is None:
             return -1
@@ -78,22 +97,31 @@ def submission_selector(func: Callable[[E, List[S]], S]):
 
 def feedback_consumer(func: Callable[[E, S, F], None]):
     """
-    Receive feedback from the Assessment Module Manager and automatically store it in the database.
+    Receive feedback from the Assessment Module Manager.
     The feedback consumer is usually called whenever the LMS gets feedback from a tutor.
     """
-
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
     feedback_type = inspect.signature(func).parameters["feedback"].annotation
 
     @app.post("/feedback", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
             feedback: feedback_type):
+        # Retrieve existing metadata for the exercise, submission and feedback
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submission.meta.update(get_stored_submission_meta(submission) or {})
+        feedback.meta.update(get_stored_feedback_meta(feedback) or {})
+
         store_feedback(feedback)
-        return func(exercise, submission, feedback)
+
+        # Call the actual consumer
+        if inspect.iscoroutinefunction(func):
+            await func(exercise, submission, feedback)
+        else:
+            func(exercise, submission, feedback)
 
     return wrapper
 
@@ -103,15 +131,28 @@ def feedback_provider(func: Callable[[E, S], List[F]]):
     Provide feedback to the Assessment Module Manager.
     The feedback provider is usually called whenever the tutor requests feedback for a submission in the LMS.
     """
-
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
 
     @app.post("/feedback_suggestions", responses=module_responses)
     @authenticated
-    def wrapper(
+    async def wrapper(
             exercise: exercise_type,
             submission: submission_type):
-        return func(exercise, submission)
+        # Retrieve existing metadata for the exercise, submission and feedback
+        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        submission.meta.update(get_stored_submission_meta(submission) or {})
 
+        store_exercise(exercise)
+        store_submissions([submission])
+
+        # Call the actual provider
+        if inspect.iscoroutinefunction(func):
+            feedbacks = await func(exercise, submission)
+        else:
+            feedbacks = func(exercise, submission)
+    
+        store_feedback_suggestions(feedbacks)
+
+        return feedbacks
     return wrapper
