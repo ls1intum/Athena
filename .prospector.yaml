@@ -7,10 +7,11 @@ ignore-paths:
   - module_cofee/module_cofee/protobuf
 
 mypy:
-    run: true
-    options:
-         ignore-missing-imports: true
-         follow-imports: skip
+  run: true
+  options:
+    ignore-missing-imports: true
+    follow-imports: skip
+  plugins: pydantic.mypy,sqlalchemy.ext.mypy.plugin
 
 pycodestyle:
   disable:

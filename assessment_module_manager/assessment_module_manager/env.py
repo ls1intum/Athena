@@ -1,7 +1,7 @@
 """Common place for environment variables with sensible defaults for local development."""
 import os
 
-from .module import list_modules
+from .module.list_modules import list_modules
 
 PRODUCTION = os.environ.get("PRODUCTION", "0") == "1"
 
