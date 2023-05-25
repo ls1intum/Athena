@@ -17,6 +17,9 @@ module_cofee = {path = "./module_cofee", develop = true}
 
 # start linter with `poetry run prospector`
 
+[tool.poetry.group.dev.dependencies]
+types-requests = "^2.31.0.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
