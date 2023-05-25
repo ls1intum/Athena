@@ -1,3 +1,6 @@
+# Prepare Module
+`make`
+
 # Start Directly
 `poetry run module`
 
