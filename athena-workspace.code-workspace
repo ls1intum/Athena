@@ -15,5 +15,9 @@
 		{
 			"path": "module_programming_llm"
 		}
-	]
+	],
+	"settings": {
+		"python.linting.prospectorEnabled": true,
+		"python.linting.mypyEnabled": true
+	}
 }
