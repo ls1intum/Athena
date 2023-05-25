@@ -10,7 +10,7 @@ export default async function handler(
     // TODO: check the security implications of this
     const url = req.query.url;
     let response;
-    const secret = req.headers['x-api-secret'] as string;
+    const secret = req.headers['X-API-Secret'] as string;
     if (!secret) {
         console.warn('No secret provided');
     }
