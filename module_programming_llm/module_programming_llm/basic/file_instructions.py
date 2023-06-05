@@ -44,7 +44,7 @@ JSON response:
     try:
         return json.loads(result.content)
     except json.JSONDecodeError:
-        logger.error(f"Could not decode JSON response from chatbot:\n{result.content}")
+        logger.error("Could not decode JSON response from chat: %s", result.content)
     return None
 
 
@@ -80,5 +80,5 @@ JSON response:
     try:
         return json.loads(result.content)
     except json.JSONDecodeError:
-        logger.error("Could not decode JSON response from chatbot:\n{result.content}")
+        logger.error("Could not decode JSON response from chat: %s", result.content)
     return None

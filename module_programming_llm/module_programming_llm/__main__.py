@@ -11,34 +11,32 @@ from module_programming_llm.basic.file_instructions import generate_file_grading
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
-    logger.info(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
+    logger.info("receive_submissions: Received %d submissions for exercise %d", len(submissions), exercise.id)
 
     # Split problem statements and grading instructions 
     exercise.meta['file_grading_instructions'] = generate_file_grading_instructions(exercise)
     exercise.meta['file_problem_statements'] = generate_file_problem_statements(exercise)
-    logger.info(exercise.meta['file_grading_instructions'])
-    logger.info(exercise.meta['file_problem_statements'])
 
     store_exercise(exercise)
 
 
 @submission_selector
 def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
-    logger.info(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
+    logger.info("select_submission: Received %d, submissions for exercise %d", len(submissions), exercise.id)
     # Always return the first submission
     return submissions[0]
 
 
 @feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
-    logger.info(f"process_feedback: Received feedback for submission {submission.id} of exercise {exercise.id}.")
-    logger.info(f"process_feedback: Feedback: {feedback}")
+    logger.info("process_feedback: Received feedback for submission %d of exercise %d.", submission.id, exercise.id)
+    logger.info("process_feedback: Feedback: %s", feedback)
     # Do something with the feedback
 
 
 @feedback_provider
 async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
-    logger.info(f"suggest_feedback: Suggestions for submission {submission.id} of exercise {exercise.id} were requested")
+    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
     # Do something with the submission and return a list of feedback
 
     # Check if file based grading instructions and problem statements are available

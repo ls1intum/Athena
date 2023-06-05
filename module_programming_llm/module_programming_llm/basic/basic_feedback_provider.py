@@ -38,12 +38,12 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
             
         problem_statement = exercise.meta['file_problem_statements'][file_path]
         if problem_statement is None:
-            logger.info(f"No problem statement for {file_path}, skipping.")
+            logger.info("No problem statement for %s, skipping.", file_path)
             continue
 
         grading_instructions = exercise.meta['file_grading_instructions'][file_path]
         if grading_instructions is None:
-            logger.info(f"No grading instructions for {file_path}, skipping.")
+            logger.info("No grading instructions for %s, skipping.", file_path)
             continue
 
         submission_content = add_line_numbers(submission_content)
