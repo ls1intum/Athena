@@ -61,11 +61,12 @@ def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iter
     remote = None
     try:
         remote = repo.remote(remote_name)
+        yield remote
     except ValueError:
         remote = repo.create_remote(remote_name, remote_url)
         remote.fetch()
+        yield remote
         repo.delete_remote(remote)
-    yield remote
 
 def get_diff(src_repo: Repo, 
              dst_repo: Repo, 
