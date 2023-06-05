@@ -58,7 +58,6 @@ def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iter
         repo (Repo): The repository to add the remote to
         remote_url (PathLike): The URL of the remote
     """
-    remote = None
     try:
         remote = repo.remote(remote_name)
         yield remote
