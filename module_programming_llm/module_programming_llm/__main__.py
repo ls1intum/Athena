@@ -9,13 +9,6 @@ from module_programming_llm.basic.basic_feedback_provider import suggest_feedbac
 from module_programming_llm.basic.file_instructions import generate_file_grading_instructions, generate_file_problem_statements
 
 
-@submission_selector
-def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
-    logger.info(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
-    # Always return the first submission
-    return submissions[0]
-
-
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     logger.info(f"receive_submissions: Received {len(submissions)} submissions for exercise {exercise.id}")
@@ -27,6 +20,13 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     logger.info(exercise.meta['file_problem_statements'])
 
     store_exercise(exercise)
+
+
+@submission_selector
+def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
+    logger.info(f"select_submission: Received {len(submissions)} submissions for exercise {exercise.id}")
+    # Always return the first submission
+    return submissions[0]
 
 
 @feedback_consumer
