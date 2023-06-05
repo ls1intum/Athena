@@ -21,11 +21,15 @@ except ImportError as e:
     raise e
 
 
+# Default token for local testing, from https://github.com/ls1intum/Athena/blob/master/.env
+DEFAULT_COFEE_TOKEN = "YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo="
+
+
 def get_cofee_url() -> str:
     """
     Get the URL of the CoFee service from the environment variable COFEE_URL.
     """
-    return os.environ["COFEE_URL"]
+    return os.environ.get("COFEE_URL", "http://localhost")
 
 
 def send_submissions(exercise: Exercise, submissions: List[Submission]):
@@ -48,7 +52,7 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
         },
         headers={
             "Content-Type": "application/json",
-            "Authorization": os.environ["COFEE_AUTH_TOKEN"],
+            "Authorization": os.environ.get("COFEE_AUTH_TOKEN", DEFAULT_COFEE_TOKEN),
         },
         timeout=60,
         # TODO: remove this again:
