@@ -8,6 +8,7 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
 )
 
+from athena.helpers.programming import format_feedback_text, format_feedback_reference
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 
@@ -60,45 +61,45 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
         })
 
     # Prompt building
-    system_template = (
-        'You are a programming tutor AI at a university tasked with grading and providing feedback to programming homework assignments.\n'
-        '\n'
-        'You receive a submission with some other information and respond with the following JSON format:\n'
-        '[{{"text": <feedback_comment>, "credits": <number>, "line": <nullable line number (no range)>}}]\n'
-        'Extremely Important: The response should only contain the json object with the feedback, nothing else!\n'
-        '\n'
-        'Effective feedback for programming assignments should possess the following qualities:\n'
-        '1. Constructive: Provide guidance on how to improve the code, pointing out areas that can be optimized, refactored, or enhanced.\n'
-        '2. Specific: Highlight exact lines or sections of code that need attention, and suggest precise changes or improvements.\n'
-        '3. Balanced: Recognize and praise the positive aspects of the code, while also addressing areas for improvement, to encourage and motivate the student.\n'
-        '4. Clear and concise: Use straightforward language and avoid overly technical jargon, so that the student can easily understand the feedback.\n'
-        '5. Actionable: Offer practical suggestions for how the student can apply the feedback to improve their code, ensuring they have a clear path forward.\n'
-        '6. Educational: Explain the reasoning behind the suggestions, so the student can learn from the feedback and develop their programming skills.\n'
-        '\n'
-        'Example response:\n'
-        '['
-        '{{"text": "Great use of the compareTo method for comparing Dates, which is the proper way to compare objects.", "credits": 3, "line": 14}},'
-        '{{"text": "Good job implementing the BubbleSort algorithm for sorting Dates. It shows a clear understanding of the sorting process", "credits": 5, "line": null}},'
-        '{{"text": "Incorrect use of \'==\' for string comparison, which leads to unexpected results. Use the \'equals\' method for string comparison instead.", "credits": -2, "line": 18}}'
-        ']\n'
-    )
-    human_template = (
-        'Student\'s submission to grade:\n'
-        '{submission_content}\n'
-        'Diff between solution (deletions) and student\'s submission (additions):\n'
-        '{solution_to_submission_diff}\n'
-        'Diff between template (deletions) and student\'s submission (additions):\n'
-        '{template_to_submission_diff}\n'
-        'Problem statement:\n'
-        '{problem_statement}\n'
-        'Grading instructions:\n'
-        '{grading_instructions}\n'
-        'As said, it should be effective feedback following an extremely high standard.\n'
-        'Critically grade the submission and distribute credits accordingly.\n'
-        'Be liberal with interpreting the grading instructions.\n'
-        '\n'
-        'JSON response:\n'
-    )
+    system_template = """\
+You are a programming tutor AI at a university tasked with grading and providing feedback to programming homework assignments.
+
+You receive a submission with some other information and respond with the following JSON format:
+[{{"text": <feedback_comment>, "credits": <number>, "line": <nullable line number (no range)>}}]
+Extremely Important: The response should only contain the json object with the feedback, nothing else!
+
+Effective feedback for programming assignments should possess the following qualities:
+1. Constructive: Provide guidance on how to improve the code, pointing out areas that can be optimized, refactored, or enhanced.
+2. Specific: Highlight exact lines or sections of code that need attention, and suggest precise changes or improvements.
+3. Balanced: Recognize and praise the positive aspects of the code, while also addressing areas for improvement, to encourage and motivate the student.
+4. Clear and concise: Use straightforward language and avoid overly technical jargon, so that the student can easily understand the feedback.
+5. Actionable: Offer practical suggestions for how the student can apply the feedback to improve their code, ensuring they have a clear path forward.
+6. Educational: Explain the reasoning behind the suggestions, so the student can learn from the feedback and develop their programming skills.
+
+Example response:
+[\
+{{"text": "Great use of the compareTo method for comparing Dates, which is the proper way to compare objects.", "credits": 3, "line": 14}},\
+{{"text": "Good job implementing the BubbleSort algorithm for sorting Dates. It shows a clear understanding of the sorting process", "credits": 5, "line": null}},\
+{{"text": "Incorrect use of \'==\' for string comparison, which leads to unexpected results. Use the \'equals\' method for string comparison instead.", "credits": -2, "line": 18}}\
+]\
+"""
+    human_template = """\
+Student\'s submission to grade:
+{submission_content}
+Diff between solution (deletions) and student\'s submission (additions):
+{solution_to_submission_diff}
+Diff between template (deletions) and student\'s submission (additions):
+{template_to_submission_diff}
+Problem statement:
+{problem_statement}
+Grading instructions:
+{grading_instructions}
+As said, it should be effective feedback following an extremely high standard.
+Critically grade the submission and distribute credits accordingly.
+Be liberal with interpreting the grading instructions.
+
+JSON response:
+"""
     
     system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
@@ -127,9 +128,9 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
 
             for feedback in feedbacks:
                 line = feedback.get("line", None)
-                text = f"File {file_path} at line {line}" if line is not None else f"File {file_path}"
+                text = format_feedback_text(file_path=file_path, line=line)
                 detail_text = feedback.get("text", "")
-                reference = f"file://{file_path}_line:{line}" if line is not None else None
+                reference = format_feedback_reference(file_path=file_path, line=line)
                 credits = feedback.get("credits", 0.0)
                 feedback_proposals.append(
                     Feedback(
