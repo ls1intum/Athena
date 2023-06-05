@@ -9,6 +9,7 @@ from langchain.prompts import (
 )
 
 from athena.programming import Exercise, Submission, Feedback
+from athena.logger import logger
 
 from module_programming_llm.helpers.utils import get_diff, get_file_extension, load_files_from_repo, add_line_numbers
 from module_programming_llm.helpers.models import chat
@@ -37,12 +38,12 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
             
         problem_statement = exercise.meta['file_problem_statements'][file_path]
         if problem_statement is None:
-            print(f"No problem statement for {file_path}, skipping.")
+            logger.info(f"No problem statement for {file_path}, skipping.")
             continue
 
         grading_instructions = exercise.meta['file_grading_instructions'][file_path]
         if grading_instructions is None:
-            print(f"No grading instructions for {file_path}, skipping.")
+            logger.info(f"No grading instructions for {file_path}, skipping.")
             continue
 
         submission_content = add_line_numbers(submission_content)
@@ -118,10 +119,10 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
             try:
                 feedbacks = json.loads(generation.text)
             except json.JSONDecodeError:
-                print("Failed to parse feedback json:", generation.text)
+                logger.error("Failed to parse feedback json:", generation.text)
                 continue
             if not isinstance(feedbacks, list):
-                print("Feedback json is not a list:", generation.text)
+                logger.error("Feedback json is not a list:", generation.text)
                 continue
 
             for feedback in feedbacks:

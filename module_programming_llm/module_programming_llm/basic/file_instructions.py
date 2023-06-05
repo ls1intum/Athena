@@ -7,6 +7,7 @@ from langchain.prompts import (
 )
 
 from athena.programming import Exercise
+from athena.logger import logger
 
 from module_programming_llm.helpers.utils import get_diff, get_file_extension
 from module_programming_llm.helpers.models import chat
@@ -43,8 +44,7 @@ def generate_file_grading_instructions(exercise: Exercise):
     try:
         return json.loads(result.content)
     except json.JSONDecodeError:
-        print("Could not decode JSON response from chatbot:")
-        print(result.content)
+        logger.error(f"Could not decode JSON response from chatbot:\n{result.content}")
     return None
 
 
@@ -80,6 +80,5 @@ def generate_file_problem_statements(exercise: Exercise):
     try:
         return json.loads(result.content)
     except json.JSONDecodeError:
-        print("Could not decode JSON response from chatbot:")
-        print(result.content)
+        logger.error("Could not decode JSON response from chatbot:\n{result.content}")
     return None
