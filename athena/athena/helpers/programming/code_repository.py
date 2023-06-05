@@ -45,5 +45,8 @@ def get_repository(url: str) -> Repo:
             repo = Repo.init(cache_dir_path)
             repo.index.add(repo.untracked_files)
             repo.index.commit("Initial commit")
+            if 'master' in repo.heads and 'main' not in repo.heads:
+                master = repo.heads.master
+                master.rename('main')
 
     return Repo(cache_dir_path)
