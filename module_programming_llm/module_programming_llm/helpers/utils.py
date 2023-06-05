@@ -25,8 +25,12 @@ def merge_repos_by_filepath(*repos: List[Repo], file_filter: Optional[Callable[[
 
 def add_line_numbers(content: str) -> str:
     lines = content.splitlines()
-    padding = len(str(len(lines)))
-    return "\n".join([f"{i+1:>{padding}} {line}" for i, line in enumerate(lines)])
+    line_number_max_length = len(str(len(lines)))
+    return "\n".join(
+        f"{str(line_number).rjust(line_number_max_length)} {line}" 
+        for line_number, line 
+        in enumerate(lines, start=1)
+    )
 
 
 def get_file_extension(programming_language: str) -> str | None:
@@ -60,32 +64,32 @@ def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iter
     except ValueError:
         remote = repo.create_remote(remote_name, remote_url)
         remote.fetch()
-        yield remote
         repo.delete_remote(remote)
-    else:
-        yield remote
-
+    yield remote
 
 def get_diff(src_repo: Repo, 
              dst_repo: Repo, 
              src_prefix: str = "a",
              dst_prefix: str = "b",
-             file_path: Optional[Union[Path, str]] = None,
+             file_path: Optional[str] = None,
              name_only: bool = False,
              branch: str = "main", 
              remote_name: str = "diff_target") -> str:
     """Get the diff between two branches of two Git repositories.
-    
+
     Args:
-        src_repo (Repo): The repository to get the diff from
-        dst_repo (Repo): The repository to get the diff to
-        src_prefix (str, optional): The prefix to use for the source files. Defaults to "a"
-        dst_prefix (str, optional): The prefix to use for the destination files. Defaults to "b"
-        file_path (Optional[Union[Path, str]]): The path to the file(s) to get the diff for. Defaults to None
-        name_only (bool, optional): Only show names of changed files. Defaults to False
-        branch (str, optional): The branch to get the diff for. Defaults to "main"
-        remote_name (str, optional): The name of the remote to use. Defaults to "diff_target"
-    """
+        src_repo (Repo): Repository to diff from
+        dst_repo (Repo): Repository to diff to
+        src_prefix (str, optional): Prefix for the source files. Defaults to "a".
+        dst_prefix (str, optional): Prefix for the destination files. Defaults to "b".
+        file_path (Optional[str], optional): Path to the file(s), supports glob patterns. Defaults to None.
+        name_only (bool, optional): Only show names of changed files. Defaults to False.
+        branch (str, optional): Branch to diff. Defaults to "main".
+        remote_name (str, optional): Name of the remote to use. Defaults to "diff_target".
+
+    Returns:
+        str: The diff between the two branches
+    """    
     if file_path is not None and "*" not in file_path:
         file_path_obj = Path(src_repo.working_tree_dir) / file_path
         if not file_path_obj.exists():
