@@ -8,7 +8,6 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
 )
 
-from athena.helpers.programming import format_feedback_text, format_feedback_reference
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 
@@ -128,17 +127,15 @@ JSON response:
 
             for feedback in feedbacks:
                 line = feedback.get("line", None)
-                text = format_feedback_text(file_path=file_path, line=line)
                 detail_text = feedback.get("text", "")
-                reference = format_feedback_reference(file_path=file_path, line=line)
                 credits = feedback.get("credits", 0.0)
                 feedback_proposals.append(
                     Feedback(
                         exercise_id=exercise.id,
                         submission_id=submission.id,
                         detail_text=detail_text,
-                        text=text,
-                        reference=reference,
+                        file_path=file_path,
+                        line=line,
                         credits=credits,
                         meta={},
                     )
