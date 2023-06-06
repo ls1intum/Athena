@@ -30,3 +30,9 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR}/module_programming_llm.env
     image: ghcr.io/pal03377/module_programming_llm:latest
+
+  module_text_llm:
+    hostname: module_text_llm
+    env_file:
+      - ${ATHENA_ENV_DIR}/module_text_llm.env
+    image: ghcr.io/pal03377/module_text_llm:latest

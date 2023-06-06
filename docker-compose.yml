@@ -30,3 +30,11 @@ services:
       - athena
     ports:
       - "5002:5002"
+
+  module_text_llm:
+    hostname: module_text_llm
+    build: ./module_text_llm
+    depends_on:
+      - athena
+    ports:
+      - "5004:5004"
