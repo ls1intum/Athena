@@ -1,12 +1,12 @@
 from typing import Optional
 
 
-def format_feedback_text(file_path: Optional[str], line: Optional[int]) -> str:
+def format_feedback_text(file_path: Optional[str] = None, line: Optional[int] = None) -> str:
     """Returns a consistent feedback text for an optional file path and line number.
 
     Args:
-        file_path (Optional[str]): Reference to a file path
-        line (Optional[int]): Reference to a line number
+        file_path (Optional[str]): Reference to a file path. Defaults to None.
+        line (Optional[int]): Reference to a line number. Defaults to None.
 
     Returns:
         str: The formatted feedback text
