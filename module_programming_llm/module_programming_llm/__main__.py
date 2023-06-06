@@ -45,5 +45,6 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     logger.info("suggest_feedback: No file based grading instructions and problem statements available. Skipping feedback generation.")
     return []
 
+
 if __name__ == "__main__":
     app.start()

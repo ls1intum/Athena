@@ -1,21 +1,22 @@
-from pathlib import Path
-from os import PathLike
+import os
+
 from contextlib import contextmanager
 from collections.abc import Iterator
-from typing import List, Dict, Optional, Callable, Union, Tuple
+from typing import List, Dict, Optional, Callable, Tuple
 
-from git import Repo, Remote
+from git import Remote
+from git.repo import Repo
 from langchain.document_loaders import GitLoader
 
 
 def load_files_from_repo(repo: Repo, file_filter: Optional[Callable[[str], bool]] = None) -> Dict[str, Optional[str]]:
     return {
         doc.metadata['file_path']: doc.page_content
-        for doc in GitLoader(repo_path=repo.working_tree_dir, file_filter=file_filter).load()
+        for doc in GitLoader(repo_path=str(repo.working_tree_dir), file_filter=file_filter).load()
     }
 
 
-def merge_repos_by_filepath(*repos: List[Repo], file_filter: Optional[Callable[[str], bool]] = None) -> Iterator[Tuple[str, List[Optional[str]]]]:
+def merge_repos_by_filepath(*repos: Repo, file_filter: Optional[Callable[[str], bool]] = None) -> Iterator[Tuple[str, List[Optional[str]]]]:
     docs = [load_files_from_repo(repo, file_filter) for repo in repos]
     files = {file for doc in docs for file in doc}
 
@@ -50,13 +51,13 @@ def get_file_extension(programming_language: str) -> str | None:
 
 
 @contextmanager
-def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iterator[Optional[Remote]]:
+def temporary_remote(remote_name: str, repo: Repo, remote_url: str) -> Iterator[Optional[Remote]]:
     """Context manager for temporarily adding a remote to a Git repository.
     
     Args:
         remote_name (str): The name of the remote
         repo (Repo): The repository to add the remote to
-        remote_url (PathLike): The URL of the remote
+        remote_url (str): The URL of the remote
     """
     try:
         remote = repo.remote(remote_name)
@@ -66,6 +67,7 @@ def temporary_remote(remote_name: str, repo: Repo, remote_url: PathLike) -> Iter
         remote.fetch()
         yield remote
         repo.delete_remote(remote)
+
 
 def get_diff(src_repo: Repo, 
              dst_repo: Repo, 
@@ -89,12 +91,15 @@ def get_diff(src_repo: Repo,
 
     Returns:
         str: The diff between the two branches
-    """    
+    """
+
+    # Check if we are diffing a specific file
     if file_path is not None and "*" not in file_path:
-        file_path_obj = Path(src_repo.working_tree_dir) / file_path
-        if not file_path_obj.exists():
+        specific_file_path = os.path.join(str(src_repo.working_tree_dir), file_path)
+        if not os.path.exists(specific_file_path):
+            # Change error from 'No such file or directory' to something more meaningful (non-standard diff output)
             return f"- {src_prefix}/{file_path} does not exist.\n+ {dst_prefix}/{file_path} has been added."
 
-    with temporary_remote(remote_name, src_repo, dst_repo.working_tree_dir):
+    with temporary_remote(remote_name, src_repo, str(dst_repo.working_tree_dir)):
         diff = src_repo.git.diff(branch, f"{remote_name}/{branch}", f"--src-prefix={src_prefix}/", f"--dst-prefix={dst_prefix}/", file_path, name_only=name_only)
     return diff
