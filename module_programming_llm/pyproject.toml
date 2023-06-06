@@ -13,6 +13,7 @@ langchain = "^0.0.152"
 gitpython = "^3.1.31"
 tiktoken = "^0.3.3"
 promptlayer = "^0.1.80"
+python-dotenv = "^1.0.0"
 
 [tool.poetry.scripts]
 module = "athena:run_module"
