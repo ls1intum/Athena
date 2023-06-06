@@ -23,7 +23,7 @@ if OPENAI_API_TYPE == "azure":
     openai.api_base = os.environ["OPENAI_API_BASE"]
     openai.api_version = os.environ["OPENAI_API_VERSION"]
      
-    deployments = openai.Deployment.list().data
+    deployments = openai.Deployment.list().data # type: ignore
     deployment_ids = [deployment.id for deployment in deployments]
     if AZURE_DEPLOYMENT_NAME not in deployment_ids:
         deployments = [{ "id": deployment.id, "model": deployment.model } for deployment in deployments]
