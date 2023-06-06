@@ -13,7 +13,7 @@ def format_feedback_text(file_path: Optional[str] = None, line: Optional[int] = 
     """
     if file_path is None:
         return "Feedback"
-    elif line is None:
+    if line is None:
         return f"File {file_path}"
     return f"File {file_path} at line {line}"
 
@@ -30,6 +30,6 @@ def format_feedback_reference(file_path: Optional[str], line: Optional[int]) -> 
     """
     if file_path is None:
         return None
-    elif line is None:
+    if line is None:
         return f"file://{file_path}"
     return f"file://{file_path}_line:{line}"

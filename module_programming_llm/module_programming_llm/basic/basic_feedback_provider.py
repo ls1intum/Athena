@@ -34,7 +34,7 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     if file_extension is None:
         raise ValueError(f"Could not determine file extension for programming language {exercise.programming_language}.")
 
-    for file_path, submission_content in load_files_from_repo(submission_repo, file_filter=lambda x: x.endswith(file_extension)).items():
+    for file_path, submission_content in load_files_from_repo(submission_repo, file_filter=lambda x: x.endswith(file_extension) if file_extension else False).items():
         if submission_content is None:
             continue
             
@@ -80,10 +80,10 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
             try:
                 feedbacks = json.loads(generation.text)
             except json.JSONDecodeError:
-                logger.error("Failed to parse feedback json:", generation.text)
+                logger.error("Failed to parse feedback json: %s", generation.text)
                 continue
             if not isinstance(feedbacks, list):
-                logger.error("Feedback json is not a list:", generation.text)
+                logger.error("Feedback json is not a list: %s", generation.text)
                 continue
 
             for feedback in feedbacks:
