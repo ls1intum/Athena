@@ -34,7 +34,7 @@ services:
     expose:
        - 8000
     env_file:
-      - ${ATHENA_ENV_DIR}/cofee.env
+      - ${ATHENA_ENV_DIR:-./env_example}/cofee.env
     working_dir: /usr/src/app
     volumes:
       - ./module_cofee/node_config.docker.yml:/config/node_config.docker.yml
@@ -52,7 +52,7 @@ services:
     expose:
        - 8000
     env_file:
-      - ${ATHENA_ENV_DIR}/cofee.env
+      - ${ATHENA_ENV_DIR:-./env_example}/cofee.env
     working_dir: /usr/src/app
     labels:
       - traefik.enable=true
@@ -70,7 +70,7 @@ services:
     expose:
        - 8000
     env_file:
-      - ${ATHENA_ENV_DIR}/cofee.env
+      - ${ATHENA_ENV_DIR:-./env_example}/cofee.env
     working_dir: /usr/src/app
     labels:
       - traefik.enable=true
@@ -88,7 +88,7 @@ services:
     expose:
        - 8000
     env_file:
-      - ${ATHENA_ENV_DIR}/cofee.env
+      - ${ATHENA_ENV_DIR:-./env_example}/cofee.env
     working_dir: /usr/src/app
     labels:
       - traefik.enable=true
@@ -101,7 +101,7 @@ services:
     expose:
       - 27017
     env_file:
-      - ${ATHENA_ENV_DIR}/cofee.env
+      - ${ATHENA_ENV_DIR:-./env_example}/cofee.env
     volumes:
       - ./module_cofee/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./data/cofee_db:/data/db
