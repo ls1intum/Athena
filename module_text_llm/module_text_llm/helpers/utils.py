@@ -1,7 +1,9 @@
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from nltk.tokenize import sent_tokenize
+
+from athena.logger import logger
 
 
 def add_sentence_numbers(content: str) -> str:
@@ -33,7 +35,7 @@ def get_sentence_spans(content: str) -> List[Tuple[int, int]]:
     return sentence_spans
 
 
-def parse_line_number_reference_as_span(reference: str, content: str) -> str:
+def parse_line_number_reference_as_span(reference: str, content: str) -> Optional[str]:
     start_line_number = None
     end_line_number = None
 
@@ -52,11 +54,16 @@ def parse_line_number_reference_as_span(reference: str, content: str) -> str:
             start_line_number = end_line_number = line_number_match.groups()[0]
 
     if start_line_number is None or end_line_number is None:
-        raise ValueError(f"Could not parse line number from reference {reference}")
+        logger.warning("Could not parse line number from reference %s", reference)
+        return None
     
     sentence_spans = get_sentence_spans(content)
     start_line_index = int(start_line_number) - 1
     end_line_index = int(end_line_number) - 1
 
+    if len(sentence_spans) <= start_line_index or len(sentence_spans) <= end_line_index:
+        logger.warning("Line number out of range for reference %s", reference)
+        return None
+    
     span_start_index, span_end_index = sentence_spans[start_line_index][0], sentence_spans[end_line_index][1]
     return f"{span_start_index}-{span_end_index}"
