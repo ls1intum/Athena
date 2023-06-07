@@ -4,7 +4,7 @@ from athena import app, submission_selector, submissions_consumer, feedback_cons
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from suggest_feedback_basic import suggest_feedback_basic
+from .suggest_feedback_basic import suggest_feedback_basic
 
 
 @submissions_consumer
