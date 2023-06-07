@@ -7,7 +7,6 @@ from .model import Model
 class DBExercise(Model):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    course_id = Column(String, index=True)
     type = Column(SqlEnum(ExerciseType), index=True)
     max_points = Column(Float, index=True)
     bonus_points = Column(Float, index=True)

@@ -39,7 +39,6 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
     resp = requests.post(
         f"{get_cofee_url()}/submit",
         json={
-            "courseId": exercise.course_id,
             # TODO: maybe make this more flexible?
             "callbackUrl": f"{module_url}/cofee_callback/{exercise.id}",
             "submissions": [
