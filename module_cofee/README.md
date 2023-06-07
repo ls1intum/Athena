@@ -1,5 +1,6 @@
 # Prepare Module
-`make`
+You have to build the protobuf files first. You can do this with the following command:
+```make```
 
 # Start Directly
 `poetry run module`
