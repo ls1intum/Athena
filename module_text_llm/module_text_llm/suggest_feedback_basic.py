@@ -12,7 +12,7 @@ from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
 from module_text_llm.helpers.models import chat
-from module_text_llm.helpers.utils import add_sentence_numbers
+from module_text_llm.helpers.utils import add_sentence_numbers, parse_line_number_reference_as_span
 
 from .prompts.suggest_feedback_basic import system_template, human_template
 
@@ -44,7 +44,7 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> 
         exercise_id=exercise.id,
         submission_id=submission.id,
         detail_text=row["text"],
-        reference=row["reference"],
+        reference=parse_line_number_reference_as_span(row["reference"], submission.content),
         credits=float(row["credits"]),
         text="Feedback",
         meta={}
