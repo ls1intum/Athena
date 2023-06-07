@@ -13,8 +13,11 @@
 			"path": "module_example"
 		},
 		{
+			"path": "module_programming_llm"
+		},
+		{
 			"path": "module_cofee"
-		}
+		},
 	],
 	"settings": {
 		"python.linting.prospectorEnabled": true,

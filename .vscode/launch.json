@@ -21,12 +21,19 @@
             "justMyCode": true
         },
         {
+            "name": "Module Programming LLM",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/module_programming_llm",
+            "module": "module_programming_llm",
+            "justMyCode": true
+        },
+        {
             "name": "Module CoFee",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}/module_cofee",
             "module": "module_cofee",
-            "justMyCode": true
-        }
+        },
     ]
 }
