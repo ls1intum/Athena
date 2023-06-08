@@ -26,7 +26,7 @@ def feedback_to_text_block(feedback: Feedback) -> Optional[DBTextBlock]:
         return None
 
 
-def link_feedback_to_block(feedback: Feedback) -> Feedback:
+def link_feedback_to_block(feedback: Feedback):
     """
     Links the given feedback to the text block that it is given on, if any.
     Modifies the feedback in place.
