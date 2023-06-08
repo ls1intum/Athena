@@ -1,24 +1,13 @@
-from typing import List, Iterable, cast
+from typing import List, Iterable
 
 from athena.database import get_db
 from athena.logger import logger
-from athena.models import DBTextFeedback
 from athena.text import Submission, Feedback
+from athena.helpers.text import get_exercise_feedbacks
 from module_cofee.models.db_text_block import DBTextBlock
 
 
 DISTANCE_THRESHOLD = 1.0
-
-
-def get_exercise_feedbacks(exercise_id: int) -> List[Feedback]:
-    """
-    Get all feedback on a given exercise.
-    """
-    with get_db() as db:
-        return [
-            cast(Feedback, f.to_schema())
-            for f in db.query(DBTextFeedback).filter_by(exercise_id=exercise_id).all()
-        ]
 
 
 def filter_feedbacks_by_block(feedbacks: List[Feedback], block: DBTextBlock) -> Iterable[Feedback]:
