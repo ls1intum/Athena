@@ -13,7 +13,6 @@ class DBTextBlock(Base):
     text = Column(String)
     start_index = Column(Integer)
     end_index = Column(Integer)
-    added_distance = Column(Float, nullable=True, default=None)
 
     # foreign keys
     submission_id = Column(Integer, ForeignKey("text_submissions.id"))  # FK to athena-native table
@@ -34,7 +33,7 @@ class DBTextBlock(Base):
 
         This is used to match feedbacks to text blocks, even if the feedback is not given on the exact text block.
         """
-        return self.start_index <= feedback.get_start_index() and feedback.get_end_index() <= self.end_index
+        return self.start_index <= feedback.get_start_index() and feedback.get_end_index() <= self.end_index  # type: ignore
 
     def feedback_is_linked_to_block(self, feedback: Feedback) -> bool:
         """The info whether the feedback is linked to the block is stored in the metadata of the feedback."""
@@ -46,7 +45,7 @@ class DBTextBlock(Base):
         """
         return self.cluster.distance_between_blocks(self, other)
 
-    def calculate_added_distance(self):
+    def get_added_distance(self):
         """
         Calculates the added distance of this block.
         The added distance is the sum of (1-distance) for each block in the cluster's distance matrix,
@@ -59,4 +58,4 @@ class DBTextBlock(Base):
         return sum(1 - distance for distance in distance_matrix_row) - 1
 
     def __str__(self):
-        return f"TextBlock{{id={self.id}, submission_id={self.submission_id} text='{self.text}', start_index='{self.start_index}', end_index='{self.end_index}', added_distance='{self.added_distance}', cluster_id='{self.cluster_id}'}}"
+        return f"TextBlock{{id={self.id}, submission_id={self.submission_id} text='{self.text}', start_index='{self.start_index}', end_index='{self.end_index}', cluster_id='{self.cluster_id}'}}"
