@@ -35,8 +35,8 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
 
 @feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
-    linked_feedback = link_feedback_to_block(feedback)
-    store_feedback(linked_feedback)
+    link_feedback_to_block(feedback)
+    store_feedback(feedback)
 
 
 @feedback_provider

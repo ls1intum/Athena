@@ -29,8 +29,8 @@ def feedback_to_text_block(feedback: Feedback) -> Optional[DBTextBlock]:
 def link_feedback_to_block(feedback: Feedback) -> Feedback:
     """
     Links the given feedback to the text block that it is given on, if any.
+    Modifies the feedback in place.
     """
     block = feedback_to_text_block(feedback)
     if block:
         feedback.meta["block_id"] = block.id
-    return feedback
