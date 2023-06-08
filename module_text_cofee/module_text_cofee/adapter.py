@@ -4,7 +4,7 @@ Adapter functions to connect to the actual CoFee service, which still has an old
 import os
 from typing import List
 
-from fastapi import Request
+from fastapi import Request, HTTPException
 import requests
 
 try:
@@ -14,7 +14,7 @@ except ImportError as e:
         raise ImportError("Could not import protobuf module. Please run `make protobuf` to generate it.") from e
     raise e
 
-from athena import app
+from athena import app, env
 from athena.text import Exercise, Submission
 from athena.logger import logger
 from athena.module_config import get_module_config
@@ -23,6 +23,7 @@ from module_text_cofee.process_results import process_results
 
 # Default token for local testing, from https://github.com/ls1intum/Athena/blob/master/.env
 DEFAULT_COFEE_TOKEN = "YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo="
+COFEE_AUTH_TOKEN = os.environ.get("COFEE_AUTH_TOKEN", DEFAULT_COFEE_TOKEN)
 
 
 def get_cofee_url() -> str:
@@ -51,7 +52,7 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
         },
         headers={
             "Content-Type": "application/json",
-            "Authorization": os.environ.get("COFEE_AUTH_TOKEN", DEFAULT_COFEE_TOKEN),
+            "Authorization": COFEE_AUTH_TOKEN,
         },
         timeout=60,
         # TODO: remove this again:
@@ -67,6 +68,12 @@ async def save_athene_result(exercise_id: int, request: Request):
     Saves automatic textAssessments of Athena.
     """
     logger.info("Received callback from CoFee")
+    # validate auth token
+    auth_token = request.headers['authorization']
+    if auth_token != COFEE_AUTH_TOKEN:
+        if env.PRODUCTION:
+            raise HTTPException(status_code=401, detail="Invalid API secret.")
+        logger.warning("DEBUG MODE: Ignoring invalid API secret.")
     cofee_resp = cofee_pb2.AtheneResponse.FromString(await request.body()) # type: ignore
     clusters = cofee_resp.clusters
     segments = cofee_resp.segments
