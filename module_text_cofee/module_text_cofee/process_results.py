@@ -63,9 +63,25 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
             db.commit()
 
 
+def set_all_added_distances(clusters: Iterable[cofee_pb2.Cluster]):  # type: ignore
+    """Sets the added distance for all text blocks in all given clusters."""
+    with get_db() as db:
+        for cluster in clusters:
+            for segment in cluster.segments:
+                text_block_id = segment.id
+                text_block = db.query(DBTextBlock).filter(DBTextBlock.id == text_block_id).first()
+                if text_block is None:
+                    logger.warning("Text block %d not found", text_block_id)
+                    continue
+                added_distance = text_block.calculate_added_distance()
+                text_block.added_distance = added_distance  # type: ignore
+        db.commit()
+
+
 def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.Segment], exercise_id):  # type: ignore
     """Processes results coming back from the CoFee system via callbackUrl"""
     logger.debug("Received %d clusters and %d segments from CoFee", len(clusters), len(segments))
     store_text_blocks(segments, clusters)
     store_text_clusters(exercise_id, clusters)
+    set_all_added_distances(clusters)
     logger.debug("Finished processing CoFee results")

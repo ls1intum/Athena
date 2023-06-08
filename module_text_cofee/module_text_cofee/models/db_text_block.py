@@ -1,3 +1,4 @@
+from typing import cast
 from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -44,6 +45,18 @@ class DBTextBlock(Base):
         Returns the distance between this block and another block.
         """
         return self.cluster.distance_between_blocks(self, other)
+
+    def calculate_added_distance(self):
+        """
+        Calculates the added distance of this block.
+        The added distance is the sum of (1-distance) for each block in the cluster's distance matrix,
+        minus 1 (because the distance between a block and itself is 1).
+        """
+        distance_matrix = self.cluster.distance_matrix
+        block_index = self.cluster.blocks.index(self)
+        distance_matrix_row = distance_matrix[block_index]
+        # subtract 1 because the statement also included the distance to itself, but it shouldn't be included
+        return sum(1 - distance for distance in distance_matrix_row) - 1
 
     def __str__(self):
         return f"TextBlock{{id={self.id}, submission_id={self.submission_id} text='{self.text}', start_index='{self.start_index}', end_index='{self.end_index}', added_distance='{self.added_distance}', cluster_id='{self.cluster_id}'}}"
