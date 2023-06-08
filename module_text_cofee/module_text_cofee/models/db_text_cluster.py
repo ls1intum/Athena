@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, LargeBinary, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
-from module_cofee.models.db_text_block import DBTextBlock
+from module_text_cofee.models.db_text_block import DBTextBlock
 
 
 class DBTextCluster(Base):

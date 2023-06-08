@@ -10,7 +10,7 @@ services:
   traefik:
     image: traefik:v2.9.6
     container_name: cofee-traefik
-    hostname: module_cofee_old
+    hostname: module_text_cofee_old
     restart: unless-stopped
     depends_on:
       # These components have API endpoints managed by traefik
@@ -21,7 +21,7 @@ services:
       - 8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./module_cofee/traefik.docker.yml:/etc/traefik/traefik.yml
+      - ./module_text_cofee/traefik.docker.yml:/etc/traefik/traefik.yml
 
   # http://localhost/queueStatus
   # http://localhost/submit
@@ -37,7 +37,7 @@ services:
       - ${ATHENA_ENV_DIR:-./env_example}/cofee.env
     working_dir: /usr/src/app
     volumes:
-      - ./module_cofee/node_config.docker.yml:/config/node_config.docker.yml
+      - ./module_text_cofee/node_config.docker.yml:/config/node_config.docker.yml
     labels:
       - traefik.enable=true
       - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
@@ -103,5 +103,5 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR:-./env_example}/cofee.env
     volumes:
-      - ./module_cofee/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./module_text_cofee/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./data/cofee_db:/data/db

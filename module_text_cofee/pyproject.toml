@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "module_cofee"
+name = "module_text_cofee"
 version = "0.1.0"
 description = "An adapter to the original [Athena](https://github.com/ls1intum/Athena), an implementation of CoFee (text exercise assessment)."
 authors = ["Paul Schwind <paul.schwind@tum.de>"]

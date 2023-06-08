@@ -1,5 +1,5 @@
 """
-Entry point for the module_cofee module.
+Entry point for the module_text_cofee module.
 """
 from typing import List
 
@@ -8,9 +8,9 @@ from athena.storage import store_feedback
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_cofee import adapter # type: ignore
-from module_cofee.link_feedback_to_block import link_feedback_to_block
-from module_cofee.suggest_feedback import suggest_feedback_for_submission
+from module_text_cofee import adapter # type: ignore
+from module_text_cofee.link_feedback_to_block import link_feedback_to_block
+from module_text_cofee.suggest_feedback import suggest_feedback_for_submission
 
 
 @submission_selector

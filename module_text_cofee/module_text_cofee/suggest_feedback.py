@@ -4,7 +4,7 @@ from athena.database import get_db
 from athena.logger import logger
 from athena.text import Submission, Feedback
 from athena.helpers.text import get_exercise_feedbacks
-from module_cofee.models.db_text_block import DBTextBlock
+from module_text_cofee.models.db_text_block import DBTextBlock
 
 
 DISTANCE_THRESHOLD = 1.0

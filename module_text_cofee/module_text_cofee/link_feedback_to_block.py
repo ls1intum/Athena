@@ -9,7 +9,7 @@ from typing import Optional
 
 from athena.database import get_db
 from athena.text import Feedback
-from module_cofee.models.db_text_block import DBTextBlock
+from module_text_cofee.models.db_text_block import DBTextBlock
 
 
 def feedback_to_text_block(feedback: Feedback) -> Optional[DBTextBlock]:

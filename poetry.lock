@@ -923,7 +923,7 @@ requests = "^2.30.0"
 
 [package.source]
 type = "directory"
-url = "module_cofee"
+url = "module_text_cofee"
 
 [[package]]
 name = "module-example"

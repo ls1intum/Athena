@@ -3,16 +3,16 @@ from typing import List, Iterable
 
 from athena.database import get_db
 from athena.logger import logger
-from module_cofee.models.db_text_cluster import DBTextCluster
+from module_text_cofee.models.db_text_cluster import DBTextCluster
 try:
-    from module_cofee.protobuf import cofee_pb2
+    from module_text_cofee.protobuf import cofee_pb2
 except ImportError:
     from typing import TYPE_CHECKING
     if TYPE_CHECKING:
         pass
     else:
         raise
-from module_cofee.models.db_text_block import DBTextBlock
+from module_text_cofee.models.db_text_block import DBTextBlock
 
 
 def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb2.Cluster]):  # type: ignore

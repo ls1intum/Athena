@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# This is the Dockerfile for the module_cofee.
+# This is the Dockerfile for the module_text_cofee.
 
 # Protobuf build
 FROM golang:alpine AS cofee_protobuf
@@ -19,7 +19,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /code
 
 # Copy proto file
-COPY --from=cofee_protobuf /proto/cofee_pb2.py ./module_cofee/protobuf/
+COPY --from=cofee_protobuf /proto/cofee_pb2.py ./module_text_cofee/protobuf/
 
 # Poetry
 RUN pip install --no-cache-dir poetry==1.5.0

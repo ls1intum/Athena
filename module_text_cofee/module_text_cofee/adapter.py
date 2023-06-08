@@ -8,7 +8,7 @@ from fastapi import Request
 import requests
 
 try:
-    from module_cofee.protobuf import cofee_pb2
+    from module_text_cofee.protobuf import cofee_pb2
 except ImportError as e:
     if "cofee_pb2" in str(e):
         raise ImportError("Could not import protobuf module. Please run `make protobuf` to generate it.") from e
@@ -18,7 +18,7 @@ from athena import app
 from athena.text import Exercise, Submission
 from athena.logger import logger
 from athena.module_config import get_module_config
-from module_cofee.process_results import process_results
+from module_text_cofee.process_results import process_results
 
 
 # Default token for local testing, from https://github.com/ls1intum/Athena/blob/master/.env
