@@ -14,7 +14,7 @@ from module_cofee.models.db_text_block import DBTextBlock
 
 def feedback_to_text_block(feedback: Feedback) -> Optional[DBTextBlock]:
     """
-    Returns the text block that the given feedback is given on, if any (feedback might span multiple blocks).
+    Returns the text block that the given feedback is given on, if any.
     """
     with get_db() as db:
         # get blocks of submission
@@ -28,7 +28,7 @@ def feedback_to_text_block(feedback: Feedback) -> Optional[DBTextBlock]:
 
 def link_feedback_to_block(feedback: Feedback) -> Feedback:
     """
-    Links the given feedback to the text block that it is given on, if any (feedback might span multiple blocks).
+    Links the given feedback to the text block that it is given on, if any.
     """
     block = feedback_to_text_block(feedback)
     if block:
