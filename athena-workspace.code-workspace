@@ -11,7 +11,16 @@
 		},
 		{
 			"path": "module_example"
-		}
+		},
+		{
+			"path": "module_programming_llm"
+		},
+		{
+			"path": "module_text_llm"
+		},
+		{
+			"path": "module_text_cofee"
+		},
 	],
 	"settings": {
 		"python.linting.prospectorEnabled": true,
