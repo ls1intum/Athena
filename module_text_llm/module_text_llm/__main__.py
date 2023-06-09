@@ -32,5 +32,5 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
 
 
 if __name__ == "__main__":
-    app.start()
     nltk.download("punkt")
+    app.start()
