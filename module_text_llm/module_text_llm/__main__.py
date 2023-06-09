@@ -1,5 +1,7 @@
 from typing import List
 
+import nltk
+
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
@@ -31,3 +33,4 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
 
 if __name__ == "__main__":
     app.start()
+    nltk.download("punkt")
