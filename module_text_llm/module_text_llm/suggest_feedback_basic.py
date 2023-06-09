@@ -36,13 +36,27 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> 
     result = f"reference,credits,text\n{result}"
     reader = csv.DictReader(result.splitlines())
 
-    return [Feedback(
-        id=None,
-        exercise_id=exercise.id,
-        submission_id=submission.id,
-        detail_text=row["text"],
-        reference=parse_line_number_reference_as_span(row["reference"], submission.content),
-        credits=float(row["credits"]),
-        text="Feedback",
-        meta={}
-    ) for row in reader]
+    feedbacks = []
+    for row in reader:
+        if "reference" not in row or "credits" not in row or "text" not in row:
+            logger.warning("Could not parse row %s", row)
+            continue
+
+        try:
+            credits = float(row["credits"])
+        except ValueError:
+            logger.warning("Could not parse credits from row %s", row)
+            continue
+        
+        feedbacks.append(Feedback(
+            id=None,
+            exercise_id=exercise.id,
+            submission_id=submission.id,
+            detail_text=row["text"],
+            reference=parse_line_number_reference_as_span(row["reference"], submission.content),
+            credits=credits,
+            text="Feedback",
+            meta={}
+        ))
+
+    return feedbacks
