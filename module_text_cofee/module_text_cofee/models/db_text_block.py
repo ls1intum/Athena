@@ -45,7 +45,7 @@ class DBTextBlock(Base):
         """
         return self.cluster.distance_between_blocks(self, other)
 
-    def get_added_distance(self):
+    def calculate_added_distance(self):
         """
         Calculates the added distance of this block.
         The added distance is the sum of (1-distance) for each block in the cluster's distance matrix,
