@@ -47,7 +47,9 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
     logger.info("process_feedback: Received feedback for submission %d of exercise %d", submission.id, exercise.id)
     logger.info("process_feedback: Feedback: %s", feedback)
-    # Do something with the feedback
+
+    # associate with method
+    submission_methods = None
 
     # Add data to feedback
     feedback.meta["some_data"] = "some_value"

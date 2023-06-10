@@ -8,6 +8,9 @@ from .db_feedback import DBFeedback
 class DBTextFeedback(DBFeedback, Base):
     __tablename__ = "text_feedbacks"
 
+    index_start: Optional[int] = Column(Integer)  # type: ignore
+    index_end: Optional[int] = Column(Integer)  # type: ignore
+
     exercise_id = Column(Integer, ForeignKey("text_exercises.id", ondelete="CASCADE"), index=True)
     submission_id = Column(Integer, ForeignKey("text_submissions.id", ondelete="CASCADE"), index=True)
 

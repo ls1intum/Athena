@@ -23,16 +23,20 @@
             "feedbacks": [
                 {
                     "id": 101,
-                    "detail_text": "Your program does not print \"Hello World\" to the console.",
                     "text": "Your program does not print \"Hello World\" to the console.",
+                    "detail_text": "Your program does not print \"Hello World\" to the console.",
                     "credits": -2.0,
+                    "file_path": "BinarySearch.java",
+                    "line_start": 20,
                     "meta": {}
                 },
                 {
                     "id": 102,
-                    "detail_text": "You're missing a semicolon at the end of the line.",
                     "text": "You're missing a semicolon at the end of the line.",
+                    "detail_text": "You're missing a semicolon at the end of the line.",
                     "credits": -2.0,
+                    "file_path": "BinarySearch.java",
+                    "line_start": 9,
                     "meta": {}
                 }
             ]

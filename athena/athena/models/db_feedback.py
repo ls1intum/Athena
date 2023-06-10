@@ -5,9 +5,8 @@ from .model import Model
 
 class DBFeedback(Model):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    detail_text = Column(String)
-    reference = Column(String, nullable=True)
     text = Column(String)
+    detail_text = Column(String)
     credits = Column(Float)
     meta = Column(JSON)
 

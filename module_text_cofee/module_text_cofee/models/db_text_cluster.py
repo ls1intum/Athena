@@ -11,10 +11,10 @@ from module_text_cofee.models.db_text_block import DBTextBlock
 class DBTextCluster(Base):
     __tablename__ = "text_clusters"
 
-    id = Column(Integer, primary_key=True, index=True)
-    probabilities = Column(LargeBinary)
-    distance_matrix_binary = Column(LargeBinary, nullable=False)
-    disabled = Column(Boolean, default=False)
+    id: int = Column(Integer, primary_key=True, index=True)  # type: ignore
+    probabilities: bytes = Column(LargeBinary)  # type: ignore
+    distance_matrix_binary: bytes = Column(LargeBinary, nullable=False)  # type: ignore
+    disabled: bool = Column(Boolean, default=False)  # type: ignore
 
     # Define the relationship to DBTextBlock
     blocks = relationship("DBTextBlock", back_populates="cluster")

@@ -18,9 +18,10 @@
             "feedbacks": [
                 {
                     "id": 301,
-                    "detail_text": "This is a test",
-                    "reference": "28-32",
                     "text": "This is a test",
+                    "detail_text": "This is a test",
+                    "index_start": 28,
+                    "index_end": 32,
                     "credits": 80,
                     "meta": {}
                 }
@@ -35,17 +36,19 @@
             "feedbacks": [
                 {
                     "id": 302,
-                    "detail_text": "This is a test",
-                    "reference": "28-32",
                     "text": "This is a test",
+                    "detail_text": "This is a test",
+                    "index_start": 28,
+                    "index_end": 32,
                     "credits": 80,
                     "meta": {}
                 },
                 {
                     "id": 303,
-                    "detail_text": "This is a test",
-                    "reference": "28-32",
                     "text": "This is a test",
+                    "detail_text": "This is a test",
+                    "index_start": 28,
+                    "index_end": 32,
                     "credits": 80,
                     "meta": {}
                 }
