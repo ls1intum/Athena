@@ -65,6 +65,9 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
             "original_submission_id": submission.id,
             "original_block_id": closest_block.id,
         }
+        # adapt line numbers to new text block
+        copy.line_start = block.line_start
+        copy.line_end = block.line_end
         suggested_feedback.append(copy)
     return suggested_feedback
 

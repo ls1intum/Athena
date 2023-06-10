@@ -33,6 +33,8 @@ class DBTextBlock(Base):
 
         This is used to match feedbacks to text blocks, even if the feedback is not given on the exact text block.
         """
+        if feedback.index_start is None or feedback.index_end is None:
+            return False
         return self.index_start <= feedback.index_start and feedback.index_end <= self.index_end
 
     def feedback_is_linked_to_block(self, feedback: Feedback) -> bool:
