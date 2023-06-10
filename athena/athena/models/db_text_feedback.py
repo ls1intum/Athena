@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
