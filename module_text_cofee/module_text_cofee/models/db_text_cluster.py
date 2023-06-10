@@ -5,7 +5,6 @@ from sqlalchemy import Column, Integer, LargeBinary, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
-from module_text_cofee.models.db_text_block import DBTextBlock
 
 
 class DBTextCluster(Base):
@@ -33,7 +32,7 @@ class DBTextCluster(Base):
         """Set the distance matrix from a list of lists of floats."""
         self.distance_matrix_binary = pickle.dumps(value)
 
-    def distance_between_blocks(self, block1: DBTextBlock, block2: DBTextBlock) -> float:
+    def distance_between_blocks(self, block1, block2) -> float:
         """Return the distance between two blocks in this cluster."""
         block1_index = self.blocks.index(block1)
         if block1_index == -1:
