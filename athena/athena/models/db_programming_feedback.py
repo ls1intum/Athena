@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from athena.database import Base, get_db
-from athena.models import DBProgrammingSubmission
+from .db_programming_submission import DBProgrammingSubmission
 from .db_feedback import DBFeedback
 
 
