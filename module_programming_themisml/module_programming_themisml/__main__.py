@@ -62,7 +62,11 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     repo_zip = submission.get_zip()
     for file_path in repo_zip.namelist():
         with repo_zip.open(file_path, "r") as f:
-            file_content = f.read().decode("utf-8")
+            try:
+                file_content = f.read().decode("utf-8")
+            except UnicodeDecodeError:
+                # skip binary files
+                continue
         method_blocks[file_path] = extract_methods(file_content)
 
     with get_db() as db:
