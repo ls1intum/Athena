@@ -5,6 +5,7 @@ from typing import Dict, List
 
 from athena.logger import logger
 from athena.models import DBProgrammingFeedback
+from athena.schemas import ProgrammingFeedback
 
 from module_programming_themisml.extract_methods.method_node import MethodNode
 from .code_similarity_computer import CodeSimilarityComputer
@@ -17,7 +18,7 @@ def get_feedback_suggestions_for_method(
         filepath: str,
         method: MethodNode,
         include_code: bool = False
-):
+) -> List[ProgrammingFeedback]:
     """Get feedback suggestions from comparisons between a function block of a given submission
     and multiple feedback rows"""
     considered_feedbacks = []
@@ -36,42 +37,48 @@ def get_feedback_suggestions_for_method(
         if similarity.f1 >= SIMILARITY_SCORE_THRESHOLD:
             logger.info("Found similar code with similarity score %d: %s", similarity, feedback)
             original_code = feedback_code
-            feedback_to_give = feedback.to_dict()
+            feedback_to_give = feedback.to_schema()
             if include_code:
                 feedback_to_give.meta["code"] = method.source_code
             feedback_to_give.line_start = method.line_start
             feedback_to_give.line_end = method.line_end
-            result_data = {
-                **feedback_to_give,
+            feedback_to_give.meta = {
+                **feedback_to_give.meta,
                 "precision_score": similarity.precision,
                 "recall_score": similarity.recall,
                 "similarity_score": similarity.f1,
                 "similarity_score_f3": similarity.f3,
             }
             if include_code:
-                result_data["originally_on_code"] = original_code
-            suggested.append(result_data)
-    return sorted(suggested, key=lambda x: x["similarity_score"], reverse=True)
+                feedback_to_give.meta["originally_on_code"] = original_code
+            suggested.append(feedback_to_give)
+    return sorted(suggested, key=lambda f: f.meta["similarity_score"], reverse=True)
 
 
 async def get_feedback_suggestions(
         function_blocks: Dict[str, List[MethodNode]],
         feedbacks: List[DBProgrammingFeedback],
         include_code: bool = False
-):
+) -> List[ProgrammingFeedback]:
     """
     Get feedback suggestions from comparisons between function blocks of a given submission
     and multiple feedback rows.
     This is quicker than calling get_feedback_suggestions_for_method for each method
     because it uses multiple processes to do the comparisons in parallel.
     """
-    loop = asyncio.get_event_loop()
-    # https://github.com/tiangolo/fastapi/issues/1487#issuecomment-657290725
-    with concurrent.futures.ProcessPoolExecutor(mp_context=get_context("spawn")) as pool:  # type: ignore
-        results = await asyncio.gather(*[
-            loop.run_in_executor(pool, get_feedback_suggestions_for_method,
-                                 feedbacks, filepath, method, include_code)
-            for filepath, methods in function_blocks.items()
-            for method in methods
-        ])
+
+    # loop = asyncio.get_event_loop()
+    # # https://github.com/tiangolo/fastapi/issues/1487#issuecomment-657290725
+    # with concurrent.futures.ProcessPoolExecutor(mp_context=get_context("spawn")) as pool:  # type: ignore
+    #     results = await asyncio.gather(*[
+    #         loop.run_in_executor(pool, get_feedback_suggestions_for_method,
+    #                              feedbacks, filepath, method, include_code)
+    #         for filepath, methods in function_blocks.items()
+    #         for method in methods
+    #     ])
+    # sync:
+    results = []
+    for filepath, methods in function_blocks.items():
+        for method in methods:
+            results.append(get_feedback_suggestions_for_method(feedbacks, filepath, method, include_code))
     return [result for result_list in results for result in result_list]
