@@ -5,7 +5,7 @@ autodetect: false
 ignore-paths:
   - docs
   - module_text_cofee/module_text_cofee/protobuf
-  - module_programming_themisml/module_programming_themisml/extract_methods/languages/*
+  - module_programming_themisml/module_programming_themisml/extract_methods/languages
   - module_programming_themisml/module_programming_themisml/extract_methods/method_parser_listener.py
 
 mypy:
