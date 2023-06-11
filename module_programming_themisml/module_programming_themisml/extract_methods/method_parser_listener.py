@@ -19,10 +19,10 @@ class MethodParserListener(ParseTreeListener):
             setattr(self, name, self.make_enter(method_name))
 
     def make_enter(self, name):
-        def enter(ctx=None):
+        def enter(ctx):
             me = MethodNode(
-                start_line=ctx.start.line,
-                stop_line=ctx.stop.line,
+                line_start=ctx.start.line,
+                line_end=ctx.stop.line,
                 # need to do it like this so that spaces are included:
                 source_code=ctx.start.source[1].getText(ctx.start.start, ctx.stop.stop),
                 name=None  # will be written later while parsing

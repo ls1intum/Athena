@@ -6,32 +6,14 @@ from typing import List
 from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
-from athena.storage import store_exercise, store_submissions, store_feedback
+from athena.storage import store_feedback
+
+from .extract_methods import extract_methods
 
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     logger.info("receive_submissions: Received %d submissions for exercise %d", len(submissions), exercise.id)
-    for submission in submissions:
-        logger.info("- Submission %d", submission.id)
-        zip_content = submission.get_zip()
-        # list the files in the zip
-        for file in zip_content.namelist():
-            logger.info("  - %s", file)
-    # Do something with the submissions
-    logger.info("Doing stuff")
-
-    # Add data to exercise
-    exercise.meta["some_data"] = "some_value"
-    logger.info("- Exercise meta: %s", exercise.meta)
-
-    # Add data to submission
-    for submission in submissions:
-        submission.meta["some_data"] = "some_value"
-        logger.info("- Submission %d meta: %s", submission.id, submission.meta)
-    
-    store_exercise(exercise)
-    store_submissions(submissions)
 
 
 @submission_selector
@@ -48,12 +30,27 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     logger.info("process_feedback: Received feedback for submission %d of exercise %d", submission.id, exercise.id)
     logger.info("process_feedback: Feedback: %s", feedback)
 
-    # associate with method
-    submission_methods = None
+    if feedback.file_path is None or feedback.line_start is None:
+        # cannot process without knowledge about method
+        return
 
-    # Add data to feedback
-    feedback.meta["some_data"] = "some_value"
+    # find method that the feedback is on
+    repo_zip = submission.get_zip()
+    with repo_zip.open(feedback.file_path, "r") as f:
+        file_content = f.read().decode("utf-8")
+    methods = extract_methods(file_content)
+    feedback_method = None
+    for m in methods:
+        # method has to contain all feedback lines
+        f_start = feedback.line_start
+        f_end = feedback.line_end
+        if f_end is None:
+            f_end = f_start
+        if m.line_start <= f_start and m.line_end >= f_end:
+            feedback_method = m
+            break
 
+    feedback.meta["method_name"] = feedback_method.name if feedback_method else None
     store_feedback(feedback)
 
 
