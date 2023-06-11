@@ -21,24 +21,25 @@
             "meta": {},
 
             "feedbacks": [
-                {
-                    "id": 101,
-                    "text": "Your program does not print \"Hello World\" to the console.",
-                    "detail_text": "Your program does not print \"Hello World\" to the console.",
-                    "credits": -2.0,
-                    "file_path": "BinarySearch.java",
-                    "line_start": 20,
-                    "meta": {}
-                },
-                {
-                    "id": 102,
-                    "text": "You're missing a semicolon at the end of the line.",
-                    "detail_text": "You're missing a semicolon at the end of the line.",
-                    "credits": -2.0,
-                    "file_path": "BinarySearch.java",
-                    "line_start": 9,
-                    "meta": {}
-                }
+            {
+                "id": 101,
+                "text": "Your program does not print \"Hello World\" to the console.",
+                "detail_text": "Your program does not print \"Hello World\" to the console.",
+                "credits": -2.0,
+                "file_path": "BinarySearch.java",
+                "line_start": 7,
+                "line_end": 22,
+                "meta": {}
+            },
+            {
+                "id": 102,
+                "text": "You're missing a semicolon at the end of the line.",
+                "detail_text": "You're missing a semicolon at the end of the line.",
+                "credits": -2.0,
+                "file_path": "BinarySearch.java",
+                "line_start": 9,
+                "meta": {}
+            }
             ]
         },
         {
@@ -52,6 +53,14 @@
             "repository_url": "http://localhost:3000/api/material/1/submissions/103.zip",
             "student_id": 3,
             "meta": {}
+        },
+        {
+            "id": 104,
+            "repository_url": "http://localhost:3000/api/material/1/submissions/101.zip",
+            "student_id": 4,
+            "meta": {
+                "comment": "same repo url as submission 101, for testing"
+            }
         }
-    ]
+        ]
 }
