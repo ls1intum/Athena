@@ -11,6 +11,7 @@ from module_programming_themisml.extract_methods.method_node import MethodNode
 from .code_similarity_computer import CodeSimilarityComputer
 
 SIMILARITY_SCORE_THRESHOLD = 0.75
+ASYNC_PROCESSING = True  # faster, but worse for debugging
 
 
 def get_feedback_suggestions_for_method(
@@ -66,19 +67,19 @@ async def get_feedback_suggestions(
     This is quicker than calling get_feedback_suggestions_for_method for each method
     because it uses multiple processes to do the comparisons in parallel.
     """
-
-    # loop = asyncio.get_event_loop()
-    # # https://github.com/tiangolo/fastapi/issues/1487#issuecomment-657290725
-    # with concurrent.futures.ProcessPoolExecutor(mp_context=get_context("spawn")) as pool:  # type: ignore
-    #     results = await asyncio.gather(*[
-    #         loop.run_in_executor(pool, get_feedback_suggestions_for_method,
-    #                              feedbacks, filepath, method, include_code)
-    #         for filepath, methods in function_blocks.items()
-    #         for method in methods
-    #     ])
-    # sync:
-    results = []
-    for filepath, methods in function_blocks.items():
-        for method in methods:
-            results.append(get_feedback_suggestions_for_method(feedbacks, filepath, method, include_code))
+    if ASYNC_PROCESSING:
+        loop = asyncio.get_event_loop()
+        # https://github.com/tiangolo/fastapi/issues/1487#issuecomment-657290725
+        with concurrent.futures.ProcessPoolExecutor(mp_context=get_context("spawn")) as pool:  # type: ignore
+            results = await asyncio.gather(*[
+                loop.run_in_executor(pool, get_feedback_suggestions_for_method,
+                                    feedbacks, filepath, method, include_code)
+                for filepath, methods in function_blocks.items()
+                for method in methods
+            ])
+    else:
+        results = []
+        for filepath, methods in function_blocks.items():
+            for method in methods:
+                results.append(get_feedback_suggestions_for_method(feedbacks, filepath, method, include_code))
     return [result for result_list in results for result in result_list]
