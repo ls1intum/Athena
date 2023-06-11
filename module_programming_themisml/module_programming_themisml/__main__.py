@@ -1,14 +1,17 @@
 """
 Entry point for the module_example module.
 """
-from typing import List
+from typing import List, cast
 
 from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
+from athena.database import get_db
+from athena.models import DBProgrammingFeedback
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 from athena.storage import store_feedback
 
 from .extract_methods import extract_methods
+from .feedback_suggestions import get_feedback_suggestions
 
 
 @submissions_consumer
@@ -35,17 +38,13 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
         return
 
     # find method that the feedback is on
-    repo_zip = submission.get_zip()
-    with repo_zip.open(feedback.file_path, "r") as f:
-        file_content = f.read().decode("utf-8")
-    methods = extract_methods(file_content)
+    code = submission.get_code(feedback.file_path)
+    methods = extract_methods(code)
     feedback_method = None
     for m in methods:
         # method has to contain all feedback lines
         f_start = feedback.line_start
-        f_end = feedback.line_end
-        if f_end is None:
-            f_end = f_start
+        f_end = feedback.line_end if feedback.line_end is not None else feedback.line_start
         if m.line_start <= f_start and m.line_end >= f_end:
             feedback_method = m
             break
@@ -55,23 +54,26 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 
 @feedback_provider
-def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
-    # Do something with the submission and return a list of feedback
-    return [
-        Feedback(
-            id=None,
-            exercise_id=exercise.id,
-            submission_id=submission.id,
-            text="There is something wrong here.",
-            detail_text="There is something wrong here.",
-            file_path=None,
-            line_start=None,
-            line_end=None,
-            credits=-1.0,
-            meta={},
-        )
-    ]
+
+    # find all methods in all files
+    method_blocks = {}
+    repo_zip = submission.get_zip()
+    for file_path in repo_zip.namelist():
+        with repo_zip.open(file_path, "r") as f:
+            file_content = f.read().decode("utf-8")
+        method_blocks[file_path] = extract_methods(file_content)
+
+    with get_db() as db:
+        # find all feedbacks for this exercise, except for the current submission
+        exercise_feedbacks = db.query(DBProgrammingFeedback) \
+            .filter_by(exercise_id=exercise.id) \
+            .filter(DBProgrammingFeedback.submission_id != submission.id) \
+            .all()
+        suggested_feedbacks = await get_feedback_suggestions(method_blocks, exercise_feedbacks, include_code=False)
+
+    return suggested_feedbacks
 
 
 if __name__ == "__main__":

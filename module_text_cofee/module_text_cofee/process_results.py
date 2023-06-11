@@ -58,7 +58,6 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
                 exercise_id=exercise_id
             )
             model.distance_matrix = distance_matrix
-            print(model)
             db.merge(model)
             db.commit()
 
