@@ -63,11 +63,14 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     # Do something with the submission and return a list of feedback
     return [
         Feedback(
+            id=None,
             exercise_id=exercise.id,
             submission_id=submission.id,
+            text="There is something wrong here.",
             detail_text="There is something wrong here.",
             file_path=None,
-            line=None,
+            line_start=None,
+            line_end=None,
             credits=-1.0,
             meta={},
         )
