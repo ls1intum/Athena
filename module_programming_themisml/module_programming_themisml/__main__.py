@@ -34,7 +34,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     logger.info("process_feedback: Feedback: %s", feedback)
 
     if feedback.file_path is None or feedback.line_start is None:
-        # cannot process without knowledge about method
+        logger.debug("Cannot process without knowledge about method.")
         return
 
     # find method that the feedback is on
