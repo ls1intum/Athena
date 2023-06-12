@@ -24,10 +24,9 @@ def get_model_params(lang: str) -> dict:
 
 
 def get_optimal_torch_device():
-    mps_available = hasattr(torch.backends, "mps") and torch.backends.mps.is_available()  # type: ignore
     if torch.cuda.is_available():
         return torch.device("cuda")
-    if mps_available:
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():  # type: ignore # MacOS devices with Metal programming framework
         return torch.device("mps")
     return torch.device("cpu")
 
