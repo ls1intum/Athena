@@ -59,9 +59,6 @@ class SimilarityScore:
         return f"precision={self.precision}, recall={self.recall}, f1={self.f1}, f3={self.f3}"
 
 
-perfect_similarity_score = SimilarityScore(1.0, 1.0, 1.0, 1.0)
-
-
 class CodeSimilarityComputer:
     """
     Takes multiple pairs of code snippets and computes their similarity scores using CodeBERT.
@@ -78,7 +75,7 @@ class CodeSimilarityComputer:
             return
         if remove_whitespace(code1) == remove_whitespace(code2):
             # identical code snippets in almost all cases
-            self.cache[key] = perfect_similarity_score
+            self.cache[key] = SimilarityScore(1.0, 1.0, 1.0, 1.0)  # perfect match
         else:
             self.cache[key] = UncomputedComparison(code1, code2)
 
