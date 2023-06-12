@@ -1,3 +1,9 @@
+"""
+This module computes the similarity between two code snippets using CodeBERT. It also caches
+the similarity scores for faster computation and auto-assigns a similarity of 1.0 to identical
+code snippets (ignoring whitespace).
+"""
+
 import os
 from dataclasses import dataclass
 from typing import Dict, Tuple, Union, cast
@@ -63,7 +69,7 @@ class CodeSimilarityComputer:
     It also caches the similarity scores for faster computation and auto-assigns a similarity
     of 1.0 to identical code snippets (ignoring whitespace).
     """
-    # keys are without whitespace
+    # keys are with all whitespace removed
     cache: Dict[Tuple[str, str], Union[SimilarityScore, UncomputedComparison]] = {}
 
     def add_comparison(self, code1: str, code2: str):
