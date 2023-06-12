@@ -100,7 +100,6 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
                         detail_text=detail_text,
                         file_path=file_path,
                         line_start=line,
-                        line_end=line,
                         credits=credits,
                         meta={},
                     )
