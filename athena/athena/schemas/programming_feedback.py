@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 from pydantic import Field
 
@@ -36,3 +36,13 @@ class ProgrammingFeedback(Feedback):
         self.file_path = file_path
         self.line_start = line_start
         self.line_end = line_end
+
+
+    @property
+    def line_range(self) -> Tuple[int, int]:
+        """Return the line range of this feedback, even if it is only a single line (line_end is None)."""
+        if self.line_start is None:
+            raise ValueError("Feedback does not have a line start")
+        if self.line_end is None:
+            return (self.line_start, self.line_start)
+        return (self.line_start, self.line_end)
