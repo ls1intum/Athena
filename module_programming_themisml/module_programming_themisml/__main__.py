@@ -1,5 +1,5 @@
 """
-Entry point for the module_example module.
+Entry point for the module_programming_themisml module.
 """
 from typing import List, cast
 
