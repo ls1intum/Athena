@@ -3,4 +3,4 @@
 ![Athena Logo](./playground/public/logo.png)
 
 ## What is Athena?
-Athena is a system to support (semi-)automated assessment of exercises. It is designed to be used in a university setting, where students can submit their solutions to exercises and get feedback on their work.
+Athena is an advanced system designed to assist educators by providing (semi-)automated assessments for various types of academic exercises. Through its integration with learning management systems (LMS), Athena offers an efficient and innovative way to evaluate students' work in large courses. The system has been expanded from its original focus on textual exercises to now include support for programming exercises and has plans for future support of additional exercise types such as UML modeling and mathematics.
