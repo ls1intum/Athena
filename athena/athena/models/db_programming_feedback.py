@@ -32,7 +32,7 @@ class DBProgrammingFeedback(DBFeedback, Base):
         if self.line_start is None:
             raise ValueError("line_start is None")
         with get_db() as db:
-            submission = db.query(DBProgrammingSubmission).filter_by(id=self.submission_id).one()
-            code = cast(ProgrammingSubmission, submission.to_schema()).get_code(self.file_path)
+            db_submission = db.query(DBProgrammingSubmission).filter_by(id=self.submission_id).one()
+            code = cast(ProgrammingSubmission, db_submission.to_schema()).get_code(self.file_path)
             line_end = self.line_end if self.line_end is not None else self.line_start
             return "\n".join(code.split("\n")[self.line_start:line_end + 1])
