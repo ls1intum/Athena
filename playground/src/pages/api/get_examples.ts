@@ -13,7 +13,7 @@ function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: st
     // 2. Replace a few placeholders.
     //    Placeholders look like this: `{{placeholder}}`
     const jsonPlaceholders: { [key: string]: string } = {
-        materialUrl: `${athenaOrigin}${baseUrl}/api/material`,
+        exampleExercisesUrl: `${athenaOrigin}${baseUrl}/api/example-exercises`,
     };
     const result: any = {};
     for (const key in json) {
