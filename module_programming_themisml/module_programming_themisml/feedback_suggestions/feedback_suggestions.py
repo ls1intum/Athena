@@ -20,8 +20,10 @@ def get_feedback_suggestions_for_method(
         method: MethodNode,
         include_code: bool = False
 ) -> List[ProgrammingFeedback]:
-    """Get feedback suggestions from comparisons between a function block of a given submission
-    and multiple feedback rows"""
+    """
+    Get feedback suggestions from comparisons between a function block of a given submission
+    and multiple feedback rows
+    """
     considered_feedbacks = []
     sim_computer = CodeSimilarityComputer()
     for feedback in feedbacks:
@@ -69,7 +71,7 @@ async def get_feedback_suggestions(
     """
     if ASYNC_PROCESSING:
         loop = asyncio.get_event_loop()
-        # https://github.com/tiangolo/fastapi/issues/1487#issuecomment-657290725
+        # Doing it like this for compatibility with FastAPI / Uvicorn, see https://github.com/tiangolo/fastapi/issues/1487#issuecomment-657290725
         with concurrent.futures.ProcessPoolExecutor(mp_context=get_context("spawn")) as pool:  # type: ignore
             results = await asyncio.gather(*[
                 loop.run_in_executor(pool, get_feedback_suggestions_for_method,
