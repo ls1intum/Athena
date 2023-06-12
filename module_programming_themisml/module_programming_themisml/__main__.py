@@ -24,7 +24,7 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     logger.info("select_submission: Received %d submissions for exercise %d", len(submissions), exercise.id)
     for submission in submissions:
         logger.info("- Submission %d", submission.id)
-    # Do something with the submissions and return the one that should be assessed next
+    # It might be possible to cleverly find "good" submissions here later
     return submissions[0]
 
 
