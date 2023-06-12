@@ -19,6 +19,27 @@ class Feedback(Schema, ABC):
 
     meta: dict = Field(example={})
 
+
+    def __init__(
+            self,
+            id: Optional[int] = None,
+            exercise_id: int = -1,
+            submission_id: int = -1,
+            detail_text: str = "",
+            text: str = "",
+            credits: float = 0.0,
+            meta: dict = None,  # type: ignore # This is None to avoid mutable default arguments
+        ):
+        super().__init__()
+        self.id = id
+        self.exercise_id = exercise_id
+        self.submission_id = submission_id
+        self.detail_text = detail_text
+        self.text = text
+        self.credits = credits
+        self.meta = meta or {}
+
+
     def to_model(self, is_suggestion: bool = False):
         return type(self).get_model_class()(**self.dict(), is_suggestion=is_suggestion)
 

@@ -94,7 +94,6 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
                 credits = feedback.get("credits", 0.0)
                 feedback_proposals.append(
                     Feedback(
-                        id=None,
                         exercise_id=exercise.id,
                         submission_id=submission.id,
                         text=detail_text,

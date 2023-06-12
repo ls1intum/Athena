@@ -61,7 +61,6 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     # Do something with the submission and return a list of feedback
     return [
         Feedback(
-            id=0,
             exercise_id=exercise.id,
             submission_id=submission.id,
             text="This is a suggestion.",
