@@ -1,8 +1,8 @@
 import { ModuleMeta } from "@/model/health_response";
-import SendSubmissions from "./send_submissions";
-import SendFeedback from "./send_feedback";
-import RequestFeedbackSuggestions from "./request_feedback_suggestions";
-import SelectSubmission from "./submission_select";
+import SendSubmissions from "@/components/normal_mode/send_submissions";
+import SendFeedback from "@/components/normal_mode/send_feedback";
+import RequestFeedbackSuggestions from "@/components/normal_mode/request_feedback_suggestions";
+import SelectSubmission from "@/components/normal_mode/request_submission_selection";
 
 export default function NormalMode({
   athenaUrl,
