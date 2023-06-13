@@ -2,7 +2,7 @@ import {useState} from "react";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
 import ExerciseSelect from "@/components/exercise_select";
-import SubmissionSelect from "@/components/submission_select";
+import SubmissionSelect from "./submission_select";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import {ModuleMeta} from "@/model/health_response";

@@ -3,13 +3,15 @@ import ModuleSelect from "@/components/module_select";
 import {ModuleMeta} from "@/model/health_response";
 
 export default function BaseInfoHeader(
-    {athenaUrl, onChangeAthenaUrl, athenaSecret, onChangeAthenaSecret, module, onChangeModule}: {
+    {athenaUrl, onChangeAthenaUrl, athenaSecret, onChangeAthenaSecret, module, onChangeModule, evaluationMode, onChangeEvaluationMode}: {
         athenaUrl: string,
         onChangeAthenaUrl: (value: string) => void,
         athenaSecret: string,
         onChangeAthenaSecret: (value: string) => void,
         module: ModuleMeta | undefined,
-        onChangeModule: (value: ModuleMeta) => void
+        onChangeModule: (value: ModuleMeta) => void,
+        evaluationMode: boolean,
+        onChangeEvaluationMode: (value: boolean) => void,
     }
 ) {
     return (
@@ -32,6 +34,10 @@ export default function BaseInfoHeader(
             </label>
             <br />
             <ModuleSelect url={athenaUrl} module={module} onChange={onChangeModule} />
+            <div className="flex flex-row mt-4">
+                <button className={`p-2 rounded-l-md ${evaluationMode ? "bg-gray-200 text-gray-500" : "bg-blue-500 text-white"}`} onClick={() => onChangeEvaluationMode(false)}>Normal mode</button>
+                <button className={`p-2 rounded-r-md ${evaluationMode ?  "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"}`} onClick={() => onChangeEvaluationMode(true)}>Evaluation mode</button>
+            </div>
         </div>
     );
 }
