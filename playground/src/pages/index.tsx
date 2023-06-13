@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import BaseInfoHeader from "@/components/base_info_header";
+import EvaluationMode from "@/components/evaluation_mode";
 import NormalMode from "@/components/normal_mode";
 import {ModuleMeta} from "@/model/health_response";
 
@@ -26,9 +27,11 @@ export default function Home() {
                 module={module} onChangeModule={setModule}
                 evaluationMode={evaluationMode} onChangeEvaluationMode={setEvaluationMode}
             />
-            {module && (evaluationMode ? <div>Eval</div>
-             :
-            <NormalMode athenaUrl={athenaUrl} athenaSecret={athenaSecret} module={module}/>)}
+            {module && (
+                evaluationMode 
+                ? <EvaluationMode athenaUrl={athenaUrl} athenaSecret={athenaSecret} module={module}/>
+                : <NormalMode athenaUrl={athenaUrl} athenaSecret={athenaSecret} module={module}/>
+            )}
         </main>
     );
 }
