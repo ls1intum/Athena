@@ -14,7 +14,7 @@ export default function EvaluationMode({
     <div className="bg-white rounded-md p-4 mt-8">
       <h1 className="text-2xl font-bold mb-4">Evaluate</h1>
       <p className="text-gray-500 mb-4">
-        Data in <code className="bg-gray-100 p-1">/data</code> directory will be used for evaluation.
+        Data in <code className="bg-gray-100 p-1">/evaluation_data</code> directory will be used for evaluation.
       </p>
       {(module.type === "text" && (
         <TextEvaluation athenaUrl={athenaUrl} athenaSecret={athenaSecret} module={module} />
