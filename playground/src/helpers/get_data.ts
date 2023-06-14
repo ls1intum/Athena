@@ -8,14 +8,13 @@ import baseUrl from "@/helpers/base_url";
 import { Mode } from "@/model/mode";
 
 
-function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: string) {
-    // 1. Replace all file references found anywhere in the json with the file contents from examples/<reference>
+function replaceJsonPlaceholders(mode: Mode, json: any, exerciseId: number, athenaOrigin: string) {
+    // 1. Replace all file references found anywhere in the json with the file contents from data/example/<reference>
     //    File references look like this: `-> file:example.txt`
     // 2. Replace a few placeholders.
     //    Placeholders look like this: `{{placeholder}}`
     const jsonPlaceholders: { [key: string]: string } = {
-        exampleDataUrl: `${athenaOrigin}${baseUrl}/api/exercise-data/example`,
-        evaluationDataUrl: `${athenaOrigin}${baseUrl}/api/exercise-data/evaluation`,
+        exerciseDataUrl: `${athenaOrigin}${baseUrl}/api/mode/${mode}/exercise/${exerciseId}/data`,
     };
     const result: any = {};
     for (const key in json) {
@@ -25,7 +24,7 @@ function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: st
                 // This is only for example exercises, for evaluation the data is already in the json
                 if (value.startsWith('-> file:')) {
                     // file reference replacement
-                    const filePath = path.join(process.cwd(), 'examples', 'exercise-' + exerciseId, value.split(':')[1]);
+                    const filePath = path.join(process.cwd(), 'example', 'exercise-' + exerciseId, value.split(':')[1]);
                     if (fs.existsSync(filePath)) {
                         value = fs.readFileSync(filePath, 'utf8');
                     } else {
@@ -41,9 +40,9 @@ function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: st
                 }
                 result[key] = value;
             } else if (Array.isArray(value)) {
-                result[key] = value.map((item) => replaceJsonPlaceholders(item, exerciseId, athenaOrigin));
+                result[key] = value.map((item) => replaceJsonPlaceholders(mode, item, exerciseId, athenaOrigin));
             } else if (typeof value === 'object') {
-                result[key] = replaceJsonPlaceholders(value, exerciseId, athenaOrigin);
+                result[key] = replaceJsonPlaceholders(mode, value, exerciseId, athenaOrigin);
             } else {
                 result[key] = value;
             }
@@ -57,7 +56,7 @@ function getExerciseJSON(mode: Mode, exerciseId: number, athenaOrigin: string): 
     const exercisePath = path.join(process.cwd(), 'data', mode, `exercise-${exerciseId}.json`);
     if (fs.existsSync(exercisePath)) {
         const exerciseJson = JSON.parse(fs.readFileSync(exercisePath, 'utf8'));
-        return replaceJsonPlaceholders(exerciseJson, exerciseId, athenaOrigin);
+        return replaceJsonPlaceholders(mode, exerciseJson, exerciseId, athenaOrigin);
     }
     throw new Error(`Exercise ${exerciseId} not found`);
 }
