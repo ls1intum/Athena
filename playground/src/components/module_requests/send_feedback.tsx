@@ -143,8 +143,8 @@ export default function SendFeedback({
   );
 
   return (
-    <div className="bg-white rounded-md p-4 mt-8">
-      <h1 className="text-2xl font-bold mb-4">Send Feedback to Athena</h1>
+    <div className="bg-white rounded-md p-4 mb-8">
+      <h3 className="text-2xl font-bold mb-4">Send Feedback to Athena</h3>
       <p className="text-gray-500 mb-4">
         Send a single given feedback to Athena, or all feedback for the whole
         exercise. This usually happens when someone gives feedback on the

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import BaseInfoHeader from "@/components/base_info_header";
-import EvaluationMode from "@/components/evaluation_mode";
 import ModuleRequests from "@/components/module_requests";
 import { ModuleMeta } from "@/model/health_response";
 import { Mode } from "@/model/mode";

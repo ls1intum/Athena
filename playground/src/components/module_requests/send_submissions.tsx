@@ -76,8 +76,8 @@ export default function SendSubmissions({
   );
 
   return (
-    <div className="bg-white rounded-md p-4 mt-8">
-      <h1 className="text-2xl font-bold mb-4">Send Submissions</h1>
+    <div className="bg-white rounded-md p-4 mb-8">
+      <h3 className="text-2xl font-bold mb-4">Send Submissions</h3>
       <p className="text-gray-500 mb-4">
         Send all submissions for an exercise to Athena. This usually happens
         when the exercise deadline is reached in the LMS. The matching module

@@ -13,8 +13,11 @@ function handler(req: NextApiRequest, res: NextApiResponse<Feedback[]>) {
     return;
   }
   try {
-    const feedbacks = getFeedbacks(mode, parsedExerciseId, getOriginFromRequest(req));
-    console.log('feedbacks', feedbacks)
+    const feedbacks = getFeedbacks(
+      mode,
+      parsedExerciseId,
+      getOriginFromRequest(req)
+    );
     res.status(200).json(feedbacks);
   } catch (e) {
     console.error(e);

@@ -15,6 +15,7 @@ export type ModuleRequestProps = {
 export default function ModuleRequests(props: ModuleRequestProps) {
   return (
     <>
+      <h2 className="text-4xl font-bold text-white mb-4">Module Requests</h2>
       <SendSubmissions {...props} />
       <SelectSubmission {...props} />
       <SendFeedback {...props} />

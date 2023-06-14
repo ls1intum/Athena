@@ -133,28 +133,26 @@ function jsonToSubmissions(json: any): Submission[] {
 function jsonToFeedbacks(json: any): Feedback[] {
   return json.submissions.flatMap((submissionJson: any) => {
     if (Array.isArray(submissionJson.feedbacks)) {
-      const feedbacks = submissionJson.feedbacks.map(
-        (feedbackJson: any) => {
-          const feedback = feedbackJson as Feedback;
-          // exercise_id is not provided in the json for convenience, so we add it here
-          feedback.exercise_id = json.id;
-          // submission_id is not provided in the json for convenience, so we add it here
-          feedback.submission_id = submissionJson.id;
+      const feedbacks = submissionJson.feedbacks.map((feedbackJson: any) => {
+        const feedback = feedbackJson as Feedback;
+        // exercise_id is not provided in the json for convenience, so we add it here
+        feedback.exercise_id = json.id;
+        // submission_id is not provided in the json for convenience, so we add it here
+        feedback.submission_id = submissionJson.id;
 
-          // replace text and detail_text with undefined if they are not strings (null somehow gets parsed as {})
-          if (typeof feedback.text !== "string") {
-            feedback.text = undefined;
-          }
-          if (typeof feedback.detail_text !== "string") {
-            feedback.detail_text = undefined;
-          }
-
-          return feedback;
+        // replace text and detail_text with undefined if they are not strings (null somehow gets parsed as {})
+        if (typeof feedback.text !== "string") {
+          feedback.text = undefined;
         }
-      );
-      return feedbacks
+        if (typeof feedback.detail_text !== "string") {
+          feedback.detail_text = undefined;
+        }
+
+        return feedback;
+      });
+      return feedbacks;
     }
-    return []
+    return [];
   });
 }
 
@@ -178,7 +176,6 @@ export function getFeedbacks(
   exerciseId: number | undefined,
   athenaOrigin: string
 ): Feedback[] {
-  console.log('getFeedbacks')
   if (exerciseId !== undefined) {
     return jsonToFeedbacks(getExerciseJSON(mode, exerciseId, athenaOrigin));
   }

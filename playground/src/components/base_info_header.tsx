@@ -26,7 +26,7 @@ export default function BaseInfoHeader({
   onChangeMode,
 }: BaseInfoHeaderProps) {
   return (
-    <div className="bg-white rounded-md p-4">
+    <div className="bg-white rounded-md p-4 mb-8">
       <label className="flex flex-col">
         <span className="text-lg font-bold">Athena URL</span>
         <input

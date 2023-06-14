@@ -74,10 +74,10 @@ export default function RequestFeedbackSuggestions({
   );
 
   return (
-    <div className="bg-white rounded-md p-4 mt-8">
-      <h1 className="text-2xl font-bold mb-4">
+    <div className="bg-white rounded-md p-4 mb-8">
+      <h3 className="text-2xl font-bold mb-4">
         Request Feedback Suggestions from Athena
-      </h1>
+      </h3>
       <p className="text-gray-500 mb-4">
         Request a list of feedback suggestions from Athena for the selected
         submission. The LMS would usually call this when a tutor starts grading

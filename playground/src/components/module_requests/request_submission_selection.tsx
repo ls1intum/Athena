@@ -74,10 +74,10 @@ export default function SelectSubmission({
   );
 
   return (
-    <div className="bg-white rounded-md p-4 mt-8">
-      <h1 className="text-2xl font-bold mb-4">
+    <div className="bg-white rounded-md p-4 mb-8">
+      <h3 className="text-2xl font-bold mb-4">
         Request Submission Selection from Athena
-      </h1>
+      </h3>
       <p className="text-gray-500 mb-4">
         Request the submission to grade next out out of many submissions from
         Athena. The LMS would usually call this right before a tutor can start
