@@ -1,5 +1,5 @@
 import Health from "@/components/health";
-import ModuleSelect from "@/components/module_select";
+import ModuleSelect from "@/components/selectors/module_select";
 import {ModuleMeta} from "@/model/health_response";
 
 export default function BaseInfoHeader(

@@ -5,6 +5,7 @@ import {Exercise} from "@/model/exercise";
 import {Submission} from "@/model/submission";
 import Feedback from "@/model/feedback";
 import baseUrl from "@/helpers/base_url";
+import { Mode } from "@/model/mode";
 
 
 function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: string) {
@@ -51,28 +52,26 @@ function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: st
     return result;
 }
 
-function getExampleExerciseJSON(exerciseId: number, athenaOrigin: string): any {
-    // find in cwd/examples/submissions/<exerciseId>.json
-    const submissionsPath = path.join(process.cwd(), 'examples', `exercise-${exerciseId}.json`);
-    if (fs.existsSync(submissionsPath)) {
-        const exerciseJson = JSON.parse(fs.readFileSync(submissionsPath, 'utf8'));
+function getExerciseJSON(mode: Mode, exerciseId: number, athenaOrigin: string): any {
+    // find in cwd/data/<mode>/exercise-<exerciseId>.json
+    const exercisePath = path.join(process.cwd(), 'data', mode, `exercise-${exerciseId}.json`);
+    if (fs.existsSync(exercisePath)) {
+        const exerciseJson = JSON.parse(fs.readFileSync(exercisePath, 'utf8'));
         return replaceJsonPlaceholders(exerciseJson, exerciseId, athenaOrigin);
     }
-    throw new Error(`No example submissions found for exercise ${exerciseId}`);
+    throw new Error(`Exercise ${exerciseId} not found`);
 }
 
-function getAllExampleExerciseJSON(athenaOrigin: string): any[] {
-    // find in cwd/examples/submissions/*.json
-    const submissionsPath = path.join(process.cwd(), 'examples');
-    const exerciseIds = fs.readdirSync(submissionsPath)
-        .filter((fileName) => fileName.endsWith('.json'))
+function getAllExerciseJSON(mode: Mode, athenaOrigin: string): any[] {
+    // find in cwd/data/<mode> all exercise-*.json
+    const exercisesDir = path.join(process.cwd(), 'data', mode);
+    const exerciseIds = fs.readdirSync(exercisesDir)
+        .filter((fileName) => fileName.endsWith('.json') && fileName.startsWith('exercise-'))
         .map((fileName) => {
-            // filename looks like `exercise-<exerciseId>.json`
             return parseInt(fileName.split('.')[0].split('-')[1]);
         });
-    return exerciseIds.map(id => getExampleExerciseJSON(id, athenaOrigin));
+    return exerciseIds.map(id => getExerciseJSON(mode, id, athenaOrigin));
 }
-
 
 function jsonToExercise(json: any): Exercise {
     const exercise = json as Exercise;
@@ -114,21 +113,20 @@ function jsonToFeedbacks(json: any): Feedback[] {
     return feedbacks;
 }
 
-
-export function getExampleExercises(athenaOrigin: string): Exercise[] {
-    return getAllExampleExerciseJSON(athenaOrigin).map(jsonToExercise);
+export function getExercises(mode: Mode, athenaOrigin: string): Exercise[] {
+    return getAllExerciseJSON(mode, athenaOrigin).map(jsonToExercise);
 }
 
-export function getExampleSubmissions(exerciseId: number | undefined, athenaOrigin: string): Submission[] {
+export function getSubmissions(mode: Mode, exerciseId: number | undefined, athenaOrigin: string): Submission[] {
     if (exerciseId !== undefined) {
-        return jsonToSubmissions(getExampleExerciseJSON(exerciseId, athenaOrigin));
+        return jsonToSubmissions(getExerciseJSON(mode, exerciseId, athenaOrigin));
     }
-    return getAllExampleExerciseJSON(athenaOrigin).flatMap(jsonToSubmissions);
+    return getAllExerciseJSON(mode, athenaOrigin).flatMap(jsonToSubmissions);
 }
 
-export function getExampleFeedbacks(exerciseId: number | undefined, athenaOrigin: string): Feedback[] {
+export function getFeedbacks(mode: Mode, exerciseId: number | undefined, athenaOrigin: string): Feedback[] {
     if (exerciseId !== undefined) {
-        return jsonToFeedbacks(getExampleExerciseJSON(exerciseId, athenaOrigin));
+        return jsonToFeedbacks(getExerciseJSON(mode, exerciseId, athenaOrigin));
     }
-    return getAllExampleExerciseJSON(athenaOrigin).flatMap(jsonToFeedbacks);
+    return getAllExerciseJSON(mode, athenaOrigin).flatMap(jsonToFeedbacks);
 }

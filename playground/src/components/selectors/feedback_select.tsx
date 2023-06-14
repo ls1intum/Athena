@@ -2,18 +2,25 @@ import useSWR from "swr";
 import Feedback from "@/model/feedback";
 import fetcher from "@/helpers/fetcher";
 import baseUrl from "@/helpers/base_url";
+import { Mode } from "@/model/mode";
+
+type FeedbackSelectProps = {
+    mode: Mode,
+    exercise_id?: number,
+    submission_id?: number,
+    feedback: Feedback | null,
+    onChange: (feedback: Feedback) => void
+};
 
 export default function FeedbackSelect(
-    {exercise_id, submission_id, feedback, onChange}: { exercise_id?: number, submission_id?: number, feedback: Feedback | null, onChange: (feedback: Feedback) => void}
+    {mode, exercise_id, submission_id, feedback, onChange}: FeedbackSelectProps
 ) {
-    const {data, error, isLoading} = useSWR(`${baseUrl}/api/feedbacks`, fetcher);
+    const apiURL = `${baseUrl}/api/mode/${mode}/${exercise_id === undefined ? "feedbacks" : `exercise/${exercise_id}/feedbacks`}`;
+    const {data, error, isLoading} = useSWR(apiURL, fetcher);
     if (error) return <div>failed to load</div>;
     if (isLoading) return <div>loading...</div>;
 
     let filteredFeedbacks = data;
-    if (exercise_id) {
-        filteredFeedbacks = filteredFeedbacks.filter((fb: Feedback) => fb.exercise_id === exercise_id);
-    }
     if (submission_id) {
         filteredFeedbacks = filteredFeedbacks.filter((fb: Feedback) => fb.submission_id === submission_id);
     }

@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
-import ExerciseSelect from "@/components/exercise_select";
-import SubmissionSelect from "@/components/submission_select";
-import FeedbackSelect from "@/components/feedback_select";
+import ExerciseSelect from "@/components/selectors/exercise_select";
+import SubmissionSelect from "@/components/selectors/submission_select";
+import FeedbackSelect from "@/components/selectors/feedback_select";
 import Feedback from "@/model/feedback";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
+import { ModuleRequestProps } from ".";
 
 async function sendFeedback(
   athenaUrl: string,
@@ -129,14 +130,11 @@ async function sendAllExerciseFeedbacks(
 }
 
 export default function SendFeedback({
+  mode,
   athenaUrl,
   athenaSecret,
   module,
-}: {
-  athenaUrl: string;
-  athenaSecret: string;
-  module: ModuleMeta;
-}) {
+}: ModuleRequestProps) {
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [isAllSubmissions, setIsAllSubmissions] = useState<boolean>(true);
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -157,11 +155,13 @@ export default function SendFeedback({
         <code>@feedback_consumer</code>.
       </p>
       <ExerciseSelect
+        mode={mode}
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
       />
       <SubmissionSelect
+        mode={mode}
         exercise_id={exercise?.id}
         submission={submission}
         onChange={setSubmission}
@@ -176,6 +176,7 @@ export default function SendFeedback({
       )}
       {!isAllSubmissions && (
         <FeedbackSelect
+          mode={mode}
           exercise_id={exercise?.id}
           submission_id={submission?.id}
           feedback={feedback}

@@ -1,11 +1,12 @@
 import {useState} from "react";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
-import ExerciseSelect from "@/components/exercise_select";
+import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import {ModuleMeta} from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
+import { ModuleRequestProps } from ".";
 
 async function sendSubmissions(athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {
@@ -47,7 +48,7 @@ async function sendSubmissions(athenaUrl: string, athenaSecret: string, module: 
 }
 
 export default function SendSubmissions(
-    { athenaUrl, athenaSecret, module }: { athenaUrl: string, athenaSecret: string, module: ModuleMeta }
+    { mode, athenaUrl, athenaSecret, module }: ModuleRequestProps
 ) {
     const [exercise, setExercise] = useState<Exercise | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -61,7 +62,7 @@ export default function SendSubmissions(
                 This usually happens when the exercise deadline is reached in the LMS.
                 The matching module for the exercise will receive the submissions at the function annotated with <code>@submission_consumer</code>.
             </p>
-            <ExerciseSelect exerciseType={module.type} exercise={exercise} onChange={setExercise} />
+            <ExerciseSelect mode={mode} exerciseType={module.type} exercise={exercise} onChange={setExercise} />
             <ModuleResponseView response={response} />
             <button
                 className="bg-blue-500 text-white rounded-md p-2 mt-4"

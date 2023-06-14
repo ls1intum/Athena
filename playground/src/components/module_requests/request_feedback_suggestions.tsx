@@ -1,12 +1,13 @@
 import {useState} from "react";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
-import ExerciseSelect from "@/components/exercise_select";
-import SubmissionSelect from "@/components/submission_select";
+import ExerciseSelect from "@/components/selectors/exercise_select";
+import SubmissionSelect from "@/components/selectors/submission_select";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import {ModuleMeta} from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
+import { ModuleRequestProps } from ".";
 
 async function requestFeedbackSuggestions(athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null, submission: Submission | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {
@@ -45,7 +46,7 @@ async function requestFeedbackSuggestions(athenaUrl: string, athenaSecret: strin
 }
 
 export default function RequestFeedbackSuggestions(
-    { athenaUrl, athenaSecret, module }: { athenaUrl: string, athenaSecret: string, module: ModuleMeta }
+    { mode, athenaUrl, athenaSecret, module }: ModuleRequestProps
 ) {
     const [exercise, setExercise] = useState<Exercise | null>(null);
     const [submission, setSubmission] = useState<Submission | null>(null);
@@ -60,8 +61,8 @@ export default function RequestFeedbackSuggestions(
                 The LMS would usually call this when a tutor starts grading a submission.
                 The matching module for the exercise will receive the request at the function annotated with <code>@feedback_provider</code>.
             </p>
-            <ExerciseSelect exerciseType={module.type} exercise={exercise} onChange={setExercise} />
-            <SubmissionSelect exercise_id={exercise?.id} submission={submission} onChange={setSubmission} />
+            <ExerciseSelect mode={mode} exerciseType={module.type} exercise={exercise} onChange={setExercise} />
+            <SubmissionSelect mode={mode} exercise_id={exercise?.id} submission={submission} onChange={setSubmission} />
             <ModuleResponseView response={response} />
             <button
                 className="bg-blue-500 text-white rounded-md p-2 mt-4"

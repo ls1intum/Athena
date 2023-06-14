@@ -1,11 +1,12 @@
 import {useState} from "react";
 import { Exercise } from "@/model/exercise";
-import ExerciseSelect from "@/components/exercise_select";
+import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
 import { Submission } from "@/model/submission";
 import {ModuleMeta} from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
+import { ModuleRequestProps } from ".";
 
 async function requestSubmissionSelection(athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {
@@ -45,7 +46,7 @@ async function requestSubmissionSelection(athenaUrl: string, athenaSecret: strin
 }
 
 export default function SelectSubmission(
-    { athenaUrl, athenaSecret, module }: { athenaUrl: string, athenaSecret: string, module: ModuleMeta }
+    { mode, athenaUrl, athenaSecret, module }: ModuleRequestProps
 ) {
     const [exercise, setExercise] = useState<Exercise | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -61,7 +62,7 @@ export default function SelectSubmission(
                 The playground currently only allows requesting a choice between all submissions of an exercise, but the LMS can also request a choice between a subset of submissions. <br />
                 <b>This endpoint will only work properly after the submissions have been sent to Athena before.</b>
             </p>
-            <ExerciseSelect exerciseType={module.type} exercise={exercise} onChange={setExercise} />
+            <ExerciseSelect mode={mode} exerciseType={module.type} exercise={exercise} onChange={setExercise} />
             <ModuleResponseView response={response} />
             <button
                 className="bg-blue-500 text-white rounded-md p-2 mt-4"

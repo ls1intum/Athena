@@ -1,16 +1,25 @@
 import useSWR from "swr";
-import {ProgrammingSubmission, Submission, TextSubmission} from "@/model/submission";
+import { ProgrammingSubmission, Submission, TextSubmission } from "@/model/submission";
+import { Mode } from "@/model/mode";
 import fetcher from "@/helpers/fetcher";
 import baseUrl from "@/helpers/base_url";
 
+type SubmissionSelectProps = {
+    mode: Mode,
+    exercise_id?: number,
+    submission: Submission | null,
+    onChange: (submission: Submission) => void,
+    isAllSubmissions?: boolean,
+    setIsAllSubmissions?: (isAllSubmissions: boolean) => void
+};
+
 export default function SubmissionSelect(
-    { exercise_id, submission, onChange, isAllSubmissions, setIsAllSubmissions }: { exercise_id?: number, submission: Submission | null, onChange: (submission: Submission) => void, isAllSubmissions?: boolean, setIsAllSubmissions?: (isAllSubmissions: boolean) => void }
+    { mode, exercise_id, submission, onChange, isAllSubmissions, setIsAllSubmissions }: SubmissionSelectProps
 ) {
-    const {data, error, isLoading} = useSWR(`${baseUrl}/api/submissions`, fetcher);
+    const apiURL = `${baseUrl}/api/mode/${mode}/${exercise_id === undefined ? "submissions" : `exercise/${exercise_id}/submissions`}`;
+    const {data, error, isLoading} = useSWR(apiURL, fetcher);
     if (error) return <div>failed to load</div>;
     if (isLoading) return <div>loading...</div>;
-
-    const filteredSubmissions = exercise_id ? data.filter((sub: Submission) => sub.exercise_id === exercise_id) : data;
 
     return (
         <label className="flex flex-col">
@@ -22,7 +31,7 @@ export default function SubmissionSelect(
                         if (value === "all") {
                             setIsAllSubmissions!(true);
                         } else {
-                            onChange(filteredSubmissions.find((sub: Submission) => sub.id === parseInt(e.target.value)));
+                            onChange(data.find((sub: Submission) => sub.id === parseInt(e.target.value)));
                             if (setIsAllSubmissions) setIsAllSubmissions(false);
                         }
                     }}>
@@ -33,7 +42,7 @@ export default function SubmissionSelect(
                         ✨ All submissions
                     </option>
                 }
-                {filteredSubmissions.map((sub: Submission) => {
+                {data.map((sub: Submission) => {
                     const contentPreview = (sub as TextSubmission)?.content || (sub as ProgrammingSubmission)?.repository_url || "?";
                     return <option
                         key={sub.id}
