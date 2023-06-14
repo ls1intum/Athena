@@ -13,7 +13,7 @@ export default function DataSelect({
 }) {
   return (
     <label className="flex flex-col">
-      <span className="text-lg font-bold">Data</span>
+      <span className="text-lg font-bold">Dataset</span>
       <div className="flex flex-row mb-2">
         <button
           className={`p-2 rounded-l-md ${
