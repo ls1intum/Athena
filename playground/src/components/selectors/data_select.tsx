@@ -1,7 +1,3 @@
-import useSWR from "swr";
-import fetcher from "@/helpers/fetcher";
-import HealthResponse, { ModuleMeta } from "@/model/health_response";
-import baseUrl from "@/helpers/base_url";
 import { Mode } from "@/model/mode";
 
 export default function DataSelect({
