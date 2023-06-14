@@ -14,13 +14,10 @@ def calculate_information_gain(submission: TextSubmission, ungraded_submission_i
     """
     information_gain = 0.0
     with get_db() as db:
-        db_submission = db.query(DBTextSubmission).filter(DBTextSubmission.id == submission.id).first()
-        if db_submission is None:
-            raise ValueError(f"Submission {submission.id} does not exist")
         # The total information gain is calculated as the following sum:
         # (1) added distance / cluster size for each block
         # (2) "cluster percentage" = number indicating percentage of clusters with less text blocks on ungraded submissions
-        all_clusters = db.query(DBTextBlock).filter(DBTextBlock.submission_id == db_submission.id).all()
+        all_clusters = db.query(DBTextBlock).filter(DBTextBlock.submission_id == submission.id).all()
         for block in all_clusters:
             # (1) added distance / cluster size for each block
             information_gain += block.calculate_added_distance() / len(block.cluster.blocks)
