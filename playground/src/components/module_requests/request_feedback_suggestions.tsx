@@ -90,12 +90,14 @@ export default function RequestFeedbackSuggestions({
         exercise={exercise}
         onChange={setExercise}
       />
-      <SubmissionSelect
-        mode={mode}
-        exercise_id={exercise?.id}
-        submission={submission}
-        onChange={setSubmission}
-      />
+      {exercise && (
+        <SubmissionSelect
+          mode={mode}
+          exercise_id={exercise?.id}
+          submission={submission}
+          onChange={setSubmission}
+        />
+      )}
       <ModuleResponseView response={response} />
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"

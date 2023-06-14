@@ -158,28 +158,33 @@ export default function SendFeedback({
         exercise={exercise}
         onChange={setExercise}
       />
-      <SubmissionSelect
-        mode={mode}
-        exercise_id={exercise?.id}
-        submission={submission}
-        onChange={setSubmission}
-        isAllSubmissions={isAllSubmissions}
-        setIsAllSubmissions={setIsAllSubmissions}
-      />
-      {isAllSubmissions && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-700 mt-2">
-          You are about to send feedback for all submissions of this exercise.
-          This will send a request for each feedback of each submission.
-        </div>
-      )}
-      {!isAllSubmissions && (
-        <FeedbackSelect
-          mode={mode}
-          exercise_id={exercise?.id}
-          submission_id={submission?.id}
-          feedback={feedback}
-          onChange={setFeedback}
-        />
+      {exercise && (
+        <>
+          <SubmissionSelect
+            mode={mode}
+            exercise_id={exercise?.id}
+            submission={submission}
+            onChange={setSubmission}
+            isAllSubmissions={isAllSubmissions}
+            setIsAllSubmissions={setIsAllSubmissions}
+          />
+          {isAllSubmissions && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-700 mt-2">
+              You are about to send feedback for all submissions of this
+              exercise. This will send a request for each feedback of each
+              submission.
+            </div>
+          )}
+          {!isAllSubmissions && (
+            <FeedbackSelect
+              mode={mode}
+              exercise_id={exercise?.id}
+              submission_id={submission?.id}
+              feedback={feedback}
+              onChange={setFeedback}
+            />
+          )}
+        </>
       )}
       {responses?.map((response, i) => (
         <ModuleResponseView key={i} response={response} />
