@@ -1,6 +1,6 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 import type Feedback from "@/model/feedback";
-import {getExampleFeedbacks} from "@/pages/api/get_examples";
+import {getExampleFeedbacks} from "@/helpers/get_examples";
 import getOriginFromRequest from '@/helpers/origin_from_req';
 
 
