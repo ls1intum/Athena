@@ -4,7 +4,13 @@ import {join} from 'path';
 import Archiver from 'archiver';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { exerciseId, path } = req.query as { exerciseId: string, path: string[] };
+  const { mode, exerciseId, path } = req.query as { mode: string, exerciseId: string, path: string[] };
+
+  if (mode != 'example' && mode != 'evaluation') {
+    res.status(404).end();
+    return;
+  }
+
   // example for path: ['submissions', '1.zip'] or just ['solution.zip']
 
   // remove ".zip" from the last path element
@@ -12,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   path[path.length - 1] = filename;
 
   // Get the folder path
-  const folderPath = join(process.cwd(), 'examples', 'exercise-' + exerciseId, ...path);
+  const folderPath = join(process.cwd(), 'data', mode, 'exercise-' + exerciseId, ...path);
 
   // Check if the folder exists
   await fs.access(folderPath);

@@ -13,13 +13,15 @@ function replaceJsonPlaceholders(json: any, exerciseId: number, athenaOrigin: st
     // 2. Replace a few placeholders.
     //    Placeholders look like this: `{{placeholder}}`
     const jsonPlaceholders: { [key: string]: string } = {
-        exampleExercisesUrl: `${athenaOrigin}${baseUrl}/api/example-exercises`,
+        exampleDataUrl: `${athenaOrigin}${baseUrl}/api/exercise-data/example`,
+        evaluationDataUrl: `${athenaOrigin}${baseUrl}/api/exercise-data/evaluation`,
     };
     const result: any = {};
     for (const key in json) {
         if (json.hasOwnProperty(key)) {
             let value = json[key];
             if (typeof value === 'string') {
+                // This is only for example exercises, for evaluation the data is already in the json
                 if (value.startsWith('-> file:')) {
                     // file reference replacement
                     const filePath = path.join(process.cwd(), 'examples', 'exercise-' + exerciseId, value.split(':')[1]);

@@ -1,6 +1,6 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 import type {Submission} from '@/model/submission';
-import {getExampleSubmissions} from "@/helpers/get_examples";
+import {getExampleSubmissions} from "@/helpers/get_data";
 import getOriginFromRequest from '@/helpers/origin_from_req';
 
 
