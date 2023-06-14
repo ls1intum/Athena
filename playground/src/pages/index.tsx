@@ -3,6 +3,7 @@ import BaseInfoHeader from "@/components/base_info_header";
 import EvaluationMode from "@/components/evaluation_mode";
 import ModuleRequests from "@/components/module_requests";
 import {ModuleMeta} from "@/model/health_response";
+import { Mode } from "@/model/mode";
 
 export default function Home() {
     const [athenaUrl, setAthenaUrl] = useState<string>(() => {
@@ -16,7 +17,7 @@ export default function Home() {
     });
     const [athenaSecret, setAthenaSecret] = useState<string>("");
     const [module, setModule] = useState<ModuleMeta | undefined>(undefined);
-    const [evaluationMode, setEvaluationMode] = useState<boolean>(false);
+    const [mode, setMode] = useState<Mode>('example');
 
     return (
         <main className="flex min-h-screen flex-col p-24">
@@ -25,10 +26,10 @@ export default function Home() {
                 athenaUrl={athenaUrl} onChangeAthenaUrl={setAthenaUrl}
                 athenaSecret={athenaSecret} onChangeAthenaSecret={setAthenaSecret}
                 module={module} onChangeModule={setModule}
-                evaluationMode={evaluationMode} onChangeEvaluationMode={setEvaluationMode}
+                mode={mode} onChangeMode={setMode}
             />
             {module && (
-                <ModuleRequests mode={evaluationMode ? 'evaluation' : 'example'} athenaUrl={athenaUrl} athenaSecret={athenaSecret} module={module}/>
+                <ModuleRequests mode={mode} athenaUrl={athenaUrl} athenaSecret={athenaSecret} module={module}/>
             )}
         </main>
     );

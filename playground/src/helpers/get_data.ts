@@ -24,7 +24,7 @@ function replaceJsonPlaceholders(mode: Mode, json: any, exerciseId: number, athe
                 // This is only for example exercises, for evaluation the data is already in the json
                 if (value.startsWith('-> file:')) {
                     // file reference replacement
-                    const filePath = path.join(process.cwd(), 'example', 'exercise-' + exerciseId, value.split(':')[1]);
+                    const filePath = path.join(process.cwd(), 'data', 'example', 'exercise-' + exerciseId, value.split(':')[1]);
                     if (fs.existsSync(filePath)) {
                         value = fs.readFileSync(filePath, 'utf8');
                     } else {
