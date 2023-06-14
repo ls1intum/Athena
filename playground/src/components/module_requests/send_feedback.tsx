@@ -10,6 +10,7 @@ import ModuleResponseView from "@/components/module_response_view";
 import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
+import { Mode } from "@/model/mode";
 
 async function sendFeedback(
   athenaUrl: string,
@@ -69,6 +70,7 @@ async function sendFeedback(
 }
 
 async function sendAllExerciseFeedbacks(
+  mode: Mode,
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
@@ -78,11 +80,8 @@ async function sendAllExerciseFeedbacks(
     alert("Please select an exercise");
     return;
   }
-  // fetch submissions for exercise from /api/submissions
   const submissionResponse = await fetch(
-    `${baseUrl}/api/submissions?${new URLSearchParams({
-      exercise_id: exercise.id.toString(),
-    })}`
+    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`
   );
   if (submissionResponse.status !== 200) {
     console.error(submissionResponse);
@@ -90,11 +89,8 @@ async function sendAllExerciseFeedbacks(
     return;
   }
   const submissions: Submission[] = await submissionResponse.json();
-  // fetch feedbacks for exercise from /api/feedbacks
   const feedbackResponse = await fetch(
-    `${baseUrl}/api/feedbacks?${new URLSearchParams({
-      exercise_id: exercise.id.toString(),
-    })}`
+    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/feedbacks`
   );
   if (feedbackResponse.status !== 200) {
     console.error(feedbackResponse);
@@ -191,7 +187,13 @@ export default function SendFeedback({
         onClick={() => {
           setLoading(true);
           if (isAllSubmissions) {
-            sendAllExerciseFeedbacks(athenaUrl, athenaSecret, module, exercise!)
+            sendAllExerciseFeedbacks(
+              mode,
+              athenaUrl,
+              athenaSecret,
+              module,
+              exercise!
+            )
               .then(setResponses)
               .finally(() => setLoading(false));
             return;

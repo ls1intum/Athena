@@ -7,13 +7,14 @@ import ModuleResponseView from "@/components/module_response_view";
 import {ModuleMeta} from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
+import { Mode } from "@/model/mode";
 
-async function sendSubmissions(athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
+async function sendSubmissions(mode: Mode, athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {
         alert("Please select an exercise");
         return;
     }
-    const submissionsResponse = await fetch(`${baseUrl}/api/submissions?${ new URLSearchParams({exercise_id: exercise.id.toString()}) }`);
+    const submissionsResponse = await fetch(`${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`);
     const submissions: Submission[] = await submissionsResponse.json();
     let response;
     try {
@@ -68,7 +69,7 @@ export default function SendSubmissions(
                 className="bg-blue-500 text-white rounded-md p-2 mt-4"
                 onClick={() => {
                     setLoading(true);
-                    sendSubmissions(athenaUrl, athenaSecret, module, exercise)
+                    sendSubmissions(mode, athenaUrl, athenaSecret, module, exercise)
                         .then(setResponse)
                         .finally(() => setLoading(false));
                 } }

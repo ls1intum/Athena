@@ -7,13 +7,14 @@ import { Submission } from "@/model/submission";
 import {ModuleMeta} from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
+import { Mode } from "@/model/mode";
 
-async function requestSubmissionSelection(athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
+async function requestSubmissionSelection(mode: Mode, athenaUrl: string, athenaSecret: string, module: ModuleMeta, exercise: Exercise | null): Promise<ModuleResponse | undefined> {
     if (!exercise) {
         alert("Please select an exercise");
         return;
     }
-    const submissionsResponse = await fetch(`${baseUrl}/api/submissions?${ new URLSearchParams({exercise_id: exercise.id.toString()}) }`);
+    const submissionsResponse = await fetch(`${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`);
     const submissions: Submission[] = await submissionsResponse.json();
     try {
         const athenaSubmissionSelectUrl = `${athenaUrl}/modules/${module.type}/${module.name}/select_submission`;
@@ -68,7 +69,7 @@ export default function SelectSubmission(
                 className="bg-blue-500 text-white rounded-md p-2 mt-4"
                 onClick={() => {
                     setLoading(true);
-                    requestSubmissionSelection(athenaUrl, athenaSecret, module, exercise)
+                    requestSubmissionSelection(mode, athenaUrl, athenaSecret, module, exercise)
                         .then(setResponse)
                         .finally(() => setLoading(false));
                 }}
