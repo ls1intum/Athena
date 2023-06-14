@@ -13,9 +13,11 @@ function handler(req: NextApiRequest, res: NextApiResponse<Feedback[]>) {
     return;
   }
   try {
-    const feedbacks = getFeedbacks(mode, undefined, getOriginFromRequest(req));
+    const feedbacks = getFeedbacks(mode, parsedExerciseId, getOriginFromRequest(req));
+    console.log('feedbacks', feedbacks)
     res.status(200).json(feedbacks);
   } catch (e) {
+    console.error(e);
     res.status(404).json([]);
   }
 }

@@ -54,7 +54,7 @@ export default function FeedbackSelect({
         </option>
         {filteredFeedbacks.map((fb: Feedback) => (
           <option key={fb.id} value={fb.id}>
-            {fb.id} {fb.text}
+            {fb.id} ({fb.credits} credits) {fb.text || fb.detail_text || "N/A"}
           </option>
         ))}
       </select>

@@ -131,25 +131,31 @@ function jsonToSubmissions(json: any): Submission[] {
 }
 
 function jsonToFeedbacks(json: any): Feedback[] {
-  let feedbacks: Feedback[] = [];
-
-  json.submissions.forEach((submissionJson: any) => {
-    if (submissionJson.feedbacks) {
-      const additionalFeedbacks = submissionJson.feedbacks.map(
+  return json.submissions.flatMap((submissionJson: any) => {
+    if (Array.isArray(submissionJson.feedbacks)) {
+      const feedbacks = submissionJson.feedbacks.map(
         (feedbackJson: any) => {
           const feedback = feedbackJson as Feedback;
           // exercise_id is not provided in the json for convenience, so we add it here
           feedback.exercise_id = json.id;
           // submission_id is not provided in the json for convenience, so we add it here
           feedback.submission_id = submissionJson.id;
+
+          // replace text and detail_text with undefined if they are not strings (null somehow gets parsed as {})
+          if (typeof feedback.text !== "string") {
+            feedback.text = undefined;
+          }
+          if (typeof feedback.detail_text !== "string") {
+            feedback.detail_text = undefined;
+          }
+
           return feedback;
         }
       );
-      feedbacks = [...feedbacks, ...additionalFeedbacks];
+      return feedbacks
     }
+    return []
   });
-
-  return feedbacks;
 }
 
 export function getExercises(mode: Mode, athenaOrigin: string): Exercise[] {
@@ -172,6 +178,7 @@ export function getFeedbacks(
   exerciseId: number | undefined,
   athenaOrigin: string
 ): Feedback[] {
+  console.log('getFeedbacks')
   if (exerciseId !== undefined) {
     return jsonToFeedbacks(getExerciseJSON(mode, exerciseId, athenaOrigin));
   }

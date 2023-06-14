@@ -6,7 +6,7 @@ export default function ModuleResponseView({
   response?: ModuleResponse;
 }) {
   if (!response) {
-    return undefined;
+    return null;
   }
   let formattedData = response.data;
   try {

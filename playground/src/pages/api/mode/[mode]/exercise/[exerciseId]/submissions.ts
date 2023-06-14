@@ -15,11 +15,12 @@ function handler(req: NextApiRequest, res: NextApiResponse<Submission[]>) {
   try {
     const submissions = getSubmissions(
       mode,
-      undefined,
+      parsedExerciseId,
       getOriginFromRequest(req)
     );
     res.status(200).json(submissions);
   } catch (e) {
+    console.error(e);
     res.status(404).json([]);
   }
 }

@@ -37,15 +37,11 @@ export default function ExerciseSelect({
           Select an exercise
         </option>
         {data.map((ex: Exercise) => {
-          return (
-            <option
-              key={ex.id}
-              value={ex.id}
-              disabled={ex.type !== exerciseType}
-            >
+          return ex.type === exerciseType ? (
+            <option key={ex.id} value={ex.id}>
               {ex.id} {ex.type}: {ex.title}
             </option>
-          );
+          ) : null;
         })}
       </select>
     </label>
