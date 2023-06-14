@@ -6,7 +6,7 @@ import { validateModeMiddleware } from "@/helpers/validate_mode_middleware";
 import { Mode } from "@/model/mode";
 
 function handler(req: NextApiRequest, res: NextApiResponse<Submission[]>) {
-  const { mode, exerciseId } = req.query as { mode: Mode, exerciseId: string };
+  const { mode, exerciseId } = req.query as { mode: Mode; exerciseId: string };
   const parsedExerciseId = exerciseId ? parseInt(exerciseId) : undefined;
   if (parsedExerciseId === undefined) {
     res.status(404).json([]);

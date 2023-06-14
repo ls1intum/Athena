@@ -1,10 +1,11 @@
 ## Test Repository instructions
 
 ### Test tool & command
+
 Tests will be run using the command `./gradlew clean test`.
 
-
 ### Project structure
+
 Make sure that the package structure of your test classes is equivalent to the
 package structure of your base and solution repository.
 Otherwise, during the test run Gradle will not be able to find the imported
@@ -39,11 +40,11 @@ project. Follow this description for IntelliJ:
 
 **Note**:
 The described changes to the `build.gradle` and `settings.gradle` files must
-*not* be pushed to the remote repository as they can only be used for editing
+_not_ be pushed to the remote repository as they can only be used for editing
 all three projects in the local IDE.
 
-
 ### Sequential test runs
+
 In case you have enabled sequential test runs when creating the exercise a
 special folder structure of the test repository is used to differentiate
 structural and behavior tests:
@@ -53,7 +54,7 @@ structural and behavior tests:
 
 **Files in other folders will not be executed!**
 
-
 ### Static Code Analysis
+
 The `build.gradle` contains dependencies for the execution of static code
 analysis, if the option is active for this programming exercise.

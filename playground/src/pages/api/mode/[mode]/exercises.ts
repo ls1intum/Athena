@@ -10,6 +10,9 @@ function handler(req: NextApiRequest, res: NextApiResponse<Exercise[]>) {
   res.status(200).json(getExercises(mode, getOriginFromRequest(req)));
 }
 
-export default function handlerWithMiddleware(req: NextApiRequest, res: NextApiResponse) {
+export default function handlerWithMiddleware(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   validateModeMiddleware(req, res, () => handler(req, res));
 }

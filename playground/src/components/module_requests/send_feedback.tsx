@@ -16,9 +16,9 @@ async function sendFeedback(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
-  exercise: Exercise | null,
-  submission: Submission | null,
-  feedback: Feedback | null,
+  exercise?: Exercise,
+  submission?: Submission,
+  feedback?: Feedback,
   alertAfterSuccess: boolean = true
 ): Promise<ModuleResponse | undefined> {
   if (!exercise) {
@@ -131,10 +131,12 @@ export default function SendFeedback({
   athenaSecret,
   module,
 }: ModuleRequestProps) {
-  const [exercise, setExercise] = useState<Exercise | null>(null);
+  const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const [isAllSubmissions, setIsAllSubmissions] = useState<boolean>(true);
-  const [submission, setSubmission] = useState<Submission | null>(null);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [submission, setSubmission] = useState<Submission | undefined>(
+    undefined
+  );
+  const [feedback, setFeedback] = useState<Feedback | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [responses, setResponses] = useState<ModuleResponse[] | undefined>(
     undefined

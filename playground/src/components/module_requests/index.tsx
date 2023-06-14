@@ -15,10 +15,10 @@ export type ModuleRequestProps = {
 export default function ModuleRequests(props: ModuleRequestProps) {
   return (
     <>
-      <SendSubmissions {...props}/>
-      <SelectSubmission {...props}/>
-      <SendFeedback {...props}/>
-      <RequestFeedbackSuggestions {...props}/>
+      <SendSubmissions {...props} />
+      <SelectSubmission {...props} />
+      <SendFeedback {...props} />
+      <RequestFeedbackSuggestions {...props} />
     </>
   );
 }

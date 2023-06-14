@@ -8,13 +8,8 @@
     "methods": [
       {
         "name": "performSort",
-        "modifiers": [
-          "public",
-          "abstract"
-        ],
-        "parameters": [
-          "List"
-        ],
+        "modifiers": ["public", "abstract"],
+        "parameters": ["List"],
         "returnType": "void"
       }
     ]
@@ -27,59 +22,41 @@
     "methods": [
       {
         "name": "getDates",
-        "modifiers": [
-          "public"
-        ],
+        "modifiers": ["public"],
         "returnType": "List"
       },
       {
         "name": "setDates",
-        "modifiers": [
-          "public"
-        ],
-        "parameters": [
-          "List"
-        ],
+        "modifiers": ["public"],
+        "parameters": ["List"],
         "returnType": "void"
       },
       {
         "name": "setSortAlgorithm",
-        "modifiers": [
-          "public"
-        ],
-        "parameters": [
-          "SortStrategy"
-        ],
+        "modifiers": ["public"],
+        "parameters": ["SortStrategy"],
         "returnType": "void"
       },
       {
         "name": "getSortAlgorithm",
-        "modifiers": [
-          "public"
-        ],
+        "modifiers": ["public"],
         "returnType": "SortStrategy"
       },
       {
         "name": "sort",
-        "modifiers": [
-          "public"
-        ],
+        "modifiers": ["public"],
         "returnType": "void"
       }
     ],
     "attributes": [
       {
         "name": "sortAlgorithm",
-        "modifiers": [
-          "private"
-        ],
+        "modifiers": ["private"],
         "type": "SortStrategy"
       },
       {
         "name": "dates",
-        "modifiers": [
-          "private"
-        ],
+        "modifiers": ["private"],
         "type": "List"
       }
     ]
@@ -88,9 +65,7 @@
     "class": {
       "name": "BubbleSort",
       "package": "mttpe1",
-      "interfaces": [
-        "SortStrategy"
-      ]
+      "interfaces": ["SortStrategy"]
     }
   },
   {
@@ -101,29 +76,21 @@
     "methods": [
       {
         "name": "configure",
-        "modifiers": [
-          "public"
-        ],
+        "modifiers": ["public"],
         "returnType": "void"
       }
     ],
     "attributes": [
       {
         "name": "context",
-        "modifiers": [
-          "private"
-        ],
+        "modifiers": ["private"],
         "type": "Context"
       }
     ],
     "constructors": [
       {
-        "modifiers": [
-          "public"
-        ],
-        "parameters": [
-          "Context"
-        ]
+        "modifiers": ["public"],
+        "parameters": ["Context"]
       }
     ]
   },
@@ -131,9 +98,7 @@
     "class": {
       "name": "MergeSort",
       "package": "mttpe1",
-      "interfaces": [
-        "SortStrategy"
-      ]
+      "interfaces": ["SortStrategy"]
     },
     "methods": []
   }

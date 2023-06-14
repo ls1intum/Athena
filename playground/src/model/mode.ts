@@ -1,1 +1,1 @@
-export type Mode = 'example' | 'evaluation';
+export type Mode = "example" | "evaluation";

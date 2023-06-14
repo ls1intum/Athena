@@ -9,7 +9,5 @@ export default function TextEvaluation({
   athenaSecret: string;
   module: ModuleMeta;
 }) {
-  return (
-    <p>TODO</p>
-  );
+  return <p>TODO</p>;
 }
