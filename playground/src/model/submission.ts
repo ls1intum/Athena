@@ -1,7 +1,6 @@
 type SubmissionBase = {
     id: number;
     exercise_id: number;
-    student_id: number;
     meta: {
         [key: string]: any;
     };
