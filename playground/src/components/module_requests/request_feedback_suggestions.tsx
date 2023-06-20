@@ -81,7 +81,8 @@ export default function RequestFeedbackSuggestions({
       <p className="text-gray-500 mb-4">
         Request a list of feedback suggestions from Athena for the selected
         submission. The LMS would usually call this when a tutor starts grading
-        a submission. The matching module for the exercise will receive the
+        a submission. You should get a list of all submissions that are not graded yet.
+        The matching module for the exercise will receive the 
         request at the function annotated with <code>@feedback_provider</code>.
       </p>
       <ExerciseSelect
