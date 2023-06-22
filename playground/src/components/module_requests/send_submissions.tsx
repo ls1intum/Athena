@@ -8,6 +8,7 @@ import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
 import { Mode } from "@/model/mode";
+import Disclosure from "../disclosure";
 
 async function sendSubmissions(
   mode: Mode,
@@ -90,6 +91,13 @@ export default function SendSubmissions({
         exercise={exercise}
         onChange={setExercise}
       />
+      {exercise && (
+        <Disclosure title="Exercise Detail">
+          <p>
+            {exercise.grading_instructions}
+          </p>
+        </Disclosure>
+      )}
       <ModuleResponseView response={response} />
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
