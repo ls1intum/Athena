@@ -8,7 +8,7 @@ type ExerciseDetailProps = {
 
 export default function ExerciseDetail({ exercise }: ExerciseDetailProps) {
   return (
-    <div>
+    <div className="space-y-2">
       {exercise.problem_statement.length > 0 ? (
         <Disclosure title="Problem Statement" openedInitially>
           <Markdown
@@ -31,6 +31,20 @@ export default function ExerciseDetail({ exercise }: ExerciseDetailProps) {
           </span>
         )}
       </Disclosure>
+      {exercise.type === 'text' && (
+        <Disclosure title="Example Solution" openedInitially>
+          {exercise.example_solution.length > 0 ? (
+            <Markdown
+              content={exercise.example_solution}
+              enablePlainTextSwitcher
+            />
+          ) : (
+            <span className="text-gray-500">
+              No example solution available
+            </span>
+          )}
+        </Disclosure>
+      )}
     </div>
   );
 }
