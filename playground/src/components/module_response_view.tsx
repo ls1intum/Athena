@@ -1,4 +1,5 @@
 import ModuleResponse from "@/model/module_response";
+import Disclosure from "@/components/disclosure";
 
 export default function ModuleResponseView({
   response,
@@ -30,10 +31,11 @@ export default function ModuleResponseView({
         <span className="mb-4">{response.status}</span>
       </div>
       <div className="flex flex-col">
-        <span className="font-bold mb-4">Data:</span>
+        <Disclosure title="Data:" openedInitially noContentIndent className="font-bold text-black">
         <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto">
           {formattedData}
         </pre>
+        </Disclosure>
       </div>
     </div>
   );

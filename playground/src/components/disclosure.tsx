@@ -6,10 +6,11 @@ type DisclosureProps = {
   title: string,
   children: JSX.Element | JSX.Element[],
   className?: string,
-  openedInitially?: boolean
+  openedInitially?: boolean,
+  noContentIndent?: boolean,
 }
 
-export default function Disclosure({ title, children, className, openedInitially }: DisclosureProps) {
+export default function Disclosure({ title, children, className, openedInitially, noContentIndent }: DisclosureProps) {
   const [open, setOpen] = useState(openedInitially ?? false);
 
   return (
@@ -20,7 +21,7 @@ export default function Disclosure({ title, children, className, openedInitially
         </span>
         {title}
       </Collapsible.Trigger>
-      <Collapsible.Content className='ml-4 mt-1'>
+      <Collapsible.Content className={twMerge('mt-1', noContentIndent ? '' : 'ml-4')}>
         {children}
       </Collapsible.Content>
     </Collapsible.Root>
