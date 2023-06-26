@@ -8,7 +8,8 @@ import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
 import { Mode } from "@/model/mode";
-import Disclosure from "../disclosure";
+import Disclosure from "@/components/disclosure";
+import ExerciseDetail from "../details/exercise_detail";
 
 async function sendSubmissions(
   mode: Mode,
@@ -92,10 +93,8 @@ export default function SendSubmissions({
         onChange={setExercise}
       />
       {exercise && (
-        <Disclosure title="Exercise Detail">
-          <p>
-            {exercise.grading_instructions}
-          </p>
+        <Disclosure title="Exercise Detail" className="mt-2">
+          <ExerciseDetail exercise={exercise} />
         </Disclosure>
       )}
       <ModuleResponseView response={response} />
