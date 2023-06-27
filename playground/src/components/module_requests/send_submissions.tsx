@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
 import ExerciseSelect from "@/components/selectors/exercise_select";
@@ -77,6 +77,10 @@ export default function SendSubmissions({
     undefined
   );
 
+  useEffect(() => {
+    setExercise(undefined);
+  }, [module, mode]);
+
   return (
     <div className="bg-white rounded-md p-4 mb-8">
       <h3 className="text-2xl font-bold mb-4">Send Submissions</h3>
@@ -94,7 +98,7 @@ export default function SendSubmissions({
       />
       {exercise && (
         <Disclosure title="Exercise Detail" className="mt-2">
-          <ExerciseDetail exercise={exercise} mode={mode} />
+          <ExerciseDetail exercise={exercise} mode={mode}/>
         </Disclosure>
       )}
       <ModuleResponseView response={response} />

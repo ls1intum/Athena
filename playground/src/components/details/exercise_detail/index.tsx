@@ -15,9 +15,9 @@ export default function ExerciseDetail({ exercise, mode }: ExerciseDetailProps) 
   const specificExerciseDetail = (() => {
     switch (exercise.type) {
       case "text":
-        return <TextExerciseDetail exercise={exercise} />;
+        return <TextExerciseDetail exercise={exercise}/>;
       case "programming":
-        return <ProgrammingExerciseDetail exercise={exercise} mode={mode} />;
+        return <ProgrammingExerciseDetail exercise={exercise} mode={mode}/>;
       default:
         return null;
     }
