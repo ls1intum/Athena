@@ -94,7 +94,7 @@ export default function SendSubmissions({
       />
       {exercise && (
         <Disclosure title="Exercise Detail" className="mt-2">
-          <ExerciseDetail exercise={exercise} />
+          <ExerciseDetail exercise={exercise} mode={mode} />
         </Disclosure>
       )}
       <ModuleResponseView response={response} />

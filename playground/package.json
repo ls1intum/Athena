@@ -19,6 +19,7 @@
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "fs": "^0.0.1-security",
+    "jszip": "^3.10.1",
     "next": "13.3.0",
     "postcss": "8.4.23",
     "react": "18.2.0",
