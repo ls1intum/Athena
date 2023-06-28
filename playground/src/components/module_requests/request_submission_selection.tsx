@@ -65,8 +65,14 @@ async function requestSubmissionSelection(
   }
 }
 
-async function requestSubmission(exercise: Exercise, submissionId: number, mode: Mode): Promise<Submission | undefined> {
-  const response = await fetch(`${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`)
+async function requestSubmission(
+  exercise: Exercise,
+  submissionId: number,
+  mode: Mode
+): Promise<Submission | undefined> {
+  const response = await fetch(
+    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`
+  );
   const submissions: Submission[] = await response.json();
   const submission = submissions.find((s) => s.id === submissionId);
   console.log(submissions, submission);
@@ -91,15 +97,14 @@ export default function SelectSubmission({
   }, [module, mode]);
 
   useEffect(() => {
-    if (exercise && response && typeof response.data === 'number') {
+    if (exercise && response && typeof response.data === "number") {
       const submissionId = response.data;
       if (!isNaN(submissionId)) {
-        requestSubmission(exercise, submissionId, mode)
-          .then((submission) => {
-            if (submission) {
-              setSubmission(submission);
-            }
-          })
+        requestSubmission(exercise, submissionId, mode).then((submission) => {
+          if (submission) {
+            setSubmission(submission);
+          }
+        });
       }
     }
   }, [response, exercise, mode]);
@@ -133,8 +138,13 @@ export default function SelectSubmission({
           <ExerciseDetail exercise={exercise} mode={mode} />
         </Disclosure>
       )}
-      <ModuleResponseView response={response} />
-      {submission && <SubmissionDetail submission={submission} />}
+      <ModuleResponseView response={response}>
+        {submission && (
+          <Disclosure title="Submission" openedInitially className="ml-4">
+            <SubmissionDetail submission={submission} />
+          </Disclosure>
+        )}
+      </ModuleResponseView>
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
         onClick={() => {

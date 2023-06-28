@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge'
 
 type DisclosureProps = {
   title: string,
-  children: JSX.Element | JSX.Element[],
+  children: string | JSX.Element | JSX.Element[],
   className?: string,
   openedInitially?: boolean,
   noContentIndent?: boolean,

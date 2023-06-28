@@ -3,8 +3,10 @@ import Disclosure from "@/components/disclosure";
 
 export default function ModuleResponseView({
   response,
+  children,
 }: {
   response?: ModuleResponse;
+  children?: string | JSX.Element | JSX.Element[] | null;
 }) {
   if (!response) {
     return null;
@@ -31,10 +33,16 @@ export default function ModuleResponseView({
         <span className="mb-4">{response.status}</span>
       </div>
       <div className="flex flex-col">
-        <Disclosure title="Data:" openedInitially noContentIndent className="font-bold text-black">
-        <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto">
-          {formattedData}
-        </pre>
+        <Disclosure
+          title="Data:"
+          openedInitially
+          noContentIndent
+          className="font-bold text-black"
+        >
+          <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto">
+            {formattedData}
+          </pre>
+          <>{children}</>
         </Disclosure>
       </div>
     </div>
