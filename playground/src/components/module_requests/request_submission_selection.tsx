@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Exercise } from "@/model/exercise";
 import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponse from "@/model/module_response";
@@ -8,6 +8,10 @@ import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
 import { Mode } from "@/model/mode";
+import ExerciseDetail from "@/components/details/exercise_detail";
+import Disclosure from "@/components/disclosure";
+import SubmissionDetail from "../details/submission_detail";
+import { getSubmissions } from "@/helpers/get_data";
 
 async function requestSubmissionSelection(
   mode: Mode,
@@ -61,6 +65,14 @@ async function requestSubmissionSelection(
   }
 }
 
+async function requestSubmission(exercise: Exercise, submissionId: number, mode: Mode): Promise<Submission | undefined> {
+  const response = await fetch(`${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`)
+  const submissions: Submission[] = await response.json();
+  const submission = submissions.find((s) => s.id === submissionId);
+  console.log(submissions, submission);
+  return submission;
+}
+
 export default function SelectSubmission({
   mode,
   athenaUrl,
@@ -72,6 +84,25 @@ export default function SelectSubmission({
   const [response, setResponse] = useState<ModuleResponse | undefined>(
     undefined
   );
+  const [submission, setSubmission] = useState<Submission | null>(null);
+
+  useEffect(() => {
+    setExercise(undefined);
+  }, [module, mode]);
+
+  useEffect(() => {
+    if (exercise && response && typeof response.data === 'number') {
+      const submissionId = response.data;
+      if (!isNaN(submissionId)) {
+        requestSubmission(exercise, submissionId, mode)
+          .then((submission) => {
+            if (submission) {
+              setSubmission(submission);
+            }
+          })
+      }
+    }
+  }, [response, exercise, mode]);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
@@ -97,7 +128,13 @@ export default function SelectSubmission({
         exercise={exercise}
         onChange={setExercise}
       />
+      {exercise && (
+        <Disclosure title="Exercise Detail" className="mt-2">
+          <ExerciseDetail exercise={exercise} mode={mode} />
+        </Disclosure>
+      )}
       <ModuleResponseView response={response} />
+      {submission && <SubmissionDetail submission={submission} />}
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
         onClick={() => {
