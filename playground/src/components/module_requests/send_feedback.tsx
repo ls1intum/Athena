@@ -15,6 +15,7 @@ import Disclosure from "../disclosure";
 import ExerciseDetail from "../details/exercise_detail";
 import SubmissionDetail from "../details/submission_detail";
 import SubmissionList from "../submission_list";
+import { useFeedbacks } from "@/helpers/client/get_data";
 
 async function sendFeedback(
   athenaUrl: string,
@@ -148,23 +149,25 @@ export default function SendFeedback({
 
   const [isAllFeedback, setIsAllFeedback] = useState<boolean>(true);
   const [feedback, setFeedback] = useState<Feedback | undefined>(undefined);
-  const [allFeedback, setAllFeedback] = useState<Feedback[] | undefined>(
-    undefined
-  );
 
   const [loading, setLoading] = useState<boolean>(false);
   const [responses, setResponses] = useState<ModuleResponse[] | undefined>(
     undefined
   );
 
+  const {
+    feedbacks,
+    isLoading: isFeedbackLoading,
+    error: feedbackError,
+  } = useFeedbacks(mode, exercise);
+
   useEffect(() => {
-    // Reset 
+    // Reset
     setResponses(undefined);
     setIsAllSubmissions(true);
     setSubmission(undefined);
     setIsAllFeedback(true);
     setFeedback(undefined);
-    setAllFeedback(undefined);
   }, [exercise]);
 
   useEffect(() => {
@@ -172,22 +175,8 @@ export default function SendFeedback({
   }, [module, mode]);
 
   useEffect(() => {
-    console.log({
-      exercise,
-      submission,
-      feedback,
-      allFeedback,
-      isAllFeedback,
-      isAllSubmissions,
-    });
-  }, [
-    exercise,
-    submission,
-    feedback,
-    allFeedback,
-    isAllFeedback,
-    isAllSubmissions,
-  ]);
+    console.log(feedbacks);
+  }, [feedbacks]);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
@@ -230,12 +219,25 @@ export default function SendFeedback({
             <ExerciseDetail exercise={exercise} mode={mode} />
             {submission ? (
               <Disclosure title="Submission">
-                <SubmissionDetail submission={submission} />
+                <SubmissionDetail
+                  submission={submission}
+                  feedbacks={feedback ? [feedback] : feedbacks?.filter(
+                    (f) => f.submission_id === submission.id
+                  )}
+                />
               </Disclosure>
             ) : (
               isAllFeedback && (
-                <SubmissionList exercise={exercise} mode={mode} />
+                <SubmissionList exercise={exercise} mode={mode} feedbacks={feedback ? [feedback] : feedbacks} />
               )
+            )}
+            {isFeedbackLoading && (
+              <div className="text-gray-500 text-sm">Loading feedbacks...</div>
+            )}
+            {feedbackError && (
+              <div className="text-red-500 text-sm">
+                Failed to load feedbacks
+              </div>
             )}
           </div>
           {isAllSubmissions && (

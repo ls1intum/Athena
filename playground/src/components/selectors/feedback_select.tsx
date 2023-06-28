@@ -29,8 +29,8 @@ export default function FeedbackSelect({
       : `exercise/${exercise_id}/feedbacks`
   }`;
   const { data, error, isLoading } = useSWR(apiURL, fetcher);
-  if (error) return <div>failed to load</div>;
-  if (isLoading) return <div>loading...</div>;
+  if (error) return <div className="text-red-500 text-sm">Failed to load</div>;
+  if (isLoading) return <div className="text-gray-500 text-sm">Loading...</div>;
 
   let filteredFeedbacks = data;
   if (submission_id) {

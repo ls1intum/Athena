@@ -92,7 +92,28 @@ export default function SelectSubmission({
     submissions,
     isLoading: submissionsLoading,
     error: submissionsError,
-  } = useSubmissions(mode, exercise, response?.data);
+  } = useSubmissions(mode, exercise);
+
+  const responseSubmissionView = (response: ModuleResponse | undefined) => {
+    if (!response || response.status !== 200 || typeof response.data !== "number") {
+      return null;
+    }
+    const submissionId = response.data;
+    const submission = submissions?.find(
+      (submission) => submission.id === submissionId
+    );
+    return (
+      submission && (
+        <Disclosure
+          title="Submission"
+          openedInitially
+          className={{ root: "ml-2" }}
+        >
+          <SubmissionDetail submission={submission} />
+        </Disclosure>
+      )
+    );
+  };
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
@@ -125,15 +146,7 @@ export default function SelectSubmission({
         </div>
       )}
       <ModuleResponseView response={response}>
-        {submissions && submissions[0] && (
-          <Disclosure
-            title="Submission"
-            openedInitially
-            className={{ root: "ml-2" }}
-          >
-            <SubmissionDetail submission={submissions[0]} />
-          </Disclosure>
-        )}
+        {responseSubmissionView(response)}
       </ModuleResponseView>
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
