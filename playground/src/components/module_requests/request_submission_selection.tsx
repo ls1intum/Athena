@@ -118,7 +118,7 @@ export default function SelectSubmission({
         onChange={setExercise}
       />
       {exercise && (
-        <Disclosure title="Exercise Detail">
+        <Disclosure title="Exercise Detail" className={{ root: "mt-2" }}>
           <ExerciseDetail exercise={exercise} mode={mode} />
         </Disclosure>
       )}

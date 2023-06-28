@@ -24,7 +24,7 @@ export default function ExerciseDetail({ exercise, mode }: ExerciseDetailProps) 
   })();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       <CommonExerciseDetail exercise={exercise} />
       {specificExerciseDetail}
     </div>
