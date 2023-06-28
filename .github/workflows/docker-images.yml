@@ -58,7 +58,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository_owner }}/athena_${{ matrix.image }}
+          images: ghcr.io/${{ github.repository_owner }}/Athena/${{ matrix.image }}
         tags: |
           # set latest tag for develop branch
           type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'develop') }}
