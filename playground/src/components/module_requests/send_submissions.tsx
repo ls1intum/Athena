@@ -111,7 +111,7 @@ export default function SendSubmissions({
           </Disclosure>
         )}
         {submissions && (
-          <Disclosure title="Submissions" className={{ content: "space-y-1" }}> 
+          <Disclosure title="Submissions" className={{ content: "space-y-1" }}>
             {submissions.map((submission) => (
               <Disclosure
                 title={`Submission ${submission.id}`}
@@ -122,8 +122,12 @@ export default function SendSubmissions({
             ))}
           </Disclosure>
         )}
-        {submissionsError && <div>Failed to load submissions</div>}
-        {isLoadingSubmissions && <div>Loading submissions...</div>}
+        {submissionsError && (
+          <div className="text-gray-500">Failed to load submissions</div>
+        )}
+        {isLoadingSubmissions && (
+          <div className="text-gray-500">Loading submissions...</div>
+        )}
         {submissions && (
           <div className="text-gray-500">
             {submissions.length} submissions to send
