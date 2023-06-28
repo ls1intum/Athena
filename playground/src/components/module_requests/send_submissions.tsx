@@ -114,9 +114,9 @@ export default function SendSubmissions({
         )}
         {submissions && (
           <Disclosure title="Submissions" className="space-y-1">
-            {submissions.map((submission, index) => (
+            {submissions.map((submission) => (
               <Disclosure
-                title={`${index + 1}: Submission ${submission.id}`}
+                title={`Submission ${submission.id}`}
                 key={submission.id}
                 className="my-1"
               >
