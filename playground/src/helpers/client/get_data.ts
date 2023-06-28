@@ -6,27 +6,6 @@ import { Submission } from "@/model/submission";
 import baseUrl from "@/helpers/base_url";
 import fetcher from "@/helpers/fetcher";
 
-export async function requestSubmissions(
-  exercise: Exercise,
-  mode: Mode
-): Promise<Submission[]> {
-  const response = await fetch(
-    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`
-  );
-  const submissions: Submission[] = await response.json();
-  return submissions;
-}
-
-export async function requestSubmission(
-  exercise: Exercise,
-  mode: Mode,
-  submissionId: number
-): Promise<Submission | undefined> {
-  const submissions = await requestSubmissions(exercise, mode);
-  const submission = submissions.find((s) => s.id === submissionId);
-  return submission;
-}
-
 export function useSubmissions(
   mode: Mode,
   exercise?: Exercise,

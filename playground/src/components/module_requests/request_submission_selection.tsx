@@ -11,10 +11,7 @@ import { Mode } from "@/model/mode";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import Disclosure from "@/components/disclosure";
 import SubmissionDetail from "../details/submission_detail";
-import {
-  requestSubmission,
-  requestSubmissions,
-} from "@/helpers/client/get_data";
+import { useSubmissions } from "@/helpers/client/get_data";
 import SubmissionList from "../submission_list";
 
 async function requestSubmissionSelection(
@@ -28,7 +25,11 @@ async function requestSubmissionSelection(
     alert("Please select an exercise");
     return;
   }
-  const submissions = await requestSubmissions(exercise, mode);
+
+  const submissionsResponse = await fetch(
+    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`
+  );
+  const submissions: Submission[] = await submissionsResponse.json();
   try {
     const athenaSubmissionSelectUrl = `${athenaUrl}/modules/${module.type}/${module.name}/select_submission`;
     const response = await fetch(
@@ -77,22 +78,21 @@ export default function SelectSubmission({
   const [response, setResponse] = useState<ModuleResponse | undefined>(
     undefined
   );
-  const [submission, setSubmission] = useState<Submission | null>(null);
+
+  useEffect(() => {
+    // Reset
+    setResponse(undefined);
+  }, [exercise]);
 
   useEffect(() => {
     setExercise(undefined);
   }, [module, mode]);
 
-  useEffect(() => {
-    if (exercise && response && typeof response.data === "number") {
-      const submissionId = response.data;
-      requestSubmission(exercise, mode, submissionId).then((submission) => {
-        if (submission) {
-          setSubmission(submission);
-        }
-      });
-    }
-  }, [response, exercise, mode]);
+  const {
+    submissions,
+    isLoading: submissionsLoading,
+    error: submissionsError,
+  } = useSubmissions(mode, exercise, response?.data);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
@@ -125,13 +125,13 @@ export default function SelectSubmission({
         </div>
       )}
       <ModuleResponseView response={response}>
-        {submission && (
+        {submissions && submissions[0] && (
           <Disclosure
             title="Submission"
             openedInitially
             className={{ root: "ml-2" }}
           >
-            <SubmissionDetail submission={submission} />
+            <SubmissionDetail submission={submissions[0]} />
           </Disclosure>
         )}
       </ModuleResponseView>

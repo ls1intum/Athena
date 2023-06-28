@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
 import ExerciseSelect from "@/components/selectors/exercise_select";
@@ -78,7 +78,8 @@ async function sendAllExerciseFeedbacks(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
-  exercise?: Exercise
+  exercise?: Exercise,
+  submission?: Submission
 ): Promise<ModuleResponse[] | undefined> {
   if (!exercise) {
     alert("Please select an exercise");
@@ -101,9 +102,12 @@ async function sendAllExerciseFeedbacks(
     alert(`Failed to fetch feedbacks for exercise ${exercise.id}`);
     return;
   }
-  const feedbacks: Feedback[] = await feedbackResponse.json();
+  let feedbacks: Feedback[] = await feedbackResponse.json();
+  if (submission) {
+    feedbacks = feedbacks.filter((f) => f.submission_id === submission.id);
+  }
   if (feedbacks.length === 0) {
-    alert("No feedbacks found for exercise");
+    alert(`No feedbacks found for ${submission ? "submission" : "exercise"}`);
     return;
   }
   const responses: ModuleResponse[] = [];
@@ -152,6 +156,38 @@ export default function SendFeedback({
   const [responses, setResponses] = useState<ModuleResponse[] | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    // Reset 
+    setResponses(undefined);
+    setIsAllSubmissions(true);
+    setSubmission(undefined);
+    setIsAllFeedback(true);
+    setFeedback(undefined);
+    setAllFeedback(undefined);
+  }, [exercise]);
+
+  useEffect(() => {
+    setExercise(undefined);
+  }, [module, mode]);
+
+  useEffect(() => {
+    console.log({
+      exercise,
+      submission,
+      feedback,
+      allFeedback,
+      isAllFeedback,
+      isAllSubmissions,
+    });
+  }, [
+    exercise,
+    submission,
+    feedback,
+    allFeedback,
+    isAllFeedback,
+    isAllSubmissions,
+  ]);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
@@ -234,18 +270,29 @@ export default function SendFeedback({
             )
               .then(setResponses)
               .finally(() => setLoading(false));
-            return;
+          } else if (isAllFeedback) {
+            sendAllExerciseFeedbacks(
+              mode,
+              athenaUrl,
+              athenaSecret,
+              module,
+              exercise!,
+              submission!
+            )
+              .then(setResponses)
+              .finally(() => setLoading(false));
+          } else {
+            sendFeedback(
+              athenaUrl,
+              athenaSecret,
+              module,
+              exercise,
+              submission,
+              feedback
+            )
+              .then((resp) => setResponses(resp ? [resp] : undefined))
+              .finally(() => setLoading(false));
           }
-          sendFeedback(
-            athenaUrl,
-            athenaSecret,
-            module,
-            exercise,
-            submission,
-            feedback
-          )
-            .then((resp) => setResponses(resp ? [resp] : undefined))
-            .finally(() => setLoading(false));
         }}
         disabled={loading}
       >

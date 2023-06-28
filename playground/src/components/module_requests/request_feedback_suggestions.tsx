@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
 import ExerciseSelect from "@/components/selectors/exercise_select";
@@ -72,6 +72,16 @@ export default function RequestFeedbackSuggestions({
   const [response, setResponse] = useState<ModuleResponse | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    // Reset
+    setResponse(undefined);
+    setSubmission(undefined);
+  }, [exercise]);
+
+  useEffect(() => {
+    setExercise(undefined);
+  }, [module, mode]);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">

@@ -81,6 +81,11 @@ export default function SendSubmissions({
   );
 
   useEffect(() => {
+    // Reset
+    setResponse(undefined);
+  }, [exercise]);
+
+  useEffect(() => {
     setExercise(undefined);
   }, [module, mode]);
 
