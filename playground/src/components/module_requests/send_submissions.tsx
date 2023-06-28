@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import useSWR from "swr";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
 import ExerciseSelect from "@/components/selectors/exercise_select";
@@ -11,7 +10,6 @@ import { ModuleRequestProps } from ".";
 import { Mode } from "@/model/mode";
 import Disclosure from "@/components/disclosure";
 import ExerciseDetail from "@/components/details/exercise_detail";
-import fetcher from "@/helpers/fetcher";
 import { useSubmissions } from "@/helpers/client/get_data";
 import SubmissionDetail from "../details/submission_detail";
 
