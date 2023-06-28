@@ -11,6 +11,9 @@ import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
 import { Mode } from "@/model/mode";
+import Disclosure from "../disclosure";
+import ExerciseDetail from "../details/exercise_detail";
+import SubmissionDetail from "../details/submission_detail";
 
 async function sendFeedback(
   athenaUrl: string,
@@ -132,11 +135,21 @@ export default function SendFeedback({
   module,
 }: ModuleRequestProps) {
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
+  
   const [isAllSubmissions, setIsAllSubmissions] = useState<boolean>(true);
   const [submission, setSubmission] = useState<Submission | undefined>(
     undefined
   );
+  const [allSubmissions, setAllSubmissions] = useState<Submission[] | undefined>(
+    undefined
+  );
+
+  const [isAllFeedback, setIsAllFeedback] = useState<boolean>(true);
   const [feedback, setFeedback] = useState<Feedback | undefined>(undefined);
+  const [allFeedback, setAllFeedback] = useState<Feedback[] | undefined>(
+    undefined
+  );
+
   const [loading, setLoading] = useState<boolean>(false);
   const [responses, setResponses] = useState<ModuleResponse[] | undefined>(
     undefined
@@ -182,7 +195,18 @@ export default function SendFeedback({
               submission_id={submission?.id}
               feedback={feedback}
               onChange={setFeedback}
+              isAllFeedback={isAllFeedback}
+              setIsAllFeedback={setIsAllFeedback}
             />
+          )}
+          <Disclosure title="Exercise Detail">
+            <ExerciseDetail exercise={exercise} mode={mode} />
+          </Disclosure>
+          
+          {submission && (
+            <Disclosure title="Submission">
+              <SubmissionDetail submission={submission} />
+            </Disclosure>
           )}
         </>
       )}

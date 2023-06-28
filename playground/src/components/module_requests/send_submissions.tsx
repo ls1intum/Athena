@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
 import ExerciseSelect from "@/components/selectors/exercise_select";
@@ -9,7 +10,10 @@ import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
 import { Mode } from "@/model/mode";
 import Disclosure from "@/components/disclosure";
-import ExerciseDetail from "../details/exercise_detail";
+import ExerciseDetail from "@/components/details/exercise_detail";
+import fetcher from "@/helpers/fetcher";
+import { useSubmissions } from "@/helpers/client/get_data";
+import SubmissionDetail from "../details/submission_detail";
 
 async function sendSubmissions(
   mode: Mode,
@@ -77,6 +81,12 @@ export default function SendSubmissions({
     undefined
   );
 
+  const {
+    submissions,
+    isLoading: isLoadingSubmissions,
+    error: submissionsError,
+  } = useSubmissions(mode, exercise);
+
   useEffect(() => {
     setExercise(undefined);
   }, [module, mode]);
@@ -96,11 +106,33 @@ export default function SendSubmissions({
         exercise={exercise}
         onChange={setExercise}
       />
-      {exercise && (
-        <Disclosure title="Exercise Detail" className="mt-2">
-          <ExerciseDetail exercise={exercise} mode={mode}/>
-        </Disclosure>
-      )}
+      <div className="space-y-1 mt-2">
+        {exercise && (
+          <Disclosure title="Exercise Detail">
+            <ExerciseDetail exercise={exercise} mode={mode} />
+          </Disclosure>
+        )}
+        {submissions && (
+          <Disclosure title="Submissions" className="space-y-1">
+            {submissions.map((submission, index) => (
+              <Disclosure
+                title={`${index + 1}: Submission ${submission.id}`}
+                key={submission.id}
+                className="my-1"
+              >
+                <SubmissionDetail key={submission.id} submission={submission} />
+              </Disclosure>
+            ))}
+          </Disclosure>
+        )}
+        {submissionsError && <div>Failed to load submissions</div>}
+        {isLoadingSubmissions && <div>Loading submissions...</div>}
+        {submissions && (
+          <div className="text-gray-500">
+            {submissions.length} submissions to send
+          </div>
+        )}
+      </div>
       <ModuleResponseView response={response} />
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"

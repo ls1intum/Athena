@@ -11,7 +11,7 @@ import { Mode } from "@/model/mode";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import Disclosure from "@/components/disclosure";
 import SubmissionDetail from "../details/submission_detail";
-import { getSubmissions } from "@/helpers/get_data";
+import { requestSubmission, requestSubmissions } from "@/helpers/client/get_data";
 
 async function requestSubmissionSelection(
   mode: Mode,
@@ -24,10 +24,7 @@ async function requestSubmissionSelection(
     alert("Please select an exercise");
     return;
   }
-  const submissionsResponse = await fetch(
-    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`
-  );
-  const submissions: Submission[] = await submissionsResponse.json();
+  const submissions = await requestSubmissions(exercise, mode);
   try {
     const athenaSubmissionSelectUrl = `${athenaUrl}/modules/${module.type}/${module.name}/select_submission`;
     const response = await fetch(
@@ -65,20 +62,6 @@ async function requestSubmissionSelection(
   }
 }
 
-async function requestSubmission(
-  exercise: Exercise,
-  submissionId: number,
-  mode: Mode
-): Promise<Submission | undefined> {
-  const response = await fetch(
-    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`
-  );
-  const submissions: Submission[] = await response.json();
-  const submission = submissions.find((s) => s.id === submissionId);
-  console.log(submissions, submission);
-  return submission;
-}
-
 export default function SelectSubmission({
   mode,
   athenaUrl,
@@ -99,7 +82,7 @@ export default function SelectSubmission({
   useEffect(() => {
     if (exercise && response && typeof response.data === "number") {
       const submissionId = response.data;
-      requestSubmission(exercise, submissionId, mode).then((submission) => {
+      requestSubmission(exercise, mode, submissionId).then((submission) => {
         if (submission) {
           setSubmission(submission);
         }
@@ -132,7 +115,7 @@ export default function SelectSubmission({
         onChange={setExercise}
       />
       {exercise && (
-        <Disclosure title="Exercise Detail" className="mt-2">
+        <Disclosure title="Exercise Detail">
           <ExerciseDetail exercise={exercise} mode={mode} />
         </Disclosure>
       )}
