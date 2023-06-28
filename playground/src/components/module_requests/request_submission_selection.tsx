@@ -99,13 +99,11 @@ export default function SelectSubmission({
   useEffect(() => {
     if (exercise && response && typeof response.data === "number") {
       const submissionId = response.data;
-      if (!isNaN(submissionId)) {
-        requestSubmission(exercise, submissionId, mode).then((submission) => {
-          if (submission) {
-            setSubmission(submission);
-          }
-        });
-      }
+      requestSubmission(exercise, submissionId, mode).then((submission) => {
+        if (submission) {
+          setSubmission(submission);
+        }
+      });
     }
   }, [response, exercise, mode]);
 
