@@ -11,7 +11,10 @@ import { Mode } from "@/model/mode";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import Disclosure from "@/components/disclosure";
 import SubmissionDetail from "../details/submission_detail";
-import { requestSubmission, requestSubmissions } from "@/helpers/client/get_data";
+import {
+  requestSubmission,
+  requestSubmissions,
+} from "@/helpers/client/get_data";
 
 async function requestSubmissionSelection(
   mode: Mode,
@@ -121,7 +124,11 @@ export default function SelectSubmission({
       )}
       <ModuleResponseView response={response}>
         {submission && (
-          <Disclosure title="Submission" openedInitially className="ml-4">
+          <Disclosure
+            title="Submission"
+            openedInitially
+            className={{ root: "ml-4" }}
+          >
             <SubmissionDetail submission={submission} />
           </Disclosure>
         )}
