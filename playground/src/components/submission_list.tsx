@@ -28,37 +28,17 @@ export default function SubmissionList({
         className={{ content: "space-y-1" }}
       >
         {submissions.map((submission) => (
-          <Disclosure
-            title={`Submission ${submission.id}`}
-            key={submission.id}
-          >
+          <Disclosure title={`Submission ${submission.id}`} key={submission.id}>
             <SubmissionDetail key={submission.id} submission={submission} />
           </Disclosure>
         ))}
       </Disclosure>
     );
+  } else if (submissionsError) {
+    return <div className="text-gray-500">Failed to load submissions</div>;
+  } else if (isLoadingSubmissions) {
+    return <div className="text-gray-500">Loading submissions...</div>;
+  } else {
+    return null;
   }
-
-  return (
-    <>
-      {submissions && (
-        <Disclosure title="Submissions" className={{ content: "space-y-1" }}>
-          {submissions.map((submission) => (
-            <Disclosure
-              title={`Submission ${submission.id}`}
-              key={submission.id}
-            >
-              <SubmissionDetail key={submission.id} submission={submission} />
-            </Disclosure>
-          ))}
-        </Disclosure>
-      )}
-      {submissionsError && (
-        <div className="text-gray-500">Failed to load submissions</div>
-      )}
-      {isLoadingSubmissions && (
-        <div className="text-gray-500">Loading submissions...</div>
-      )}
-    </>
-  );
 }

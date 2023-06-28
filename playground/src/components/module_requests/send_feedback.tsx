@@ -14,6 +14,7 @@ import { Mode } from "@/model/mode";
 import Disclosure from "../disclosure";
 import ExerciseDetail from "../details/exercise_detail";
 import SubmissionDetail from "../details/submission_detail";
+import SubmissionList from "../submission_list";
 
 async function sendFeedback(
   athenaUrl: string,
@@ -140,9 +141,6 @@ export default function SendFeedback({
   const [submission, setSubmission] = useState<Submission | undefined>(
     undefined
   );
-  const [allSubmissions, setAllSubmissions] = useState<
-    Submission[] | undefined
-  >(undefined);
 
   const [isAllFeedback, setIsAllFeedback] = useState<boolean>(true);
   const [feedback, setFeedback] = useState<Feedback | undefined>(undefined);
@@ -181,13 +179,6 @@ export default function SendFeedback({
             isAllSubmissions={isAllSubmissions}
             setIsAllSubmissions={setIsAllSubmissions}
           />
-          {isAllSubmissions && (
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-700 mt-2">
-              You are about to send feedback for all submissions of this
-              exercise. This will send a request for each feedback of each
-              submission.
-            </div>
-          )}
           {!isAllSubmissions && (
             <FeedbackSelect
               mode={mode}
@@ -199,11 +190,30 @@ export default function SendFeedback({
               setIsAllFeedback={setIsAllFeedback}
             />
           )}
-          <ExerciseDetail exercise={exercise} mode={mode} />
-          {submission && (
-            <Disclosure title="Submission">
-              <SubmissionDetail submission={submission} />
-            </Disclosure>
+          <div className="space-y-1 mt-2">
+            <ExerciseDetail exercise={exercise} mode={mode} />
+            {submission ? (
+              <Disclosure title="Submission">
+                <SubmissionDetail submission={submission} />
+              </Disclosure>
+            ) : (
+              isAllFeedback && (
+                <SubmissionList exercise={exercise} mode={mode} />
+              )
+            )}
+          </div>
+          {isAllSubmissions && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-700 mt-2">
+              You are about to send feedback for all submissions of this
+              exercise. This will send a request for each feedback of each
+              submission.
+            </div>
+          )}
+          {!isAllSubmissions && isAllFeedback && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-700 mt-2">
+              You are about to send all feedback for the selected submission.
+              This will send a request for each feedback of the submission.
+            </div>
           )}
         </>
       )}

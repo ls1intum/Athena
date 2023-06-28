@@ -99,14 +99,12 @@ export default function SendSubmissions({
         exercise={exercise}
         onChange={setExercise}
       />
-      <div className="space-y-1 mt-2">
-        {exercise && (
-          <>
-            <ExerciseDetail exercise={exercise} mode={mode} />
-            <SubmissionList exercise={exercise} mode={mode} />
-          </>
-        )}
-      </div>
+      {exercise && (
+        <div className="space-y-1 mt-2">
+          <ExerciseDetail exercise={exercise} mode={mode} />
+          <SubmissionList exercise={exercise} mode={mode} />
+        </div>
+      )}
       <ModuleResponseView response={response} />
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"

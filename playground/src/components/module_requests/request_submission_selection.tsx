@@ -119,12 +119,10 @@ export default function SelectSubmission({
         onChange={setExercise}
       />
       {exercise && (
-        <>
-          <Disclosure title="Exercise Detail" className={{ root: "mt-2" }}>
-            <ExerciseDetail exercise={exercise} mode={mode} />
-          </Disclosure>
+        <div className="space-y-1 mt-2">
+          <ExerciseDetail exercise={exercise} mode={mode} />
           <SubmissionList exercise={exercise} mode={mode} />
-        </>
+        </div>
       )}
       <ModuleResponseView response={response}>
         {submission && (
