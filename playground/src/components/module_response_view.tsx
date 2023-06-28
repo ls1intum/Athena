@@ -37,7 +37,7 @@ export default function ModuleResponseView({
           title="Data:"
           openedInitially
           noContentIndent
-          className="font-bold text-black"
+          className={{ trigger: "font-bold text-black" }}
         >
           <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto">
             {formattedData}

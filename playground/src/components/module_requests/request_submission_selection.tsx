@@ -15,6 +15,7 @@ import {
   requestSubmission,
   requestSubmissions,
 } from "@/helpers/client/get_data";
+import SubmissionList from "../submission_list";
 
 async function requestSubmissionSelection(
   mode: Mode,
@@ -118,9 +119,12 @@ export default function SelectSubmission({
         onChange={setExercise}
       />
       {exercise && (
-        <Disclosure title="Exercise Detail" className={{ root: "mt-2" }}>
-          <ExerciseDetail exercise={exercise} mode={mode} />
-        </Disclosure>
+        <>
+          <Disclosure title="Exercise Detail" className={{ root: "mt-2" }}>
+            <ExerciseDetail exercise={exercise} mode={mode} />
+          </Disclosure>
+          <SubmissionList exercise={exercise} mode={mode} />
+        </>
       )}
       <ModuleResponseView response={response}>
         {submission && (

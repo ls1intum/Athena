@@ -12,6 +12,7 @@ import Disclosure from "@/components/disclosure";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import { useSubmissions } from "@/helpers/client/get_data";
 import SubmissionDetail from "../details/submission_detail";
+import SubmissionList from "../submission_list";
 
 async function sendSubmissions(
   mode: Mode,
@@ -79,12 +80,6 @@ export default function SendSubmissions({
     undefined
   );
 
-  const {
-    submissions,
-    isLoading: isLoadingSubmissions,
-    error: submissionsError,
-  } = useSubmissions(mode, exercise);
-
   useEffect(() => {
     setExercise(undefined);
   }, [module, mode]);
@@ -106,32 +101,10 @@ export default function SendSubmissions({
       />
       <div className="space-y-1 mt-2">
         {exercise && (
-          <Disclosure title="Exercise Detail">
+          <>
             <ExerciseDetail exercise={exercise} mode={mode} />
-          </Disclosure>
-        )}
-        {submissions && (
-          <Disclosure title="Submissions" className={{ content: "space-y-1" }}>
-            {submissions.map((submission) => (
-              <Disclosure
-                title={`Submission ${submission.id}`}
-                key={submission.id}
-              >
-                <SubmissionDetail key={submission.id} submission={submission} />
-              </Disclosure>
-            ))}
-          </Disclosure>
-        )}
-        {submissionsError && (
-          <div className="text-gray-500">Failed to load submissions</div>
-        )}
-        {isLoadingSubmissions && (
-          <div className="text-gray-500">Loading submissions...</div>
-        )}
-        {submissions && (
-          <div className="text-gray-500">
-            {submissions.length} submissions to send
-          </div>
+            <SubmissionList exercise={exercise} mode={mode} />
+          </>
         )}
       </div>
       <ModuleResponseView response={response} />

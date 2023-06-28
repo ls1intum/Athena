@@ -3,7 +3,7 @@ import { useState } from "react";
 import { twMerge } from 'tailwind-merge'
 
 type DisclosureProps = {
-  title: string,
+  title: string | JSX.Element | JSX.Element[],
   children: string | JSX.Element | JSX.Element[],
   className?: {
     root?: string,

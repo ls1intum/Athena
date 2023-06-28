@@ -135,14 +135,14 @@ export default function SendFeedback({
   module,
 }: ModuleRequestProps) {
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
-  
+
   const [isAllSubmissions, setIsAllSubmissions] = useState<boolean>(true);
   const [submission, setSubmission] = useState<Submission | undefined>(
     undefined
   );
-  const [allSubmissions, setAllSubmissions] = useState<Submission[] | undefined>(
-    undefined
-  );
+  const [allSubmissions, setAllSubmissions] = useState<
+    Submission[] | undefined
+  >(undefined);
 
   const [isAllFeedback, setIsAllFeedback] = useState<boolean>(true);
   const [feedback, setFeedback] = useState<Feedback | undefined>(undefined);
@@ -199,10 +199,7 @@ export default function SendFeedback({
               setIsAllFeedback={setIsAllFeedback}
             />
           )}
-          <Disclosure title="Exercise Detail">
-            <ExerciseDetail exercise={exercise} mode={mode} />
-          </Disclosure>
-          
+          <ExerciseDetail exercise={exercise} mode={mode} />
           {submission && (
             <Disclosure title="Submission">
               <SubmissionDetail submission={submission} />
