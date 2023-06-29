@@ -105,6 +105,7 @@ jobs:
   pre-deployment:
     needs: [ compute-tag ]
     runs-on: ubuntu-latest
+    permissions: issues
     steps:
       - uses: actions-ecosystem/action-remove-labels@v1
         with:
@@ -114,7 +115,6 @@ jobs:
 
       - name: Check "lock:athena-test3" label
         uses: actions/github-script@v6
-        permissions: issues
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
