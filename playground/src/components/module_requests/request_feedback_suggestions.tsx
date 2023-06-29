@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
+
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
+import { ModuleMeta } from "@/model/health_response";
+import ModuleResponse from "@/model/module_response";
 import ExerciseSelect from "@/components/selectors/exercise_select";
 import SubmissionSelect from "@/components/selectors/submission_select";
-import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
-import { ModuleMeta } from "@/model/health_response";
+import ExerciseDetail from "@/components/details/exercise_detail";
+import SubmissionDetail from "@/components/details/submission_detail";
+import Disclosure from "@/components/disclosure";
 import baseUrl from "@/helpers/base_url";
 import { ModuleRequestProps } from ".";
 
@@ -83,6 +87,25 @@ export default function RequestFeedbackSuggestions({
     setExercise(undefined);
   }, [module, mode]);
 
+  const responseSubmissionView = (response: ModuleResponse | undefined) => {
+    if (!response || response.status !== 200) {
+      return null;
+    }
+
+    const feedbacks = response.data;
+    return (
+      submission && (
+        <Disclosure
+          title="Submission with Feedback Suggestions"
+          openedInitially
+          className={{ root: "ml-2" }}
+        >
+          <SubmissionDetail submission={submission} feedbacks={feedbacks} />
+        </Disclosure>
+      )
+    );
+  };
+
   return (
     <div className="bg-white rounded-md p-4 mb-8">
       <h3 className="text-2xl font-bold mb-4">
@@ -91,8 +114,8 @@ export default function RequestFeedbackSuggestions({
       <p className="text-gray-500 mb-4">
         Request a list of feedback suggestions from Athena for the selected
         submission. The LMS would usually call this when a tutor starts grading
-        a submission. You should get a list of all submissions that are not graded yet.
-        The matching module for the exercise will receive the 
+        a submission. You should get a list of all submissions that are not
+        graded yet. The matching module for the exercise will receive the
         request at the function annotated with <code>@feedback_provider</code>.
       </p>
       <ExerciseSelect
@@ -102,14 +125,26 @@ export default function RequestFeedbackSuggestions({
         onChange={setExercise}
       />
       {exercise && (
-        <SubmissionSelect
-          mode={mode}
-          exercise_id={exercise?.id}
-          submission={submission}
-          onChange={setSubmission}
-        />
+        <>
+          <SubmissionSelect
+            mode={mode}
+            exercise_id={exercise?.id}
+            submission={submission}
+            onChange={setSubmission}
+          />
+          <div className="space-y-1 mt-2">
+            <ExerciseDetail exercise={exercise} mode={mode} />
+            {submission && (
+              <Disclosure title="Submission">
+                <SubmissionDetail submission={submission} />
+              </Disclosure>
+            )}
+          </div>
+        </>
       )}
-      <ModuleResponseView response={response} />
+      <ModuleResponseView response={response}>
+        {responseSubmissionView(response)}
+      </ModuleResponseView>
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
         onClick={() => {
