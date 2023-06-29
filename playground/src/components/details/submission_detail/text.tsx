@@ -15,9 +15,13 @@ export default function TextSubmissionDetail({
   return (
     <>
       <Markdown content={submission.content} enablePlainTextSwitcher />
-      {feedbacks?.map((feedback) => (
-        <FeedbackDetail key={feedback.id} feedback={feedback} />
-      ))}
+      {feedbacks && feedbacks.length > 0 && (
+        <div className="space-y-1 mt-2">
+          {feedbacks.map((feedback) => (
+            <FeedbackDetail key={feedback.id} feedback={feedback} />
+          ))}
+        </div>
+      )}
     </>
   );
 }

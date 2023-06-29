@@ -15,9 +15,13 @@ export default function ProgrammingSubmissionDetail({
   return (
     <>
       <CodeView repository_url={submission.repository_url} />
-      {feedbacks?.map((feedback) => (
-        <FeedbackDetail key={feedback.id} feedback={feedback} />
-      ))}
+      {feedbacks && feedbacks.length > 0 && (
+        <div className="space-y-1 mt-2">
+          {feedbacks.map((feedback) => (
+            <FeedbackDetail key={feedback.id} feedback={feedback} />
+          ))}
+        </div>
+      )}
     </>
   );
 }
