@@ -21,7 +21,7 @@ class ProgrammingSubmission(Submission):
         """Return the submission repository as a Repo object."""
         return get_repository(self.repository_url)
     
-    def get_code(self, file_path: str):
+    def get_code(self, file_path: str) -> str:
         """
         Fetches the code from the submission repository.
         Might be quite an expensive operation! If you need to fetch multiple files, consider using get_zip() instead.
