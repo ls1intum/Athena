@@ -112,41 +112,41 @@ jobs:
           labels: |
             deploy:athena-test3
 
-      - name: Check "lock:athena-test3" label
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const opts = github.rest.issues.listForRepo.endpoint.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['lock:athena-test3']
-            })
-            const issues = await github.paginate(opts)
-            if (issues.length == 1 && (!context.issue || issues[0].number != context.issue.number)) {
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `### ❌ Unable to deploy to test server ❌\nAthena Testserver is already in use by PR #${issues[0].number}.`
-              })
-              core.setFailed(`Athena Testserver is already in use by PR #${issues[0].number}.`);
-            } else if (issues.length > 1) {
-              github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: '### ❌ Unable to deploy to test server ❌\nAthena Testserver is already in use by multiple PRs. Check PRs with label "lock:pyris-test"!'
-                })
-              core.setFailed('Athena Testserver is already in use by multiple PRs. Check PRs with label "lock:athena-test3"!');
-            } else if (context.issue && context.issue.number) {
-              await github.rest.issues.addLabels({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                labels: ['lock:athena-test3']
-              })
-            }
+      # - name: Check "lock:athena-test3" label
+      #   uses: actions/github-script@v6
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const opts = github.rest.issues.listForRepo.endpoint.merge({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         labels: ['lock:athena-test3']
+      #       })
+      #       const issues = await github.paginate(opts)
+      #       if (issues.length == 1 && (!context.issue || issues[0].number != context.issue.number)) {
+      #         github.rest.issues.createComment({
+      #           issue_number: context.issue.number,
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           body: `### ❌ Unable to deploy to test server ❌\nAthena Testserver is already in use by PR #${issues[0].number}.`
+      #         })
+      #         core.setFailed(`Athena Testserver is already in use by PR #${issues[0].number}.`);
+      #       } else if (issues.length > 1) {
+      #         github.rest.issues.createComment({
+      #             issue_number: context.issue.number,
+      #             owner: context.repo.owner,
+      #             repo: context.repo.repo,
+      #             body: '### ❌ Unable to deploy to test server ❌\nAthena Testserver is already in use by multiple PRs. Check PRs with label "lock:pyris-test"!'
+      #           })
+      #         core.setFailed('Athena Testserver is already in use by multiple PRs. Check PRs with label "lock:athena-test3"!');
+      #       } else if (context.issue && context.issue.number) {
+      #         await github.rest.issues.addLabels({
+      #           issue_number: context.issue.number,
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           labels: ['lock:athena-test3']
+      #         })
+      #       }
 
   # Deploy to the test servers
   deploy:
