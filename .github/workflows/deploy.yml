@@ -21,6 +21,8 @@ on:
     secrets:
       DEPLOYMENT_GATEWAY_SSH_KEY:
         required: true
+      DEPLOYMENT_SSH_KEY:
+        required: true
 
 concurrency: deploy
 
@@ -59,7 +61,7 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           GATEWAY_SSH_KEY: "${{ secrets.DEPLOYMENT_GATEWAY_SSH_KEY }}"
-          DEPLOYMENT_SSH_KEY: "${{ inputs.deployment-ssh-key }}"
+          DEPLOYMENT_SSH_KEY: "${{ secrets.DEPLOYMENT_SSH_KEY }}"
         run: |
           mkdir -p ~/.ssh
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
