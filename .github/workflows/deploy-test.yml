@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [labeled]
 
-permissions: read-all|write-all
+permissions: write-all
 
 jobs:
   # Get an up to date version of the label list. github.event.pull_request.labels seems to sometimes be outdated
