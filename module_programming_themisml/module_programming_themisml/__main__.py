@@ -43,8 +43,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     feedback_method = None
     for m in methods:
         # method has to contain all feedback lines
-        f_start, f_end = feedback.line_range
-        if m.line_start <= f_start and m.line_end >= f_end:
+        if m.line_start <= feedback.line_start and m.line_end >= feedback.line_end:
             feedback_method = m
             break
 
