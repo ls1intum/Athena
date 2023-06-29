@@ -7,11 +7,11 @@ type SubmissionBase = {
 };
 
 export type TextSubmission = SubmissionBase & {
-    content: string;
+  content: string;
 };
 
 export type ProgrammingSubmission = SubmissionBase & {
-    repository_url: string;
+  repository_url: string;
 };
 
 export type Submission = ProgrammingSubmission | TextSubmission;
