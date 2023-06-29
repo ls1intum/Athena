@@ -1,6 +1,6 @@
 import useSWR from "swr";
-import fetcher from "@/helpers/fetcher";
 import HealthResponse, { ModuleMeta } from "@/model/health_response";
+import fetcher from "@/helpers/fetcher";
 import baseUrl from "@/helpers/base_url";
 
 export default function ModuleSelect({

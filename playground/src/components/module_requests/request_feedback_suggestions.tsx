@@ -4,13 +4,16 @@ import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
 import { ModuleMeta } from "@/model/health_response";
 import ModuleResponse from "@/model/module_response";
+
 import ExerciseSelect from "@/components/selectors/exercise_select";
 import SubmissionSelect from "@/components/selectors/submission_select";
 import ModuleResponseView from "@/components/module_response_view";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionDetail from "@/components/details/submission_detail";
 import Disclosure from "@/components/disclosure";
+
 import baseUrl from "@/helpers/base_url";
+
 import { ModuleRequestProps } from ".";
 
 async function requestFeedbackSuggestions(

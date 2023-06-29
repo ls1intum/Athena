@@ -1,5 +1,5 @@
-import * as Collapsible from '@radix-ui/react-collapsible';
 import { useState } from "react";
+import * as Collapsible from '@radix-ui/react-collapsible';
 import { twMerge } from 'tailwind-merge'
 
 type DisclosureProps = {

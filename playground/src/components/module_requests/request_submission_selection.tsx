@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
+
 import { Exercise } from "@/model/exercise";
-import ExerciseSelect from "@/components/selectors/exercise_select";
-import ModuleResponse from "@/model/module_response";
-import ModuleResponseView from "@/components/module_response_view";
-import { Submission } from "@/model/submission";
-import { ModuleMeta } from "@/model/health_response";
-import baseUrl from "@/helpers/base_url";
-import { ModuleRequestProps } from ".";
 import { Mode } from "@/model/mode";
+import { ModuleMeta } from "@/model/health_response";
+import { Submission } from "@/model/submission";
+import ModuleResponse from "@/model/module_response";
+
+import ExerciseSelect from "@/components/selectors/exercise_select";
+import ModuleResponseView from "@/components/module_response_view";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import Disclosure from "@/components/disclosure";
-import SubmissionDetail from "../details/submission_detail";
+import SubmissionDetail from "@/components/details/submission_detail";
+import SubmissionList from "@/components/submission_list";
+
+import baseUrl from "@/helpers/base_url";
 import { useSubmissions } from "@/helpers/client/get_data";
-import SubmissionList from "../submission_list";
+
+import { ModuleRequestProps } from ".";
 
 async function requestSubmissionSelection(
   mode: Mode,

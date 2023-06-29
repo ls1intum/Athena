@@ -1,8 +1,10 @@
 import { Exercise } from "@/model/exercise";
 import { Mode } from "@/model/mode";
 import Feedback from "@/model/feedback";
+
 import Disclosure from "@/components/disclosure";
 import SubmissionDetail from "@/components/details/submission_detail";
+
 import { useSubmissions } from "@/helpers/client/get_data";
 
 type SubmissionListProps = {

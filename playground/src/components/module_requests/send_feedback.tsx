@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
+
 import { Submission } from "@/model/submission";
+import { Mode } from "@/model/mode";
 import { Exercise } from "@/model/exercise";
+import Feedback from "@/model/feedback";
+import ModuleResponse from "@/model/module_response";
+import { ModuleMeta } from "@/model/health_response";
+
 import ExerciseSelect from "@/components/selectors/exercise_select";
 import SubmissionSelect from "@/components/selectors/submission_select";
 import FeedbackSelect from "@/components/selectors/feedback_select";
-import Feedback from "@/model/feedback";
-import ModuleResponse from "@/model/module_response";
 import ModuleResponseView from "@/components/module_response_view";
-import { ModuleMeta } from "@/model/health_response";
+import Disclosure from "@/components/disclosure";
+import ExerciseDetail from "@/components/details/exercise_detail";
+import SubmissionDetail from "@/components/details/submission_detail";
+import SubmissionList from "@/components/submission_list";
+
 import baseUrl from "@/helpers/base_url";
-import { ModuleRequestProps } from ".";
-import { Mode } from "@/model/mode";
-import Disclosure from "../disclosure";
-import ExerciseDetail from "../details/exercise_detail";
-import SubmissionDetail from "../details/submission_detail";
-import SubmissionList from "../submission_list";
 import { useFeedbacks } from "@/helpers/client/get_data";
+
+import { ModuleRequestProps } from ".";
 
 async function sendFeedback(
   athenaUrl: string,
