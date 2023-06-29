@@ -105,7 +105,8 @@ jobs:
   pre-deployment:
     needs: [ compute-tag ]
     runs-on: ubuntu-latest
-    permissions: issues
+    permissions:
+      issues: write
     steps:
       - uses: actions-ecosystem/action-remove-labels@v1
         with:
