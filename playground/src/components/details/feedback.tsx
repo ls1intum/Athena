@@ -11,6 +11,7 @@ export default function FeedbackDetail({ feedback }: FeedbackDetailProps) {
         {feedback.text || "Feedback"}
       </h3>
       <pre>{feedback.detail_text}</pre>
+      <pre>{feedback.id}</pre>
     </div>
   );
 }

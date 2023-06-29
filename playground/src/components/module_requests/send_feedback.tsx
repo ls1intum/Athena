@@ -171,12 +171,14 @@ export default function SendFeedback({
   }, [exercise]);
 
   useEffect(() => {
-    setExercise(undefined);
-  }, [module, mode]);
+    // Reset
+    setIsAllFeedback(true);
+    setFeedback(undefined);
+  }, [submission, isAllSubmissions]);
 
   useEffect(() => {
-    console.log(feedbacks);
-  }, [feedbacks]);
+    setExercise(undefined);
+  }, [module, mode]);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
