@@ -42,4 +42,3 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR:-./env_example}/module_text_cofee.env
     image: ghcr.io/ls1intum/Athena/module_text_cofee:${ATHENA_TAG:-develop}
-
