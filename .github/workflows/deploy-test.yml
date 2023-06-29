@@ -33,6 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     # Only run workflow if the added label is a deploy label
     if: contains(needs.get-labels.outputs.labels, 'deploy:athena-test3')
+    permissions:
+      issues: write
     steps:
       - name: Get latest successful build for branch
         id: check_build
@@ -167,6 +169,8 @@ jobs:
     needs: [ check-build-status, compute-tag, pre-deployment, deploy ]
     runs-on: ubuntu-latest
     if: ${{ failure() }}
+    permissions:
+      issues: write
     steps:
       - name: Add error label
         uses: actions-ecosystem/action-add-labels@v1
