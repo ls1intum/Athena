@@ -29,13 +29,13 @@ def get_feedback_suggestions_for_method(
     for feedback in feedbacks:
         if feedback.file_path == filepath and feedback.meta.get("method_name") == method.name:
             considered_feedbacks.append(feedback)
-            sim_computer.add_comparison(method.source_code, feedback.get_code())
+            sim_computer.add_comparison(method.source_code, feedback.get_referenced_code())
 
     sim_computer.compute_similarity_scores()
 
     suggested = []
     for feedback in considered_feedbacks:
-        feedback_code = feedback.get_code()
+        feedback_code = feedback.get_referenced_code()
         similarity = sim_computer.get_similarity_score(method.source_code, feedback_code)
         if similarity.f1 >= SIMILARITY_SCORE_THRESHOLD:
             logger.info("Found similar code with similarity score %d: %s", similarity, feedback)
