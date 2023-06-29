@@ -34,7 +34,7 @@ jobs:
     # Only run workflow if the added label is a deploy label
     if: contains(needs.get-labels.outputs.labels, 'deploy:athena-test3')
     permissions:
-      issues: write
+      issues: write, read
     steps:
       - name: Get latest successful build for branch
         id: check_build
@@ -108,7 +108,7 @@ jobs:
     needs: [ compute-tag ]
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      issues: write, read
     steps:
       - uses: actions-ecosystem/action-remove-labels@v1
         with:
