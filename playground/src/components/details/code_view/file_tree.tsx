@@ -4,7 +4,7 @@ export default function FileTree({ tree }: { tree: FileTree[] }) {
   return (
     <ul>
       {tree.map((file, index) => (
-        <li key={index} style={{ marginLeft: "0.5rem" }}>
+        <li key={index} className="ml-2">
           {file.dir ? (
             <>
               {file.dirname}
