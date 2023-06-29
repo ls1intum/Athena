@@ -3,6 +3,12 @@ name: Deploy to Athena Test
 on:
   pull_request:
     types: [labeled]
+  workflow_dispatch:  # Allow manual trigger of the workflow with a custom SSH key
+    inputs:
+      deployment-ssh-key:
+        description: 'Deployment SSH Key'  
+        required: false
+        default: ''
 
 permissions: write-all
 
@@ -159,6 +165,7 @@ jobs:
       branch-name: ${{ github.event.pull_request.head.ref }}
       environment-name: Athena Test Server 3
       environment-url: https://athenetest1-03.ase.cit.tum.de/
+      deployment-ssh-key: ${{ github.event.inputs.deployment-ssh-key || secrets.DEPLOYMENT_SSH_KEY }}
     secrets: inherit
 
 
