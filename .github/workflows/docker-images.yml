@@ -65,7 +65,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/Athena/${{ matrix.image }}
-            ls1intum/Athena/${{ matrix.image }}
+            ls1tum/Athena/${{ matrix.image }}
           tags: |
             type=raw,value=${{ github.ref == format('refs/heads/{0}', 'develop') && 'latest' || 'default-tag' }}
             type=raw,value=${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'default-pr-tag' }}
