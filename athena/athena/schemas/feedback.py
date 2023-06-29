@@ -8,8 +8,6 @@ from .schema import Schema
 
 class Feedback(Schema, ABC):
     id: Optional[int] = Field(None, example=1)
-    exercise_id: int = Field(example=1)
-    submission_id: int = Field(example=1)
     detail_text: str = Field("", description="The detailed feedback text that is shown to the student.",
                              example="Your solution is correct.")
     text: str = Field("", description="The title of the feedback that is shown to the student.",
@@ -18,6 +16,9 @@ class Feedback(Schema, ABC):
                            example=1.0)
 
     meta: dict = Field({}, example={})
+
+    exercise_id: int = Field(example=1)
+    submission_id: int = Field(example=1)
 
     def to_model(self, is_suggestion: bool = False):
         return type(self).get_model_class()(**self.dict(), is_suggestion=is_suggestion)
