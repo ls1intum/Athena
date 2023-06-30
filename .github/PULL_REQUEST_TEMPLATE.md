@@ -10,4 +10,3 @@
 
 ### Screenshots
 <!-- Add screenshots to demonstrate the changes in the UI of the playground etc. -->
-<!-- Create a GIF file from a screen recording in a docker container https://toub.es/2017/09/11/high-quality-gif-with-ffmpeg-and-docker/ -->
