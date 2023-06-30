@@ -159,7 +159,6 @@ jobs:
       branch-name: ${{ github.event.pull_request.head.ref }}
       environment-name: Athena Test Server 3
       environment-url: https://athenetest1-03.ase.cit.tum.de/
-      deployment-ssh-key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
     secrets: inherit
 
 

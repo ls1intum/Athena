@@ -21,8 +21,6 @@ on:
     secrets:
       DEPLOYMENT_GATEWAY_SSH_KEY:
         required: true
-      DEPLOYMENT_SSH_KEY:
-        required: true
 
 concurrency: deploy
 
