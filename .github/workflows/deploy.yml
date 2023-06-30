@@ -15,9 +15,6 @@ on:
       environment-url:
         required: true
         type: string
-      deployment-ssh-key:
-        required: true
-        type: string
     secrets:
       DEPLOYMENT_GATEWAY_SSH_KEY:
         required: true
