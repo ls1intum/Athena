@@ -32,11 +32,19 @@ function download_docker_compose {
   done
 }
 
+function download_caddyfile {
+  local pr_branch=$1
+
+  echo "Downloading Caddyfile..."
+  curl -sSL -o Caddyfile https://raw.githubusercontent.com/ls1intum/Athena/"$pr_branch"/Caddyfile
+}
+
 function start {
   local pr_tag=$1
   local pr_branch=$2
 
   download_docker_compose "$pr_branch"
+  download_caddyfile "$pr_branch"
 
   echo "Starting Athena with PR tag: $pr_tag and branch: $pr_branch"
   export ATHENA_ENV_DIR="$(pwd)/athena-env"
