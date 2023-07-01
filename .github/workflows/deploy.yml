@@ -36,8 +36,8 @@ jobs:
     env:
       DOCKER_TAG: ${{ inputs.docker-tag }}
       BRANCH_NAME: ${{ inputs.branch-name }}
-      DEPLOYMENT_USER: ${{ vars.DEPLOYMENT_USER }}
-      DEPLOYMENT_HOST: ${{ vars.DEPLOYMENT_HOST }}
+      DEPLOYMENT_USER: ${{ vars.DEPLOYMENT_USER || 'ge32yam' }} # TODO: remove default value and add environment variable
+      DEPLOYMENT_HOST: ${{ vars.DEPLOYMENT_HOST || 'athenetest1-03.ase.cit.tum.de' }} # TODO: remove default value and add environment variable
       DEPLOYMENT_FOLDER: ${{ vars.DEPLOYMENT_FOLDER }}
       DEPLOYMENT_HOST_PUBLIC_KEYS: ${{ vars.DEPLOYMENT_HOST_PUBLIC_KEYS }}
       GATEWAY_USER: "jump"
