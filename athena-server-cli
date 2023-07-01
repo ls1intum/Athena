@@ -127,7 +127,7 @@ function docker_deploy_menu {
     local branch=''
     local directory=''
 
-    local OPTIND
+    OPTIND=1   # reset OPTIND
     while getopts ":hyg:t:b:d:" opt; do
         case ${opt} in
             h )
