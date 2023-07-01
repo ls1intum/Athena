@@ -45,7 +45,7 @@ echo "Downloading docker management script..."
 curl -sSL -o athena-docker.sh https://raw.githubusercontent.com/ls1intum/Athena/$4/athena-docker.sh
 chmod +x athena-docker.sh
 echo "Executing docker management script"
-./athena-docker.sh start $3 $4
+./athena-docker.sh start $3 $4 $1
 COMMAND
 }
 

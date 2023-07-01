@@ -6,7 +6,7 @@ if [ ! -d athena-env ]; then
     exit 1
 fi
 
-# heavily inspired from https://github.com/ls1intum/artemis-ansible-collection/blob/20b000d7601735e6916e225b5cea41b960d51197/roles/artemis/templates/artemis-docker.sh.j2#L4
+# heavily inspired by https://github.com/ls1intum/artemis-ansible-collection/blob/20b000d7601735e6916e225b5cea41b960d51197/roles/artemis/templates/artemis-docker.sh.j2#L4
 
 # Function: Print general usage information
 function general_help {
@@ -15,10 +15,10 @@ Usage:
   ./$(basename "$0") <command> [options]
 
 Commands:
-  start <pr_tag> <pr_branch>      Start Athena
-  stop                            Stop the Athena server.
-  restart <pr_tag>                Restart the Athena server.
-  run <docker compose cmd>        Run any docker compose subcommand of your choice
+  start <pr_tag> <pr_branch> <domain>   Start Athena
+  stop                                  Stop the Athena server.
+  restart <pr_tag> <pr_branch> <domain> Restart the Athena server.
+  run <docker compose cmd>              Run any docker compose subcommand of your choice
 HELP
 }
 
@@ -42,6 +42,7 @@ function download_caddyfile {
 function start {
   local pr_tag=$1
   local pr_branch=$2
+  local domain=$3
 
   download_docker_compose "$pr_branch"
   download_caddyfile "$pr_branch"
@@ -49,6 +50,7 @@ function start {
   echo "Starting Athena with PR tag: $pr_tag and branch: $pr_branch"
   export ATHENA_ENV_DIR="$(pwd)/athena-env"
   export ATHENA_TAG="$pr_tag"
+  export ATHENA_DOMAIN="$domain"
   docker compose -f docker-compose.prod.yml -f docker-compose.playground.prod.yml -f docker-compose.cofee.yml up -d --pull always --no-build
 }
 
