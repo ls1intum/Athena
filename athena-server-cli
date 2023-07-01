@@ -38,6 +38,7 @@ function user_confirmation {
 # @param deployment directory
 function docker_deploy {
     user_confirmation "About to start a deployment of PR $3 ($4) on remote server $1 using gateway server $2"
+    hostname=$(echo "$1" | cut -d'@' -f2) # Separating hostname from user in the provided SSH connection string
 
     ssh -J "$2" -o "StrictHostKeyChecking=no" "$1" << COMMAND
 cd $5
@@ -45,7 +46,7 @@ echo "Downloading docker management script..."
 curl -sSL -o athena-docker.sh https://raw.githubusercontent.com/ls1intum/Athena/$4/athena-docker.sh
 chmod +x athena-docker.sh
 echo "Executing docker management script"
-./athena-docker.sh start $3 $4 $1
+./athena-docker.sh start $3 $4 $hostname
 COMMAND
 }
 
