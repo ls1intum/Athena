@@ -10,17 +10,21 @@ import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponseView from "@/components/module_response_view";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionList from "@/components/submission_list";
+import LLMModelConfig from "@/components/llm_model_config";
 
 import baseUrl from "@/helpers/base_url";
 
 import { ModuleRequestProps } from ".";
+import { OpenAIModelConfig } from "../llm_model_config/openai";
+import Disclosure from "../disclosure";
 
 async function sendSubmissions(
   mode: Mode,
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
-  exercise: Exercise | undefined
+  exercise: Exercise | undefined,
+  meta: any
 ): Promise<ModuleResponse | undefined> {
   if (!exercise) {
     alert("Please select an exercise");
@@ -33,6 +37,7 @@ async function sendSubmissions(
   let response;
   try {
     const athenaSubmissionsUrl = `${athenaUrl}/modules/${module.type}/${module.name}/submissions`;
+
     response = await fetch(
       `${baseUrl}/api/athena_request?${new URLSearchParams({
         url: athenaSubmissionsUrl,
@@ -43,7 +48,16 @@ async function sendSubmissions(
           "Content-Type": "application/json",
           "X-API-Secret": athenaSecret,
         },
-        body: JSON.stringify({ exercise, submissions }),
+        body: JSON.stringify({
+          exercise: {
+            ...exercise,
+            meta: {
+              ...exercise.meta,
+              ...meta,
+            },
+          },
+          submissions,
+        }),
       }
     );
   } catch (e) {
@@ -81,6 +95,11 @@ export default function SendSubmissions({
     undefined
   );
 
+  const [overrideLLM, setOverrideLLM] = useState<boolean>(false);
+  const [llmModelConfig, setLLMModelConfig] = useState<
+    OpenAIModelConfig | undefined
+  >(undefined);
+
   useEffect(() => {
     // Reset
     setResponse(undefined);
@@ -105,6 +124,25 @@ export default function SendSubmissions({
         exercise={exercise}
         onChange={setExercise}
       />
+      {module.name.includes("llm") && (
+        <div className="space-y-1 mt-2">
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={overrideLLM}
+              onChange={(e) => setOverrideLLM(e.target.checked)}
+            />
+            <div className="ml-2 text-gray-700 font-normal">
+              Override LLM Config
+            </div>
+          </label>
+          {overrideLLM && (
+            <Disclosure title={"LLM Model Config"} openedInitially>
+              <LLMModelConfig setModelConfig={setLLMModelConfig} />
+            </Disclosure>
+          )}
+        </div>
+      )}
       {exercise && (
         <div className="space-y-1 mt-2">
           <ExerciseDetail exercise={exercise} mode={mode} />
@@ -116,7 +154,18 @@ export default function SendSubmissions({
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
         onClick={() => {
           setLoading(true);
-          sendSubmissions(mode, athenaUrl, athenaSecret, module, exercise)
+          sendSubmissions(
+            mode,
+            athenaUrl,
+            athenaSecret,
+            module,
+            exercise,
+            overrideLLM
+              ? {
+                  llm_model_config: llmModelConfig,
+                }
+              : undefined
+          )
             .then(setResponse)
             .finally(() => setLoading(false));
         }}

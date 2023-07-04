@@ -6,12 +6,23 @@ from athena import app, submission_selector, submissions_consumer, feedback_cons
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
+from module_text_llm.helpers.models import get_model_from_exercise_meta
+
 from .suggest_feedback_basic import suggest_feedback_basic
 
+from langchain.llms.loading import load_llm_from_config
+from langchain.chat_models.azure_openai import AzureChatOpenAI
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     logger.info("receive_submissions: Received %d submissions for exercise %d", len(submissions), exercise.id)
+    logger.info("exercise: %s", exercise)
+
+    model = get_model_from_exercise_meta(exercise)
+    logger.info("model: %s", model)
+
+    test = model.predict("Hello World")
+    logger.info("test: %s", test)
 
 
 @submission_selector
