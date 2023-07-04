@@ -81,4 +81,4 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: ATHENA_BRANCH=${{ steps.vars.outputs.branch }}
+          build-args: ATHENA_BRANCH=${{ steps.branch.outputs.branch }}
