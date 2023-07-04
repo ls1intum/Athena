@@ -42,3 +42,9 @@ services:
     env_file:
       - ${ATHENA_ENV_DIR:-./env_example}/module_text_cofee.env
     image: ls1tum/athena_module_text_cofee:${ATHENA_TAG:-develop}
+
+  module_programming_themisml:
+    hostname: module_programming_themisml
+    env_file:
+      - ${ATHENA_ENV_DIR:-./env_example}/module_programming_themisml.env
+    image: ls1tum/athena_module_programming_themisml:${ATHENA_TAG:-develop}
