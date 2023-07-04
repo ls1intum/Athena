@@ -13,12 +13,15 @@ export default function App({ Component, pageProps }: AppProps) {
       <footer className="p-4 text-white border-t border-opacity-10 text-xs">
         {
           process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA ? <>
-            <a href={`https://github.com/ls1intum/Athena/tree/${process.env.ATHENA_BRANCH}`} target="_blank">
+            <a href={`https://github.com/ls1intum/Athena/tree/${process.env.NEXT_PUBLIC_ATHENA_BRANCH}`} target="_blank">
               Branch:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_BRANCH}&nbsp;- 
             </a>
             <span>
               Commit:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA}&nbsp;-
             </span>
+            <a href={`https://github.com/ls1intum/Athena/pull/${process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}`} target="_blank">
+              PR&nbsp;#{process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}
+            </a>
           </> : (
             <span>Local build</span>
           )
