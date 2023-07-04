@@ -11,14 +11,16 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <Component {...pageProps} />
       <footer className="p-4 text-white border-t border-opacity-10 text-xs">
-        Branch:&nbsp;
         {
-          process.env.NEXT_PUBLIC_ATHENA_BRANCH ? (
+          process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA ? <>
             <a href={`https://github.com/ls1intum/Athena/tree/${process.env.ATHENA_BRANCH}`} target="_blank">
-              {process.env.NEXT_PUBLIC_ATHENA_BRANCH}
+              Branch:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_BRANCH}&nbsp;- 
             </a>
-          ) : (
-            <span>local</span>
+            <span>
+              Commit:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA}&nbsp;-
+            </span>
+          </> : (
+            <span>Local build</span>
           )
         }
       </footer>

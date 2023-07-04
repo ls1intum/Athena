@@ -81,4 +81,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: ATHENA_BRANCH=${{ steps.branch.outputs.branch }}
+          build-args: |
+            ATHENA_PR_NUMBER=${{ github.event.pull_request.number }}
+            ATHENA_SHA=${{ github.sha }}
+            ATHENA_BRANCH=${{ steps.branch.outputs.branch }}
