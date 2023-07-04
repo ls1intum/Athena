@@ -5,6 +5,9 @@ LABEL org.opencontainers.image.source=https://github.com/ls1intum/Athena
 
 WORKDIR /app
 
+ARG ATHENA_BRANCH
+ENV NEXT_PUBLIC_ATHENA_BRANCH $ATHENA_BRANCH
+
 # install packages
 COPY package.json ./
 COPY package-lock.json ./
