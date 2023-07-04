@@ -11,13 +11,18 @@ from langchain.prompts import (
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.helpers.models import chat
+from module_text_llm.helpers.models import default_model, get_model_from_exercise_meta
 from module_text_llm.helpers.utils import add_sentence_numbers, parse_line_number_reference_as_span
 
 from .prompts.suggest_feedback_basic import system_template, human_template
 
 
 async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> List[Feedback]:
+    model = get_model_from_exercise_meta(exercise)
+    if model is None:
+        model = default_model
+    logger.info("suggest_feedback_basic - model: %s", model)
+
     input = {
         "max_points": exercise.max_points,
         "bonus_points": exercise.bonus_points,
@@ -31,7 +36,7 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> 
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
     chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
-    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    chain = LLMChain(llm=model, prompt=chat_prompt)
     result = chain.run(**input)
     result = f"reference,credits,text\n{result}"
     reader = csv.DictReader(result.splitlines())

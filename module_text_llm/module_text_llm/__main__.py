@@ -12,17 +12,15 @@ from .suggest_feedback_basic import suggest_feedback_basic
 
 from langchain.llms.loading import load_llm_from_config
 from langchain.chat_models.azure_openai import AzureChatOpenAI
+from langchain.schema import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     logger.info("receive_submissions: Received %d submissions for exercise %d", len(submissions), exercise.id)
-    logger.info("exercise: %s", exercise)
-
-    model = get_model_from_exercise_meta(exercise)
-    logger.info("model: %s", model)
-
-    test = model.predict("Hello World")
-    logger.info("test: %s", test)
 
 
 @submission_selector
@@ -39,6 +37,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 @feedback_provider
 async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
+    logger.info("suggest_feedback - exercise: %s", exercise)
     return await suggest_feedback_basic(exercise, submission)
 
 

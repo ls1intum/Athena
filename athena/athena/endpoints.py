@@ -37,14 +37,21 @@ def submissions_consumer(func: Union[Callable[[E, List[S]], None], Callable[[E, 
             exercise: exercise_type,
             submissions: List[submission_type]):
         # Retrieve existing metadata for the exercise and submissions
-        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        meta = get_stored_exercise_meta(exercise) or {}
+        meta.update(exercise.meta)
+        exercise.meta = meta
         submissions_dict = {s.id: s for s in submissions}
         if submissions:
             stored_submissions = get_stored_submissions(submissions[0].__class__, exercise.id, [s.id for s in submissions])
             for stored_submission in stored_submissions:
                 if stored_submission.id in submissions_dict:
-                    submissions_dict[stored_submission.id].meta.update(stored_submission.meta)
+                    meta = get_stored_submission_meta(stored_submission) or {}
+                    meta.update(stored_submission.meta)
+                    submissions_dict[stored_submission.id].meta = meta
         submissions = list(submissions_dict.values())
+
+        store_exercise(exercise)
+        store_submissions(submissions)
 
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
