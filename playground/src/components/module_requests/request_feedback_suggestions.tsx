@@ -41,7 +41,7 @@ async function requestFeedbackSuggestions(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Secret": athenaSecret,
+          "Authorization": athenaSecret,
         },
         body: JSON.stringify({ exercise, submission }),
       }

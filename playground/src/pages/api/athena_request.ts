@@ -17,7 +17,7 @@ export default async function handler(
   // TODO: check the security implications of this
   const url = req.query.url;
   let response;
-  const secret = req.headers["x-api-secret"] as string;
+  const secret = req.headers["authorization"] as string;
   if (!secret) {
     console.warn("No secret provided");
   }
@@ -26,7 +26,7 @@ export default async function handler(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-API-Secret": secret,
+        "Authorization": secret,
       },
       method: req.method,
       body: JSON.stringify(req.body),

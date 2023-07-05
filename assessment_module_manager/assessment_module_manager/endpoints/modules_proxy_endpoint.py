@@ -16,7 +16,7 @@ from starlette.responses import JSONResponse
             "description": "Module is not of the requested type",
         },
         403: {
-            "description": "API secret is invalid - set the environment variable SECRET and the X-API-Secret header "
+            "description": "API secret is invalid - set the environment variable SECRET and the Authorization header "
                            "to the same value",
         },
         404: {
