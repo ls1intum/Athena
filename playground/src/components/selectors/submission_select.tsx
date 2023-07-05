@@ -69,7 +69,7 @@ export default function SubmissionSelect({
           )}
         {data.map((sub: Submission) => {
           const contentPreview =
-            (sub as TextSubmission)?.content ||
+            (sub as TextSubmission)?.text ||
             (sub as ProgrammingSubmission)?.repository_url ||
             "?";
           return (

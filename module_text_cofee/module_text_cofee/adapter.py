@@ -45,7 +45,7 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
             "submissions": [
                 {
                     "id": submission.id,
-                    "text": submission.content,
+                    "text": submission.text,
                 }
                 for submission in submissions
             ],
