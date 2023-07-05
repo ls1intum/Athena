@@ -5,7 +5,7 @@ from typing import List
 
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.storage import store_feedback
-from athena.text import Exercise, Submission, Feedback
+from athena.text import Exercise, Submission, Feedback, TextLanguageEnum
 from athena.logger import logger
 
 from module_text_cofee import adapter
@@ -28,6 +28,8 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     logger.info("receive_submissions: Received %d submissions for exercise %d", len(submissions), exercise.id)
+    # CoFee only supports English submissions
+    submissions = [s for s in submissions if s.language == TextLanguageEnum.ENGLISH]
     if len(submissions) < 10:
         # CoFee needs at least 10 submissions to work
         logger.info("receive_submissions: Not enough submissions, not sending to CoFee")
