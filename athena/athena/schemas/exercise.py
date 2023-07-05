@@ -23,7 +23,7 @@ class Exercise(Schema, ABC):
     problem_statement: str = Field("", description="Markdown text that describes the problem statement.",
                                    example="Write a program that prints 'Hello World!'")
 
-    meta: dict = Field(example={"internal_id": "5"})
+    meta: dict = Field({}, example={"internal_id": "5"})
 
     class Config:
         orm_mode = True
