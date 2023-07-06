@@ -164,3 +164,19 @@ def feedback_provider(func: Union[Callable[[E, S], List[F]], Callable[[E, S], Co
 
         return feedbacks
     return wrapper
+
+
+def config_provider(func: Union[Callable[[], dict], Callable[[], Coroutine[Any, Any, dict]]]):
+    """
+    Get available configuration options of a module.
+    """
+
+    @app.get("/config", responses=module_responses)
+    @authenticated
+    async def wrapper():
+        if inspect.iscoroutinefunction(func):
+            config = await func()
+        else:
+            config = func()
+        return config
+    return wrapper

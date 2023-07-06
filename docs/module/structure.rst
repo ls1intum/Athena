@@ -95,6 +95,34 @@ Example:
                 )
             ]
 
+Provide Config Options
+~~~~~~~~~~~~~~~~~~~~~~
+Get a list of config options for the module. Those config options can then be provided in the header of a request to override the default values. The module will receive the request at the function annotated with ``@config_provider``.
+
+Example:
+    .. code-block:: python
+
+        from athena import *
+
+        @config_provider
+        def available_config() -> dict:
+            ...
+            return {
+                "model": {
+                    "type": "str",
+                    "default": "bert-base-uncased",
+                    "options": ["bert-base-uncased", "bert-base-cased"],
+                    "description": "The model to use for the prediction."
+                },
+                "approach": {
+                    "type": "str",
+                    "default": "simple",
+                    "options": ["simple", "advanced"],
+                    "description": "The approach to use for the prediction."
+                }
+                ...
+            }
+
 Environment Variables
 ---------------------
 You should provide at least the following environment variables for your module to work properly:

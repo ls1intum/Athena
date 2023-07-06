@@ -36,6 +36,8 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> 
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
     chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
+    logger.info(chat_prompt.format(**input))
+
     chain = LLMChain(llm=model, prompt=chat_prompt)
     result = chain.run(**input)
     result = f"reference,credits,text\n{result}"

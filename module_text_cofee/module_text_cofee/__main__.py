@@ -50,5 +50,21 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     return suggest_feedback_for_submission(submission)
 
 
+@config_provider
+def available_config() -> dict:
+    return {
+        "config": {
+            "type": "object",
+            "properties": {
+                "max_suggestions": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "default": 10,
+                },
+            },
+        },
+    }
+
 if __name__ == "__main__":
     app.start()
