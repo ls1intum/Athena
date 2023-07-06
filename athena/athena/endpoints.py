@@ -2,10 +2,13 @@
 import inspect
 from typing import TypeVar, Callable, List, Union, Any, Coroutine
 
+from pydantic import BaseModel
+
 from athena.app import app
 from athena.authenticate import authenticated
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
+from athena.schemas.schema import to_camel
 from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
     store_exercise, store_feedback, store_feedback_suggestions, store_submissions, get_stored_submissions
     
@@ -64,11 +67,21 @@ def submission_selector(func: Union[Callable[[E, List[S]], S], Callable[[E, List
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
 
+    # own request model to allow for `submissionIds` instead of `submission_ids` (camelCase vs snake_case)
+    class SubmissionSelectorRequest(BaseModel):
+        exercise: exercise_type
+        submission_ids: List[int]
+    
+        class Config:
+            # Allow camelCase field names in the API (converted to snake_case)
+            alias_generator = to_camel
+            allow_population_by_field_name = True
+
     @app.post("/select_submission", responses=module_responses)
     @authenticated
-    async def wrapper(
-            exercise: exercise_type,
-            submission_ids: List[int]) -> int:
+    async def wrapper(req: SubmissionSelectorRequest) -> int:
+        exercise = req.exercise
+        submission_ids = req.submission_ids
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
 
