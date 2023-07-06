@@ -1,3 +1,4 @@
+import openai # delete later
 import csv
 from typing import List
 
@@ -11,19 +12,21 @@ from langchain.prompts import (
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.helpers.models import default_model, get_model_from_exercise_meta
+from module_text_llm.helpers.models import get_default_model
 from module_text_llm.helpers.utils import add_sentence_numbers, parse_line_number_reference_as_span
 
 from .prompts.suggest_feedback_basic import system_template, human_template
 
 
 async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> List[Feedback]:
-    model = get_model_from_exercise_meta(exercise)
-    if model is None:
-        model = default_model
+    model = get_default_model()
+    logger.info(openai.api_type) # delete later
+    logger.info(openai.api_key) # delete later
+    logger.info(openai.api_base) # delete later
+    logger.info(openai.api_version) # delete later
     logger.info("suggest_feedback_basic - model: %s", model)
 
-    input = {
+    prompt_input = {
         "max_points": exercise.max_points,
         "bonus_points": exercise.bonus_points,
         "grading_instructions": exercise.grading_instructions,
@@ -36,10 +39,8 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> 
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
     chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
-    logger.info(chat_prompt.format(**input))
-
     chain = LLMChain(llm=model, prompt=chat_prompt)
-    result = chain.run(**input)
+    result = chain.run(**prompt_input)
     result = f"reference,credits,text\n{result}"
     reader = csv.DictReader(result.splitlines())
 
