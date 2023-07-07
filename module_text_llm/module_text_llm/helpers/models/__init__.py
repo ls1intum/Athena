@@ -1,11 +1,10 @@
 import os
+
+from langchain.base_language import BaseLanguageModel
+
 from .openai import available_models as available_openai_models
 from .openai import OpenAIModelSettings
 
-
-provider_to_model_settings = {
-    "openai": OpenAIModelSettings,
-}
 
 available_models = {
     **available_openai_models,
@@ -17,8 +16,38 @@ if default_model_key is None or default_model_key not in available_models:
 
 model = available_models[default_model_key]
 
+
+provider_to_model_settings = {
+    "openai": OpenAIModelSettings,
+}
+
+
+def get_model(provider: str, settings: dict) -> BaseLanguageModel:
+    """Get a model from a provider and settings.
+
+    Args:
+        provider (str): The provider to use.
+        settings (dict): The settings to use. (See provider_to_model_settings)
+
+    Raises:
+        ValueError: If the provider is not supported or the settings are invalid.
+
+    Returns:
+        BaseLanguageModel: The model.
+    """    
+    if provider not in provider_to_model_settings:
+        raise ValueError(f"Provider {provider} is not supported, available providers: {', '.join(provider_to_model_settings)}.")
+    
+    model_config = provider_to_model_settings[provider](**settings)
+    model = available_models[model_config.model_name].copy()
+    for attr, value in model_config.__dict__.items():
+        setattr(model, attr, value)
+    return model
+
+
 __all__ = [
     "provider_to_model_settings",
     "available_models",
     "model",
+    "get_model",
 ]
