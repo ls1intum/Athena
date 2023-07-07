@@ -17,7 +17,6 @@ if default_model_key is None or default_model_key not in available_models:
 
 model = available_models[default_model_key]
 
-
 provider_to_model_settings = {
     "openai": OpenAIModelSettings,
 }
