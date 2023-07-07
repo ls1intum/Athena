@@ -10,7 +10,7 @@ class Feedback(Schema, ABC):
     id: Optional[int] = Field(None, example=1)
     detail_text: str = Field("", description="The detailed feedback text that is shown to the student.",
                              example="Your solution is correct.")
-    text: str = Field("", description="The title of the feedback that is shown to the student.",
+    text: Optional[str] = Field(None, description="The title of the feedback that is shown to the student.",
                       example="File src/pe1/MergeSort.java at line 12")
     credits: float = Field(0.0, description="The number of points that the student received for this feedback.",
                            example=1.0)
