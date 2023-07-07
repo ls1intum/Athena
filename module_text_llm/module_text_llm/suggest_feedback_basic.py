@@ -1,4 +1,3 @@
-import openai # delete later
 import csv
 from typing import List
 
@@ -12,18 +11,13 @@ from langchain.prompts import (
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.helpers.models import get_default_model
+from module_text_llm.helpers.models import model
 from module_text_llm.helpers.utils import add_sentence_numbers, parse_line_number_reference_as_span
 
 from .prompts.suggest_feedback_basic import system_template, human_template
 
 
 async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> List[Feedback]:
-    model = get_default_model()
-    logger.info(openai.api_type) # delete later
-    logger.info(openai.api_key) # delete later
-    logger.info(openai.api_base) # delete later
-    logger.info(openai.api_version) # delete later
     logger.info("suggest_feedback_basic - model: %s", model)
 
     prompt_input = {
