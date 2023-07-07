@@ -116,14 +116,14 @@ def feedbacks_consumer(func: Union[Callable[[E, S, List[F]], None], Callable[[E,
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
-    feedback_type = inspect.signature(func).parameters["feedback"].annotation
+    feedbacks_type = inspect.signature(func).parameters["feedbacks"].annotation
 
     @app.post("/feedbacks", responses=module_responses)
     @authenticated
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
-            feedbacks: List[feedback_type]):
+            feedbacks: feedbacks_type):
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         submission.meta.update(get_stored_submission_meta(submission) or {})
