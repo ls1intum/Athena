@@ -6,7 +6,8 @@ from .openai import available_models as available_openai_models
 from .openai import OpenAIModelSettings
 
 
-available_models = {
+# model names -> models
+available_models: dict[str, BaseLanguageModel] = {
     **available_openai_models,
 }
 
@@ -39,6 +40,10 @@ def get_model(provider: str, settings: dict) -> BaseLanguageModel:
         raise ValueError(f"Provider {provider} is not supported, available providers: {', '.join(provider_to_model_settings)}.")
     
     model_config = provider_to_model_settings[provider](**settings)
+    if not isinstance(model_config.model_name, str):
+        raise ValueError(f"Model name must be a string, got {model_config.model_name} of type {type(model_config.model_name)}.")
+    if model_config.model_name not in available_models:
+        raise ValueError(f"Model {model_config.model_name} is not supported, available models: {', '.join(available_models)}.")
     model = available_models[model_config.model_name].copy()
     for attr, value in model_config.__dict__.items():
         setattr(model, attr, value)
