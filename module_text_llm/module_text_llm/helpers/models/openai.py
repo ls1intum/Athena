@@ -1,13 +1,21 @@
 # mypy: ignore-errors
 import os
 from contextlib import contextmanager
-from typing import Any, Callable
+from typing import Any, Callable, List, Literal
+from pydantic import BaseModel, Field, validator, PositiveInt
+from enum import Enum
 
 import openai
 from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.llms import AzureOpenAI, OpenAI
 from langchain.llms.openai import BaseOpenAI
 from langchain.base_language import BaseLanguageModel
+
+from athena.logger import logger
+
+
+OPENAI_PREFIX = "openai_"
+AZURE_OPENAI_PREFIX = "azure_openai_"
 
 
 #########################################################################
@@ -121,7 +129,7 @@ def _openai_client(use_azure_api: bool, is_preference: bool):
     yield
 
 
-def _get_available_deployments(openai_models):
+def _get_available_deployments(openai_models: dict[str, List[str]], model_aliases: dict[str, str]):
     available_deployments: dict[str, dict[str, Any]] = {
         "chat_completion": {},
         "completion": {},
@@ -133,12 +141,14 @@ def _get_available_deployments(openai_models):
             deployments = openai.Deployment.list().get("data")  # type: ignore
             if deployments is not None:
                 for deployment in deployments:
-                    # special case for gpt-3.5-turbo on azure...
-                    if deployment.model in openai_models["chat_completion"] or deployment.model == "gpt-35-turbo":
+                    model_name = deployment.model
+                    if model_name in model_aliases:
+                        model_name = model_aliases[model_name]
+                    if model_name in openai_models["chat_completion"]:
                         available_deployments["chat_completion"][deployment.id] = deployment
-                    elif deployment.model in openai_models["completion"]:
+                    elif model_name in openai_models["completion"]:
                         available_deployments["completion"][deployment.id] = deployment
-                    elif deployment.model in openai_models["fine_tuneing"]:
+                    elif model_name in openai_models["fine_tuneing"]:
                         available_deployments["fine_tuneing"][deployment.id] = deployment
 
     return available_deployments
@@ -150,10 +160,10 @@ def _get_available_models(openai_models, available_deployments):
     if openai_available:
         openai_api_key = os.environ["LLM_OPENAI_API_KEY"]
         for model_name in openai_models["chat_completion"]:
-            available_models[f"openai_{model_name}"] = ChatOpenAI(
+            available_models[f"{OPENAI_PREFIX}{model_name}"] = ChatOpenAI(
                 model=model_name, openai_api_key=openai_api_key, client="")
         for model_name in openai_models["completion"]:
-            available_models[f"openai_{model_name}"] = OpenAI(
+            available_models[f"{OPENAI_PREFIX}{model_name}"] = OpenAI(
                 model=model_name, openai_api_key=openai_api_key, client="")
 
     if azure_openai_available:
@@ -162,7 +172,7 @@ def _get_available_models(openai_models, available_deployments):
         azure_openai_api_version = os.environ["LLM_AZURE_OPENAI_API_VERSION"]
 
         for deployment_name, deployment in available_deployments["chat_completion"].items():
-            available_models[f"azure_openai_{deployment_name}"] = AzureChatOpenAI(
+            available_models[f"{AZURE_OPENAI_PREFIX}{deployment_name}"] = AzureChatOpenAI(
                 deployment_name=deployment_name,
                 openai_api_base=azure_openai_api_base,
                 openai_api_version=azure_openai_api_version,
@@ -171,7 +181,7 @@ def _get_available_models(openai_models, available_deployments):
             )
 
         for deployment_name, deployment in available_deployments["completion"].items():
-            available_models[f"azure_openai_{deployment_name}"] = AzureOpenAI(
+            available_models[f"{AZURE_OPENAI_PREFIX}{deployment_name}"] = AzureOpenAI(
                 model=deployment.model,
                 deployment_name=deployment_name,
                 openai_api_base=azure_openai_api_base,
@@ -182,6 +192,10 @@ def _get_available_models(openai_models, available_deployments):
 
     return available_models
 
+
+_model_aliases = {
+    "gpt-35-turbo": "gpt-3.5-turbo",
+}
 
 # Hardcoded because openai can't provide a trustworthly api to get the list of models and capabilities...
 openai_models = {
@@ -204,5 +218,70 @@ openai_models = {
         "ada",
     ]
 }
-available_deployments = _get_available_deployments(openai_models)
+available_deployments = _get_available_deployments(
+    openai_models, _model_aliases)
 available_models = _get_available_models(openai_models, available_deployments)
+
+
+OpenAIModel = Enum('OpenAIModel', {
+                   name: name for name in available_models})
+
+
+# Long descriptions will be displayed in the playground UI and are copied from the OpenAI docs
+class OpenAIModelSettings(BaseModel):
+    model_name: OpenAIModel = Field(...,  # type: ignore
+                                    description="The name of the model to use.")
+    max_tokens: PositiveInt = Field(..., description="""\
+The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the chat completion.
+
+The total length of input tokens and generated tokens is limited by the model's context length. \
+[Example Python code](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) for counting tokens.\
+""")
+
+    temperature: float = Field(0.7, ge=0, le=2, description="""\
+What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, \
+while lower values like 0.2 will make it more focused and deterministic.
+
+We generally recommend altering this or `top_p` but not both.\
+""")
+
+    top_p: float = Field(1, ge=0, le=1, description="""\
+An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. \
+So 0.1 means only the tokens comprising the top 10% probability mass are considered.
+
+We generally recommend altering this or `temperature` but not both.\
+""")
+
+    presence_penalty: float = Field(
+        0, ge=-2, le=2, description="""\
+Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, \
+increasing the model's likelihood to talk about new topics.
+
+[See more information about frequency and presence penalties.](https://platform.openai.com/docs/api-reference/parameter-details)\
+""")
+
+    frequency_penalty: float = Field(
+        0, ge=-2, le=2, description="""\
+Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, \
+decreasing the model's likelihood to repeat the same line verbatim.
+
+[See more information about frequency and presence penalties.](https://platform.openai.com/docs/api-reference/parameter-details)\
+""")
+
+    @validator('max_tokens')
+    def max_tokens_must_be_positive(cls, v):
+        """
+        Validate that max_tokens is a positive integer.
+        """
+        max_contextsize = BaseOpenAI(model=cls.model_name.value, client="").modelname_to_contextsize(
+            modelname=cls.model_name.value)
+
+        if v <= 0:
+            raise ValueError('max_tokens must be a positive integer')
+        if v > max_contextsize:
+            raise ValueError(
+                f'max_tokens must be less than or equal to {max_contextsize} for model {cls.model_name}')
+        return v
+
+
+logger.info("Available openai models: %s", ", ".join(available_models.keys()))
