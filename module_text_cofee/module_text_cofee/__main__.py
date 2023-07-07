@@ -3,7 +3,7 @@ Entry point for the module_text_cofee module.
 """
 from typing import List
 
-from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
+from athena import app, submission_selector, submissions_consumer, feedbacks_consumer, feedback_provider
 from athena.storage import store_feedback
 from athena.text import Exercise, Submission, Feedback, TextLanguageEnum
 from athena.logger import logger
@@ -37,10 +37,11 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     adapter.send_submissions(exercise, submissions)
 
 
-@feedback_consumer
-def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
-    link_feedback_to_block(feedback)
-    store_feedback(feedback)
+@feedbacks_consumer
+def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
+    for feedback in feedbacks:
+        link_feedback_to_block(feedback)
+        store_feedback(feedback)
 
 
 @feedback_provider

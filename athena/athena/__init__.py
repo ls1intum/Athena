@@ -4,7 +4,7 @@ from pathlib import Path
 
 from .app import app
 from .schemas import ExerciseType
-from .endpoints import submission_selector, submissions_consumer, feedback_consumer, feedback_provider  # type: ignore
+from .endpoints import submission_selector, submissions_consumer, feedbacks_consumer, feedback_provider  # type: ignore
 
 
 @app.get("/")
@@ -23,7 +23,7 @@ def run_module():
 __all__ = [
     "submission_selector",
     "submissions_consumer",
-    "feedback_consumer",
+    "feedbacks_consumer",
     "feedback_provider",
     "ExerciseType",
     "app"

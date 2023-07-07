@@ -1,6 +1,6 @@
 from typing import List
 
-from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
+from athena import app, submission_selector, submissions_consumer, feedbacks_consumer, feedback_provider
 from athena.storage import store_exercise
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
@@ -27,10 +27,10 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@feedback_consumer
-def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
-    logger.info("process_feedback: Received feedback for submission %d of exercise %d.", submission.id, exercise.id)
-    logger.info("process_feedback: Feedback: %s", feedback)
+@feedbacks_consumer
+def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
+    logger.info("process_feedback: Received feedbacks for submission %d of exercise %d.", submission.id, exercise.id)
+    logger.info("process_feedback: Feedbacks: %s", feedbacks)
     # Do something with the feedback
 
 

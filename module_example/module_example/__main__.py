@@ -3,7 +3,7 @@ Entry point for the module_example module.
 """
 from typing import List
 
-from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
+from athena import app, submissions_consumer, submission_selector, feedbacks_consumer, feedback_provider
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
@@ -43,16 +43,16 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@feedback_consumer
-def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
-    logger.info("process_feedback: Received feedback for submission %d of exercise %d", submission.id, exercise.id)
-    logger.info("process_feedback: Feedback: %s", feedback)
+@feedbacks_consumer
+def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
+    logger.info("process_feedback: Received feedbacks for submission %d of exercise %d", submission.id, exercise.id)
+    logger.info("process_feedback: Feedbacks: %s", feedbacks)
     # Do something with the feedback
 
     # Add data to feedback
-    feedback.meta["some_data"] = "some_value"
-
-    store_feedback(feedback)
+    for feedback in feedbacks:
+        feedback.meta["some_data"] = "some_value"
+        store_feedback(feedback)
 
 
 @feedback_provider

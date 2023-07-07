@@ -109,7 +109,7 @@ def submission_selector(func: Union[Callable[[E, List[S]], S], Callable[[E, List
     return wrapper
 
 
-def feedback_consumer(func: Union[Callable[[E, S, F], None], Callable[[E, S, F], Coroutine[Any, Any, None]]]):
+def feedbacks_consumer(func: Union[Callable[[E, S, List[F]], None], Callable[[E, S, List[F]], Coroutine[Any, Any, None]]]):
     """
     Receive feedback from the Assessment Module Manager.
     The feedback consumer is usually called whenever the LMS gets feedback from a tutor.
@@ -118,24 +118,24 @@ def feedback_consumer(func: Union[Callable[[E, S, F], None], Callable[[E, S, F],
     submission_type = inspect.signature(func).parameters["submission"].annotation
     feedback_type = inspect.signature(func).parameters["feedback"].annotation
 
-    @app.post("/feedback", responses=module_responses)
+    @app.post("/feedbacks", responses=module_responses)
     @authenticated
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
-            feedback: feedback_type):
+            feedbacks: List[feedback_type]):
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         submission.meta.update(get_stored_submission_meta(submission) or {})
-        feedback.meta.update(get_stored_feedback_meta(feedback) or {})
-
-        store_feedback(feedback)
+        for feedback in feedbacks:
+            feedback.meta.update(get_stored_feedback_meta(feedback) or {})
+            store_feedback(feedback)
 
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
-            await func(exercise, submission, feedback)
+            await func(exercise, submission, feedbacks)
         else:
-            func(exercise, submission, feedback)
+            func(exercise, submission, feedbacks)
 
     return wrapper
 
