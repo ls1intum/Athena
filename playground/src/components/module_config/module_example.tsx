@@ -1,10 +1,10 @@
 import { ModuleConfigProps } from '.';
 
-export default function ModuleExampleConfig({ onChangeConfig }: ModuleConfigProps) {
+export default function ModuleExampleConfig({ configOptions, onChangeConfig }: ModuleConfigProps) {
 
   return (
     <p>
-      Example config
+      {JSON.stringify(configOptions, undefined, 2)}
     </p>
   );
 };

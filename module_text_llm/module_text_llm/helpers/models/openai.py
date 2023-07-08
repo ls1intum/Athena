@@ -10,6 +10,7 @@ from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.llms import AzureOpenAI, OpenAI
 from langchain.llms.openai import BaseOpenAI
 from langchain.base_language import BaseLanguageModel
+from .model_config import ModelConfig
 
 from athena.logger import logger
 
@@ -227,11 +228,17 @@ OpenAIModel = Enum('OpenAIModel', {
                    name: name for name in available_models})
 
 
+if os.environ["LLM_DEFAULT_MODEL"] in available_models:
+    default_openai_model = OpenAIModel[os.environ["LLM_DEFAULT_MODEL"]]
+else:
+    default_openai_model = OpenAIModel["gpt-3.5-turbo"]
+
+
 # Long descriptions will be displayed in the playground UI and are copied from the OpenAI docs
-class OpenAIModelSettings(BaseModel):
-    model_name: OpenAIModel = Field(...,  # type: ignore
+class OpenAIModelConfig(ModelConfig):
+    model_name: OpenAIModel = Field(default_openai_model,  # type: ignore
                                     description="The name of the model to use.")
-    max_tokens: PositiveInt = Field(..., description="""\
+    max_tokens: PositiveInt = Field(512, description="""\
 The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the chat completion.
 
 The total length of input tokens and generated tokens is limited by the model's context length. \
@@ -273,15 +280,17 @@ decreasing the model's likelihood to repeat the same line verbatim.
         """
         Validate that max_tokens is a positive integer.
         """
-        max_contextsize = BaseOpenAI(model=cls.model_name.value, client="").modelname_to_contextsize(
-            modelname=cls.model_name.value)
-
         if v <= 0:
             raise ValueError('max_tokens must be a positive integer')
-        if v > max_contextsize:
-            raise ValueError(
-                f'max_tokens must be less than or equal to {max_contextsize} for model {cls.model_name}')
         return v
+
+
+    def get_model(self) -> BaseLanguageModel:
+        model = available_models[self.model_name].copy()
+        for attr, value in self.dict().items():
+            if attr != "model_name":
+                setattr(model, attr, value)
+        return model
 
 
 logger.info("Available openai models: %s", ", ".join(available_models.keys()))

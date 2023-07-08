@@ -9,6 +9,7 @@ import ModuleExampleConfig from "./module_example";
 type SetConfig = Dispatch<SetStateAction<any | undefined>>;
 
 export type ModuleConfigProps = {
+  configOptions?: any;
   moduleConfig: any | undefined;
   onChangeConfig: SetConfig;
 };
@@ -50,9 +51,14 @@ export default function ModuleConfig({
           "X-API-Secret": athenaSecret,
         },
       }
-    ).then((res) => {
-      return res.json();
-    });
+    ).then((res) =>
+      res.json().then((data) => {
+        if (res.status !== 200) {
+          throw new Error(data);
+        }
+        return data.data;
+      })
+    );
 
   const selectorExists = moduleConfigSelectorExists(module.name);
   const { data, error, isLoading } = useSWR(
@@ -75,19 +81,17 @@ export default function ModuleConfig({
   const SelectedModule = moduleConfigComponents[module.name as Modules];
   return (
     <>
-      <SelectedModule
-        moduleConfig={moduleConfig}
-        onChangeConfig={onChangeConfig}
-      />
-      <div className="bg-white rounded-md p-4 mb-8">
-        {isLoading && <p>Loading...</p>}
-        {error && (
-          <p className="text-red-500">
-            Failed to get config from Athena: {error.message}
-          </p>
-        )}
-        {data && JSON.stringify(data, null, 2)}
-      </div>
+      {isLoading && <p>Loading...</p>}
+      {error && (
+        <p className="text-red-500">Failed to get config options from Athena</p>
+      )}
+      {data && (
+        <SelectedModule
+          configOptions={data}
+          moduleConfig={moduleConfig}
+          onChangeConfig={onChangeConfig}
+        />
+      )}
     </>
   );
 }

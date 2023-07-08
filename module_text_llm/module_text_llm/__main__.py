@@ -6,8 +6,9 @@ from athena import app, config_provider, submission_selector, submissions_consum
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
+from module_text_llm.config import Configuration
+
 from .suggest_feedback_basic import suggest_feedback_basic
-from .helpers.models import provider_to_model_settings
 
 
 @submissions_consumer
@@ -36,19 +37,24 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
 @config_provider
 def available_config() -> dict:
     
-    model_providers = {
-        provider: settings.schema()
-        for provider, settings in provider_to_model_settings.items()
-    }
+    # model_providers = {
+    #     provider: settings.schema()
+    #     for provider, settings in provider_to_model_settings.items()
+    # }
 
-    return {
-        # "approaches": {
-        #     "basic": { ... },
-        #     "fine-tuned": { ... },
-        #     "advanced": { ... },
-        # },
-        "model_providers": model_providers,
-    }
+    # obj = {
+    #   "provider": "openai",
+    #   "config": {
+    #     "temperature": 0,
+    #     "model_name": "openai_text-ada-001",
+    #     "max_tokens": 0
+    #   }
+    # }
+
+    # logger.info(Configuration.parse_obj(obj))
+    
+
+    return Configuration.schema()
 
 
 if __name__ == "__main__":
