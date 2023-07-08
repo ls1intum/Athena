@@ -1,11 +1,14 @@
 import { useState } from "react";
 
-import ModuleResponseView from "@/components/module_response_view";
-import baseUrl from "@/helpers/base_url";
+import validator from "@rjsf/validator-ajv8";
+import Form from "@/components/form";
 
-import { ModuleRequestProps } from ".";
 import { ModuleMeta } from "@/model/health_response";
 import ModuleResponse from "@/model/module_response";
+import baseUrl from "@/helpers/base_url";
+import ModuleResponseView from "@/components/module_response_view";
+
+import { ModuleRequestProps } from ".";
 
 async function getConfig(
   athenaUrl: string,
@@ -45,7 +48,6 @@ async function getConfig(
 }
 
 export default function GetConfig({
-  mode,
   athenaUrl,
   athenaSecret,
   module,
@@ -69,7 +71,19 @@ export default function GetConfig({
         module. The selected module&apos;s function annotated with{" "}
         <code>@config_provider</code> will be called to get the config.
       </p>
-      <ModuleResponseView response={response} />
+      <ModuleResponseView response={response}>
+        {response && (
+          <ChakraProvider>
+            <Form
+              schema={response.data}
+              validator={validator}
+              onChange={console.log}
+              onSubmit={console.log}
+              onError={console.log}
+            />
+          </ChakraProvider>
+        )}
+      </ModuleResponseView>
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
         onClick={() => {

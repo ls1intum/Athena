@@ -1,10 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
 import useSWR from "swr";
+import validator from "@rjsf/validator-ajv8";
 
 import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 
 import ModuleExampleConfig from "./module_example";
+import Form from "@/components/form";
 
 type SetConfig = Dispatch<SetStateAction<any | undefined>>;
 
@@ -23,7 +25,8 @@ const moduleConfigComponents: {
 };
 
 export function moduleConfigSelectorExists(moduleName: string): boolean {
-  return Object.keys(moduleConfigComponents).includes(moduleName);
+  // return Object.keys(moduleConfigComponents).includes(moduleName);
+  return true;
 }
 
 type Props = ModuleConfigProps & {
@@ -68,17 +71,17 @@ export default function ModuleConfig({
     athenaFetcher
   );
 
-  if (!selectorExists) {
-    return (
-      <p className="text-gray-500">
-        Module config selector for{" "}
-        <code className="bg-gray-100 p-1 rounded-sm">{module.name}</code> is not
-        implemented.
-      </p>
-    );
-  }
+  // if (!selectorExists) {
+  //   return (
+  //     <p className="text-gray-500">
+  //       Module config selector for{" "}
+  //       <code className="bg-gray-100 p-1 rounded-sm">{module.name}</code> is not
+  //       implemented.
+  //     </p>
+  //   );
+  // }
 
-  const SelectedModule = moduleConfigComponents[module.name as Modules];
+  // const SelectedModule = moduleConfigComponents[module.name as Modules];
   return (
     <>
       {isLoading && <p>Loading...</p>}
@@ -86,11 +89,18 @@ export default function ModuleConfig({
         <p className="text-red-500">Failed to get config options from Athena</p>
       )}
       {data && (
-        <SelectedModule
-          configOptions={data}
-          moduleConfig={moduleConfig}
-          onChangeConfig={onChangeConfig}
-        />
+        <Form
+        schema={data}
+        validator={validator}
+        onChange={console.log}
+        onSubmit={console.log}
+        onError={console.log}
+      />
+        // <SelectedModule
+        //   configOptions={data}
+        //   moduleConfig={moduleConfig}
+        //   onChangeConfig={onChangeConfig}
+        // />
       )}
     </>
   );

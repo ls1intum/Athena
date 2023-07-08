@@ -55,6 +55,7 @@ def available_config() -> dict:
     
 
     return Configuration.schema()
+    # return { "test": Configuration.schema(), "xd": ["test"] }
 
 
 if __name__ == "__main__":
