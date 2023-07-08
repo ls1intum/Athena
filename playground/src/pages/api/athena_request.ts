@@ -29,7 +29,7 @@ export default async function handler(
         "X-API-Secret": secret,
       },
       method: req.method,
-      body: JSON.stringify(req.body),
+      ...(req.method === "POST" ? { body: JSON.stringify(req.body) } : {}),
     });
   } catch (error) {
     console.error("Fetch failed:", error);

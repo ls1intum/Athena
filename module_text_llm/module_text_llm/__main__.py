@@ -2,19 +2,13 @@ from typing import List
 
 import nltk
 
-from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
+from athena import app, config_provider, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
 from .suggest_feedback_basic import suggest_feedback_basic
+from .helpers.models import provider_to_model_settings
 
-from langchain.llms.loading import load_llm_from_config
-from langchain.chat_models.azure_openai import AzureChatOpenAI
-from langchain.schema import (
-    AIMessage,
-    HumanMessage,
-    SystemMessage
-)
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission]):
@@ -37,6 +31,24 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
     logger.info("suggest_feedback - exercise: %s", exercise)
     return await suggest_feedback_basic(exercise, submission)
+
+
+@config_provider
+def available_config() -> dict:
+    
+    model_providers = {
+        provider: settings.schema()
+        for provider, settings in provider_to_model_settings.items()
+    }
+
+    return {
+        # "approaches": {
+        #     "basic": { ... },
+        #     "fine-tuned": { ... },
+        #     "advanced": { ... },
+        # },
+        "model_providers": model_providers,
+    }
 
 
 if __name__ == "__main__":

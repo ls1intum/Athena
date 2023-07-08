@@ -32,15 +32,20 @@ async def find_module_by_name(
     return None
 
 
-async def request_to_module(module: Module, path: str, data: dict) -> ModuleResponse:
+async def request_to_module(module: Module, path: str, data: Optional[dict], method: str = "POST") -> ModuleResponse:
     """
     Helper function to send a request to a module.
     It raises appropriate FastAPI HTTPException if the request fails.
     """
     module_secret = env.MODULE_SECRETS[module.name]
+    headers = {'X-API-Secret': module_secret} if module_secret else None
+
     try:
         async with httpx.AsyncClient(base_url=module.url, timeout=600) as client:
-            response = await client.post(path, json=data, headers={'X-API-Secret': module_secret} if module_secret else None)
+            if method == "POST":
+                response = await client.post(path, json=data, headers=headers)
+            else:
+                response = await client.get(path, headers=headers)
     except httpx.ConnectError as exc:
         raise HTTPException(status_code=503, detail=f"Module {module.name} is not available") from exc
     try:
