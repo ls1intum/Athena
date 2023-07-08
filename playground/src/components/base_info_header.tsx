@@ -92,12 +92,11 @@ export default function BaseInfoHeader({
                 </div>
               </label>
               {moduleConfig !== undefined && (
-                <Disclosure
-                  title="Configuration"
-                  openedInitially
-                >
+                <Disclosure title="Configuration" openedInitially>
                   <ModuleConfig
-                    moduleName={module.name}
+                    module={module}
+                    athenaUrl={athenaUrl}
+                    athenaSecret={athenaSecret}
                     moduleConfig={moduleConfig}
                     onChangeConfig={onChangeModuleConfig}
                   />
@@ -106,7 +105,8 @@ export default function BaseInfoHeader({
             </>
           ) : (
             <p className="text-gray-500">
-              This module does not have a custom configuration (selector) implemented.
+              This module does not have a custom configuration (selector)
+              implemented.
             </p>
           )}
         </div>

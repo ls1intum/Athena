@@ -1,19 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import useSWR from "swr";
-
-import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponseView from "@/components/module_response_view";
-import ExerciseDetail from "@/components/details/exercise_detail";
-import SubmissionList from "@/components/submission_list";
-import LLMModelConfig from "@/components/llm_model_config";
-
 import baseUrl from "@/helpers/base_url";
 
 import { ModuleRequestProps } from ".";
-import { OpenAIModelConfig } from "../llm_model_config/openai";
-import Disclosure from "../disclosure";
-import fetcher from "@/helpers/fetcher";
 import { ModuleMeta } from "@/model/health_response";
 import ModuleResponse from "@/model/module_response";
 
@@ -24,9 +14,6 @@ async function getConfig(
 ): Promise<ModuleResponse | undefined> {
   try {
     const athenaConfigUrl = `${athenaUrl}/modules/${module.type}/${module.name}/config`;
-    console.log( `${baseUrl}/api/athena_request?${new URLSearchParams({
-      url: athenaConfigUrl,
-    })}`)
     const response = await fetch(
       `${baseUrl}/api/athena_request?${new URLSearchParams({
         url: athenaConfigUrl,
