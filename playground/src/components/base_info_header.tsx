@@ -1,8 +1,13 @@
+import { Mode } from "@/model/mode";
+import { ModuleMeta } from "@/model/health_response";
+
 import Health from "@/components/health";
 import ModuleSelect from "@/components/selectors/module_select";
-import { ModuleMeta } from "@/model/health_response";
-import { Mode } from "@/model/mode";
-import DataSelect from "./selectors/data_select";
+import DataSelect from "@/components/selectors/data_select";
+import ModuleConfig, {
+  moduleConfigSelectorExists,
+} from "@/components/module_config";
+import Disclosure from "./disclosure";
 
 type BaseInfoHeaderProps = {
   athenaUrl: string;
@@ -11,6 +16,8 @@ type BaseInfoHeaderProps = {
   onChangeAthenaSecret: (value: string) => void;
   module: ModuleMeta | undefined;
   onChangeModule: (value: ModuleMeta) => void;
+  moduleConfig: any | undefined;
+  onChangeModuleConfig: (value: any | undefined) => void;
   mode: Mode;
   onChangeMode: (value: Mode) => void;
 };
@@ -22,6 +29,8 @@ export default function BaseInfoHeader({
   onChangeAthenaSecret,
   module,
   onChangeModule,
+  moduleConfig,
+  onChangeModuleConfig,
   mode,
   onChangeMode,
 }: BaseInfoHeaderProps) {
@@ -50,7 +59,58 @@ export default function BaseInfoHeader({
         />
       </label>
       <br />
-      <ModuleSelect url={athenaUrl} module={module} onChange={onChangeModule} />
+      <ModuleSelect
+        url={athenaUrl}
+        module={module}
+        onChange={(value) => {
+          onChangeModule(value);
+          onChangeModuleConfig(undefined);
+        }}
+      />
+      {module && (
+        <div className="mt-2 space-y-1">
+          {moduleConfigSelectorExists(module.name) ? (
+            <>
+              <p className="text-gray-500">
+                This module has a custom configuration. You can use the default
+                configuration or provide your own.
+              </p>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={moduleConfig !== undefined}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      onChangeModuleConfig({});
+                    } else {
+                      onChangeModuleConfig(undefined);
+                    }
+                  }}
+                />
+                <div className="ml-2 text-gray-700 font-normal">
+                  Use custom module config
+                </div>
+              </label>
+              {moduleConfig !== undefined && (
+                <Disclosure
+                  title="Configuration"
+                  openedInitially
+                >
+                  <ModuleConfig
+                    moduleName={module.name}
+                    moduleConfig={moduleConfig}
+                    onChangeConfig={onChangeModuleConfig}
+                  />
+                </Disclosure>
+              )}
+            </>
+          ) : (
+            <p className="text-gray-500">
+              This module does not have a custom configuration (selector) implemented.
+            </p>
+          )}
+        </div>
+      )}
       <br />
       <DataSelect mode={mode} onChangeMode={onChangeMode} />
     </div>
