@@ -78,22 +78,15 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     ]
 
 
-# Optional: Provide configuration options for the module
-# This is an example how this could look like
-class ResponseMode(Enum):
-    debug = "debug"
-    production = "production"
-
-
 class ConfigOptions(BaseModel):
-    response_mode: ResponseMode = Field(ResponseMode.production, 
-                                        description="The response mode of the module. If set to `debug` the module will return a debug response instead of a production response. This is useful for testing the module.")
+    debug: bool = Field(False, description="Whether the module is in debug mode.")
 
 
+# Optional: Provide configuration options for the module
 @config_provider
 def available_config() -> dict:
     # Custom configuration options
-    # Maybe return a schema RFC8927 compliant schema (pydantic is not compliant)
+    # Ideally return a schema RFC8927 compliant json schema (pydantic with `.schema()` mostly is)
     return ConfigOptions.schema()
 
 
