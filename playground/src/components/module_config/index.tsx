@@ -38,7 +38,7 @@ export default function ModuleConfig({
   athenaUrl,
   athenaSecret,
 }: Props) {
-  const athenaFetcher = (url: string) => {
+  const athenaFetcher = (url: string) =>
     fetch(
       `${baseUrl}/api/athena_request?${new URLSearchParams({
         url: url,
@@ -51,10 +51,8 @@ export default function ModuleConfig({
         },
       }
     ).then((res) => {
-      console.log("Hello")
-      return res.json()
+      return res.json();
     });
-  };
 
   const selectorExists = moduleConfigSelectorExists(module.name);
   const { data, error, isLoading } = useSWR(
@@ -82,10 +80,13 @@ export default function ModuleConfig({
         onChangeConfig={onChangeConfig}
       />
       <div className="bg-white rounded-md p-4 mb-8">
-        Test
-        {"isLoading: " + isLoading}
-        {"error: " + error}
-        {"data: " + data}
+        {isLoading && <p>Loading...</p>}
+        {error && (
+          <p className="text-red-500">
+            Failed to get config from Athena: {error.message}
+          </p>
+        )}
+        {data && JSON.stringify(data, null, 2)}
       </div>
     </>
   );
