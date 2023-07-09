@@ -37,13 +37,14 @@ body {
   }
   /* Label + component = group */
   .schema-form .form-group {
-    @apply mb-2;
+    @apply mb-4;
   }
+  .schema-form .form-group:last-child {
+    @apply mb-0;
+  }
+
   .schema-form label.control-label {
-    @apply block mb-1 font-bold;
-  }
-  .schema-form p.field-description {
-    @apply mb-1;
+    @apply block font-bold;
   }
   /* Select component, and maybe other .form-control too */
   .schema-form .form-control {
@@ -98,12 +99,18 @@ body {
     @apply border-primary-200;
   }
   .schema-form button[type='submit'] {
-    @apply bg-primary-500 text-white hover:bg-primary-400;
+    @apply bg-primary-500 text-white hover:bg-primary-600;
   }
   .schema-form .text-danger {
     @apply text-red-500;
   }
-  
+  .schema-form .required {
+    @apply text-red-500;
+  }
+  .schema-form .field-description {
+    @apply prose prose-sm leading-snug;
+  }
+
   .schema-form .panel.panel-danger.errors {
     
     @apply bg-red-100 border border-red-400 rounded-md shadow-sm px-4 py-2;

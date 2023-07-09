@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import useSWR from "swr";
 import validator from "@rjsf/validator-ajv8";
 
@@ -6,7 +6,8 @@ import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
 
 import ModuleExampleConfig from "./module_example";
-import Form from "@/components/form";
+import Form, { getUISchema } from "@/components/form";
+import { toPathSchema, toIdSchema } from "@rjsf/utils";
 
 type SetConfig = Dispatch<SetStateAction<any | undefined>>;
 
@@ -90,13 +91,28 @@ export default function ModuleConfig({
       )}
       {data && (
         <Form
-        schema={data}
-        validator={validator}
-        onChange={console.log}
-        onSubmit={console.log}
-        onError={console.log}
-        className="schema-form"
-      />
+          schema={data}
+          validator={validator}
+          onChange={console.log}
+          onSubmit={console.log}
+          onError={console.log}
+          className="schema-form"
+          uiSchema={{
+            "ui:label": false,
+            ...getUISchema(validator, data, {
+              "ui:enableMarkdownInDescription": true,
+            }),
+          }}
+        >
+          <div>
+            <button type="submit" className="btn btn-info">
+              Save
+            </button>
+            <button className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn">
+              Reset
+            </button>
+          </div>
+        </Form>
         // <SelectedModule
         //   configOptions={data}
         //   moduleConfig={moduleConfig}
