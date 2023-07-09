@@ -246,7 +246,7 @@ def config_schema_provider(func: Union[Callable[[], dict], Callable[[], Coroutin
     Get available configuration options of a module.
     """
 
-    @app.get("/config", responses=module_responses)
+    @app.get("/config_schema", responses=module_responses)
     @authenticated
     async def wrapper():
         if inspect.iscoroutinefunction(func):

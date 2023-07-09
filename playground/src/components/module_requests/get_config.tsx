@@ -13,7 +13,7 @@ async function getConfig(
   module: ModuleMeta
 ): Promise<ModuleResponse | undefined> {
   try {
-    const athenaConfigUrl = `${athenaUrl}/modules/${module.type}/${module.name}/config`;
+    const athenaConfigUrl = `${athenaUrl}/modules/${module.type}/${module.name}/config_schema`;
     const response = await fetch(
       `${baseUrl}/api/athena_request?${new URLSearchParams({
         url: athenaConfigUrl,

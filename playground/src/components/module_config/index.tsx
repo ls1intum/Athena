@@ -68,7 +68,7 @@ export default function ModuleConfig({
   const selectorExists = moduleConfigSelectorExists(module.name);
   const { data, error, isLoading } = useSWR(
     selectorExists
-      ? `${athenaUrl}/modules/${module.type}/${module.name}/config`
+      ? `${athenaUrl}/modules/${module.type}/${module.name}/config_schema`
       : null,
     athenaFetcher
   );
