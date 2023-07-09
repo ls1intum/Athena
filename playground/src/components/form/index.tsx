@@ -7,7 +7,6 @@ import ReactMarkdown from "react-markdown";
 export function getUISchema(validator: ValidatorType, schema: RJSFSchema, value: UIOptionsType) {
   const paths = toPathSchema(validator, schema, undefined, schema);
   function recursiveSetValueForPaths(paths: PathSchema) {
-    console.log(paths)
     const properties = Object.keys(paths).filter((path) => path !== "$name");
     if (properties.length === 0) {
       return value;

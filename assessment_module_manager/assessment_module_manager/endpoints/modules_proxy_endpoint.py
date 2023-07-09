@@ -8,6 +8,7 @@ from athena.schemas import ExerciseType
 from fastapi import Body, HTTPException, Request
 from starlette.responses import JSONResponse
 
+from assessment_module_manager.logger import logger
 
 @app.api_route(
     "/modules/{module_type}/{module_name}/{path:path}",
@@ -49,8 +50,11 @@ async def proxy_to_module(
     if module.type != module_type:
         raise HTTPException(
             status_code=400, detail=f"Found module {module_name} is not of type {module_type}.")
+    
+    module_config = request.headers.get('X-Module-Config')
     resp = await request_to_module(
         module,
+        module_config,
         '/' + path,
         data,
         method=request.method,

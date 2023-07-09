@@ -25,6 +25,7 @@ async function sendFeedback(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
+  moduleConfig: any,
   exercise?: Exercise,
   submission?: Submission,
   feedback?: Feedback,
@@ -53,6 +54,7 @@ async function sendFeedback(
         headers: {
           "Content-Type": "application/json",
           "X-API-Secret": athenaSecret,
+          "X-Module-Config": JSON.stringify(moduleConfig),
         },
         body: JSON.stringify({ exercise, submission, feedback }),
       }
@@ -83,6 +85,7 @@ async function sendAllExerciseFeedbacks(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
+  moduleConfig: any,
   exercise?: Exercise,
   submission?: Submission
 ): Promise<ModuleResponse[] | undefined> {
@@ -122,6 +125,7 @@ async function sendAllExerciseFeedbacks(
       athenaUrl,
       athenaSecret,
       module,
+      moduleConfig,
       exercise,
       submission!,
       feedback,
@@ -143,6 +147,7 @@ export default function SendFeedback({
   athenaUrl,
   athenaSecret,
   module,
+  moduleConfig,
 }: ModuleRequestProps) {
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
 
@@ -274,6 +279,7 @@ export default function SendFeedback({
               athenaUrl,
               athenaSecret,
               module,
+              moduleConfig,
               exercise!
             )
               .then(setResponses)
@@ -284,6 +290,7 @@ export default function SendFeedback({
               athenaUrl,
               athenaSecret,
               module,
+              moduleConfig,
               exercise!,
               submission!
             )
@@ -294,6 +301,7 @@ export default function SendFeedback({
               athenaUrl,
               athenaSecret,
               module,
+              moduleConfig,
               exercise,
               submission,
               feedback

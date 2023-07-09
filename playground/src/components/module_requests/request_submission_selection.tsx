@@ -23,6 +23,7 @@ async function requestSubmissionSelection(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
+  moduleConfig: any,
   exercise: Exercise | undefined
 ): Promise<ModuleResponse | undefined> {
   if (!exercise) {
@@ -45,6 +46,7 @@ async function requestSubmissionSelection(
         headers: {
           "Content-Type": "application/json",
           "X-API-Secret": athenaSecret,
+          "X-Module-Config": JSON.stringify(moduleConfig),
         },
         body: JSON.stringify({
           exercise,
@@ -76,6 +78,7 @@ export default function SelectSubmission({
   athenaUrl,
   athenaSecret,
   module,
+  moduleConfig,
 }: ModuleRequestProps) {
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -161,6 +164,7 @@ export default function SelectSubmission({
             athenaUrl,
             athenaSecret,
             module,
+            moduleConfig,
             exercise
           )
             .then(setResponse)

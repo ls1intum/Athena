@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BaseInfoHeader from "@/components/base_info_header";
 import ModuleRequests from "@/components/module_requests";
 import { ModuleMeta } from "@/model/health_response";
@@ -22,6 +22,10 @@ export default function Home() {
   const [moduleConfig, setModuleConfig] = useState<any | undefined>(undefined);
   const [mode, setMode] = useState<Mode>("example");
 
+  useEffect(() => {
+    console.log("moduleConfig", moduleConfig)
+  }, [moduleConfig])
+
   return (
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-6xl font-bold text-white mb-8">Playground</h1>
@@ -43,6 +47,7 @@ export default function Home() {
           athenaUrl={athenaUrl}
           athenaSecret={athenaSecret}
           module={module}
+          moduleConfig={moduleConfig}
         />
       )}
     </main>

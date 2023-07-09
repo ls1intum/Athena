@@ -1,6 +1,8 @@
 # type: ignore # too much weird behavior of mypy with decorators
 import inspect
-from typing import TypeVar, Callable, List, Union, Any, Coroutine
+import json
+from fastapi import Header
+from typing import TypeVar, Callable, List, Union, Any, Coroutine, Optional
 
 from athena.app import app
 from athena.authenticate import authenticated
@@ -35,7 +37,11 @@ def submissions_consumer(func: Union[Callable[[E, List[S]], None], Callable[[E, 
     @authenticated
     async def wrapper(
             exercise: exercise_type,
-            submissions: List[submission_type]):
+            submissions: List[submission_type],
+            module_config: Optional[str] = Header(None, alias="X-Module-Config")):
+        if module_config:
+            module_config = json.loads(module_config)
+
         # Retrieve existing metadata for the exercise and submissions
         meta = get_stored_exercise_meta(exercise) or {}
         meta.update(exercise.meta)
@@ -75,9 +81,13 @@ def submission_selector(func: Union[Callable[[E, List[S]], S], Callable[[E, List
     @authenticated
     async def wrapper(
             exercise: exercise_type,
-            submission_ids: List[int]) -> int:
+            submission_ids: List[int],
+            module_config: Optional[str] = Header(None, alias="X-Module-Config")) -> int:        
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
+
+        if module_config:
+            module_config = json.loads(module_config)
 
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
 
@@ -117,7 +127,11 @@ def feedback_consumer(func: Union[Callable[[E, S, F], None], Callable[[E, S, F],
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
-            feedback: feedback_type):
+            feedback: feedback_type,
+            module_config: Optional[str] = Header(None, alias="X-Module-Config")):
+        if module_config:
+            module_config = json.loads(module_config)
+
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         submission.meta.update(get_stored_submission_meta(submission) or {})
@@ -146,7 +160,11 @@ def feedback_provider(func: Union[Callable[[E, S], List[F]], Callable[[E, S], Co
     @authenticated
     async def wrapper(
             exercise: exercise_type,
-            submission: submission_type):
+            submission: submission_type,
+            module_config: Optional[str] = Header(None, alias="X-Module-Config")):
+        if module_config:
+            module_config = json.loads(module_config)
+
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         submission.meta.update(get_stored_submission_meta(submission) or {})

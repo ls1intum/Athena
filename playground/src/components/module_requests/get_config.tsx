@@ -23,6 +23,7 @@ async function getConfig(
         headers: {
           "Content-Type": "application/json",
           "X-API-Secret": athenaSecret,
+          // No X-Module-Config here
         },
       }
     );

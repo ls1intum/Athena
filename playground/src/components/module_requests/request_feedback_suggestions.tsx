@@ -20,6 +20,7 @@ async function requestFeedbackSuggestions(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
+  moduleConfig: any,
   exercise: Exercise | undefined,
   submission: Submission | undefined
 ): Promise<ModuleResponse | undefined> {
@@ -42,6 +43,7 @@ async function requestFeedbackSuggestions(
         headers: {
           "Content-Type": "application/json",
           "X-API-Secret": athenaSecret,
+          "X-Module-Config": JSON.stringify(moduleConfig),
         },
         body: JSON.stringify({ exercise, submission }),
       }
@@ -70,6 +72,7 @@ export default function RequestFeedbackSuggestions({
   athenaUrl,
   athenaSecret,
   module,
+  moduleConfig,
 }: ModuleRequestProps) {
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const [submission, setSubmission] = useState<Submission | undefined>(
@@ -156,6 +159,7 @@ export default function RequestFeedbackSuggestions({
             athenaUrl,
             athenaSecret,
             module,
+            moduleConfig,
             exercise,
             submission
           )

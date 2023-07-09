@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import validator from "@rjsf/validator-ajv8";
 
@@ -7,7 +7,7 @@ import baseUrl from "@/helpers/base_url";
 
 import ModuleExampleConfig from "./module_example";
 import Form, { getUISchema } from "@/components/form";
-import { toPathSchema, toIdSchema } from "@rjsf/utils";
+import { getDefaultFormState } from "@rjsf/utils";
 
 type SetConfig = Dispatch<SetStateAction<any | undefined>>;
 
@@ -53,6 +53,7 @@ export default function ModuleConfig({
         headers: {
           "Content-Type": "application/json",
           "X-API-Secret": athenaSecret,
+          // No X-Module-Config here
         },
       }
     ).then((res) =>
@@ -73,6 +74,17 @@ export default function ModuleConfig({
   );
 
   const [formKey, setFormKey] = useState(0);
+
+  useEffect(() => {
+    if (data) {
+      const defaultFormData = getDefaultFormState(validator, data, {}, data)
+      if (Object.keys(moduleConfig).length === 0 && Object.keys(defaultFormData).length !== 0) {
+        onChangeConfig(defaultFormData);
+        setFormKey(formKey + 1);
+      }
+    }
+  }, [data, formKey, moduleConfig, onChangeConfig]);
+
 
   // if (!selectorExists) {
   //   return (
@@ -115,7 +127,8 @@ export default function ModuleConfig({
             </button>
             <button className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
               onClick={() => {
-                onChangeConfig({});
+                const defaultFormData = getDefaultFormState(validator, data, {}, data)
+                onChangeConfig(defaultFormData);
                 setFormKey(formKey + 1);
               }}
             >
@@ -132,3 +145,7 @@ export default function ModuleConfig({
     </>
   );
 }
+function createRef<T>() {
+  throw new Error("Function not implemented.");
+}
+

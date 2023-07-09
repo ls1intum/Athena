@@ -11,6 +11,7 @@ export type ModuleRequestProps = {
   athenaUrl: string;
   athenaSecret: string;
   module: ModuleMeta;
+  moduleConfig: any;
 };
 
 export default function ModuleRequests(props: ModuleRequestProps) {

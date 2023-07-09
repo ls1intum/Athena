@@ -12,12 +12,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(JSON.stringify(req.body));
   // needed for CORS
   // TODO: check the security implications of this
   const url = req.query.url;
   let response;
   const secret = req.headers["x-api-secret"] as string;
+  const moduleConfig = req.headers["x-module-config"] as string;
   if (!secret) {
     console.warn("No secret provided");
   }
@@ -27,6 +27,7 @@ export default async function handler(
         "Content-Type": "application/json",
         Accept: "application/json",
         "X-API-Secret": secret,
+        "X-Module-Config": moduleConfig,
       },
       method: req.method,
       ...(req.method === "POST" ? { body: JSON.stringify(req.body) } : {}),
