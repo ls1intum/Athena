@@ -99,7 +99,6 @@ export default function ModuleConfig({
           onSubmit={(props) => {
             onChangeConfig(props.formData);
           }}
-          showErrorList={'bottom'}
           formData={moduleConfig}
           liveValidate
           className="schema-form"
