@@ -149,7 +149,7 @@ export default function RequestFeedbackSuggestions({
         {responseSubmissionView(response)}
       </ModuleResponseView>
       <button
-        className="bg-blue-500 text-white rounded-md p-2 mt-4"
+        className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-400"
         onClick={() => {
           setLoading(true);
           requestFeedbackSuggestions(

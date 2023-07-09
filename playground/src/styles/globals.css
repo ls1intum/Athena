@@ -6,6 +6,8 @@ body {
   background: black;
 }
 
+
+/* Styling for the rjsf form with className="schema-form" */
 @layer utilities {
   .border-input {
     border-color: #e2e8f0;
@@ -18,7 +20,6 @@ body {
     --tw-ring-color: #4299e1;
   }
 }
-
 
 @layer components {
   .schema-form {
@@ -86,7 +87,7 @@ body {
   .schema-form .glyphicon-plus::before {
     content: 'Add';
   }
-  /* Buttons (tends to be icon buttons */
+  /* Buttons (tends to be icon buttons) */
   .schema-form .btn {
     @apply rounded-md p-2 border mx-1;
   }
@@ -94,9 +95,20 @@ body {
     @apply border-red-200;
   }
   .schema-form .btn-add {
-    @apply border-blue-200;
+    @apply border-primary-200;
   }
   .schema-form button[type='submit'] {
-    @apply bg-blue-500 text-white hover:bg-blue-400;
+    @apply bg-primary-500 text-white hover:bg-primary-400;
+  }
+  .schema-form .text-danger {
+    @apply text-red-500;
+  }
+  
+  .schema-form .panel.panel-danger.errors {
+    
+    @apply bg-red-100 border border-red-400 rounded-md shadow-sm px-4 py-2;
+  }
+  .schema-form .panel.panel-danger.errors .panel-heading {
+    @apply text-lg font-semibold text-red-700;
   }
 }
