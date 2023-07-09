@@ -95,6 +95,7 @@ export default function ModuleConfig({
         onChange={console.log}
         onSubmit={console.log}
         onError={console.log}
+        className="schema-form"
       />
         // <SelectedModule
         //   configOptions={data}

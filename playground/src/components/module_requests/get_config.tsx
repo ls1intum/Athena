@@ -73,15 +73,13 @@ export default function GetConfig({
       </p>
       <ModuleResponseView response={response}>
         {response && (
-          <ChakraProvider>
-            <Form
-              schema={response.data}
-              validator={validator}
-              onChange={console.log}
-              onSubmit={console.log}
-              onError={console.log}
-            />
-          </ChakraProvider>
+          <Form
+            schema={response.data}
+            validator={validator}
+            onChange={console.log}
+            onSubmit={console.log}
+            onError={console.log}
+          />
         )}
       </ModuleResponseView>
       <button

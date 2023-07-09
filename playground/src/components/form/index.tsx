@@ -1,5 +1,4 @@
-import { withTheme } from "@rjsf/core";
-import { CustomTheme } from "./custom_theme";
+import CoreForm from '@rjsf/core'
 
-const Form = withTheme(CustomTheme);
-export default Form;
+export default CoreForm;
+;
