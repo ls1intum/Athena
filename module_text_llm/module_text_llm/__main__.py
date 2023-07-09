@@ -2,7 +2,7 @@ from typing import List
 
 import nltk
 
-from athena import app, config_provider, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
+from athena import app, config_schema_provider, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
@@ -34,8 +34,8 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
     return await suggest_feedback_basic(exercise, submission)
 
 
-@config_provider
-def available_config() -> dict:
+@config_schema_provider
+def available_config_schema() -> dict:
     
     # model_providers = {
     #     provider: settings.schema()

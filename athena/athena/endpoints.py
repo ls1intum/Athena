@@ -241,7 +241,7 @@ def feedback_provider(func: Union[
     return wrapper
 
 
-def config_provider(func: Union[Callable[[], dict], Callable[[], Coroutine[Any, Any, dict]]]):
+def config_schema_provider(func: Union[Callable[[], dict], Callable[[], Coroutine[Any, Any, dict]]]):
     """
     Get available configuration options of a module.
     """

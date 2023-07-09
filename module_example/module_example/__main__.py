@@ -6,13 +6,14 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from enum import Enum
 
-from athena import app, config_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider, emit_meta
+from athena import app, config_schema_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider, emit_meta
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
 
 
 class Configuration(BaseModel):
+    """Example configuration for the module_example module."""
     debug: bool = Field(False, description="Whether the module is in **debug mode**. This is an example config option.")
 
 
@@ -99,10 +100,11 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
 
 
 # Optional: Provide configuration options for the module
-@config_provider
-def available_config() -> dict:
+@config_schema_provider
+def available_config_schema() -> dict:
     # Custom configuration options
-    # Ideally return a schema RFC8927 compliant json schema (pydantic with `.schema()` mostly is)
+    # Ideally return a schema RFC8927 compliant json schema or something similar
+    # pydantic with `.schema()` mostly does the job
     return Configuration.schema()
 
 

@@ -58,16 +58,16 @@ export default function GetConfig({
   return (
     <div className="bg-white rounded-md p-4 mb-8">
       <h3 className="text-2xl font-bold mb-4">
-        Get Config Options{" "}
+        Get Config Schema{" "}
         <span className="text-gray-500 text-sm">(OPTIONAL)</span>
       </h3>
       <p className="text-gray-500 mb-4">
         Get the module specific config options for the given module. This is
         usually used to get the available configuration options for the module
-        which can then be used in the request header to override the default
+        which can then be used in the request header `X-Module-Config` to override the default
         config. The shape of the config and how it is used is specific to the
         module, however using a JSON schema is recommended. The selected
-        module&apos;s function annotated with <code>@config_provider</code> will
+        module&apos;s function annotated with <code>@config_schema_provider</code> will
         be called to get the config.
       </p>
       <ModuleResponseView response={response} />
@@ -81,7 +81,7 @@ export default function GetConfig({
         }}
         disabled={loading}
       >
-        {loading ? "Loading..." : "Get Config Options"}
+        {loading ? "Loading..." : "Get Config Schema"}
       </button>
     </div>
   );

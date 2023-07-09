@@ -95,32 +95,38 @@ Example:
                 )
             ]
 
-Provide Config Options
+Provide Config Schema
 ~~~~~~~~~~~~~~~~~~~~~~
-Get a list of config options for the module. Those config options can then be provided in the header of a request to override the default values. The module will receive the request at the function annotated with ``@config_provider``.
+Get a list of config options for the module, ideally as a standardized json schema. The config complying to the schema can then be provided in the header of a request `X-Module-Config` to override the default values. The module will receive the schema request at the function annotated with ``@config_schema_provider``.
 
 Example:
     .. code-block:: python
 
         from athena import *
 
-        @config_provider
-        def available_config() -> dict:
+        @config_schema_provider
+        def available_config_schema() -> dict:
             ...
             return {
-                "model": {
-                    "type": "str",
-                    "default": "bert-base-uncased",
-                    "options": ["bert-base-uncased", "bert-base-cased"],
-                    "description": "The model to use for the prediction."
-                },
-                "approach": {
-                    "type": "str",
-                    "default": "simple",
-                    "options": ["simple", "advanced"],
-                    "description": "The approach to use for the prediction."
+              "title": "Configuration",
+              "description": "A simple module config example.",
+              "type": "object",
+              "required": [
+                "mode"
+              ],
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "title": "Mode",
+                  "description": "Configure the mode of the module",
+                  "default": "normal",
+                  "enum": [
+                    "basic",
+                    "normal",
+                    "advanced"
+                  ]
                 }
-                ...
+              }
             }
 
 Environment Variables
