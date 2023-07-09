@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import useSWR from "swr";
 import validator from "@rjsf/validator-ajv8";
 
@@ -72,6 +72,8 @@ export default function ModuleConfig({
     athenaFetcher
   );
 
+  const [formKey, setFormKey] = useState(0);
+
   // if (!selectorExists) {
   //   return (
   //     <p className="text-gray-500">
@@ -91,11 +93,15 @@ export default function ModuleConfig({
       )}
       {data && (
         <Form
+          key={formKey}
           schema={data}
           validator={validator}
-          onChange={console.log}
-          onSubmit={console.log}
-          onError={console.log}
+          onSubmit={(props) => {
+            onChangeConfig(props.formData);
+          }}
+          showErrorList={'bottom'}
+          formData={moduleConfig}
+          liveValidate
           className="schema-form"
           uiSchema={{
             "ui:label": false,
@@ -108,7 +114,12 @@ export default function ModuleConfig({
             <button type="submit" className="btn btn-info">
               Save
             </button>
-            <button className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn">
+            <button className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
+              onClick={() => {
+                onChangeConfig({});
+                setFormKey(formKey + 1);
+              }}
+            >
               Reset
             </button>
           </div>
