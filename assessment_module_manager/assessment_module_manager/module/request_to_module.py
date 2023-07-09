@@ -9,6 +9,7 @@ from .module import Module
 from .available_module_enum import AvailableModuleNames
 from .list_modules import list_modules
 from assessment_module_manager import env
+from assessment_module_manager.logger import logger
 
 T = TypeVar('T')
 class ModuleResponse(GenericModel, Generic[T]):

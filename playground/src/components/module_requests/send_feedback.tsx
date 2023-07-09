@@ -54,7 +54,9 @@ async function sendFeedback(
         headers: {
           "Content-Type": "application/json",
           "X-API-Secret": athenaSecret,
-          "X-Module-Config": JSON.stringify(moduleConfig),
+          ...(moduleConfig && {
+            "X-Module-Config": JSON.stringify(moduleConfig),
+          }),
         },
         body: JSON.stringify({ exercise, submission, feedback }),
       }

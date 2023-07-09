@@ -17,7 +17,7 @@ export default async function handler(
   const url = req.query.url;
   let response;
   const secret = req.headers["x-api-secret"] as string;
-  const moduleConfig = req.headers["x-module-config"] as string;
+  const moduleConfig = req.headers["x-module-config"] as string | undefined;
   if (!secret) {
     console.warn("No secret provided");
   }
@@ -27,7 +27,7 @@ export default async function handler(
         "Content-Type": "application/json",
         Accept: "application/json",
         "X-API-Secret": secret,
-        "X-Module-Config": moduleConfig,
+        ...(moduleConfig && { "X-Module-Config": moduleConfig }),
       },
       method: req.method,
       ...(req.method === "POST" ? { body: JSON.stringify(req.body) } : {}),

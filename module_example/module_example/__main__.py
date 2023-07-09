@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from enum import Enum
 
-from athena import app, config_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
+from athena import app, config_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider, emit_meta
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
@@ -23,6 +23,7 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
             logger.info("  - %s", file)
     # Do something with the submissions
     logger.info("Doing stuff")
+    emit_meta('method1', 'receive_submissions')
 
     # Add data to exercise
     exercise.meta["some_data"] = "some_value"
@@ -43,6 +44,7 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
         submissions), exercise.id)
     for submission in submissions:
         logger.info("- Submission %d", submission.id)
+    emit_meta('method2', 'select_submission')
     # Do something with the submissions and return the one that should be assessed next
     return submissions[0]
 
@@ -53,7 +55,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
                 submission.id, exercise.id)
     logger.info("process_feedback: Feedback: %s", feedback)
     # Do something with the feedback
-
+    emit_meta('method3', 'process_incoming_feedback')
     # Add data to feedback
     feedback.meta["some_data"] = "some_value"
 
@@ -65,6 +67,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested",
                 submission.id, exercise.id)
     # Do something with the submission and return a list of feedback
+    emit_meta('method4', 'suggest_feedback')
     return [
         Feedback(
             exercise_id=exercise.id,

@@ -1,9 +1,10 @@
 # type: ignore # too much weird behavior of mypy with decorators
 import inspect
 import json
-from fastapi import Header
-from typing import TypeVar, Callable, List, Union, Any, Coroutine, Optional
+from fastapi import Header, Depends
+from typing import TypeVar, Callable, List, Dict, Union, Any, Coroutine, Optional
 
+from athena import get_meta
 from athena.app import app
 from athena.authenticate import authenticated
 from athena.logger import logger
@@ -38,9 +39,14 @@ def submissions_consumer(func: Union[Callable[[E, List[S]], None], Callable[[E, 
     async def wrapper(
             exercise: exercise_type,
             submissions: List[submission_type],
-            module_config: Optional[str] = Header(None, alias="X-Module-Config")):
+            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
+            metadata: Dict[str, Any] = Depends(get_meta)):
         if module_config:
-            module_config = json.loads(module_config)
+            try:
+                module_config = json.loads(module_config)
+            except json.JSONDecodeError:
+                logger.warning("Invalid module config received: %s", module_config)
+                module_config = None
 
         # Retrieve existing metadata for the exercise and submissions
         meta = get_stored_exercise_meta(exercise) or {}
@@ -65,6 +71,7 @@ def submissions_consumer(func: Union[Callable[[E, List[S]], None], Callable[[E, 
         else:
             func(exercise, submissions)
 
+        return { "data": None, "meta": metadata }
     return wrapper
 
 
@@ -82,12 +89,17 @@ def submission_selector(func: Union[Callable[[E, List[S]], S], Callable[[E, List
     async def wrapper(
             exercise: exercise_type,
             submission_ids: List[int],
-            module_config: Optional[str] = Header(None, alias="X-Module-Config")) -> int:        
+            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
+            metadata: Dict[str, Any] = Depends(get_meta)):        
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
 
         if module_config:
-            module_config = json.loads(module_config)
+            try:
+                module_config = json.loads(module_config)
+            except json.JSONDecodeError:
+                logger.warning("Invalid module config received: %s", module_config)
+                module_config = None
 
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
 
@@ -98,7 +110,7 @@ def submission_selector(func: Union[Callable[[E, List[S]], S], Callable[[E, List
                            "Have you sent all submissions to the submission consumer before?")
         if not submissions:
             # Nothing to select from
-            return -1
+            return { "data": -1, "meta": metadata }
 
         # Select the submission
         if inspect.iscoroutinefunction(func):
@@ -107,8 +119,8 @@ def submission_selector(func: Union[Callable[[E, List[S]], S], Callable[[E, List
             submission = func(exercise, submissions)
 
         if submission is None:
-            return -1
-        return submission.id
+            return { "data": -1, "meta": metadata }
+        return { "data": submission.id, "meta": metadata }
 
     return wrapper
 
@@ -128,9 +140,14 @@ def feedback_consumer(func: Union[Callable[[E, S, F], None], Callable[[E, S, F],
             exercise: exercise_type,
             submission: submission_type,
             feedback: feedback_type,
-            module_config: Optional[str] = Header(None, alias="X-Module-Config")):
+            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
+            metadata: Dict[str, Any] = Depends(get_meta)):
         if module_config:
-            module_config = json.loads(module_config)
+            try:
+                module_config = json.loads(module_config)
+            except json.JSONDecodeError:
+                logger.warning("Invalid module config received: %s", module_config)
+                module_config = None
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -145,6 +162,8 @@ def feedback_consumer(func: Union[Callable[[E, S, F], None], Callable[[E, S, F],
         else:
             func(exercise, submission, feedback)
 
+
+        return { "data": None, "meta": metadata }
     return wrapper
 
 
@@ -161,9 +180,14 @@ def feedback_provider(func: Union[Callable[[E, S], List[F]], Callable[[E, S], Co
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
-            module_config: Optional[str] = Header(None, alias="X-Module-Config")):
+            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
+            metadata: Dict[str, Any] = Depends(get_meta)):
         if module_config:
-            module_config = json.loads(module_config)
+            try:
+                module_config = json.loads(module_config)
+            except json.JSONDecodeError:
+                logger.warning("Invalid module config received: %s", module_config)
+                module_config = None
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -179,8 +203,7 @@ def feedback_provider(func: Union[Callable[[E, S], List[F]], Callable[[E, S], Co
             feedbacks = func(exercise, submission)
     
         store_feedback_suggestions(feedbacks)
-
-        return feedbacks
+        return { "data": feedbacks, "meta": metadata }
     return wrapper
 
 
