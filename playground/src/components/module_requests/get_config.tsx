@@ -1,8 +1,5 @@
 import { useState } from "react";
 
-import validator from "@rjsf/validator-ajv8";
-import Form from "@/components/form";
-
 import { ModuleMeta } from "@/model/health_response";
 import ModuleResponse from "@/model/module_response";
 import baseUrl from "@/helpers/base_url";
@@ -68,20 +65,11 @@ export default function GetConfig({
         usually used to get the available configuration options for the module
         which can then be used in the request header to override the default
         config. The shape of the config and how it is used is specific to the
-        module. The selected module&apos;s function annotated with{" "}
-        <code>@config_provider</code> will be called to get the config.
+        module, however using a JSON schema is recommended. The selected
+        module&apos;s function annotated with <code>@config_provider</code> will
+        be called to get the config.
       </p>
-      <ModuleResponseView response={response}>
-        {response && (
-          <Form
-            schema={response.data}
-            validator={validator}
-            onChange={console.log}
-            onSubmit={console.log}
-            onError={console.log}
-          />
-        )}
-      </ModuleResponseView>
+      <ModuleResponseView response={response} />
       <button
         className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600"
         onClick={() => {
