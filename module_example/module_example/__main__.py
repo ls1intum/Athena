@@ -1,7 +1,8 @@
 """
 Entry point for the module_example module.
 """
-from typing import List
+from ast import Dict
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from enum import Enum
 
@@ -11,8 +12,12 @@ from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
 
 
+class Configuration(BaseModel):
+    debug: bool = Field(False, description="Whether the module is in **debug mode**. This is an example config option.")
+
+
 @submissions_consumer
-def receive_submissions(exercise: Exercise, submissions: List[Submission]):
+def receive_submissions(exercise: Exercise, submissions: List[Submission], module_config: Optional[dict]):
     logger.info("receive_submissions: Received %d submissions for exercise %d", len(
         submissions), exercise.id)
     for submission in submissions:
@@ -23,7 +28,14 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
             logger.info("  - %s", file)
     # Do something with the submissions
     logger.info("Doing stuff")
-    emit_meta('method1', 'receive_submissions')
+
+    # Example use module config
+    if module_config:
+        config = Configuration.parse_obj(module_config)
+        logger.info("Config: %s", config)
+        if config.debug:
+            emit_meta('debug', True)
+            emit_meta('_comment', 'You can add any meta data you want here')
 
     # Add data to exercise
     exercise.meta["some_data"] = "some_value"
@@ -44,7 +56,6 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
         submissions), exercise.id)
     for submission in submissions:
         logger.info("- Submission %d", submission.id)
-    emit_meta('method2', 'select_submission')
     # Do something with the submissions and return the one that should be assessed next
     return submissions[0]
 
@@ -55,7 +66,6 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
                 submission.id, exercise.id)
     logger.info("process_feedback: Feedback: %s", feedback)
     # Do something with the feedback
-    emit_meta('method3', 'process_incoming_feedback')
     # Add data to feedback
     feedback.meta["some_data"] = "some_value"
 
@@ -63,11 +73,18 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 
 @feedback_provider
-def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Optional[dict]) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested",
                 submission.id, exercise.id)
     # Do something with the submission and return a list of feedback
-    emit_meta('method4', 'suggest_feedback')
+
+    # Example use of module config
+    if module_config:
+        config = Configuration.parse_obj(module_config)
+        logger.info("Config: %s", config)
+        if config.debug:
+            emit_meta('costs', '100.00€')
+
     return [
         Feedback(
             exercise_id=exercise.id,
@@ -81,16 +98,12 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
     ]
 
 
-class ConfigOptions(BaseModel):
-    debug: bool = Field(False, description="Whether the module is in debug mode.")
-
-
 # Optional: Provide configuration options for the module
 @config_provider
 def available_config() -> dict:
     # Custom configuration options
     # Ideally return a schema RFC8927 compliant json schema (pydantic with `.schema()` mostly is)
-    return ConfigOptions.schema()
+    return Configuration.schema()
 
 
 if __name__ == "__main__":
