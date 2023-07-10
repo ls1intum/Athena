@@ -45,7 +45,7 @@ async function getConfig(
   }
 }
 
-export default function GetConfig({
+export default function GetConfigSchema({
   athenaUrl,
   athenaSecret,
   module,
