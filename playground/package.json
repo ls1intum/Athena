@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.5.1",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@rjsf/core": "^5.9.0",
     "@rjsf/utils": "^5.9.0",
@@ -24,6 +25,7 @@
     "fs": "^0.0.1-security",
     "jszip": "^3.10.1",
     "langchain": "^0.0.102",
+    "monaco-editor": "^0.40.0",
     "next": "13.3.0",
     "postcss": "8.4.23",
     "react": "18.2.0",
