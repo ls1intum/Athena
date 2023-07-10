@@ -33,14 +33,14 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission, con
     human_message_prompt = HumanMessagePromptTemplate.from_template(config.prompt.human_message)
     chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
-    emit_meta("formatted_prompt", chat_prompt.format(**prompt_input))
-
     chain = LLMChain(llm=model, prompt=chat_prompt)
     result = chain.run(**prompt_input)
     result = f"reference,credits,text\n{result}"
     reader = csv.DictReader(result.splitlines())
 
-    emit_meta("result", result)
+    if debug:
+        emit_meta("prompt", chat_prompt.format(**prompt_input))
+        emit_meta("result", result)
 
     feedbacks = []
     for row in reader:

@@ -66,7 +66,7 @@ def _set_credentials(self):
 # Monkey patching langchain
 ChatOpenAI._generate = _wrap(ChatOpenAI._generate, _set_credentials)  # pylint: disable=protected-access # type: ignore
 ChatOpenAI._agenerate = _async_wrap(ChatOpenAI._agenerate, _set_credentials)  # pylint: disable=protected-access # type: ignore
-BaseOpenAI._agenerate = _wrap(BaseOpenAI._agenerate, _set_credentials)  # pylint: disable=protected-access # type: ignore
+BaseOpenAI._generate = _wrap(BaseOpenAI._generate, _set_credentials)  # pylint: disable=protected-access # type: ignore
 BaseOpenAI._agenerate = _async_wrap(BaseOpenAI._agenerate, _set_credentials)  # pylint: disable=protected-access # type: ignore
 
 #########################################################################
@@ -286,10 +286,16 @@ decreasing the model's likelihood to repeat the same line verbatim.
 
 
     def get_model(self) -> BaseLanguageModel:
-        model = available_models[self.model_name].copy()
+        model = available_models[self.model_name.value]
+        logger.info("Using model %s", self.model_name.value)
         for attr, value in self.dict().items():
             if attr != "model_name":
-                setattr(model, attr, value)
+                if hasattr(model, attr):
+                    setattr(model, attr, value)
+                else:
+                    logger.warning(
+                        f"Model {self.model_name.value} does not support {attr}")
+
         return model
 
 
