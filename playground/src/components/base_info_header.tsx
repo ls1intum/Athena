@@ -1,13 +1,15 @@
+import useSWR from "swr";
+
 import { Mode } from "@/model/mode";
 import { ModuleMeta } from "@/model/health_response";
+import athenaFetcher from "@/helpers/athena_fetcher";
 
 import Health from "@/components/health";
 import ModuleSelect from "@/components/selectors/module_select";
 import DataSelect from "@/components/selectors/data_select";
-import ModuleConfig, {
-  moduleConfigSelectorExists,
-} from "@/components/module_config";
+import ModuleConfig from "@/components/module_config";
 import Disclosure from "./disclosure";
+import { useEffect } from "react";
 
 type BaseInfoHeaderProps = {
   athenaUrl: string;
@@ -34,6 +36,17 @@ export default function BaseInfoHeader({
   mode,
   onChangeMode,
 }: BaseInfoHeaderProps) {
+  const url = module
+    ? `${athenaUrl}/modules/${module.type}/${module.name}/config_schema`
+    : null;
+  const { data, error, isLoading } = useSWR(url, athenaFetcher(athenaSecret));
+
+  useEffect(() => {
+    console.log("data", data);
+    console.log("error", JSON.stringify(error));
+    console.log("isLoading", isLoading);
+  }, [data, error, isLoading]);
+
   return (
     <div className="bg-white rounded-md p-4 mb-8">
       <label className="flex flex-col">
@@ -69,7 +82,18 @@ export default function BaseInfoHeader({
       />
       {module && (
         <div className="mt-2 space-y-1">
-          {moduleConfigSelectorExists(module.name) ? (
+          {isLoading && <p className="text-gray-500">Loading...</p>}
+          {error &&
+            (error.status === 404 ? (
+              <p className="text-gray-500">
+                Config options not available, not implemented in the module
+              </p>
+            ) : (
+              <p className="text-red-500">
+                Failed to get config options from Athena
+              </p>
+            ))}
+          {data && (
             <>
               <p className="text-gray-500">
                 This module has a custom configuration. You can use the default
@@ -103,11 +127,6 @@ export default function BaseInfoHeader({
                 </Disclosure>
               )}
             </>
-          ) : (
-            <p className="text-gray-500">
-              This module does not have a custom configuration (selector)
-              implemented.
-            </p>
           )}
         </div>
       )}
