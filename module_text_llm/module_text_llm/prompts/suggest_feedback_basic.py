@@ -11,7 +11,7 @@ Problem statement:
 Grading instructions:
 {grading_instructions}
 Student\'s submission to grade (with sentence numbers <number>: <sentence>):
-{submission_with_sentence_numbers}
+{submission}
 
 Respond in the following CSV format:
 reference,credits,text

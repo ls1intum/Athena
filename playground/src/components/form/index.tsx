@@ -4,22 +4,22 @@ import ReactMarkdown from "react-markdown";
 
 
 
-export function getUISchema(validator: ValidatorType, schema: RJSFSchema, value: UIOptionsType) {
+export function getUISchema(validator: ValidatorType, schema: RJSFSchema, value: (property: string) => UIOptionsType) {
   const paths = toPathSchema(validator, schema, undefined, schema);
-  function recursiveSetValueForPaths(paths: PathSchema) {
+  function recursiveSetValueForPaths(property: string, paths: PathSchema) {
     const properties = Object.keys(paths).filter((path) => path !== "$name");
     if (properties.length === 0) {
-      return value;
+      return value(property);
     }
     return {
       ...properties.reduce((acc, property) => {
-        acc[property] = recursiveSetValueForPaths(paths[property]); 
+        acc[property] = recursiveSetValueForPaths(property, paths[property]); 
         return acc;
       }
       , {}),
     }
   }
-  return recursiveSetValueForPaths(paths);
+  return recursiveSetValueForPaths("__root__", paths);
 }
   
 

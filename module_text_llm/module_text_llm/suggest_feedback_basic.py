@@ -26,7 +26,7 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> 
         "grading_instructions": exercise.grading_instructions,
         "problem_statement": exercise.problem_statement,
         # TODO: "example_solution": exercise.example_solution, MISSING
-        "submission_with_sentence_numbers": add_sentence_numbers(submission.content)
+        "submission": add_sentence_numbers(submission.content)
     }
 
     system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)

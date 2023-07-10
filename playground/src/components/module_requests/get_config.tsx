@@ -64,7 +64,7 @@ export default function GetConfig({
       <p className="text-gray-500 mb-4">
         Get the module specific config options for the given module. This is
         usually used to get the available configuration options for the module
-        which can then be used in the request header `X-Module-Config` to override the default
+        which can then be used in the request header <code>X-Module-Config</code> to override the default
         config. The shape of the config and how it is used is specific to the
         module, however using a JSON schema is recommended. The selected
         module&apos;s function annotated with <code>@config_schema_provider</code> will

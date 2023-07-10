@@ -7,7 +7,7 @@ import baseUrl from "@/helpers/base_url";
 
 import ModuleExampleConfig from "./module_example";
 import Form, { getUISchema } from "@/components/form";
-import { getDefaultFormState } from "@rjsf/utils";
+import { UIOptionsType, getDefaultFormState } from "@rjsf/utils";
 
 type SetConfig = Dispatch<SetStateAction<any | undefined>>;
 
@@ -77,14 +77,16 @@ export default function ModuleConfig({
 
   useEffect(() => {
     if (data) {
-      const defaultFormData = getDefaultFormState(validator, data, {}, data)
-      if (Object.keys(moduleConfig).length === 0 && Object.keys(defaultFormData).length !== 0) {
+      const defaultFormData = getDefaultFormState(validator, data, {}, data);
+      if (
+        Object.keys(moduleConfig).length === 0 &&
+        Object.keys(defaultFormData).length !== 0
+      ) {
         onChangeConfig(defaultFormData);
         setFormKey(formKey + 1);
       }
     }
   }, [data, formKey, moduleConfig, onChangeConfig]);
-
 
   // if (!selectorExists) {
   //   return (
@@ -116,8 +118,14 @@ export default function ModuleConfig({
           className="schema-form"
           uiSchema={{
             "ui:label": false,
-            ...getUISchema(validator, data, {
-              "ui:enableMarkdownInDescription": true,
+            ...getUISchema(validator, data, (property) => {
+              let config: UIOptionsType = {
+                "ui:enableMarkdownInDescription": true,
+              };
+              if (property.includes("message")) {
+                config["ui:widget"] = "textarea"
+              }
+              return config;
             }),
           }}
         >
@@ -125,9 +133,15 @@ export default function ModuleConfig({
             <button type="submit" className="btn btn-info">
               Save
             </button>
-            <button className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
+            <button
+              className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
               onClick={() => {
-                const defaultFormData = getDefaultFormState(validator, data, {}, data)
+                const defaultFormData = getDefaultFormState(
+                  validator,
+                  data,
+                  {},
+                  data
+                );
                 onChangeConfig(defaultFormData);
                 setFormKey(formKey + 1);
               }}
@@ -148,4 +162,3 @@ export default function ModuleConfig({
 function createRef<T>() {
   throw new Error("Function not implemented.");
 }
-
