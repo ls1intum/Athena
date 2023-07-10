@@ -28,7 +28,7 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
     # Find the cluster that this block belongs to
     cluster = block.cluster
     if not cluster:
-        logger.warning("Block %d has no cluster", block.id)
+        logger.warning("Block %s has no cluster", block.id)
         return []
     # If the cluster is disabled, there should be no suggestions
     if cluster.disabled:
