@@ -31,12 +31,14 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission], modul
     logger.info("Doing stuff")
 
     # Example use module config
-    if module_config:
+    if module_config is not None:
         config = Configuration.parse_obj(module_config)
         logger.info("Config: %s", config)
         if config.debug:
             emit_meta('debug', True)
             emit_meta('_comment', 'You can add any meta data you want here')
+    else:
+        logger.info("No config")
 
     # Add data to exercise
     exercise.meta["some_data"] = "some_value"
@@ -80,7 +82,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
     # Do something with the submission and return a list of feedback
 
     # Example use of module config
-    if module_config:
+    if module_config is not None:
         config = Configuration.parse_obj(module_config)
         logger.info("Config: %s", config)
         if config.debug:

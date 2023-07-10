@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import nltk
 
@@ -6,7 +6,7 @@ from athena import app, config_schema_provider, submission_selector, submissions
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.config import Configuration
+from module_text_llm.config import Configuration, default_config
 
 from .suggest_feedback_basic import suggest_feedback_basic
 
@@ -28,34 +28,20 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 
 @feedback_provider
-async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Optional[dict]) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
     logger.info("suggest_feedback - exercise: %s", exercise)
-    return await suggest_feedback_basic(exercise, submission)
+
+    config: Configuration = default_config
+    if module_config is not None:
+        config = Configuration.parse_obj(module_config)
+
+    return await suggest_feedback_basic(exercise, submission, config.approach, config.debug)
 
 
 @config_schema_provider
 def available_config_schema() -> dict:
-    
-    # model_providers = {
-    #     provider: settings.schema()
-    #     for provider, settings in provider_to_model_settings.items()
-    # }
-
-    # obj = {
-    #   "provider": "openai",
-    #   "config": {
-    #     "temperature": 0,
-    #     "model_name": "openai_text-ada-001",
-    #     "max_tokens": 0
-    #   }
-    # }
-
-    # logger.info(Configuration.parse_obj(obj))
-    
-
     return Configuration.schema()
-    # return { "test": Configuration.schema(), "xd": ["test"] }
 
 
 if __name__ == "__main__":

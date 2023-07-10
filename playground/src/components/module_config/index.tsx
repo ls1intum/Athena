@@ -7,7 +7,7 @@ import baseUrl from "@/helpers/base_url";
 
 import ModuleExampleConfig from "./module_example";
 import Form, { getUISchema } from "@/components/form";
-import { UIOptionsType, getDefaultFormState } from "@rjsf/utils";
+import { UIOptionsType, WidgetProps, getDefaultFormState } from "@rjsf/utils";
 
 type SetConfig = Dispatch<SetStateAction<any | undefined>>;
 
@@ -124,6 +124,17 @@ export default function ModuleConfig({
               };
               if (property.includes("message")) {
                 config["ui:widget"] = "textarea"
+                // config["ui:widget"] = ((props: WidgetProps) => {
+                //   return (
+                //     <input
+                //       type='text'
+                //       className='custom'
+                //       value={props.value}
+                //       required={props.required}
+                //       onChange={(event) => props.onChange(event.target.value)}
+                //     />
+                //   );
+                // });
               }
               return config;
             }),

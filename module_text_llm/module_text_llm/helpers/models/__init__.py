@@ -3,7 +3,7 @@ import os
 from langchain.base_language import BaseLanguageModel
 
 from .openai import available_models as available_openai_models
-from .openai import OpenAIModelConfig
+from .openai import OpenAIModelConfig, OpenAIModel
 
 
 model_config = OpenAIModelConfig
@@ -18,6 +18,15 @@ if default_model_key is None or default_model_key not in available_models:
     raise EnvironmentError(f"LLM_DEFAULT_MODEL is not set correctly, available models:\n{', '.join(available_models)}")
 
 model = available_models[default_model_key]
+
+default_model_config = OpenAIModelConfig(
+    model_name=OpenAIModel[default_model_key],
+    temperature=0,
+    max_tokens=1024,
+    top_p=1,
+    presence_penalty=0,
+    frequency_penalty=0,
+)
 
 
 __all__ = [

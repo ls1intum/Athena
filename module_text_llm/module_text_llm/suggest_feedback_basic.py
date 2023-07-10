@@ -8,17 +8,17 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
 )
 
+from athena import emit_meta
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
+from module_text_llm.config import BasicApproachConfig
 
-from module_text_llm.helpers.models import model
 from module_text_llm.helpers.utils import add_sentence_numbers, parse_line_number_reference_as_span
 
-from .prompts.suggest_feedback_basic import system_template, human_template
 
-
-async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> List[Feedback]:
-    logger.info("suggest_feedback_basic - model: %s", model)
+async def suggest_feedback_basic(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
+    model = config.model.get_model()
+    logger.debug("suggest_feedback_basic - model: %s", model)
 
     prompt_input = {
         "max_points": exercise.max_points,
@@ -29,14 +29,18 @@ async def suggest_feedback_basic(exercise: Exercise, submission: Submission) -> 
         "submission": add_sentence_numbers(submission.content)
     }
 
-    system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
-    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+    system_message_prompt = SystemMessagePromptTemplate.from_template(config.prompt.system_message)
+    human_message_prompt = HumanMessagePromptTemplate.from_template(config.prompt.human_message)
     chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+
+    emit_meta("formatted_prompt", chat_prompt.format(**prompt_input))
 
     chain = LLMChain(llm=model, prompt=chat_prompt)
     result = chain.run(**prompt_input)
     result = f"reference,credits,text\n{result}"
     reader = csv.DictReader(result.splitlines())
+
+    emit_meta("result", result)
 
     feedbacks = []
     for row in reader:

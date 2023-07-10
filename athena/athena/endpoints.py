@@ -75,11 +75,15 @@ def submissions_consumer(func: Union[
         store_exercise(exercise)
         store_submissions(submissions)
 
+        args = [exercise, submissions]
+        if len(inspect.signature(func).parameters) > 2:
+            args.append(module_config)
+
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
-            await func(exercise, submissions, module_config)
+            await func(*args)
         else:
-            func(exercise, submissions, module_config)
+            func(*args)
 
         return {"data": None, "meta": metadata}
     return wrapper
@@ -131,11 +135,15 @@ def submission_selector(func: Union[
             # Nothing to select from
             return {"data": -1, "meta": metadata}
 
+        args = [exercise, submissions]
+        if len(inspect.signature(func).parameters) > 2:
+            args.append(module_config)
+
         # Select the submission
         if inspect.iscoroutinefunction(func):
-            submission = await func(exercise, submissions)
+            submission = await func(*args)
         else:
-            submission = func(exercise, submissions)
+            submission = func(*args)
 
         if submission is None:
             return {"data": -1, "meta": metadata}
@@ -183,11 +191,15 @@ def feedback_consumer(func: Union[
 
         store_feedback(feedback)
 
+        args = [exercise, submission, feedback]
+        if len(inspect.signature(func).parameters) > 2:
+            args.append(module_config)
+
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
-            await func(exercise, submission, feedback)
+            await func(*args)
         else:
-            func(exercise, submission, feedback)
+            func(*args)
 
         return {"data": None, "meta": metadata}
     return wrapper
@@ -230,11 +242,15 @@ def feedback_provider(func: Union[
         store_exercise(exercise)
         store_submissions([submission])
 
+        args = [exercise, submission]
+        if len(inspect.signature(func).parameters) > 2:
+            args.append(module_config)
+
         # Call the actual provider
         if inspect.iscoroutinefunction(func):
-            feedbacks = await func(exercise, submission)
+            feedbacks = await func(*args)
         else:
-            feedbacks = func(exercise, submission)
+            feedbacks = func(*args)
 
         store_feedback_suggestions(feedbacks)
         return {"data": feedbacks, "meta": metadata}
