@@ -5,7 +5,7 @@ import { UIOptionsType, WidgetProps, getDefaultFormState } from "@rjsf/utils";
 
 import { ModuleMeta } from "@/model/health_response";
 import baseUrl from "@/helpers/base_url";
-import Form, { getUISchema } from "@/components/form";
+import Form from "@/components/form";
 
 import DefaultSchemaFormModuleConfig from "./default_schema_form";
 import ModuleLLMConfig from "./module_llm";
