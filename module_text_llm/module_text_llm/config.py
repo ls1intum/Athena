@@ -9,8 +9,7 @@ class Prompt(BaseModel):
 
 
 class BasicPrompt(Prompt):
-    """Features available: **{problem_statement}**, **{grading_instructions}**, **{submission}**, **{max_points}**, **{bonus_points}**
-    """
+    """Features available: **{problem_statement}**, **{grading_instructions}**, **{submission}**, **{max_points}**, **{bonus_points}**"""
     system_message: str = Field(default=system_template,
                                 description="A Message for priming AI behavior, usually passed in as the first of a sequence of input messages.")
     human_message: str = Field(default=human_template,
@@ -18,10 +17,7 @@ class BasicPrompt(Prompt):
 
 
 class BasicApproachConfig(BaseModel):
-    """Basic approach.
-
-    This approach uses a LLM with a single prompt to generate feedback in a single step.
-    """
+    """This approach uses a LLM with a single prompt to generate feedback in a single step."""
     model: model_config
     prompt: BasicPrompt
 
