@@ -45,6 +45,15 @@ body {
   .schema-form label.control-label {
     @apply block font-bold;
   }
+
+  /* Checkbox component */
+  .schema-form .form-group .checkbox label {
+    @apply flex items-center;
+  }
+  .schema-form .form-group .checkbox input {
+    @apply w-4 h-4 mr-2;
+  }
+
   /* Select component, and maybe other .form-control too */
   .schema-form .form-control {
     @apply block w-full rounded-md border border-input p-2;
