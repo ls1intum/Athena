@@ -41,12 +41,6 @@ export default function BaseInfoHeader({
     : null;
   const { data, error, isLoading } = useSWR(url, athenaFetcher(athenaSecret));
 
-  useEffect(() => {
-    console.log("data", data);
-    console.log("error", JSON.stringify(error));
-    console.log("isLoading", isLoading);
-  }, [data, error, isLoading]);
-
   return (
     <div className="bg-white rounded-md p-4 mb-8">
       <label className="flex flex-col">

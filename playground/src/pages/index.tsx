@@ -22,10 +22,6 @@ export default function Home() {
   const [moduleConfig, setModuleConfig] = useState<any | undefined>(undefined);
   const [mode, setMode] = useState<Mode>("example");
 
-  useEffect(() => {
-    console.log("moduleConfig", moduleConfig)
-  }, [moduleConfig])
-
   return (
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-6xl font-bold text-white mb-8">Playground</h1>

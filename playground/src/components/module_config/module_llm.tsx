@@ -60,7 +60,6 @@ export default function ModuleLLMConfig({
             configOptions
           );
           onChangeConfig(defaultFormData);
-          console.log("Reset");
         }}
       >
         Reset
