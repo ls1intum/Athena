@@ -13,6 +13,7 @@
     {
       "id": 301,
       "text": "Hello world\nThis is a test\nPlease cluster me into cluster one\none one one",
+      "language": "ENGLISH",
       "meta": {},
       "feedbacks": [
         {
@@ -28,6 +29,7 @@
     {
       "id": 302,
       "text": "Hello world\nThis is a test\nPlease cluster me into cluster one\none one one",
+      "language": "ENGLISH",
       "meta": {},
 
       "feedbacks": [
@@ -52,41 +54,49 @@
     {
       "id": 303,
       "text": "Hello world\nThis is a test\nPlease cluster me into cluster one\none one one",
+      "language": "ENGLISH",
       "meta": {}
     },
     {
       "id": 304,
       "text": "Hello world\nThis is a test\nPlease cluster me into cluster one\none one one",
+      "language": "ENGLISH",
       "meta": {}
     },
     {
       "id": 305,
       "text": "Hello world\nThis is a test\nPlease cluster me into cluster one\none one one",
+      "language": "ENGLISH",
       "meta": {}
     },
     {
       "id": 306,
       "text": "Hello world\nThis is a test\nPlease cluster me into the second cluster!\ntwo two two",
+      "language": "ENGLISH",
       "meta": {}
     },
     {
       "id": 307,
       "text": "Hello world\nThis is a test\nPlease cluster me into the second cluster!\ntwo two two",
+      "language": "ENGLISH",
       "meta": {}
     },
     {
       "id": 308,
       "text": "Hello world\nThis is a test\nPlease cluster me into the second cluster!\ntwo two two",
+      "language": "ENGLISH",
       "meta": {}
     },
     {
       "id": 309,
       "text": "Hello world\nThis is a test\nPlease cluster me into the second cluster!\ntwo two two",
+      "language": "ENGLISH",
       "meta": {}
     },
     {
       "id": 310,
       "text": "Hello world\nThis is a test\nPlease cluster me into the second cluster!\ntwo two two",
+      "language": "ENGLISH",
       "meta": {}
     }
   ]

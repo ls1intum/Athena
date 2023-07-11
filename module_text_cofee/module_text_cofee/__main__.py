@@ -32,7 +32,7 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission]):
     submissions = [s for s in submissions if s.language == TextLanguageEnum.ENGLISH]
     if len(submissions) < 10:
         # CoFee needs at least 10 submissions to work
-        logger.info("receive_submissions: Not enough submissions, not sending to CoFee")
+        logger.info("receive_submissions: Not enough submissions (%d in English), not sending to CoFee", len(submissions))
         return
     adapter.send_submissions(exercise, submissions)
 
