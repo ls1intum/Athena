@@ -21,14 +21,14 @@ import { useFeedbacks } from "@/helpers/client/get_data";
 
 import { ModuleRequestProps } from ".";
 
-async function sendFeedback(
+async function sendFeedbacks(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
-  exercise?: Exercise,
-  submission?: Submission,
+  exercise: Exercise | undefined,
+  submission: Submission | undefined,
   feedbacks: Feedback[],
-  alertAfterSuccess: boolean = true
+  alertAfterSuccess: boolean
 ): Promise<ModuleResponse | undefined> {
   if (!exercise) {
     alert("Please select an exercise");
@@ -81,7 +81,7 @@ async function sendAllExerciseFeedbacks(
   module: ModuleMeta,
   exercise?: Exercise,
   submission?: Submission
-): Promise<ModuleResponse[] | undefined> {
+): Promise<ModuleResponse | undefined> {
   if (!exercise) {
     alert("Please select an exercise");
     return;
@@ -111,7 +111,7 @@ async function sendAllExerciseFeedbacks(
     alert(`No feedbacks found for ${submission ? "submission" : "exercise"}`);
     return;
   }
-  const responses = await sendFeedback(
+  const responses = await sendFeedbacks(
     athenaUrl,
     athenaSecret,
     module,
@@ -141,7 +141,7 @@ export default function SendFeedback({
   const [feedback, setFeedback] = useState<Feedback | undefined>(undefined);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [responses, setResponses] = useState<ModuleResponse[] | undefined>(
+  const [response, setResponse] = useState<ModuleResponse | undefined>(
     undefined
   );
 
@@ -153,7 +153,7 @@ export default function SendFeedback({
 
   useEffect(() => {
     // Reset
-    setResponses(undefined);
+    setResponse(undefined);
     setIsAllSubmissions(true);
     setSubmission(undefined);
     setIsAllFeedback(true);
@@ -247,9 +247,7 @@ export default function SendFeedback({
           )}
         </>
       )}
-      {responses?.map((response, i) => (
-        <ModuleResponseView key={i} response={response} />
-      ))}
+      <ModuleResponseView response={response} />
       <button
         className="bg-blue-500 text-white rounded-md p-2 mt-4"
         onClick={() => {
@@ -262,7 +260,7 @@ export default function SendFeedback({
               module,
               exercise!
             )
-              .then(setResponses)
+              .then(setResponse)
               .finally(() => setLoading(false));
           } else if (isAllFeedback) {
             sendAllExerciseFeedbacks(
@@ -273,18 +271,19 @@ export default function SendFeedback({
               exercise!,
               submission!
             )
-              .then(setResponses)
+              .then(setResponse)
               .finally(() => setLoading(false));
           } else {
-            sendFeedback(
+            sendFeedbacks(
               athenaUrl,
               athenaSecret,
               module,
               exercise,
               submission,
-              feedback
+              [feedback!],
+              true
             )
-              .then((resp) => setResponses(resp ? [resp] : undefined))
+              .then((resp) => setResponse(resp))
               .finally(() => setLoading(false));
           }
         }}
