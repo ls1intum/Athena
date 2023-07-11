@@ -1,7 +1,5 @@
-import { RJSFSchema, UiSchema, FieldProps, RegistryFieldsType, Registry, toPathSchema, UIOptionsType, ValidatorType, PathSchema } from '@rjsf/utils';
+import { RJSFSchema, toPathSchema, UIOptionsType, ValidatorType, PathSchema } from '@rjsf/utils';
 import Form from '@rjsf/core';
-import ReactMarkdown from "react-markdown";
-
 
 
 export function getUISchema(validator: ValidatorType, schema: RJSFSchema, value: (property: string) => UIOptionsType) {

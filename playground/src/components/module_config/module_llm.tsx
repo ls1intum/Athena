@@ -8,7 +8,6 @@ import { editor } from "monaco-editor";
 import Form, { getUISchema } from "@/components/form";
 import { ModuleConfigProps } from ".";
 
-
 const PromptTextAreaWidget = ({ id, value, onChange }: WidgetProps) => {
   const [height, setHeight] = useState(100);
 
@@ -68,33 +67,34 @@ export default function ModuleLLMConfig({
   onChangeConfig,
 }: ModuleConfigProps) {
   return (
-    <Form
-      schema={configOptions}
-      validator={validator}
-      onChange={(props) => {
-        onChangeConfig(props.formData);
-      }}
-      onSubmit={(props) => {
-        onChangeConfig(props.formData);
-      }}
-      formData={moduleConfig}
-      liveValidate
-      className="schema-form"
-      uiSchema={{
-        "ui:label": false,
-        ...getUISchema(validator, configOptions, (property) => {
-          let config: UIOptionsType = {
-            "ui:enableMarkdownInDescription": true,
-          };
-          if (property.includes("message")) {
-            config["ui:widget"] = PromptTextAreaWidget;
-          }
-          return config;
-        }),
-      }}
-    >
+    <>
+      <Form
+        schema={configOptions}
+        validator={validator}
+        onChange={(props) => {
+          onChangeConfig(props.formData);
+        }}
+        formData={moduleConfig}
+        liveValidate
+        className="schema-form"
+        uiSchema={{
+          "ui:submitButtonOptions": {
+            norender: true,
+          },
+          "ui:label": false,
+          ...getUISchema(validator, configOptions, (property) => {
+            let config: UIOptionsType = {
+              "ui:enableMarkdownInDescription": true,
+            };
+            if (property.includes("message")) {
+              config["ui:widget"] = PromptTextAreaWidget;
+            }
+            return config;
+          }),
+        }}
+      />
       <button
-        className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
+        className="text-white bg-gray-500 hover:bg-gray-700 rounded-md p-2 border mx-1"
         onClick={() => {
           const defaultFormData = getDefaultFormState(
             validator,
@@ -103,10 +103,11 @@ export default function ModuleLLMConfig({
             configOptions
           );
           onChangeConfig(defaultFormData);
+          console.log("Reset");
         }}
       >
         Reset
       </button>
-    </Form>
+    </>
   );
 }
