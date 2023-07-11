@@ -289,12 +289,14 @@ decreasing the model's likelihood to repeat the same line verbatim.
         model = available_models[self.model_name.value]
         logger.info("Using model %s", self.model_name.value)
         for attr, value in self.dict().items():
+            model_kwargs = {}
             if attr != "model_name":
                 if hasattr(model, attr):
                     setattr(model, attr, value)
                 else:
-                    logger.warning(
-                        f"Model {self.model_name.value} does not support {attr}")
+                    model_kwargs[attr] = value
+            # Chat models don't have the parameters defined in the pydantic model
+            model.model_kwargs = model_kwargs
 
         return model
 
