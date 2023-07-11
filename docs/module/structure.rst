@@ -97,7 +97,7 @@ Example:
 
 Provide Config Schema
 ~~~~~~~~~~~~~~~~~~~~~~
-Get a list of config options for the module, ideally as a standardized json schema. The config complying to the schema can then be provided in the header of a request `X-Module-Config` to override the default values. The module will receive the schema request at the function annotated with ``@config_schema_provider``.
+Get a schema for config options of the module, ideally as a standardized json schema. The config complying to the schema can then be provided in the header of a request `X-Module-Config` to override the default values. The module will receive the schema request at the function annotated with ``@config_schema_provider``.
 
 Example:
     .. code-block:: python

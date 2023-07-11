@@ -1,9 +1,8 @@
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import JSONResponse, StreamingResponse
 from typing import Dict, Any
 import contextvars
-import json
+
 
 metadata_context = contextvars.ContextVar("metadata")
 

@@ -1,10 +1,8 @@
 """
 Entry point for the module_example module.
 """
-from ast import Dict
 from typing import List, Optional
-from pydantic import BaseModel, Field
-from enum import Enum
+from pydantic import BaseModel, Field, ValidationError
 
 from athena import app, config_schema_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider, emit_meta
 from athena.programming import Exercise, Submission, Feedback
@@ -19,8 +17,7 @@ class Configuration(BaseModel):
 
 @submissions_consumer
 def receive_submissions(exercise: Exercise, submissions: List[Submission], module_config: Optional[dict]):
-    logger.info("receive_submissions: Received %d submissions for exercise %d", len(
-        submissions), exercise.id)
+    logger.info("receive_submissions: Received %d submissions for exercise %d", len(submissions), exercise.id)
     for submission in submissions:
         logger.info("- Submission %d", submission.id)
         zip_content = submission.get_zip()
@@ -55,8 +52,7 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission], modul
 
 @submission_selector
 def select_submission(exercise: Exercise, submissions: List[Submission]) -> Submission:
-    logger.info("select_submission: Received %d submissions for exercise %d", len(
-        submissions), exercise.id)
+    logger.info("select_submission: Received %d submissions for exercise %d", len(submissions), exercise.id)
     for submission in submissions:
         logger.info("- Submission %d", submission.id)
     # Do something with the submissions and return the one that should be assessed next
@@ -65,8 +61,7 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 
 @feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
-    logger.info("process_feedback: Received feedback for submission %d of exercise %d",
-                submission.id, exercise.id)
+    logger.info("process_feedback: Received feedback for submission %d of exercise %d", submission.id, exercise.id)
     logger.info("process_feedback: Feedback: %s", feedback)
     # Do something with the feedback
     # Add data to feedback
@@ -77,8 +72,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 @feedback_provider
 def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Optional[dict]) -> List[Feedback]:
-    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested",
-                submission.id, exercise.id)
+    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
     # Do something with the submission and return a list of feedback
 
     # Example use of module config
@@ -101,7 +95,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
     ]
 
 
-# Optional: Provide configuration options for the module
+# Optional: Provide configuration options for the module if needed
 @config_schema_provider
 def available_config_schema() -> dict:
     # Custom configuration options
