@@ -48,10 +48,7 @@ async function sendSubmissions(
             "X-Module-Config": JSON.stringify(moduleConfig),
           }),
         },
-        body: JSON.stringify({
-          exercise,
-          submissions,
-        }),
+        body: JSON.stringify({ exercise, submissions }),
       }
     );
   } catch (e) {

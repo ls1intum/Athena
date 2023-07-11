@@ -19,9 +19,9 @@ export function getUISchema(
     }
     return {
       ...properties.reduce((acc, property) => {
-        acc[property] = recursiveSetValueForPaths(property, paths[property]);
+        acc[property] = recursiveSetValueForPaths(property, paths[property]!);
         return acc;
-      }, {}),
+      }, {} as UIOptionsType),
     };
   }
   return recursiveSetValueForPaths("__root__", paths);

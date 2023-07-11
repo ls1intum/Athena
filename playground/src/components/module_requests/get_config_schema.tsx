@@ -3,8 +3,8 @@ import { useState } from "react";
 import { ModuleMeta } from "@/model/health_response";
 import ModuleResponse from "@/model/module_response";
 import baseUrl from "@/helpers/base_url";
-import ModuleResponseView from "@/components/module_response_view";
 
+import ModuleResponseView from "@/components/module_response_view";
 import { ModuleRequestProps } from ".";
 
 async function getConfig(

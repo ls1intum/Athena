@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import BaseInfoHeader from "@/components/base_info_header";
 import ModuleRequests from "@/components/module_requests";
 import { ModuleMeta } from "@/model/health_response";

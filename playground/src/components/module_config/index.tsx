@@ -1,7 +1,7 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import useSWR from "swr";
 import validator from "@rjsf/validator-ajv8";
-import { UIOptionsType, WidgetProps, getDefaultFormState } from "@rjsf/utils";
+import { getDefaultFormState } from "@rjsf/utils";
 
 import { ModuleMeta } from "@/model/health_response";
 

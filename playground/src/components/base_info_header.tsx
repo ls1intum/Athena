@@ -8,8 +8,7 @@ import Health from "@/components/health";
 import ModuleSelect from "@/components/selectors/module_select";
 import DataSelect from "@/components/selectors/data_select";
 import ModuleConfig from "@/components/module_config";
-import Disclosure from "./disclosure";
-import { useEffect } from "react";
+import Disclosure from "@/components/disclosure";
 
 type BaseInfoHeaderProps = {
   athenaUrl: string;
