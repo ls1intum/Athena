@@ -2,7 +2,7 @@
 import os
 from contextlib import contextmanager
 from typing import Any, Callable, List
-from pydantic import BaseModel, Field, validator, PositiveInt
+from pydantic import Field, validator, PositiveInt
 from enum import Enum
 
 import openai
@@ -10,9 +10,9 @@ from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.llms import AzureOpenAI, OpenAI
 from langchain.llms.openai import BaseOpenAI
 from langchain.base_language import BaseLanguageModel
-from .model_config import ModelConfig
 
 from athena.logger import logger
+from .model_config import ModelConfig
 
 
 OPENAI_PREFIX = "openai_"
@@ -95,7 +95,7 @@ azure_openai_available = os.environ.get("LLM_AZURE_OPENAI_API_KEY") is not None
 
 # This is a hack to make sure that the openai api is set correctly
 # Right now it is overkill, but it will be useful when the api gets fixed and we no longer
-# hardcode the model names
+# hardcode the model names (i.e. OpenAI fixes their api)
 @contextmanager
 def _openai_client(use_azure_api: bool, is_preference: bool):
     """Set the openai client to use the correct api type, if available
@@ -111,10 +111,14 @@ def _openai_client(use_azure_api: bool, is_preference: bool):
             _use_openai_credentials()
         elif is_preference:
             raise EnvironmentError(
-                "No OpenAI api available, please set LLM_AZURE_OPENAI_API_KEY, LLM_AZURE_OPENAI_API_BASE and LLM_AZURE_OPENAI_API_VERSION environment variables or LLM_OPENAI_API_KEY environment variable")
+                "No OpenAI api available, please set LLM_AZURE_OPENAI_API_KEY, LLM_AZURE_OPENAI_API_BASE and "
+                "LLM_AZURE_OPENAI_API_VERSION environment variables or LLM_OPENAI_API_KEY environment variable"
+            )
         else:
             raise EnvironmentError(
-                "Azure OpenAI api not available, please set LLM_AZURE_OPENAI_API_KEY, LLM_AZURE_OPENAI_API_BASE and LLM_AZURE_OPENAI_API_VERSION environment variables")
+                "Azure OpenAI api not available, please set LLM_AZURE_OPENAI_API_KEY, LLM_AZURE_OPENAI_API_BASE and "
+                "LLM_AZURE_OPENAI_API_VERSION environment variables"
+            )
     else:
         if openai_available:
             _use_openai_credentials()
@@ -122,11 +126,15 @@ def _openai_client(use_azure_api: bool, is_preference: bool):
             _use_azure_credentials()
         elif is_preference:
             raise EnvironmentError(
-                "No OpenAI api available, please set LLM_OPENAI_API_KEY environment variable or LLM_AZURE_OPENAI_API_KEY, LLM_AZURE_OPENAI_API_BASE and LLM_AZURE_OPENAI_API_VERSION environment variables")
+                "No OpenAI api available, please set LLM_OPENAI_API_KEY environment variable or LLM_AZURE_OPENAI_API_KEY, "
+                "LLM_AZURE_OPENAI_API_BASE and LLM_AZURE_OPENAI_API_VERSION environment variables"
+            )
         else:
             raise EnvironmentError(
-                "OpenAI api not available, please set LLM_OPENAI_API_KEY environment variable")
+                "OpenAI api not available, please set LLM_OPENAI_API_KEY environment variable"
+            )
 
+    # API client is setup correctly
     yield
 
 
@@ -287,7 +295,7 @@ decreasing the model's likelihood to repeat the same line verbatim.
 
     def get_model(self) -> BaseLanguageModel:
         model = available_models[self.model_name.value]
-        logger.info("Using model %s", self.model_name.value)
+        logger.debug("Using model %s", self.model_name.value)
         for attr, value in self.dict().items():
             model_kwargs = {}
             if attr != "model_name":
