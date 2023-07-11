@@ -181,7 +181,7 @@ def feedback_consumer(func: Union[
         store_feedback(feedback)
 
         args = [exercise, submission, feedback]
-        if len(inspect.signature(func).parameters) > 2:
+        if len(inspect.signature(func).parameters) > 3:
             args.append(module_config)
 
         # Call the actual consumer
