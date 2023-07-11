@@ -38,7 +38,8 @@ export default function ModuleConfigWrapper({
   athenaUrl,
   athenaSecret,
 }: ModuleConfigWrapperProps) {
-  const hasCustomModuleConfigComponent = module.name in customModuleConfigComponents;
+  const hasCustomModuleConfigComponent =
+    module.name in customModuleConfigComponents;
   const CustomModuleConfigComponent =
     customModuleConfigComponents[module.name as CustomModuleConfig];
 
@@ -90,76 +91,4 @@ export default function ModuleConfigWrapper({
         ))}
     </>
   );
-
-  // const SelectedModule = moduleConfigComponents[module.name as Modules];
-  // return (
-  //   <>
-  //     {isLoading && <p>Loading...</p>}
-  //     {error && (
-  //       <p className="text-red-500">Failed to get config options from Athena</p>
-  //     )}
-  //     {data && (
-  //       <Form
-  //         key={formKey}
-  //         schema={data}
-  //         validator={validator}
-  //         onSubmit={(props) => {
-  //           onChangeConfig(props.formData);
-  //         }}
-  //         formData={moduleConfig}
-  //         liveValidate
-  //         className="schema-form"
-  //         uiSchema={{
-  //           "ui:label": false,
-  //           ...getUISchema(validator, data, (property) => {
-  //             let config: UIOptionsType = {
-  //               "ui:enableMarkdownInDescription": true,
-  //             };
-  //             if (property.includes("message")) {
-  //               config["ui:widget"] = "textarea";
-  //               // config["ui:widget"] = ((props: WidgetProps) => {
-  //               //   return (
-  //               //     <input
-  //               //       type='text'
-  //               //       className='custom'
-  //               //       value={props.value}
-  //               //       required={props.required}
-  //               //       onChange={(event) => props.onChange(event.target.value)}
-  //               //     />
-  //               //   );
-  //               // });
-  //             }
-  //             return config;
-  //           }),
-  //         }}
-  //       >
-  //         <div>
-  //           <button type="submit" className="btn btn-info">
-  //             Save
-  //           </button>
-  //           <button
-  //             className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
-  //             onClick={() => {
-  //               const defaultFormData = getDefaultFormState(
-  //                 validator,
-  //                 data,
-  //                 {},
-  //                 data
-  //               );
-  //               onChangeConfig(defaultFormData);
-  //               setFormKey(formKey + 1);
-  //             }}
-  //           >
-  //             Reset
-  //           </button>
-  //         </div>
-  //       </Form>
-  //       // <SelectedModule
-  //       //   configOptions={data}
-  //       //   moduleConfig={moduleConfig}
-  //       //   onChangeConfig={onChangeConfig}
-  //       // />
-  //     )}
-  //   </>
-  // );
 }

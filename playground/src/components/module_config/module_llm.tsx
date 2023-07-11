@@ -1,15 +1,5 @@
-import { useRef, useState } from "react";
-
-import {
-  UIOptionsType,
-  getDefaultFormState,
-  WidgetProps,
-  DescriptionFieldProps,
-  RegistryFieldsType,
-} from "@rjsf/utils";
+import { getDefaultFormState } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
-import { Editor, Monaco } from "@monaco-editor/react";
-import { editor } from "monaco-editor";
 
 import Form from "@/components/form";
 import { getUISchema } from "@/components/form/utils";
@@ -43,7 +33,7 @@ export default function ModuleLLMConfig({
                 "ui:options": {
                   showLineNumbers: true,
                 },
-              }
+              };
             } else {
               return {};
             }
@@ -51,7 +41,7 @@ export default function ModuleLLMConfig({
         }}
       />
       <button
-        className="text-white bg-gray-500 hover:bg-gray-700 rounded-md p-2 border mx-1"
+        className="text-white bg-gray-500 hover:bg-gray-700 rounded-md p-2 border mt-2"
         onClick={() => {
           const defaultFormData = getDefaultFormState(
             validator,
