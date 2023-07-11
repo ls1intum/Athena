@@ -1,71 +1,48 @@
-import validator from "@rjsf/validator-ajv8";
-
-import { ModuleConfigProps } from ".";
-import Form, { getUISchema } from "@/components/form";
-import { UIOptionsType, getDefaultFormState, WidgetProps } from "@rjsf/utils";
-import TextareaAutosize from "react-textarea-autosize";
-import { Editor, Monaco } from "@monaco-editor/react";
 import { useState } from "react";
+
+import { UIOptionsType, getDefaultFormState, WidgetProps } from "@rjsf/utils";
+import validator from "@rjsf/validator-ajv8";
+import { Editor, Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 
+import Form, { getUISchema } from "@/components/form";
+import { ModuleConfigProps } from ".";
 
-const AutoResizingTextAreaWidget = ({
-  id,
-  required,
-  value,
-  readonly,
-  disabled,
-  autofocus,
-  onChange,
-  onBlur,
-  onFocus,
-}: WidgetProps) => {
-  const handleOnChange = (e) => {
-    onChange(e.target.value);
-  };
 
-  const handleOnBlur = (e) => {
-    onBlur(id, e.target.value);
-  };
-
-  const handleOnFocus = (e) => {
-    onFocus(id, e.target.value);
-  };
-
+const PromptTextAreaWidget = ({ id, value, onChange }: WidgetProps) => {
   const [height, setHeight] = useState(100);
 
-  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
+  const handleEditorDidMount = (
+    editor: editor.IStandaloneCodeEditor,
+    monaco: Monaco
+  ) => {
     editor.onDidContentSizeChange(() => {
       setHeight(Math.min(1000, editor.getContentHeight()));
       editor.layout();
     });
 
-    monaco.languages.register({ id: 'placeholder' });
-    monaco.languages.setMonarchTokensProvider('placeholder', {
+    monaco.languages.register({ id: "placeholder" });
+    monaco.languages.setMonarchTokensProvider("placeholder", {
       tokenizer: {
-        root: [
-          [/{\w*}/, 'variable']
-        ]
-      }
+        root: [[/{\w*}/, "variable"]],
+      },
     });
-    monaco.editor.defineTheme('my-theme', {
-      base: 'vs',
+    monaco.editor.defineTheme("my-theme", {
+      base: "vs",
       inherit: true,
-      rules: [
-        { token: 'variable', foreground: '0000FF' }
-      ],
+      rules: [{ token: "variable", foreground: "0000FF" }],
       colors: {},
     });
-    monaco.editor.setTheme('my-theme');
+    monaco.editor.setTheme("my-theme");
   };
 
   return (
-    <div className="border border-gray-300 rounded my-2 py-2">
+    <div id={id} className="border border-gray-300 rounded my-2 py-2">
       <div style={{ height }}>
         <Editor
-          options={{ 
+          options={{
             scrollBeyondLastLine: false,
-            automaticLayout: true, 
+            automaticLayout: true,
             scrollbar: {
               vertical: "hidden",
               horizontal: "hidden",
@@ -78,20 +55,10 @@ const AutoResizingTextAreaWidget = ({
           value={value}
           onMount={handleEditorDidMount}
           defaultLanguage="placeholder"
+          onChange={(value) => onChange(value)}
         />
       </div>
     </div>
-    // <TextareaAutosize
-    //   id={id}
-    //   required={required}
-    //   value={value}
-    //   disabled={disabled || readonly}
-    //   autoFocus={autofocus}
-    //   onChange={handleOnChange}
-    //   onBlur={handleOnBlur}
-    //   onFocus={handleOnFocus}
-    //   className="form-control" // Make sure this matches the class your form uses
-    // />
   );
 };
 
@@ -104,6 +71,9 @@ export default function ModuleLLMConfig({
     <Form
       schema={configOptions}
       validator={validator}
+      onChange={(props) => {
+        onChangeConfig(props.formData);
+      }}
       onSubmit={(props) => {
         onChangeConfig(props.formData);
       }}
@@ -117,42 +87,26 @@ export default function ModuleLLMConfig({
             "ui:enableMarkdownInDescription": true,
           };
           if (property.includes("message")) {
-            config["ui:widget"] = AutoResizingTextAreaWidget; // "textarea";
-            // config["ui:widget"] = ((props: WidgetProps) => {
-            //   return (
-            //     <input
-            //       type='text'
-            //       className='custom'
-            //       value={props.value}
-            //       required={props.required}
-            //       onChange={(event) => props.onChange(event.target.value)}
-            //     />
-            //   );
-            // });
+            config["ui:widget"] = PromptTextAreaWidget;
           }
           return config;
         }),
       }}
     >
-      <div>
-        <button type="submit" className="btn btn-info">
-          Save
-        </button>
-        <button
-          className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
-          onClick={() => {
-            const defaultFormData = getDefaultFormState(
-              validator,
-              configOptions,
-              {},
-              configOptions
-            );
-            onChangeConfig(defaultFormData);
-          }}
-        >
-          Reset
-        </button>
-      </div>
+      <button
+        className="text-white bg-gray-500 hover:bg-gray-700 ml-2 btn"
+        onClick={() => {
+          const defaultFormData = getDefaultFormState(
+            validator,
+            configOptions,
+            {},
+            configOptions
+          );
+          onChangeConfig(defaultFormData);
+        }}
+      >
+        Reset
+      </button>
     </Form>
   );
 }
