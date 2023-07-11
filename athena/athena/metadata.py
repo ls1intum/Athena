@@ -4,7 +4,7 @@ from typing import Dict, Any
 import contextvars
 
 
-metadata_context = contextvars.ContextVar("metadata")
+metadata_context: contextvars.ContextVar[Dict[str, Any]] = contextvars.ContextVar("metadata")
 
 
 class MetaDataMiddleware(BaseHTTPMiddleware):
@@ -17,7 +17,7 @@ class MetaDataMiddleware(BaseHTTPMiddleware):
 
 def get_meta() -> Dict[str, Any]:
     # This will return an empty dict if no metadata has been set
-    return metadata_context.get(dict())
+    return metadata_context.get({})
 
 
 def emit_meta(key: str, value: Any):
