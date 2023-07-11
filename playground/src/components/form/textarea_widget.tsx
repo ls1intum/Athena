@@ -4,9 +4,9 @@ import { WidgetProps } from "@rjsf/utils";
 import { Editor, Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 
-
-const TextAreaWidget = ({ id, value, onChange }: WidgetProps) => {
+const TextAreaWidget = ({ id, value, onChange, options }: WidgetProps) => {
   const [height, setHeight] = useState(100);
+  const lineNumbers: editor.LineNumbersType = options.showLineNumbers ? "on" : "off";
 
   const handleEditorDidMount = (
     editor: editor.IStandaloneCodeEditor,
@@ -37,6 +37,8 @@ const TextAreaWidget = ({ id, value, onChange }: WidgetProps) => {
       <div style={{ height }}>
         <Editor
           options={{
+            lineNumbers: lineNumbers,
+            lineDecorationsWidth: 0,
             scrollBeyondLastLine: false,
             automaticLayout: true,
             scrollbar: {
@@ -56,6 +58,12 @@ const TextAreaWidget = ({ id, value, onChange }: WidgetProps) => {
       </div>
     </div>
   );
+};
+
+TextAreaWidget.defaultProps = {
+  options: {
+    showLineNumbers: false,
+  },
 };
 
 export default TextAreaWidget;

@@ -6,7 +6,6 @@ import {
   PathSchema,
 } from "@rjsf/utils";
 
-
 export function getUISchema(
   validator: ValidatorType,
   schema: RJSFSchema,

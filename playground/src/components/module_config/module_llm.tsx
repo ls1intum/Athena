@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-import { UIOptionsType, getDefaultFormState, WidgetProps, DescriptionFieldProps, RegistryFieldsType } from "@rjsf/utils";
+import {
+  UIOptionsType,
+  getDefaultFormState,
+  WidgetProps,
+  DescriptionFieldProps,
+  RegistryFieldsType,
+} from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import { Editor, Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
@@ -8,16 +14,6 @@ import { editor } from "monaco-editor";
 import Form from "@/components/form";
 import { getUISchema } from "@/components/form/utils";
 import { ModuleConfigProps } from ".";
-
-
-const CustomDescriptionField = ({id, description}) => {
-  return <div id={id}>TEST: {description}</div>;
-};
-
-const fields = {
-  DescriptionField: CustomDescriptionField
-};
-
 
 export default function ModuleLLMConfig({
   moduleConfig,
@@ -35,20 +31,22 @@ export default function ModuleLLMConfig({
         formData={moduleConfig}
         liveValidate
         className="schema-form"
-        fields={fields}
         uiSchema={{
           "ui:submitButtonOptions": {
             norender: true,
           },
           "ui:label": false,
           ...getUISchema(validator, configOptions, (property) => {
-            let config: UIOptionsType = {
-              "ui:enableMarkdownInDescription": true,
-            };
             if (property.includes("message")) {
-              config["ui:widget"] = "textarea";
+              return {
+                "ui:widget": "textarea",
+                "ui:options": {
+                  showLineNumbers: true,
+                },
+              }
+            } else {
+              return {};
             }
-            return config;
           }),
         }}
       />
