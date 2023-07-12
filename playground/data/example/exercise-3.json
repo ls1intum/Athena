@@ -19,7 +19,8 @@
         {
           "id": 301,
           "detail_text": "This is a test",
-          "reference": "28-32",
+          "index_start": 28,
+          "index_end": 32,
           "text": "This is a test",
           "credits": 80,
           "meta": {}
@@ -36,7 +37,8 @@
         {
           "id": 302,
           "detail_text": "This is a test",
-          "reference": "28-32",
+          "index_start": 28,
+          "index_end": 32,
           "text": "This is a test",
           "credits": 80,
           "meta": {}
@@ -44,7 +46,8 @@
         {
           "id": 303,
           "detail_text": "This is a test",
-          "reference": "28-32",
+          "index_start": 28,
+          "index_end": 32,
           "text": "This is a test",
           "credits": 80,
           "meta": {}
