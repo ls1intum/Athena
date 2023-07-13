@@ -48,6 +48,7 @@ def submissions_consumer(func: Union[Callable[[E, List[S]], None], Callable[[E, 
                 if stored_submission.id in submissions_dict:
                     submissions_dict[stored_submission.id].meta.update(stored_submission.meta)
         submissions = list(submissions_dict.values())
+        store_submissions(submissions)
 
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
