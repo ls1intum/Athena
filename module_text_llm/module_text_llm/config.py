@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+
+from athena import config_schema_provider
 from module_text_llm.helpers.models import model_config, default_model_config
 from .prompts.suggest_feedback_basic import system_template, human_template
 
@@ -13,21 +15,11 @@ class BasicPrompt(BaseModel):
 
 class BasicApproachConfig(BaseModel):
     """This approach uses a LLM with a single prompt to generate feedback in a single step."""
-    model: model_config
-    prompt: BasicPrompt
+    model: model_config = Field(default=default_model_config)
+    prompt: BasicPrompt = Field(default=BasicPrompt())
 
 
+@config_schema_provider
 class Configuration(BaseModel):
     debug: bool = Field(default=False, description="Enable debug mode.")
-    approach: BasicApproachConfig
-
-
-default_config = Configuration(
-    approach=BasicApproachConfig(
-        model=default_model_config,
-        prompt=BasicPrompt(
-            system_message=system_template,
-            human_message=human_template
-        )
-    )
-)
+    approach: BasicApproachConfig = Field(default=BasicApproachConfig())

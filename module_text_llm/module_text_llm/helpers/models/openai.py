@@ -246,14 +246,14 @@ else:
 class OpenAIModelConfig(ModelConfig):
     model_name: OpenAIModel = Field(default_openai_model,  # type: ignore
                                     description="The name of the model to use.")
-    max_tokens: PositiveInt = Field(512, description="""\
+    max_tokens: PositiveInt = Field(1024, description="""\
 The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the chat completion.
 
 The total length of input tokens and generated tokens is limited by the model's context length. \
 [Example Python code](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) for counting tokens.\
 """)
 
-    temperature: float = Field(0.7, ge=0, le=2, description="""\
+    temperature: float = Field(0.0, ge=0, le=2, description="""\
 What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, \
 while lower values like 0.2 will make it more focused and deterministic.
 

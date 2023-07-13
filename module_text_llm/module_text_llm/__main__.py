@@ -1,12 +1,12 @@
-from typing import List, Optional
+from typing import List
 
 import nltk
 
-from athena import app, config_schema_provider, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
+from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.config import Configuration, default_config
+from module_text_llm.config import Configuration
 from .suggest_feedback_basic import suggest_feedback_basic
 
 
@@ -27,19 +27,9 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 
 @feedback_provider
-async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Optional[dict]) -> List[Feedback]:
+async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
-
-    config: Configuration = default_config
-    if module_config is not None:
-        config = Configuration.parse_obj(module_config)
-
-    return await suggest_feedback_basic(exercise, submission, config.approach, config.debug)
-
-
-@config_schema_provider
-def available_config_schema() -> dict:
-    return Configuration.schema()
+    return await suggest_feedback_basic(exercise, submission, module_config.approach, module_config.debug)
 
 
 if __name__ == "__main__":

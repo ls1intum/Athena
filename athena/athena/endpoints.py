@@ -1,13 +1,13 @@
 # type: ignore # too much weird behavior of mypy with decorators
 import inspect
 from fastapi import Depends
-
-from typing import TypeVar, Callable, List, Dict, Union, Any, Coroutine, Optional
+from pydantic import BaseModel, ValidationError
+from typing import TypeVar, Callable, List, Union, Any, Coroutine, Type
 
 from athena.app import app
 from athena.authenticate import authenticated
 from athena.metadata import with_meta
-from athena.module_config import get_dynamic_module_config
+from athena.module_config import get_dynamic_module_config_factory
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
 from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
@@ -18,6 +18,8 @@ E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
 F = TypeVar('F', bound=Feedback)
 
+# Config type
+C = TypeVar("C", bound=BaseModel)
 
 module_responses = {
     403: {
@@ -29,9 +31,9 @@ module_responses = {
 
 def submissions_consumer(func: Union[
     Callable[[E, List[S]], None],
-    Callable[[E, List[S], Optional[dict]], None],
+    Callable[[E, List[S], C], None],
     Callable[[E, List[S]], Coroutine[Any, Any, None]],
-    Callable[[E, List[S], Optional[dict]], Coroutine[Any, Any, None]]
+    Callable[[E, List[S], C], Coroutine[Any, Any, None]]
 ]):
     """
     Receive submissions from the Assessment Module Manager.
@@ -62,6 +64,7 @@ def submissions_consumer(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/submissions", responses=module_responses)
     @authenticated
@@ -69,7 +72,7 @@ def submissions_consumer(func: Union[
     async def wrapper(
             exercise: exercise_type,
             submissions: List[submission_type],
-            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
         
         # Retrieve existing metadata for the exercise and submissions
         exercise_meta = get_stored_exercise_meta(exercise) or {}
@@ -105,9 +108,9 @@ def submissions_consumer(func: Union[
 
 def submission_selector(func: Union[
     Callable[[E, List[S]], S],
-    Callable[[E, List[S], Optional[dict]], S],
+    Callable[[E, List[S], C], S],
     Callable[[E, List[S]], Coroutine[Any, Any, S]],
-    Callable[[E, List[S], Optional[dict]], Coroutine[Any, Any, S]]
+    Callable[[E, List[S], C], Coroutine[Any, Any, S]]
 ]):
     """
     Receive an exercise and some (not necessarily all!) submissions from the Assessment Module Manager and
@@ -139,6 +142,7 @@ def submission_selector(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/select_submission", responses=module_responses)
     @authenticated
@@ -146,7 +150,7 @@ def submission_selector(func: Union[
     async def wrapper(
             exercise: exercise_type,
             submission_ids: List[int],
-            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
 
@@ -180,9 +184,9 @@ def submission_selector(func: Union[
 
 def feedback_consumer(func: Union[
     Callable[[E, S, F], None],
-    Callable[[E, S, F, Optional[dict]], None],
+    Callable[[E, S, F, C], None],
     Callable[[E, S, F], Coroutine[Any, Any, None]],
-    Callable[[E, S, F, Optional[dict]], Coroutine[Any, Any, None]]
+    Callable[[E, S, F, C], Coroutine[Any, Any, None]]
 ]):
     """
     Receive feedback from the Assessment Module Manager.
@@ -214,6 +218,7 @@ def feedback_consumer(func: Union[
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
     feedback_type = inspect.signature(func).parameters["feedback"].annotation
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/feedback", responses=module_responses)
     @authenticated
@@ -222,7 +227,7 @@ def feedback_consumer(func: Union[
             exercise: exercise_type,
             submission: submission_type,
             feedback: feedback_type,
-            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -247,9 +252,9 @@ def feedback_consumer(func: Union[
 
 def feedback_provider(func: Union[
     Callable[[E, S], List[F]],
-    Callable[[E, S, Optional[dict]], List[F]],
+    Callable[[E, S, C], List[F]],
     Callable[[E, S], Coroutine[Any, Any, List[F]]],
-    Callable[[E, S, Optional[dict]], Coroutine[Any, Any, List[F]]]
+    Callable[[E, S, C], Coroutine[Any, Any, List[F]]]
 ]):
     """
     Provide feedback to the Assessment Module Manager.
@@ -280,6 +285,7 @@ def feedback_provider(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/feedback_suggestions", responses=module_responses)
     @authenticated
@@ -287,7 +293,7 @@ def feedback_provider(func: Union[
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
-            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
         
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -312,17 +318,32 @@ def feedback_provider(func: Union[
     return wrapper
 
 
-def config_schema_provider(func: Union[Callable[[], dict], Callable[[], Coroutine[Any, Any, dict]]]):
+def config_schema_provider(cls: Type[C]) -> Type[C]:
     """
-    Get available configuration options of a module.
-    """
+    Decorator for a class to provide an endpoint that returns the configuration class schema.
 
-    @app.get("/config_schema", responses=module_responses)
-    @authenticated
+    The decorated class must be a subclass of BaseModel and must have default values for all parameters (default configuration).
+
+    Example:
+        >>> @config_schema_provider
+        ... class MyConfig(BaseModel):
+        ...     my_parameter: str = "default value"
+    """
+    if not issubclass(cls, BaseModel):
+        raise TypeError("Decorated class must be a subclass of BaseModel")
+
+    if getattr(app.state, "config_schema_defined", False):
+        raise Exception("@config_schema_provider can only be used once")
+
+    # Try to initialize the class without parameters (default values will be used)
+    try:
+        cls()
+    except ValidationError:
+        raise TypeError(f'Cannot initialize {cls.__name__} without parameters, please provide default values for all parameters')
+
+    @app.get(f"/config_schema")
     async def wrapper():
-        if inspect.iscoroutinefunction(func):
-            config = await func()
-        else:
-            config = func()
-        return config
-    return wrapper
+        return cls.schema()
+
+    app.state.config_schema_defined = True
+    return cls
