@@ -12,13 +12,22 @@ export default function ModuleResponseView({
     return null;
   }
   let formattedData = response.data;
+  let formattedMeta = response.meta;
   try {
     formattedData = JSON.parse(formattedData);
   } catch (e) {
     // ignore
   }
+  try {
+    formattedMeta = JSON.parse(formattedMeta);
+  } catch (e) {
+    // ignore
+  }
   if (typeof formattedData === "object") {
     formattedData = JSON.stringify(formattedData, undefined, 2);
+  }
+  if (typeof formattedMeta === "object") {
+    formattedMeta = JSON.stringify(formattedMeta, undefined, 2);
   }
   // show response.module_name and the formattedData
   return (
@@ -32,19 +41,27 @@ export default function ModuleResponseView({
         <span className="font-bold mb-4">Status code:</span>
         <span className="mb-4">{response.status}</span>
       </div>
-      <div className="flex flex-col">
-        <Disclosure
-          title="Data:"
-          openedInitially
-          noContentIndent
-          className={{ trigger: "font-bold text-black" }}
-        >
-          <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto">
-            {formattedData}
-          </pre>
-          <>{children}</>
-        </Disclosure>
-      </div>
+      <Disclosure
+        title="Meta:"
+        openedInitially
+        noContentIndent
+        className={{ trigger: "font-bold text-black" }}
+      >
+        <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto whitespace-pre-wrap">
+          {formattedMeta}
+        </pre>
+      </Disclosure>
+      <Disclosure
+        title="Data:"
+        openedInitially
+        noContentIndent
+        className={{ trigger: "font-bold text-black" }}
+      >
+        <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto whitespace-pre-wrap">
+          {formattedData}
+        </pre>
+        <>{children}</>
+      </Disclosure>
     </div>
   );
 }

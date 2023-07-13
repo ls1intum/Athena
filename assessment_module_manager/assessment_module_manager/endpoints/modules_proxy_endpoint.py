@@ -26,7 +26,7 @@ from assessment_module_manager.module import ModuleResponse, AvailableModuleName
             "description": "Module is not available",
         },
     },
-    response_model=ModuleResponse[Any],
+    response_model=ModuleResponse[Any, Any],
 )
 @authenticated
 async def proxy_to_module(

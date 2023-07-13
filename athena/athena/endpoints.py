@@ -35,6 +35,29 @@ def submissions_consumer(func: Union[
     """
     Receive submissions from the Assessment Module Manager.
     The submissions consumer is usually called whenever the deadline for an exercise is reached.
+    
+    This decorator can be used with several types of functions: synchronous or asynchronous, with or without a module config.
+
+    Examples:
+        Below are some examples of possible functions that you can decorate with this decorator:
+
+        Without using module config (both synchronous and asynchronous forms):
+        >>> @submissions_consumer
+        ... def sync_receive_submissions(exercise: Exercise, submissions: List[Submission]):
+        ...     # process submissions synchronously here
+
+        >>> @submissions_consumer
+        ... async def async_receive_submissions(exercise: Exercise, submissions: List[Submission]):
+        ...     # process submissions asynchronously here
+
+        With using module config (both synchronous and asynchronous forms):
+        >>> @submissions_consumer
+        ... def sync_receive_submissions_with_config(exercise: Exercise, submissions: List[Submission], module_config: Optional[dict]):
+        ...     # process submissions synchronously here using module_config
+
+        >>> @submissions_consumer
+        ... async def async_receive_submissions_with_config(exercise: Exercise, submissions: List[Submission], module_config: Optional[dict]):
+        ...     # process submissions asynchronously here using module_config
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
@@ -95,6 +118,29 @@ def submission_selector(func: Union[
     Receive an exercise and some (not necessarily all!) submissions from the Assessment Module Manager and
     return the submission that should ideally be assessed next.
     If the selector returns None, the LMS will select a random submission in the end.
+
+    This decorator can be used with several types of functions: synchronous or asynchronous, with or without a module config.
+
+    Examples:
+        Below are some examples of possible functions that you can decorate with this decorator:
+
+        Without using module config (both synchronous and asynchronous forms):
+        >>> @submission_selector
+        ... def sync_select_submission(exercise: Exercise, submissions: List[Submission]):
+        ...     # process submissions here and return the chosen submission
+
+        >>> @submission_selector
+        ... async def async_select_submission(exercise: Exercise, submissions: List[Submission]):
+        ...     # process submissions here and return the chosen submission
+
+        With using module config (both synchronous and asynchronous forms):
+        >>> @submission_selector
+        ... def sync_select_submission_with_config(exercise: Exercise, submissions: List[Submission], module_config: Optional[dict]):
+        ...     # process submissions here using module_config and return the chosen submission
+
+        >>> @submission_selector
+        ... async def async_select_submission_with_config(exercise: Exercise, submissions: List[Submission], module_config: Optional[dict]):
+        ...     # process submissions here using module_config and return the chosen submission
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
@@ -153,6 +199,29 @@ def feedback_consumer(func: Union[
     """
     Receive feedback from the Assessment Module Manager.
     The feedback consumer is usually called whenever the LMS gets feedback from a tutor.
+
+    This decorator can be used with several types of functions: synchronous or asynchronous, with or without a module config.
+
+    Examples:
+        Below are some examples of possible functions that you can decorate with this decorator:
+
+        Without using module config (both synchronous and asynchronous forms):
+        >>> @feedback_consumer
+        ... def sync_process_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
+        ...     # process feedback here
+
+        >>> @feedback_consumer
+        ... async def async_process_feedback(exercise: Exercise, submission: Submission, feedback: Feedback):
+        ...     # process feedback here
+
+        With using module config (both synchronous and asynchronous forms):
+        >>> @feedback_consumer
+        ... def sync_process_feedback_with_config(exercise: Exercise, submission: Submission, feedback: Feedback, module_config: Optional[dict]):
+        ...     # process feedback here using module_config
+
+        >>> @feedback_consumer
+        ... async def async_process_feedback_with_config(exercise: Exercise, submission: Submission, feedback: Feedback, module_config: Optional[dict]):
+        ...     # process feedback here using module_config
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
@@ -203,6 +272,29 @@ def feedback_provider(func: Union[
     """
     Provide feedback to the Assessment Module Manager.
     The feedback provider is usually called whenever the tutor requests feedback for a submission in the LMS.
+
+    This decorator can be used with several types of functions: synchronous or asynchronous, with or without a module config.
+
+    Examples:
+        Below are some examples of possible functions that you can decorate with this decorator:
+
+        Without using module config (both synchronous and asynchronous forms):
+        >>> @feedback_provider
+        ... def sync_suggest_feedback(exercise: Exercise, submission: Submission):
+        ...     # suggest feedback here and return it as a list
+
+        >>> @feedback_provider
+        ... async def async_suggest_feedback(exercise: Exercise, submission: Submission):
+        ...     # suggest feedback here and return it as a list
+
+        With using module config (both synchronous and asynchronous forms):
+        >>> @feedback_provider
+        ... def sync_suggest_feedback_with_config(exercise: Exercise, submission: Submission, module_config: Optional[dict]):
+        ...     # suggest feedback here using module_config and return it as a list
+
+        >>> @feedback_provider
+        ... async def async_suggest_feedback_with_config(exercise: Exercise, submission: Submission, module_config: Optional[dict]):
+        ...     # suggest feedback here using module_config and return it as a list
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation

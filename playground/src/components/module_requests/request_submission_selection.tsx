@@ -104,10 +104,10 @@ export default function SelectSubmission({
   } = useSubmissions(mode, exercise);
 
   const responseSubmissionView = (response: ModuleResponse | undefined) => {
-    if (!response || response.status !== 200 || typeof response.data.data !== "number") {
+    if (!response || response.status !== 200 || typeof response.data !== "number") {
       return null;
     }
-    const submissionId = response.data.data;
+    const submissionId = response.data;
     const submission = submissions?.find(
       (submission) => submission.id === submissionId
     );

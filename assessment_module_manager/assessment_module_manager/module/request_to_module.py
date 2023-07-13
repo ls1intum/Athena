@@ -11,13 +11,15 @@ from .list_modules import list_modules
 from assessment_module_manager import env
 
 T = TypeVar('T')
-class ModuleResponse(GenericModel, Generic[T]):
+M = TypeVar('M')
+class ModuleResponse(GenericModel, Generic[T, M]):
     """
     A response from a module.
     """
     module_name: str
     status: int
     data: T
+    meta: M
 
 
 async def find_module_by_name(
@@ -32,7 +34,7 @@ async def find_module_by_name(
     return None
 
 
-async def request_to_module(module: Module, module_config: Optional[str], path: str, data: Optional[dict], method: str = "POST") -> ModuleResponse:
+async def request_to_module(module: Module, module_config: Optional[str], path: str, data: Optional[dict], method: str) -> ModuleResponse:
     """
     Helper function to send a request to a module.
     It raises appropriate FastAPI HTTPException if the request fails.
@@ -52,12 +54,17 @@ async def request_to_module(module: Module, module_config: Optional[str], path: 
                 response = await client.get(path, headers=headers)
     except httpx.ConnectError as exc:
         raise HTTPException(status_code=503, detail=f"Module {module.name} is not available") from exc
+    
     try:
         response.raise_for_status()
     except httpx.HTTPStatusError:
-        try:
-            response_data = response.json()
-        except json.JSONDecodeError:
-            response_data = response.text
-        return ModuleResponse(module_name=module.name, status=response.status_code, data=response_data)
-    return ModuleResponse(module_name=module.name, status=response.status_code, data=response.json())
+        pass
+
+    try:
+        response_data = response.json()
+        meta = response_data.get('meta', {})
+        response_data = response_data.get('data', response_data)
+    except json.JSONDecodeError:
+        response_data = response.text
+        meta = {}
+    return ModuleResponse(module_name=module.name, status=response.status_code, data=response_data, meta=meta)

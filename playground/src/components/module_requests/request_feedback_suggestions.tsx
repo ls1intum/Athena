@@ -100,7 +100,7 @@ export default function RequestFeedbackSuggestions({
       return null;
     }
 
-    const feedbacks = response.data.data;
+    const feedbacks = response.data;
     return (
       submission && (
         <Disclosure
