@@ -1,13 +1,13 @@
 # type: ignore # too much weird behavior of mypy with decorators
 import inspect
-import json
-from fastapi import Header, Depends, HTTPException, status
+from fastapi import Depends
 
 from typing import TypeVar, Callable, List, Dict, Union, Any, Coroutine, Optional
 
-from athena import get_meta
 from athena.app import app
 from athena.authenticate import authenticated
+from athena.metadata import with_meta
+from athena.module_config import get_dynamic_module_config
 from athena.logger import logger
 from athena.schemas import Exercise, Submission, Feedback
 from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
@@ -65,18 +65,12 @@ def submissions_consumer(func: Union[
 
     @app.post("/submissions", responses=module_responses)
     @authenticated
+    @with_meta
     async def wrapper(
             exercise: exercise_type,
             submissions: List[submission_type],
-            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
-            metadata: Dict[str, Any] = Depends(get_meta)):
-        if module_config:
-            try:
-                module_config = json.loads(module_config)
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
-                                    detail="Invalid module config received, check the X-Module-Config header")
-
+            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
+        
         # Retrieve existing metadata for the exercise and submissions
         exercise_meta = get_stored_exercise_meta(exercise) or {}
         exercise_meta.update(exercise.meta)
@@ -96,7 +90,7 @@ def submissions_consumer(func: Union[
         store_submissions(submissions)
 
         kwargs = {}
-        if "module_config" in sig.parameters:
+        if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
         # Call the actual consumer
@@ -105,7 +99,7 @@ def submissions_consumer(func: Union[
         else:
             func(exercise, submissions, **kwargs)
 
-        return {"data": None, "meta": metadata}
+        return None
     return wrapper
 
 
@@ -148,20 +142,13 @@ def submission_selector(func: Union[
 
     @app.post("/select_submission", responses=module_responses)
     @authenticated
+    @with_meta
     async def wrapper(
             exercise: exercise_type,
             submission_ids: List[int],
-            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
-            metadata: Dict[str, Any] = Depends(get_meta)):
+            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
-
-        if module_config:
-            try:
-                module_config = json.loads(module_config)
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
-                                    detail="Invalid module config received, check the X-Module-Config header")
 
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
 
@@ -172,10 +159,10 @@ def submission_selector(func: Union[
                            "Have you sent all submissions to the submission consumer before?")
         if not submissions:
             # Nothing to select from
-            return {"data": -1, "meta": metadata}
+            return -1
 
         kwargs = {}
-        if "module_config" in sig.parameters:
+        if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
         # Select the submission
@@ -185,8 +172,8 @@ def submission_selector(func: Union[
             submission = func(exercise, submissions, **kwargs)
 
         if submission is None:
-            return {"data": -1, "meta": metadata}
-        return {"data": submission.id, "meta": metadata}
+            return -1
+        return submission.id
 
     return wrapper
 
@@ -230,18 +217,12 @@ def feedback_consumer(func: Union[
 
     @app.post("/feedback", responses=module_responses)
     @authenticated
+    @with_meta
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
             feedback: feedback_type,
-            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
-            metadata: Dict[str, Any] = Depends(get_meta)):
-        if module_config:
-            try:
-                module_config = json.loads(module_config)
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
-                                    detail="Invalid module config received, check the X-Module-Config header")
+            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -251,7 +232,7 @@ def feedback_consumer(func: Union[
         store_feedback(feedback)
 
         kwargs = {}
-        if "module_config" in sig.parameters:
+        if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
         # Call the actual consumer
@@ -260,7 +241,7 @@ def feedback_consumer(func: Union[
         else:
             func(exercise, submission, feedback, **kwargs)
 
-        return {"data": None, "meta": metadata}
+        return None
     return wrapper
 
 
@@ -302,18 +283,12 @@ def feedback_provider(func: Union[
 
     @app.post("/feedback_suggestions", responses=module_responses)
     @authenticated
+    @with_meta
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
-            module_config: Optional[str] = Header(None, alias="X-Module-Config"),
-            metadata: Dict[str, Any] = Depends(get_meta)):
-        if module_config:
-            try:
-                module_config = json.loads(module_config)
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
-                                    detail="Invalid module config received, check the X-Module-Config header")
-
+            module_config: Optional[Dict] = Depends(get_dynamic_module_config)):
+        
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         submission.meta.update(get_stored_submission_meta(submission) or {})
@@ -322,7 +297,7 @@ def feedback_provider(func: Union[
         store_submissions([submission])
 
         kwargs = {}
-        if "module_config" in sig.parameters:
+        if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
         # Call the actual provider
@@ -332,7 +307,8 @@ def feedback_provider(func: Union[
             feedbacks = func(exercise, submission, **kwargs)
 
         store_feedback_suggestions(feedbacks)
-        return {"data": feedbacks, "meta": metadata}
+
+        return feedbacks
     return wrapper
 
 

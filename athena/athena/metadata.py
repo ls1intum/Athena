@@ -1,26 +1,79 @@
+import contextvars
+from typing import Dict, Any
+from functools import wraps
+
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from typing import Dict, Any
-import contextvars
 
 
 metadata_context: contextvars.ContextVar[Dict[str, Any]] = contextvars.ContextVar("metadata")
 
 
 class MetaDataMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to handle metadata in the context of HTTP requests.
+
+    This middleware allows to set and get metadata context in each HTTP request.
+    The context is then available throughout the processing of a request, even in asynchronous operations.
+    """
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        # Init metadata in context variable
+        """
+        Middleware dispatcher.
+
+        This method sets the metadata context at the start of processing each request.
+        It then gets the response from the next middleware or the actual route handler, and returns it.
+
+        Args:
+            request (Request): The incoming HTTP request.
+            call_next (RequestResponseEndpoint): The next middleware or route handler.
+
+        Returns:
+            The response from the next middleware or route handler.
+        """
         metadata_context.set({})
         response = await call_next(request)
         return response
 
 
 def get_meta() -> Dict[str, Any]:
-    # This will return an empty dict if no metadata has been set
+    """
+    Get the current metadata context.
+
+    Returns:
+        Dict[str, Any]: A dictionary with the current metadata context.
+    """
     return metadata_context.get({})
 
 
 def emit_meta(key: str, value: Any):
-    # Get the current metadata, add the new key-value pair
+    """
+    Add a key-value pair to the current metadata context for the current HTTP request.
+
+    This metadata will be returned in the response of the HTTP request if the endpoint supports it.
+
+    Args:
+        key (str): The key for the metadata entry.
+        value (Any): The value for the metadata entry.
+    """
     metadata = metadata_context.get({})
     metadata[key] = value
+
+
+def with_meta(func):
+    """
+    Decorator for endpoints that can send back metadata.
+    
+    Examples:
+        >>> @app.post("/endpoint") 
+        ... @with_meta
+        ... def endpoint():
+        ...    ...
+    """
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        data = await func(*args, **kwargs)
+        return {
+            "data": data,
+            "meta": get_meta(),
+        }
+    return wrapper
