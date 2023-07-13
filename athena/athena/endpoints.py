@@ -1,7 +1,8 @@
 # type: ignore # too much weird behavior of mypy with decorators
 import inspect
 import json
-from fastapi import Header, Depends
+from fastapi import Header, Depends, HTTPException, status
+
 from typing import TypeVar, Callable, List, Dict, Union, Any, Coroutine, Optional
 
 from athena import get_meta
@@ -73,8 +74,8 @@ def submissions_consumer(func: Union[
             try:
                 module_config = json.loads(module_config)
             except json.JSONDecodeError:
-                logger.warning("Invalid module config received: %s", module_config)
-                module_config = None
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
+                                    detail="Invalid module config received, check the X-Module-Config header")
 
         # Retrieve existing metadata for the exercise and submissions
         exercise_meta = get_stored_exercise_meta(exercise) or {}
@@ -94,15 +95,15 @@ def submissions_consumer(func: Union[
         store_exercise(exercise)
         store_submissions(submissions)
 
-        args = [exercise, submissions]
-        if len(inspect.signature(func).parameters) > 2:
-            args.append(module_config)
+        kwargs = {}
+        if "module_config" in sig.parameters:
+            kwargs["module_config"] = module_config
 
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
-            await func(*args)
+            await func(exercise, submissions, **kwargs)
         else:
-            func(*args)
+            func(exercise, submissions, **kwargs)
 
         return {"data": None, "meta": metadata}
     return wrapper
@@ -159,8 +160,8 @@ def submission_selector(func: Union[
             try:
                 module_config = json.loads(module_config)
             except json.JSONDecodeError:
-                logger.warning("Invalid module config received: %s", module_config)
-                module_config = None
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
+                                    detail="Invalid module config received, check the X-Module-Config header")
 
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
 
@@ -173,15 +174,15 @@ def submission_selector(func: Union[
             # Nothing to select from
             return {"data": -1, "meta": metadata}
 
-        args = [exercise, submissions]
-        if len(inspect.signature(func).parameters) > 2:
-            args.append(module_config)
+        kwargs = {}
+        if "module_config" in sig.parameters:
+            kwargs["module_config"] = module_config
 
         # Select the submission
         if inspect.iscoroutinefunction(func):
-            submission = await func(*args)
+            submission = await func(exercise, submissions, **kwargs)
         else:
-            submission = func(*args)
+            submission = func(exercise, submissions, **kwargs)
 
         if submission is None:
             return {"data": -1, "meta": metadata}
@@ -239,8 +240,8 @@ def feedback_consumer(func: Union[
             try:
                 module_config = json.loads(module_config)
             except json.JSONDecodeError:
-                logger.warning("Invalid module config received: %s", module_config)
-                module_config = None
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
+                                    detail="Invalid module config received, check the X-Module-Config header")
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -249,15 +250,15 @@ def feedback_consumer(func: Union[
 
         store_feedback(feedback)
 
-        args = [exercise, submission, feedback]
-        if len(inspect.signature(func).parameters) > 3:
-            args.append(module_config)
+        kwargs = {}
+        if "module_config" in sig.parameters:
+            kwargs["module_config"] = module_config
 
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
-            await func(*args)
+            await func(exercise, submission, feedback, **kwargs)
         else:
-            func(*args)
+            func(exercise, submission, feedback, **kwargs)
 
         return {"data": None, "meta": metadata}
     return wrapper
@@ -310,8 +311,8 @@ def feedback_provider(func: Union[
             try:
                 module_config = json.loads(module_config)
             except json.JSONDecodeError:
-                logger.warning("Invalid module config received: %s", module_config)
-                module_config = None
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
+                                    detail="Invalid module config received, check the X-Module-Config header")
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -320,15 +321,15 @@ def feedback_provider(func: Union[
         store_exercise(exercise)
         store_submissions([submission])
 
-        args = [exercise, submission]
-        if len(inspect.signature(func).parameters) > 2:
-            args.append(module_config)
+        kwargs = {}
+        if "module_config" in sig.parameters:
+            kwargs["module_config"] = module_config
 
         # Call the actual provider
         if inspect.iscoroutinefunction(func):
-            feedbacks = await func(*args)
+            feedbacks = await func(exercise, submission, **kwargs)
         else:
-            feedbacks = func(*args)
+            feedbacks = func(exercise, submission, **kwargs)
 
         store_feedback_suggestions(feedbacks)
         return {"data": feedbacks, "meta": metadata}
