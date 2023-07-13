@@ -2,6 +2,30 @@
 Provides request metadata handling for Athena.
 
 You can use this module to add metadata to HTTP responses for most endpoints (decorated with @with_meta).
+
+Example usage:
+    from fastapi import FastAPI
+    from .metadata import MetaDataMiddleware, with_meta, emit_meta
+
+    app = FastAPI()
+    app.add_middleware(MetaDataMiddleware)
+
+    @app.get("/items/{item_id}")
+    @with_meta
+    async def read_item(item_id: str):
+        emit_meta("item_id", item_id)
+        return {"item_id": item_id, "name": "Fancy Item"}
+
+    Response of /items/42:
+    {
+        "data": {
+            "item_id": 42
+            "name": "Fancy Item"
+        },
+        "meta": {
+            "item_id": 42
+        }
+    }
 """
 
 import contextvars
