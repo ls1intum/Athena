@@ -3,12 +3,7 @@ from module_text_llm.helpers.models import model_config, default_model_config
 from .prompts.suggest_feedback_basic import system_template, human_template
 
 
-class Prompt(BaseModel):
-    system_message: str
-    human_message: str
-
-
-class BasicPrompt(Prompt):
+class BasicPrompt(BaseModel):
     """Features available: **{problem_statement}**, **{grading_instructions}**, **{submission}**, **{max_points}**, **{bonus_points}**"""
     system_message: str = Field(default=system_template,
                                 description="A Message for priming AI behavior, usually passed in as the first of a sequence of input messages.")
