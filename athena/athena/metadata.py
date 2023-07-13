@@ -1,3 +1,9 @@
+"""
+Provides request metadata handling for Athena.
+
+You can use this module to add metadata to HTTP responses for most endpoints (decorated with @with_meta).
+"""
+
 import contextvars
 from typing import Dict, Any
 from functools import wraps
