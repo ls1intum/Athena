@@ -180,24 +180,16 @@ def _get_available_models(openai_models, available_deployments):
         azure_openai_api_base = os.environ["LLM_AZURE_OPENAI_API_BASE"]
         azure_openai_api_version = os.environ["LLM_AZURE_OPENAI_API_VERSION"]
 
-        for deployment_name, deployment in available_deployments["chat_completion"].items():
-            available_models[AZURE_OPENAI_PREFIX + deployment_name] = AzureChatOpenAI(
-                deployment_name=deployment_name,
-                openai_api_base=azure_openai_api_base,
-                openai_api_version=azure_openai_api_version,
-                openai_api_key=azure_openai_api_key,
-                client="",
-            )
-
-        for deployment_name, deployment in available_deployments["completion"].items():
-            available_models[AZURE_OPENAI_PREFIX + deployment_name] = AzureOpenAI(
-                model=deployment.model,
-                deployment_name=deployment_name,
-                openai_api_base=azure_openai_api_base,
-                openai_api_version=azure_openai_api_version,
-                openai_api_key=azure_openai_api_key,
-                client="",
-            )
+        for model_type, Model in [("chat_completion", AzureChatOpenAI), ("completion", AzureOpenAI)]:
+            for deployment_name, deployment in available_deployments[model_type].items():
+                available_models[AZURE_OPENAI_PREFIX + deployment_name] = Model(
+                    model=deployment.model,
+                    deployment_name=deployment_name,
+                    openai_api_base=azure_openai_api_base,
+                    openai_api_version=azure_openai_api_version,
+                    openai_api_key=azure_openai_api_key,
+                    client="",
+                )
 
     return available_models
 
