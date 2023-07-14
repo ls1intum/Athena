@@ -1,7 +1,6 @@
-# mypy: ignore-errors
 import os
 from contextlib import contextmanager
-from typing import Any, Callable, List
+from typing import Any, Callable, Dict, List
 from pydantic import Field, validator, PositiveInt
 from enum import Enum
 
@@ -64,10 +63,12 @@ def _set_credentials(self):
 
 
 # Monkey patching langchain
-ChatOpenAI._generate = _wrap(ChatOpenAI._generate, _set_credentials)  # pylint: disable=protected-access # type: ignore
-ChatOpenAI._agenerate = _async_wrap(ChatOpenAI._agenerate, _set_credentials)  # pylint: disable=protected-access # type: ignore
-BaseOpenAI._generate = _wrap(BaseOpenAI._generate, _set_credentials)  # pylint: disable=protected-access # type: ignore
-BaseOpenAI._agenerate = _async_wrap(BaseOpenAI._agenerate, _set_credentials)  # pylint: disable=protected-access # type: ignore
+# pylint: disable=protected-access
+ChatOpenAI._generate = _wrap(ChatOpenAI._generate, _set_credentials) # type: ignore
+ChatOpenAI._agenerate = _async_wrap(ChatOpenAI._agenerate, _set_credentials) # type: ignore
+BaseOpenAI._generate = _wrap(BaseOpenAI._generate, _set_credentials) # type: ignore
+BaseOpenAI._agenerate = _async_wrap(BaseOpenAI._agenerate, _set_credentials) # type: ignore
+# pylint: enable=protected-access
 
 #########################################################################
 # Monkey patching end                                                   #
@@ -138,8 +139,8 @@ def _openai_client(use_azure_api: bool, is_preference: bool):
     yield
 
 
-def _get_available_deployments(openai_models: dict[str, List[str]], model_aliases: dict[str, str]):
-    available_deployments: dict[str, dict[str, Any]] = {
+def _get_available_deployments(openai_models: Dict[str, List[str]], model_aliases: Dict[str, str]):
+    available_deployments: Dict[str, Dict[str, Any]] = {
         "chat_completion": {},
         "completion": {},
         "fine_tuneing": {},
@@ -164,7 +165,7 @@ def _get_available_deployments(openai_models: dict[str, List[str]], model_aliase
 
 
 def _get_available_models(openai_models, available_deployments):
-    available_models: dict[str, BaseLanguageModel] = {}
+    available_models: Dict[str, BaseLanguageModel] = {}
 
     if openai_available:
         openai_api_key = os.environ["LLM_OPENAI_API_KEY"]
