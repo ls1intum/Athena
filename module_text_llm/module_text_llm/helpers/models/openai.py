@@ -219,8 +219,7 @@ openai_models = {
         "ada",
     ]
 }
-available_deployments = _get_available_deployments(
-    openai_models, _model_aliases)
+available_deployments = _get_available_deployments(openai_models, _model_aliases)
 available_models = _get_available_models(openai_models, available_deployments)
 
 
@@ -282,18 +281,33 @@ decreasing the model's likelihood to repeat the same line verbatim.
 
 
     def get_model(self) -> BaseLanguageModel:
-        model = available_models[self.model_name.value]
-        logger.debug("Using model %s", self.model_name.value)
-        for attr, value in self.dict().items():
-            model_kwargs = {}
-            if attr != "model_name":
-                if hasattr(model, attr):
-                    setattr(model, attr, value)
-                else:
-                    model_kwargs[attr] = value
-            # Chat models don't have the parameters defined in the pydantic model
-            model.model_kwargs = model_kwargs
+        """Get the model from the configuration.
 
+        Returns:
+            BaseLanguageModel: The model.
+        """
+        model = available_models[self.model_name.value]
+        # pylint: disable=[protected-access]
+        kwargs = model._lc_kwargs 
+        # pylint: enable=[protected-access]
+        secrets = { secret: getattr(model, secret) for secret in model.lc_secrets.keys() }
+        kwargs.update(secrets)
+
+        model_kwargs = kwargs.get("model_kwargs", {})
+        for attr, value in self.dict().items():
+            if attr == "model_name":
+                # Skip model_name
+                continue
+            if hasattr(model, attr):
+                # If the model has the attribute, add it to kwargs
+                kwargs[attr] = value
+            else:
+                # Otherwise, add it to model_kwargs (necessary for chat models)
+                model_kwargs[attr] = value
+        kwargs["model_kwargs"] = model_kwargs        
+        
+        # Initialize a copy of the model using the config
+        model = model.__class__(**kwargs)
         return model
 
 

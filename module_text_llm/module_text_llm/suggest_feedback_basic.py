@@ -18,7 +18,6 @@ from module_text_llm.helpers.utils import add_sentence_numbers, parse_line_numbe
 
 async def suggest_feedback_basic(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()
-    logger.debug("suggest_feedback_basic - model: %s", model)
 
     prompt_input = {
         "max_points": exercise.max_points,
