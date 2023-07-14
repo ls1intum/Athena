@@ -17,11 +17,11 @@ const customModuleConfigComponents: {
   module_text_llm: ModuleLLMConfig,
 };
 
-type SetConfig = Dispatch<SetStateAction<any | undefined>>;
+type SetConfig = Dispatch<SetStateAction<any>>;
 
 export type ModuleConfigProps = {
   configOptions?: any;
-  moduleConfig: any | undefined;
+  moduleConfig: any;
   onChangeConfig: SetConfig;
 };
 

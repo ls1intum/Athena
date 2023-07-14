@@ -17,8 +17,8 @@ type BaseInfoHeaderProps = {
   onChangeAthenaSecret: (value: string) => void;
   module: ModuleMeta | undefined;
   onChangeModule: (value: ModuleMeta) => void;
-  moduleConfig: any | undefined;
-  onChangeModuleConfig: (value: any | undefined) => void;
+  moduleConfig: any;
+  onChangeModuleConfig: (value: any) => void;
   mode: Mode;
   onChangeMode: (value: Mode) => void;
 };

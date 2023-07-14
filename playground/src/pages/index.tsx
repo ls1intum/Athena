@@ -19,7 +19,7 @@ export default function Home() {
   });
   const [athenaSecret, setAthenaSecret] = useState<string>("");
   const [module, setModule] = useState<ModuleMeta | undefined>(undefined);
-  const [moduleConfig, setModuleConfig] = useState<any | undefined>(undefined);
+  const [moduleConfig, setModuleConfig] = useState<any>(undefined);
   const [mode, setMode] = useState<Mode>("example");
 
   return (

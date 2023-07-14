@@ -13,7 +13,7 @@ class FetchError extends Error {
 }
 
 const athenaFetcher =
-  (athenaSecret: string, moduleConfig: any | undefined = undefined) =>
+  (athenaSecret: string, moduleConfig: any = undefined) =>
   async (url: string) => {
     const res = await fetch(
       `${baseUrl}/api/athena_request?${new URLSearchParams({
