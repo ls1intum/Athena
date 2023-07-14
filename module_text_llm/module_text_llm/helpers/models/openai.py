@@ -148,18 +148,17 @@ def _get_available_deployments(openai_models: Dict[str, List[str]], model_aliase
 
     if azure_openai_available:
         with _openai_client(use_azure_api=True, is_preference=False):
-            deployments = openai.Deployment.list().get("data")  # type: ignore
-            if deployments is not None:
-                for deployment in deployments:
-                    model_name = deployment.model
-                    if model_name in model_aliases:
-                        model_name = model_aliases[model_name]
-                    if model_name in openai_models["chat_completion"]:
-                        available_deployments["chat_completion"][deployment.id] = deployment
-                    elif model_name in openai_models["completion"]:
-                        available_deployments["completion"][deployment.id] = deployment
-                    elif model_name in openai_models["fine_tuneing"]:
-                        available_deployments["fine_tuneing"][deployment.id] = deployment
+            deployments = openai.Deployment.list().get("data") or [] # type: ignore
+            for deployment in deployments:
+                model_name = deployment.model
+                if model_name in model_aliases:
+                    model_name = model_aliases[model_name]
+                if model_name in openai_models["chat_completion"]:
+                    available_deployments["chat_completion"][deployment.id] = deployment
+                elif model_name in openai_models["completion"]:
+                    available_deployments["completion"][deployment.id] = deployment
+                elif model_name in openai_models["fine_tuneing"]:
+                    available_deployments["fine_tuneing"][deployment.id] = deployment
 
     return available_deployments
 
@@ -233,14 +232,10 @@ available_deployments = _get_available_deployments(
 available_models = _get_available_models(openai_models, available_deployments)
 
 
-OpenAIModel = Enum('OpenAIModel', {
-                   name: name for name in available_models})
+OpenAIModel = Enum('OpenAIModel', {name: name for name in available_models}) # type: ignore
 
 
-if os.environ["LLM_DEFAULT_MODEL"] in available_models:
-    default_openai_model = OpenAIModel[os.environ["LLM_DEFAULT_MODEL"]]
-else:
-    default_openai_model = OpenAIModel["gpt-3.5-turbo"]
+default_openai_model = OpenAIModel[os.environ.get("LLM_DEFAULT_MODEL", "gpt-3.5-turbo")]
 
 
 # Long descriptions will be displayed in the playground UI and are copied from the OpenAI docs
