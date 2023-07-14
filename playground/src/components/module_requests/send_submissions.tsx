@@ -65,6 +65,7 @@ async function sendSubmissions(
       module_name: "Unknown",
       status: response.status,
       data: await response.text(),
+      meta: {},
     };
   }
   alert(`${submissions.length} submissions sent successfully!`);

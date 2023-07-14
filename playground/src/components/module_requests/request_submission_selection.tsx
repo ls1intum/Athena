@@ -63,6 +63,7 @@ async function requestSubmissionSelection(
         module_name: "Unknown",
         status: response.status,
         data: await response.text(),
+        meta: {},
       };
     }
     alert("Submission selection requested successfully!");
