@@ -1,6 +1,11 @@
+/* Modified version of:
+ * https://github.com/rjsf-team/react-jsonschema-form/blob/main/packages/core/src/components/templates/DescriptionField.tsx
+ * 
+ * To enable markdown rendering for all description fields by default
+ * Also needed to enable markdown rendering for the description of the object and not just the description of the fields
+ */
 import { DescriptionFieldProps, FormContextType, RJSFSchema, StrictRJSFSchema } from '@rjsf/utils';
 import ReactMarkdown from "react-markdown";
-
 
 /** The `DescriptionField` is the template to use to render the description of a field
  *
