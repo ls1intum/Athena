@@ -169,10 +169,10 @@ def _get_available_models(openai_models, available_deployments):
     if openai_available:
         openai_api_key = os.environ["LLM_OPENAI_API_KEY"]
         for model_name in openai_models["chat_completion"]:
-            available_models[f"{OPENAI_PREFIX}{model_name}"] = ChatOpenAI(
+            available_models[OPENAI_PREFIX + model_name] = ChatOpenAI(
                 model=model_name, openai_api_key=openai_api_key, client="")
         for model_name in openai_models["completion"]:
-            available_models[f"{OPENAI_PREFIX}{model_name}"] = OpenAI(
+            available_models[OPENAI_PREFIX + model_name] = OpenAI(
                 model=model_name, openai_api_key=openai_api_key, client="")
 
     if azure_openai_available:
@@ -181,7 +181,7 @@ def _get_available_models(openai_models, available_deployments):
         azure_openai_api_version = os.environ["LLM_AZURE_OPENAI_API_VERSION"]
 
         for deployment_name, deployment in available_deployments["chat_completion"].items():
-            available_models[f"{AZURE_OPENAI_PREFIX}{deployment_name}"] = AzureChatOpenAI(
+            available_models[AZURE_OPENAI_PREFIX + deployment_name] = AzureChatOpenAI(
                 deployment_name=deployment_name,
                 openai_api_base=azure_openai_api_base,
                 openai_api_version=azure_openai_api_version,
@@ -190,7 +190,7 @@ def _get_available_models(openai_models, available_deployments):
             )
 
         for deployment_name, deployment in available_deployments["completion"].items():
-            available_models[f"{AZURE_OPENAI_PREFIX}{deployment_name}"] = AzureOpenAI(
+            available_models[AZURE_OPENAI_PREFIX + deployment_name] = AzureOpenAI(
                 model=deployment.model,
                 deployment_name=deployment_name,
                 openai_api_base=azure_openai_api_base,
