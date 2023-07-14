@@ -9,7 +9,20 @@ import DefaultSchemaFormModuleConfig from "./default_schema_form";
 import ModuleLLMConfig from "./module_llm";
 import athenaFetcher from "@/helpers/athena_fetcher";
 
-// Add custom module config components here
+// Need to customize the form for some modules?
+// You can do that here.
+//
+// Add custom module config components in case you 
+// need to really customize the default schema form 
+// (DefaultSchemaFormModuleConfig).
+//
+// 1. Add your module name to the CustomModuleConfig type i.e.:
+//    type CustomModuleConfig = "module_text_llm" | "my_new_module"
+// 2. Add your module name to the customModuleConfigComponents object
+// 3. Create your component in the same folder as this file
+// 4. Add your component to the customModuleConfigComponents object
+//
+// Use ModuleLLMConfig as example.
 type CustomModuleConfig = "module_text_llm";
 const customModuleConfigComponents: {
   [key in CustomModuleConfig]: React.FC<ModuleConfigProps>;
