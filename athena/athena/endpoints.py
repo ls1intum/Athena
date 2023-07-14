@@ -333,15 +333,15 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
         raise TypeError("Decorated class must be a subclass of BaseModel")
 
     if getattr(app.state, "config_schema_defined", False):
-        raise Exception("@config_schema_provider can only be used once")
+        raise ValueError("@config_schema_provider can only be used once")
 
     # Try to initialize the class without parameters (default values will be used)
     try:
         cls()
-    except ValidationError:
-        raise TypeError(f'Cannot initialize {cls.__name__} without parameters, please provide default values for all parameters')
+    except ValidationError as exc:
+        raise TypeError(f'Cannot initialize {cls.__name__} without parameters, please provide default values for all parameters') from exc
 
-    @app.get(f"/config_schema")
+    @app.get("/config_schema")
     async def wrapper():
         return cls.schema()
 
