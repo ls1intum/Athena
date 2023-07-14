@@ -287,7 +287,7 @@ decreasing the model's likelihood to repeat the same line verbatim.
             BaseLanguageModel: The model.
         """
         model = available_models[self.model_name.value]
-        kwargs = model._lc_kwargs  # pylint: disable=protected-access
+        kwargs = model._lc_kwargs
         secrets = {secret: getattr(model, secret) for secret in model.lc_secrets.keys()}
         kwargs.update(secrets)
 

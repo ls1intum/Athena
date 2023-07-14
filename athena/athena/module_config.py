@@ -31,7 +31,7 @@ def get_module_config() -> ModuleConfig:
 C = TypeVar("C", bound=BaseModel)
 def get_dynamic_module_config_factory(module_config_type: Optional[Type[C]]):
     """Create a function that gets the dynamic module config from the request header."""
-    
+
     async def get_dynamic_module_config(module_config: Optional[str] = Header(None, alias="X-Module-Config")) -> Optional[C]:
         """Get the dynamic module config from the request header."""
         if module_config_type is None:
@@ -40,15 +40,15 @@ def get_dynamic_module_config_factory(module_config_type: Optional[Type[C]]):
         if module_config is not None:
             try:
                 config_dict = json.loads(module_config)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as exc:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
-                                    detail="Invalid module config received, could not parse JSON from X-Module-Config header.")
+                                    detail="Invalid module config received, could not parse JSON from X-Module-Config header.") from exc
             
             try:
                 return module_config_type.parse_obj(config_dict)
-            except ValidationError as e:
+            except ValidationError as exc:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
-                                    detail=f"Validation error for module config: {e}")
+                                    detail=f"Validation error for module config: {exc}") from exc
         
         # Return a default instance of module_config_type when module_config is None
         return module_config_type()
