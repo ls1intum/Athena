@@ -64,10 +64,10 @@ def _set_credentials(self):
 
 # Monkey patching langchain
 # pylint: disable=protected-access
-ChatOpenAI._generate = _wrap(ChatOpenAI._generate, _set_credentials) # type: ignore
-ChatOpenAI._agenerate = _async_wrap(ChatOpenAI._agenerate, _set_credentials) # type: ignore
-BaseOpenAI._generate = _wrap(BaseOpenAI._generate, _set_credentials) # type: ignore
-BaseOpenAI._agenerate = _async_wrap(BaseOpenAI._agenerate, _set_credentials) # type: ignore
+ChatOpenAI._generate = _wrap(ChatOpenAI._generate, _set_credentials)  # type: ignore
+ChatOpenAI._agenerate = _async_wrap(ChatOpenAI._agenerate, _set_credentials)  # type: ignore
+BaseOpenAI._generate = _wrap(BaseOpenAI._generate, _set_credentials)  # type: ignore
+BaseOpenAI._agenerate = _async_wrap(BaseOpenAI._agenerate, _set_credentials)  # type: ignore
 # pylint: enable=protected-access
 
 #########################################################################
@@ -148,7 +148,7 @@ def _get_available_deployments(openai_models: Dict[str, List[str]], model_aliase
 
     if azure_openai_available:
         with _openai_client(use_azure_api=True, is_preference=False):
-            deployments = openai.Deployment.list().get("data") or [] # type: ignore
+            deployments = openai.Deployment.list().get("data") or []  # type: ignore
             for deployment in deployments:
                 model_name = deployment.model
                 if model_name in model_aliases:
@@ -163,7 +163,8 @@ def _get_available_deployments(openai_models: Dict[str, List[str]], model_aliase
     return available_deployments
 
 
-def _get_available_models(openai_models, available_deployments):
+def _get_available_models(openai_models: Dict[str, List[str]], 
+                          available_deployments: Dict[str, Dict[str, Any]]):
     available_models: Dict[str, BaseLanguageModel] = {}
 
     if openai_available:
@@ -223,7 +224,7 @@ available_deployments = _get_available_deployments(openai_models, _model_aliases
 available_models = _get_available_models(openai_models, available_deployments)
 
 
-OpenAIModel = Enum('OpenAIModel', {name: name for name in available_models}) # type: ignore
+OpenAIModel = Enum('OpenAIModel', {name: name for name in available_models})  # type: ignore
 
 
 default_openai_model = OpenAIModel[os.environ.get("LLM_DEFAULT_MODEL", "gpt-3.5-turbo")]
@@ -279,7 +280,6 @@ decreasing the model's likelihood to repeat the same line verbatim.
             raise ValueError('max_tokens must be a positive integer')
         return v
 
-
     def get_model(self) -> BaseLanguageModel:
         """Get the model from the configuration.
 
@@ -287,10 +287,8 @@ decreasing the model's likelihood to repeat the same line verbatim.
             BaseLanguageModel: The model.
         """
         model = available_models[self.model_name.value]
-        # pylint: disable=[protected-access]
-        kwargs = model._lc_kwargs 
-        # pylint: enable=[protected-access]
-        secrets = { secret: getattr(model, secret) for secret in model.lc_secrets.keys() }
+        kwargs = model._lc_kwargs  # pylint: disable=protected-access
+        secrets = {secret: getattr(model, secret) for secret in model.lc_secrets.keys()}
         kwargs.update(secrets)
 
         model_kwargs = kwargs.get("model_kwargs", {})
@@ -304,8 +302,8 @@ decreasing the model's likelihood to repeat the same line verbatim.
             else:
                 # Otherwise, add it to model_kwargs (necessary for chat models)
                 model_kwargs[attr] = value
-        kwargs["model_kwargs"] = model_kwargs        
-        
+        kwargs["model_kwargs"] = model_kwargs
+
         # Initialize a copy of the model using the config
         model = model.__class__(**kwargs)
         return model
