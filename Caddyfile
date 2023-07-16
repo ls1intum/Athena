@@ -5,7 +5,7 @@
 	reverse_proxy /playground* http://playground:3000
 	route /logs* {
 		basicauth {
-			user $ATHENA_LOGS_BASICAUTH
+			athena $ATHENA_LOGS_BASICAUTH
 		}
 		reverse_proxy http://log_viewer:4998
 	}
