@@ -4,6 +4,7 @@ import validator from "@rjsf/validator-ajv8";
 import Form from "@/components/form";
 import { getUISchema } from "@/components/form/utils";
 import { ModuleConfigProps } from ".";
+import { Monaco } from "@monaco-editor/react";
 
 export default function ModuleLLMConfig({
   moduleConfig,
@@ -32,6 +33,21 @@ export default function ModuleLLMConfig({
                 "ui:widget": "textarea",
                 "ui:options": {
                   showLineNumbers: true,
+                  customizeMonaco: (monaco: Monaco) => {
+                    monaco.languages.register({ id: "placeholder" });
+                    monaco.languages.setMonarchTokensProvider("placeholder", {
+                      tokenizer: {
+                        root: [[/{\w*}/, "variable"]],
+                      },
+                    });
+                    monaco.editor.defineTheme("my-theme", {
+                      base: "vs",
+                      inherit: true,
+                      rules: [{ token: "variable", foreground: "0000FF" }],
+                      colors: {},
+                    });
+                    monaco.editor.setTheme("my-theme");
+                  },
                 },
               };
             } else {
