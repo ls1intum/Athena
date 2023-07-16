@@ -41,6 +41,7 @@ def submissions_consumer(func: Union[Callable[[E, List[S]], None], Callable[[E, 
             submissions: List[submission_type]):
         # Retrieve existing metadata for the exercise and submissions
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        store_exercise(exercise)
         submissions_dict = {s.id: s for s in submissions}
         if submissions:
             stored_submissions = get_stored_submissions(submissions[0].__class__, exercise.id, [s.id for s in submissions])
@@ -87,6 +88,7 @@ def submission_selector(func: Union[Callable[[E, List[S]], S], Callable[[E, List
         # only works with the full submission objects.
 
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        store_exercise(exercise)
 
         # Get the full submission objects
         submissions = list(get_stored_submissions(submission_type, exercise.id, submission_ids))
@@ -127,7 +129,9 @@ def feedbacks_consumer(func: Union[Callable[[E, S, List[F]], None], Callable[[E,
             feedbacks: feedbacks_type):
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
+        store_exercise(exercise)
         submission.meta.update(get_stored_submission_meta(submission) or {})
+        store_submissions([submission])
         for feedback in feedbacks:
             feedback.meta.update(get_stored_feedback_meta(feedback) or {})
             store_feedback(feedback)
