@@ -51,6 +51,13 @@ function download_caddyfile {
   curl -sSL -o Caddyfile https://raw.githubusercontent.com/ls1intum/Athena/"$pr_branch"/Caddyfile
 }
 
+function download_postgres_init {
+  local pr_branch=$1
+
+  echo "Downloading postgres-init.sql..."
+  curl -sSL -o postgres-init.sql https://raw.githubusercontent.com/ls1intum/Athena/"$pr_branch"/postgres-init.sql
+}
+
 function start {
   local pr_tag=$1
   local pr_branch=$2
@@ -59,6 +66,7 @@ function start {
   download_docker_compose "$pr_branch"
   download_cofee_config "$pr_branch"
   download_caddyfile "$pr_branch"
+  download_postgres_init "$pr_branch"
 
   echo "Starting Athena with PR tag: $pr_tag and branch: $pr_branch"
   export ATHENA_ENV_DIR="$(pwd)/athena-env"

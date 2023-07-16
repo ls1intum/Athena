@@ -25,7 +25,7 @@ def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb
                     cluster_id = cluster.treeId
                     break
         if cluster_id is None:
-            logger.warning("Segment %d has no cluster", segment.id)
+            logger.warning("Segment %s has no cluster", segment.id)
         # store text block in DB
         with get_db() as db:
             model = DBTextBlock(
