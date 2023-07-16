@@ -19,6 +19,7 @@ Commands:
   stop                                  Stop the Athena server.
   restart <pr_tag> <pr_branch> <domain> Restart the Athena server.
   run <docker compose cmd>              Run any docker compose subcommand of your choice
+  cleanup                               Remove old docker images
 HELP
 }
 
@@ -74,6 +75,10 @@ function all_logs {
   docker compose -f docker-compose.prod.yml -f docker-compose.playground.prod.yml -f docker-compose.cofee.yml logs -f
 }
 
+function cleanup {
+  docker image prune -f
+}
+
 function run_docker_compose_cmd {
   export ATHENA_ENV_DIR="$(pwd)/athena-env"
   export ATHENA_TAG="$pr_tag"
@@ -104,6 +109,9 @@ case "$subcommand" in
         ;;
     logs)
         all_logs "$@"
+        ;;
+    cleanup)
+        cleanup "$@"
         ;;
     run)
         run_docker_compose_cmd "$@"
