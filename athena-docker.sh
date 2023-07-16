@@ -33,6 +33,14 @@ function download_docker_compose {
   done
 }
 
+function download_cofee_traefik_config {
+  local pr_branch=$1
+
+  echo "Downloading Cofee Traefik config into ./module_text_cofee/traefik.docker.yml..."
+  mkdir -p ./module_text_cofee
+  curl -sSL -o ./module_text_cofee/traefik.docker.yml https://raw.githubusercontent.com/ls1intum/Athena/"$pr_branch"/module_text_cofee/traefik.docker.yml
+}
+
 function download_caddyfile {
   local pr_branch=$1
 
@@ -46,6 +54,7 @@ function start {
   local domain=$3
 
   download_docker_compose "$pr_branch"
+  download_cofee_traefik_config "$pr_branch"
   download_caddyfile "$pr_branch"
 
   echo "Starting Athena with PR tag: $pr_tag and branch: $pr_branch"
