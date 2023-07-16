@@ -56,9 +56,14 @@ function start {
 }
 
 function stop {
-  # TODO: In the future extract pr_tag and pr_branch from env
+  local pr_tag=$1
+  local pr_branch=$2
+  local domain=$3
 
   echo "Stopping Athena"
+  export ATHENA_ENV_DIR="$(pwd)/athena-env"
+  export ATHENA_TAG="$pr_tag"
+  export ATHENA_DOMAIN="$domain"
   docker compose -f docker-compose.prod.yml -f docker-compose.playground.prod.yml -f docker-compose.cofee.yml stop
 }
 
