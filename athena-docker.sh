@@ -38,7 +38,7 @@ function download_cofee_config {
 
   echo "Downloading Cofee config files into ./module_text_cofee..."
   mkdir -p ./module_text_cofee
-  for file in traeik.docker.yml node_config.docker.yml; do
+  for file in traefik.docker.yml node_config.docker.yml; do
     echo "  Downloading $file..."
     curl -sSL -o ./module_text_cofee/$file https://raw.githubusercontent.com/ls1intum/Athena/"$pr_branch"/module_text_cofee/"$file"
   done

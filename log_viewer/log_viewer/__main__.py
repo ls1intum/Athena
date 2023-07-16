@@ -1,12 +1,22 @@
-from fastapi import FastAPI
+from typing import Annotated, List
+import os
+import secrets
+
+from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import docker
-from typing import List
 
 app = FastAPI()
+security = HTTPBasic()
+LOGS_PWD = os.environ["LOGS_PASSWORD"]
 
 @app.get("/logs", response_class=HTMLResponse)
-def get_docker_logs():
+def get_docker_logs(credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
+    """Get logs from all docker containers"""
+    if credentials.username != "athena" or secrets.compare_digest(credentials.password.encode("utf-8"), LOGS_PWD.encode("utf-8")) is False:
+        return {"message": "Incorrect username or password"}
+
     client = docker.from_env()
 
     # Get logs from all containers

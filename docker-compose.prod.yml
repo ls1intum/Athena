@@ -11,8 +11,6 @@ services:
       - "443:443"
     environment:
       - ATHENA_DOMAIN=${ATHENA_DOMAIN:-localhost}
-    env_file:
-      - ${ATHENA_ENV_DIR:-./env_example}/caddy.env
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
 
