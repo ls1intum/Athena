@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Athena Docker Logs</h1>
+        <div id="logs"></div>
+        <script>
+            const socket = new WebSocket(`ws://${location.host}/logs/ws`);
+
+            // Connection opened
+            // socket.addEventListener('open', function (event) {
+            //     socket.send('Hello Server!');
+            // });
+
+            // Listen for messages
+            socket.addEventListener('message', function (event) {
+                const logs = document.getElementById('logs');
+                const p = document.createElement('p');
+                p.innerHTML = event.data;
+                logs.appendChild(p);
+            });
+        </script>
+    </body>
+</html>
