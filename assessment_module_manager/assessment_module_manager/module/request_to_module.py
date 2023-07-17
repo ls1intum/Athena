@@ -50,8 +50,10 @@ if module_config:
         async with httpx.AsyncClient(base_url=module.url, timeout=600) as client:
             if method == "POST":
                 response = await client.post(path, json=data, headers=headers)
-            else:
+            elif method == "GET":
                 response = await client.get(path, headers=headers)
+            else:
+                raise ...
     except httpx.ConnectError as exc:
         raise HTTPException(status_code=503, detail=f"Module {module.name} is not available") from exc
     
