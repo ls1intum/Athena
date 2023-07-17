@@ -83,5 +83,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             ATHENA_PR_NUMBER=${{ github.event.pull_request.number }}
-            ATHENA_SHA=${{ github.sha }}
+            ATHENA_COMMIT_SHA=${{ github.sha }}
             ATHENA_BRANCH=${{ steps.branch.outputs.branch }}
