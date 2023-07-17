@@ -53,7 +53,7 @@ async def request_to_module(module: Module, module_config: Optional[str], path: 
                 elif method == "GET":
                     response = await client.get(path, headers=headers)
                 else:
-                    raise ...
+                    raise NotImplementedError(f"Method {method} is not implemented")
         except httpx.ConnectError as exc:
             raise HTTPException(status_code=503, detail=f"Module {module.name} is not available") from exc
         
