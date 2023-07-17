@@ -17,15 +17,8 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
   const { mode } = useBaseInfo();
 
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
-  const { data: submissions, isLoading: isLoadingSubmissions } =
-    useSubmissions(exercise);
-  const {
-    data: response,
-    isLoading,
-    error,
-    mutate,
-    reset,
-  } = useSendSubmissions(module, {
+  const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions(exercise);
+  const { data: response, isLoading, error, mutate, reset } = useSendSubmissions(module, {
     onError: (error) => {
       console.error(error);
       alert(
