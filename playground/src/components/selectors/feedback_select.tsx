@@ -1,13 +1,11 @@
-import useSWR from "swr";
 import Feedback from "@/model/feedback";
-import fetcher from "@/helpers/fetcher";
-import baseUrl from "@/helpers/base_url";
-import { Mode } from "@/model/mode";
+import useFeedbacks from "@/hooks/playground/feedbacks";
+import { Submission } from "@/model/submission";
+import { Exercise } from "@/model/exercise";
 
 type FeedbackSelectProps = {
-  mode: Mode;
-  exercise_id?: number;
-  submission_id?: number;
+  exercise?: Exercise;
+  submission?: Submission;
   feedback?: Feedback;
   onChange: (feedback: Feedback) => void;
   isAllFeedback?: boolean;
@@ -16,30 +14,17 @@ type FeedbackSelectProps = {
 };
 
 export default function FeedbackSelect({
-  mode,
-  exercise_id,
-  submission_id,
+  exercise,
+  submission,
   feedback,
   onChange,
   isAllFeedback,
   setIsAllFeedback,
   disabled,
 }: FeedbackSelectProps) {
-  const apiURL = `${baseUrl}/api/mode/${mode}/${
-    exercise_id === undefined
-      ? "feedbacks"
-      : `exercise/${exercise_id}/feedbacks`
-  }`;
-  const { data, error, isLoading } = useSWR(apiURL, fetcher);
+  const { data, error, isLoading } = useFeedbacks(exercise, submission)
   if (error) return <div className="text-red-500 text-sm">Failed to load</div>;
   if (isLoading) return <div className="text-gray-500 text-sm">Loading...</div>;
-
-  let filteredFeedbacks = data;
-  if (submission_id) {
-    filteredFeedbacks = filteredFeedbacks.filter(
-      (fb: Feedback) => fb.submission_id === submission_id
-    );
-  }
 
   return (
     <label className="flex flex-col">
@@ -53,11 +38,7 @@ export default function FeedbackSelect({
           if (value === "all") {
             setIsAllFeedback!(true);
           } else {
-            onChange(
-              filteredFeedbacks.find(
-                (fb: Feedback) => fb.id === parseInt(e.target.value)
-              )
-            );
+            onChange(data!.find((fb: Feedback) => fb.id === parseInt(e.target.value))!);
             if (setIsAllFeedback) setIsAllFeedback(false);
           }
         }}
@@ -75,7 +56,7 @@ export default function FeedbackSelect({
             ✨ All feedback
             </option>
           )}
-        {filteredFeedbacks.map((fb: Feedback) => (
+        {data && data.map((fb: Feedback) => (
           <option key={fb.id} value={fb.id}>
             {fb.id} ({fb.credits} credits) {fb.text || fb.detail_text || "N/A"}
           </option>

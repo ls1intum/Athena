@@ -85,9 +85,8 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
           />
           {!isAllSubmissions && (
             <FeedbackSelect
-              mode={mode}
-              exercise_id={exercise?.id}
-              submission_id={submission?.id}
+              exercise={exercise}
+              submission={submission}
               feedback={feedback}
               onChange={setFeedback}
               isAllFeedback={isAllFeedback}
