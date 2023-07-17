@@ -6,9 +6,7 @@ type TextExerciseDetailProps = {
   exercise: TextExercise;
 };
 
-export default function TextExerciseDetail({
-  exercise,
-}: TextExerciseDetailProps) {
+export default function TextExerciseDetail({ exercise }: TextExerciseDetailProps) {
   return (
     <Disclosure title="Example Solution">
       {exercise.example_solution.length > 0 ? (

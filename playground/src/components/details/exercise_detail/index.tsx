@@ -1,6 +1,4 @@
 import { Exercise } from "@/model/exercise";
-import { Mode } from "@/model/mode";
-
 import Disclosure from "@/components/disclosure";
 
 import CommonExerciseDetail from "./common";
@@ -9,19 +7,15 @@ import ProgrammingExerciseDetail from "./programming";
 
 type ExerciseDetailProps = {
   exercise: Exercise;
-  mode: Mode;
 };
 
-export default function ExerciseDetail({
-  exercise,
-  mode,
-}: ExerciseDetailProps) {
+export default function ExerciseDetail({ exercise }: ExerciseDetailProps) {
   const specificExerciseDetail = (() => {
     switch (exercise.type) {
       case "text":
         return <TextExerciseDetail exercise={exercise} />;
       case "programming":
-        return <ProgrammingExerciseDetail exercise={exercise} mode={mode} />;
+        return <ProgrammingExerciseDetail exercise={exercise} />;
       default:
         return null;
     }
