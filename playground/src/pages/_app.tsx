@@ -13,14 +13,16 @@ export default function App({ Component, pageProps }: AppProps) {
       <footer className="p-4 text-white border-t border-opacity-10 text-xs">
         {
           process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA ? <>
-            <a href={`https://github.com/ls1intum/Athena/tree/${process.env.NEXT_PUBLIC_ATHENA_BRANCH}`} target="_blank">
-              Branch:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_BRANCH}&nbsp;- 
+            <a href={`https://github.com/ls1intum/Athena/pull/${process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}`} target="_blank" className="hover:underline">
+              PR&nbsp;#{process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}:&nbsp;
+              {process.env.NEXT_PUBLIC_ATHENA_PR_TITLE}
             </a>
-            <span>
-              Commit:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA}&nbsp;-
-            </span>
-            <a href={`https://github.com/ls1intum/Athena/pull/${process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}`} target="_blank">
-              PR&nbsp;#{process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}
+            <a href={`https://github.com/ls1intum/Athena/tree/${process.env.NEXT_PUBLIC_ATHENA_BRANCH}`} target="_blank" className="hover:underline">
+              Branch:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_BRANCH}&nbsp;-&nbsp;
+            </a>
+            <a href={`https://github.com/ls1intum/Athena/pull/${process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}/commits/${process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA}`} className="hover:underline">
+              Commit:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA.slice(0, 7)}&nbsp;-&nbsp;
+              with message: {process.env.NEXT_PUBLIC_ATHENA_COMMIT_MESSAGE}
             </a>
           </> : (
             <span>Local build</span>
