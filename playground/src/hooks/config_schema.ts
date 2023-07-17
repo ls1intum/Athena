@@ -8,6 +8,9 @@ import ModuleResponse from "@/model/module_response";
  *
  * @example
  * const { data, isLoading, error } = useConfigSchema(module);
+ * 
+ * @param module The module to fetch the config schema for.
+ * @param options The react-query options.
  */
 export function useConfigSchema<Data = ModuleResponse, Error = AthenaError>(
   module?: ModuleMeta,
@@ -20,7 +23,7 @@ export function useConfigSchema<Data = ModuleResponse, Error = AthenaError>(
       if (athenaFetcher === undefined) {
         throw new AthenaError("No module set.", 0, undefined);
       }
-      return await athenaFetcher("/config_schema") as ModuleResponse;
+      return await athenaFetcher("/config_schema");
     },
     ...options,
   });

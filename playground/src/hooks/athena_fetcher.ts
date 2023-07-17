@@ -67,7 +67,7 @@ export function useAthenaFetcher(module?: ModuleMeta) {
           await response.json()
         );
       }
-      return response.json();
+      return response.json() as Promise<ModuleResponse>;
     }
   );
 }
