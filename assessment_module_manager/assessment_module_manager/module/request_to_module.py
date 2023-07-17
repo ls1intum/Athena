@@ -10,9 +10,9 @@ from .available_module_enum import AvailableModuleNames
 from .list_modules import list_modules
 from assessment_module_manager import env
 
-T = TypeVar('T')
+D = TypeVar('D')
 M = TypeVar('M')
-class ModuleResponse(GenericModel, Generic[T, M]):
+class ModuleResponse(GenericModel, Generic[D, M]):
     """
     A response from a module.
     """
