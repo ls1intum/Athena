@@ -2,6 +2,7 @@ import { useConfigSchema } from "@/hooks/use_config_schema";
 import ModuleResponseView from "@/components/module_response_view";
 import { ModuleRequestProps } from ".";
 
+
 export default function GetConfigSchema({ module }: ModuleRequestProps) {
   const { data, error, isLoading, refetch } = useConfigSchema(module, {
     onError: (error) => {
@@ -31,9 +32,7 @@ export default function GetConfigSchema({ module }: ModuleRequestProps) {
       <ModuleResponseView response={data || error?.asModuleResponse()} />
       <button
         className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600"
-        onClick={() => {
-          refetch();
-        }}
+        onClick={() => refetch()}
         disabled={isLoading}
       >
         {isLoading ? "Loading..." : "Get Config Schema"}
