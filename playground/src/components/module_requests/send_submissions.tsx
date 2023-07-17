@@ -83,7 +83,7 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
         {exercise
           ? isLoading || isLoadingSubmissions
             ? "Loading..."
-            : "Send Submissions"
+            : "Send submissions"
           : "Please select an exercise"}
       </button>
     </div>

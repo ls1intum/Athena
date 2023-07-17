@@ -4,10 +4,13 @@ import { ModuleRequestProps } from ".";
 
 
 export default function GetConfigSchema({ module }: ModuleRequestProps) {
-  const { data, error, isLoading, refetch } = useConfigSchema(module, {
+  const { data, error, isLoading, refetch, remove } = useConfigSchema(module, {
     onError: (error) => {
       console.error(error);
       alert(`Failed to get config from Athena: ${error.message}. Is the URL correct?`);
+    },
+    onSuccess: () => {
+      alert(`Config schema received successfully!`);
     },
     queryKey: ["config_schema", module.name, "module_requests"],
     retry: false,
@@ -32,11 +35,14 @@ export default function GetConfigSchema({ module }: ModuleRequestProps) {
       </p>
       <ModuleResponseView response={data || error?.asModuleResponse()} />
       <button
-        className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600"
-        onClick={() => refetch()}
+        className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600 disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed"
+        onClick={() => {
+          remove();
+          refetch();
+        }}
         disabled={isLoading}
       >
-        {isLoading ? "Loading..." : "Get Config Schema"}
+        {isLoading ? "Loading..." : "Get config schema"}
       </button>
     </div>
   );
