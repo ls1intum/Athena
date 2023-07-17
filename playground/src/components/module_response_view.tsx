@@ -16,12 +16,12 @@ export default function ModuleResponseView({
   try {
     formattedData = JSON.parse(formattedData);
   } catch (e) {
-    // ignore
+    // continue to show the non-formatted response string
   }
   try {
     formattedMeta = JSON.parse(formattedMeta);
   } catch (e) {
-    // ignore
+    // continue to show the non-formatted response string
   }
   if (typeof formattedData === "object") {
     formattedData = JSON.stringify(formattedData, undefined, 2);
