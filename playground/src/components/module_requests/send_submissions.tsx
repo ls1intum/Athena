@@ -21,9 +21,7 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
   const { data: response, isLoading, error, mutate, reset } = useSendSubmissions(module, {
     onError: (error) => {
       console.error(error);
-      alert(
-        `Failed to send submissions to Athena: ${error.message}. Is the URL correct?`
-      );
+      alert(`Failed to send submissions to Athena: ${error.message}. Is the URL correct?`);
     },
     onSuccess: () => {
       alert(`${submissions?.length} submissions sent successfully!`);
