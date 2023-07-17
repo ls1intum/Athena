@@ -18,7 +18,7 @@ class ModuleResponse(GenericModel, Generic[D, M]):
     """
     module_name: str
     status: int
-    data: T
+    data: D
     meta: M
 
 
