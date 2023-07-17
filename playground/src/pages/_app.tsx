@@ -10,7 +10,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/logo.png" sizes="any" />
       </Head>
       <Component {...pageProps} />
-      <footer className="p-4 text-white border-t border-opacity-10 text-xs">
+      <footer className="p-4 text-gray-400 border-t border-gray-800 text-xs">
         {
           process.env.NEXT_PUBLIC_ATHENA_IS_DEVELOP === 'true' ? <>
             <span>develop</span>&nbsp;-&nbsp;
