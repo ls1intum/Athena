@@ -14,7 +14,7 @@ import { useBaseInfo } from "@/hooks/base_info_context";
  * @param exercise The exercise to fetch the submissions for.
  * @param options The react-query options.
  */
-export function useSubmissions(
+export default function useSubmissions(
   exercise?: Exercise,
   options: Omit<UseQueryOptions<Submission[], Error, Submission[]>, 'queryFn'> = {}
 ) {

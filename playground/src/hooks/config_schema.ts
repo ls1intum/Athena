@@ -12,7 +12,7 @@ import ModuleResponse from "@/model/module_response";
  * @param module The module to fetch the config schema for.
  * @param options The react-query options.
  */
-export function useConfigSchema<Data = ModuleResponse, Error = AthenaError>(
+export default function useConfigSchema<Data = ModuleResponse, Error = AthenaError>(
   module?: ModuleMeta,
   options: Omit<UseQueryOptions<Data, Error, Data>, 'queryFn'> = {}
 ) {

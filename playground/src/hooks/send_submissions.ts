@@ -16,7 +16,7 @@ import ModuleResponse from "@/model/module_response";
  * @param module The module to send the submissions to.
  * @param options The react-query options.
  */
-export function useSendSubmissions(
+export default function useSendSubmissions(
   module?: ModuleMeta,
   options: Omit<
     UseMutationOptions<ModuleResponse, AthenaError, { exercise: Exercise; submissions: Submission[] }>,

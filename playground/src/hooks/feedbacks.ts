@@ -14,7 +14,7 @@ import { useBaseInfo } from "@/hooks/base_info_context";
  * @param exercise The exercise to fetch the feedbacks for.
  * @param options The react-query options.
  */
-export function useExercises(
+export default function useExercises(
   exercise?: Exercise,
   options: Omit<UseQueryOptions<Feedback[], Error, Feedback[]>, 'queryFn'> = {}
 ) {

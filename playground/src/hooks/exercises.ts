@@ -12,7 +12,7 @@ import { useBaseInfo } from "@/hooks/base_info_context";
  * 
  * @param options The react-query options.
  */
-export function useExercises(
+export default function useExercises(
   options: Omit<UseQueryOptions<Exercise[], Error, Exercise[]>, 'queryFn'> = {}
 ) {
   const { mode } = useBaseInfo();
