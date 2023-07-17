@@ -74,7 +74,6 @@ export default function SelectSubmission({ module }: ModuleRequestProps) {
         </b>
       </p>
       <ExerciseSelect
-        mode={mode}
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
@@ -82,7 +81,7 @@ export default function SelectSubmission({ module }: ModuleRequestProps) {
       />
       {exercise && (
         <div className="space-y-1 mt-2">
-          <ExerciseDetail exercise={exercise} mode={mode} />
+          <ExerciseDetail exercise={exercise} />
           <SubmissionList exercise={exercise} />
         </div>
       )}

@@ -66,7 +66,6 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
         <code>@feedback_consumer</code>.
       </p>
       <ExerciseSelect
-        mode={mode}
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
@@ -75,7 +74,6 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
       {exercise && (
         <>
           <SubmissionSelect
-            mode={mode}
             exercise={exercise}
             submission={submission}
             onChange={setSubmission}
@@ -95,7 +93,7 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
             />
           )}
           <div className="space-y-1 mt-2">
-            <ExerciseDetail exercise={exercise} mode={mode} />
+            <ExerciseDetail exercise={exercise} />
             {submission ? (
               <Disclosure title="Submission">
                 <SubmissionDetail

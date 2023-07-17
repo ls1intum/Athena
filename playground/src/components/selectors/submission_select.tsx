@@ -3,12 +3,10 @@ import {
   Submission,
   TextSubmission,
 } from "@/model/submission";
-import { Mode } from "@/model/mode";
 import useSubmissions from "@/hooks/playground/submissions";
 import { Exercise } from "@/model/exercise";
 
 type SubmissionSelectProps = {
-  mode: Mode;
   exercise?: Exercise;
   submission?: Submission;
   onChange: (submission: Submission) => void;
@@ -41,11 +39,7 @@ export default function SubmissionSelect({
           if (value === "all") {
             setIsAllSubmissions!(true);
           } else {
-            onChange(
-              data.find(
-                (sub: Submission) => sub.id === parseInt(e.target.value)
-              )
-            );
+            onChange(data!.find((sub: Submission) => sub.id === parseInt(e.target.value))!);
             if (setIsAllSubmissions) setIsAllSubmissions(false);
           }
         }}
@@ -63,7 +57,7 @@ export default function SubmissionSelect({
               ✨ All submissions
             </option>
           )}
-        {data.map((sub: Submission) => {
+        {data && data.map((sub: Submission) => {
           const contentPreview =
             (sub as TextSubmission)?.content ||
             (sub as ProgrammingSubmission)?.repository_url ||

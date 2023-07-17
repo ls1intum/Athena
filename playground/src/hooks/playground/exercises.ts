@@ -3,7 +3,6 @@ import baseUrl from "@/helpers/base_url";
 import { Exercise } from "@/model/exercise";
 import { useBaseInfo } from "@/hooks/base_info_context";
 
-
 /**
  * Fetches the exercises of the playground.
  * 

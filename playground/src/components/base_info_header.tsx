@@ -28,7 +28,7 @@ export default function BaseInfoHeader() {
           onChange={(e) => dispatch({ type: "SET_ATHENA_URL", payload: e.target.value })}
         />
       </label>
-      <Health url={athenaUrl} />
+      <Health />
       <label className="flex flex-col mt-4">
         <span className="text-lg font-bold">Secret</span>
         <p className="text-gray-500 mb-2">

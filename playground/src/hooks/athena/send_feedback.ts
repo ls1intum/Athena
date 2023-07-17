@@ -6,7 +6,6 @@ import { Submission } from "@/model/submission";
 import Feedback from "@/model/feedback";
 import ModuleResponse from "@/model/module_response";
 
-
 /**
  * Sends feedback for an exercise and a submission to an Athena module.
  *

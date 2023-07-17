@@ -40,7 +40,6 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
         with <code>@submission_consumer</code>.
       </p>
       <ExerciseSelect
-        mode={mode}
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
@@ -48,7 +47,7 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
       />
       {exercise && (
         <div className="space-y-1 mt-2">
-          <ExerciseDetail exercise={exercise} mode={mode} />
+          <ExerciseDetail exercise={exercise} />
           <SubmissionList exercise={exercise} />
         </div>
       )}

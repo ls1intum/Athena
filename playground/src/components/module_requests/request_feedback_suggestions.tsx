@@ -82,7 +82,6 @@ export default function RequestFeedbackSuggestions({
         request at the function annotated with <code>@feedback_provider</code>.
       </p>
       <ExerciseSelect
-        mode={mode}
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
@@ -91,14 +90,13 @@ export default function RequestFeedbackSuggestions({
       {exercise && (
         <>
           <SubmissionSelect
-            mode={mode}
             exercise={exercise}
             submission={submission}
             onChange={setSubmission}
             disabled={isLoading}
           />
           <div className="space-y-1 mt-2">
-            <ExerciseDetail exercise={exercise} mode={mode} />
+            <ExerciseDetail exercise={exercise} />
             {submission && (
               <Disclosure title="Submission">
                 <SubmissionDetail submission={submission} />

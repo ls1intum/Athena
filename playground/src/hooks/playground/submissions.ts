@@ -4,7 +4,6 @@ import { Exercise } from "@/model/exercise";
 import { Submission } from "@/model/submission";
 import { useBaseInfo } from "@/hooks/base_info_context";
 
-
 /**
  * Fetches the submissions for an exercise of the playground.
  * 

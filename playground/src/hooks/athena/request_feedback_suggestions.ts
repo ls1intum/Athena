@@ -5,7 +5,6 @@ import { Exercise } from "@/model/exercise";
 import { Submission } from "@/model/submission";
 import ModuleResponse from "@/model/module_response";
 
-
 /**
  * Requests feedback suggestions for an exercise and a submission from an Athena module.
  *
