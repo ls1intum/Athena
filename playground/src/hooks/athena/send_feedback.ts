@@ -30,11 +30,7 @@ export default function useSendFeedback(
 ) {
   const athenaFetcher = useAthenaFetcher(module);
   return useMutation({
-    mutationFn: async ({
-      exercise,
-      submission,
-      feedback
-    }) => {
+    mutationFn: async ({ exercise, submission, feedback }) => {
       if (athenaFetcher === undefined) {
         throw new AthenaError("No module set.", 0, undefined);
       }

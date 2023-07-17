@@ -7,29 +7,29 @@ import ModuleResponse from "@/model/module_response";
 
 
 /**
- * Sends submissions for an exercise to an Athena module.
+ * Requests feedback suggestions for an exercise and a submission from an Athena module.
  *
  * @example
- * const { data, isLoading, error, mutate } = useSendSubmissions(module);
- * mutate({ exercise, submissions });
+ * const { data, isLoading, error, mutate } = useRequestFeedbackSuggestions(module);
+ * mutate({ exercise, submission });
  * 
- * @param module The module to send the submissions to.
+ * @param module The module to request the feedback suggestions from.
  * @param options The react-query options.
  */
-export default function useSendSubmissions(
+export default function useRequestFeedbackSuggestions(
   module?: ModuleMeta,
   options: Omit<
-    UseMutationOptions<ModuleResponse, AthenaError, { exercise: Exercise; submissions: Submission[] }>,
+    UseMutationOptions<ModuleResponse, AthenaError, { exercise: Exercise; submission: Submission }>,
     "mutationFn"
   > = {}
 ) {
   const athenaFetcher = useAthenaFetcher(module);
   return useMutation({
-    mutationFn: async ({ exercise, submissions }) => {
+    mutationFn: async ({ exercise, submission }) => {
       if (athenaFetcher === undefined) {
         throw new AthenaError("No module set.", 0, undefined);
       }
-      return await athenaFetcher("/submissions", { exercise, submissions });
+      return await athenaFetcher("/feedback_suggestions", { exercise, submission });
     },
     ...options,
   });

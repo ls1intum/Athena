@@ -25,10 +25,7 @@ export default function useRequestSubmissionSelection(
 ) {
   const athenaFetcher = useAthenaFetcher(module);
   return useMutation({
-    mutationFn: async ({
-      exercise,
-      submissions,
-    }) => {
+    mutationFn: async ({ exercise, submissions }) => {
       if (athenaFetcher === undefined) {
         throw new AthenaError("No module set.", 0, undefined);
       }
