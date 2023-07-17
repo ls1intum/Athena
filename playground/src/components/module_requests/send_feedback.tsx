@@ -171,6 +171,10 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
               });
             });
           }
+          if (items.length === 0) {
+            alert("No feedback to send");
+            return;
+          }
           mutate(items);
         }}
         disabled={!exercise || isLoading || isLoadingSubmissions || isLoadingFeedbacks}
