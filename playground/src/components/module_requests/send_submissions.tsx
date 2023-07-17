@@ -1,97 +1,44 @@
 import { useEffect, useState } from "react";
 
-import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
-import { ModuleMeta } from "@/model/health_response";
-import { Mode } from "@/model/mode";
-import ModuleResponse from "@/model/module_response";
+
+import { useBaseInfo } from "@/hooks/base_info_context";
+import useSendSubmissions from "@/hooks/athena/send_submissions";
+import useSubmissions from "@/hooks/playground/submissions";
 
 import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponseView from "@/components/module_response_view";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionList from "@/components/submission_list";
-
-import baseUrl from "@/helpers/base_url";
-
 import { ModuleRequestProps } from ".";
-import { useBaseInfo } from "@/hooks/base_info_context";
 
-async function sendSubmissions(
-  mode: Mode,
-  athenaUrl: string,
-  athenaSecret: string,
-  module: ModuleMeta,
-  moduleConfig: any,
-  exercise: Exercise | undefined,
-): Promise<ModuleResponse | undefined> {
-  if (!exercise) {
-    alert("Please select an exercise");
-    return;
-  }
-  const submissionsResponse = await fetch(
-    `${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`
-  );
-  const submissions: Submission[] = await submissionsResponse.json();
-  let response;
-  try {
-    const athenaSubmissionsUrl = `${athenaUrl}/modules/${module.type}/${module.name}/submissions`;
-
-    response = await fetch(
-      `${baseUrl}/api/athena_request?${new URLSearchParams({
-        url: athenaSubmissionsUrl,
-      })}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Secret": athenaSecret,
-          ...(moduleConfig && {
-            "X-Module-Config": JSON.stringify(moduleConfig),
-          }),
-        },
-        body: JSON.stringify({ exercise, submissions }),
-      }
-    );
-  } catch (e) {
-    console.error(e);
-    alert(
-      "Failed to send submissions to Athena: Failed to fetch. Is the URL correct?"
-    );
-    return;
-  }
-  if (!response.ok) {
-    console.error(response);
-    alert(`Athena responded with status code ${response.status}`);
-    return {
-      module_name: "Unknown",
-      status: response.status,
-      data: await response.text(),
-    };
-  }
-  alert(`${submissions.length} submissions sent successfully!`);
-  return {
-    ...(await response.json()),
-    status: response.status,
-  };
-}
 
 export default function SendSubmissions({ module }: ModuleRequestProps) {
-  const { mode, athenaUrl, athenaSecret, moduleConfig } = useBaseInfo();
+  const { mode } = useBaseInfo();
 
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<ModuleResponse | undefined>(
-    undefined
-  );
+  const { data: submissions, isLoading: isLoadingSubmissions } =
+    useSubmissions(exercise);
+  const {
+    data: response,
+    isLoading,
+    error,
+    mutate,
+    reset,
+  } = useSendSubmissions(module, {
+    onError: (error) => {
+      console.error(error);
+      alert(
+        `Failed to send submissions to Athena: ${error.message}. Is the URL correct?`
+      );
+    },
+    onSuccess: () => {
+      alert(`${submissions?.length} submissions sent successfully!`);
+    },
+  });
 
-  useEffect(() => {
-    // Reset
-    setResponse(undefined);
-  }, [exercise]);
-
-  useEffect(() => {
-    setExercise(undefined);
-  }, [module, mode]);
+  useEffect(() => reset(), [exercise, reset]);
+  useEffect(() => setExercise(undefined), [module, mode]);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
@@ -114,25 +61,31 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
           <SubmissionList exercise={exercise} mode={mode} />
         </div>
       )}
-      <ModuleResponseView response={response} />
+      <ModuleResponseView response={response || error?.asModuleResponse()} />
+
       <button
-        className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600"
+        className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600 disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed"
         onClick={() => {
-          setLoading(true);
-          sendSubmissions(
-            mode,
-            athenaUrl,
-            athenaSecret,
-            module,
-            moduleConfig,
-            exercise
-          )
-            .then(setResponse)
-            .finally(() => setLoading(false));
+          if (!exercise) {
+            alert("Please select an exercise");
+            return;
+          }
+          if (!submissions) {
+            alert("Failed to fetch submissions or no submissions found");
+            return;
+          }
+          mutate({
+            exercise,
+            submissions,
+          });
         }}
-        disabled={loading}
+        disabled={isLoading || isLoadingSubmissions}
       >
-        {loading ? "Loading..." : "Send Submissions"}
+        {exercise
+          ? isLoading || isLoadingSubmissions
+            ? "Loading..."
+            : "Send Submissions"
+          : "Please select an exercise"}
       </button>
     </div>
   );

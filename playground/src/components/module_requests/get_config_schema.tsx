@@ -6,7 +6,8 @@ import { ModuleRequestProps } from ".";
 export default function GetConfigSchema({ module }: ModuleRequestProps) {
   const { data, error, isLoading, refetch } = useConfigSchema(module, {
     onError: (error) => {
-      alert(`Failed to get config from Athena: ${error.message}.\n\nIs the URL correct?`);
+      console.error(error);
+      alert(`Failed to get config from Athena: ${error.message}. Is the URL correct?`);
     },
     queryKey: ["config_schema", module.name, "module_requests"],
     retry: false,
