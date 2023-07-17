@@ -31,8 +31,8 @@ module_responses = {
 
 def submissions_consumer(func: Union[
     Callable[[E, List[S]], None],
-    Callable[[E, List[S], C], None],
     Callable[[E, List[S]], Coroutine[Any, Any, None]],
+    Callable[[E, List[S], C], None],
     Callable[[E, List[S], C], Coroutine[Any, Any, None]]
 ]):
     """
@@ -108,8 +108,8 @@ def submissions_consumer(func: Union[
 
 def submission_selector(func: Union[
     Callable[[E, List[S]], S],
-    Callable[[E, List[S], C], S],
     Callable[[E, List[S]], Coroutine[Any, Any, S]],
+    Callable[[E, List[S], C], S],
     Callable[[E, List[S], C], Coroutine[Any, Any, S]]
 ]):
     """
@@ -184,8 +184,8 @@ def submission_selector(func: Union[
 
 def feedback_consumer(func: Union[
     Callable[[E, S, F], None],
-    Callable[[E, S, F, C], None],
     Callable[[E, S, F], Coroutine[Any, Any, None]],
+    Callable[[E, S, F, C], None],
     Callable[[E, S, F, C], Coroutine[Any, Any, None]]
 ]):
     """
@@ -252,8 +252,8 @@ def feedback_consumer(func: Union[
 
 def feedback_provider(func: Union[
     Callable[[E, S], List[F]],
-    Callable[[E, S, C], List[F]],
     Callable[[E, S], Coroutine[Any, Any, List[F]]],
+    Callable[[E, S, C], List[F]],
     Callable[[E, S, C], Coroutine[Any, Any, List[F]]]
 ]):
     """
