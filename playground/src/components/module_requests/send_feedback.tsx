@@ -20,6 +20,7 @@ import baseUrl from "@/helpers/base_url";
 import { useFeedbacks } from "@/helpers/client/get_data";
 
 import { ModuleRequestProps } from ".";
+import { useBaseInfo } from "@/hooks/base_info_context";
 
 async function sendFeedback(
   athenaUrl: string,
@@ -144,13 +145,9 @@ async function sendAllExerciseFeedbacks(
   return responses;
 }
 
-export default function SendFeedback({
-  mode,
-  athenaUrl,
-  athenaSecret,
-  module,
-  moduleConfig,
-}: ModuleRequestProps) {
+export default function SendFeedback({ module }: ModuleRequestProps) {
+  const { mode, athenaUrl, athenaSecret, moduleConfig } = useBaseInfo();
+
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
 
   const [isAllSubmissions, setIsAllSubmissions] = useState<boolean>(true);

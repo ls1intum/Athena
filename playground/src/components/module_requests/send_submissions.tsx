@@ -14,6 +14,7 @@ import SubmissionList from "@/components/submission_list";
 import baseUrl from "@/helpers/base_url";
 
 import { ModuleRequestProps } from ".";
+import { useBaseInfo } from "@/hooks/base_info_context";
 
 async function sendSubmissions(
   mode: Mode,
@@ -74,13 +75,9 @@ async function sendSubmissions(
   };
 }
 
-export default function SendSubmissions({
-  mode,
-  athenaUrl,
-  athenaSecret,
-  module,
-  moduleConfig,
-}: ModuleRequestProps) {
+export default function SendSubmissions({ module }: ModuleRequestProps) {
+  const { mode, athenaUrl, athenaSecret, moduleConfig } = useBaseInfo();
+
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<ModuleResponse | undefined>(

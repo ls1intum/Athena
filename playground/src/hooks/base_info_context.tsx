@@ -52,7 +52,7 @@ function reducer(state: BaseInfo, action: Action): BaseInfo {
     case "SET_ATHENA_SECRET":
       return { ...state, athenaSecret: action.payload };
     case "SET_MODULE":
-      return { ...state, module: action.payload };
+      return { ...state, module: action.payload, moduleConfig: undefined };
     case "SET_MODULE_CONFIG":
       return { ...state, moduleConfig: action.payload };
     case "SET_MODE":

@@ -15,6 +15,7 @@ import Disclosure from "@/components/disclosure";
 import baseUrl from "@/helpers/base_url";
 
 import { ModuleRequestProps } from ".";
+import { useBaseInfo } from "@/hooks/base_info_context";
 
 async function requestFeedbackSuggestions(
   athenaUrl: string,
@@ -69,13 +70,9 @@ async function requestFeedbackSuggestions(
   }
 }
 
-export default function RequestFeedbackSuggestions({
-  mode,
-  athenaUrl,
-  athenaSecret,
-  module,
-  moduleConfig,
-}: ModuleRequestProps) {
+export default function RequestFeedbackSuggestions({ module }: ModuleRequestProps) {
+  const { mode, athenaUrl, athenaSecret, moduleConfig } = useBaseInfo();
+
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const [submission, setSubmission] = useState<Submission | undefined>(
     undefined

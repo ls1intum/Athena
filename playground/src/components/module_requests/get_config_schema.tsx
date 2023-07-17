@@ -6,6 +6,7 @@ import baseUrl from "@/helpers/base_url";
 
 import ModuleResponseView from "@/components/module_response_view";
 import { ModuleRequestProps } from ".";
+import { useBaseInfo } from "@/hooks/base_info_context";
 
 async function getConfig(
   athenaUrl: string,
@@ -45,11 +46,9 @@ async function getConfig(
   }
 }
 
-export default function GetConfigSchema({
-  athenaUrl,
-  athenaSecret,
-  module,
-}: ModuleRequestProps) {
+export default function GetConfigSchema({ module }: ModuleRequestProps) {
+  const { athenaUrl, athenaSecret } = useBaseInfo();
+
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<ModuleResponse | undefined>(
     undefined

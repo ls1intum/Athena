@@ -17,6 +17,7 @@ import baseUrl from "@/helpers/base_url";
 import { useSubmissions } from "@/helpers/client/get_data";
 
 import { ModuleRequestProps } from ".";
+import { useBaseInfo } from "@/hooks/base_info_context";
 
 async function requestSubmissionSelection(
   mode: Mode,
@@ -75,13 +76,9 @@ async function requestSubmissionSelection(
   }
 }
 
-export default function SelectSubmission({
-  mode,
-  athenaUrl,
-  athenaSecret,
-  module,
-  moduleConfig,
-}: ModuleRequestProps) {
+export default function SelectSubmission({ module }: ModuleRequestProps) {
+  const { mode, athenaUrl, athenaSecret, moduleConfig } = useBaseInfo();
+
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<ModuleResponse | undefined>(

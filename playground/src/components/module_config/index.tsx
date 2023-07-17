@@ -8,6 +8,7 @@ import { ModuleMeta } from "@/model/health_response";
 import DefaultSchemaFormModuleConfig from "./default_schema_form";
 import ModuleLLMConfig from "./module_llm";
 import athenaFetcher from "@/helpers/athena_fetcher";
+import { useBaseInfo } from "@/hooks/base_info_context";
 
 // Need to customize the form for some modules?
 // You can do that here.
@@ -40,17 +41,15 @@ export type ModuleConfigProps = {
 
 type ModuleConfigWrapperProps = ModuleConfigProps & {
   module: ModuleMeta;
-  athenaUrl: string;
-  athenaSecret: string;
 };
 
 export default function ModuleConfigWrapper({
+  module,
   moduleConfig,
   onChangeConfig,
-  module,
-  athenaUrl,
-  athenaSecret,
 }: ModuleConfigWrapperProps) {
+  const { athenaUrl, athenaSecret } = useBaseInfo();
+
   const hasCustomModuleConfigComponent =
     module.name in customModuleConfigComponents;
   const CustomModuleConfigComponent =
