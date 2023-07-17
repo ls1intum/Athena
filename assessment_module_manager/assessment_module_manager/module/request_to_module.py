@@ -46,27 +46,23 @@ async def request_to_module(module: Module, module_config: Optional[str], path: 
     if module_config:
         headers['X-Module-Config'] = module_config
 
-        try:
-            async with httpx.AsyncClient(base_url=module.url, timeout=600) as client:
-                if method == "POST":
-                    response = await client.post(path, json=data, headers=headers)
-                elif method == "GET":
-                    response = await client.get(path, headers=headers)
-                else:
-                    raise NotImplementedError(f"Method {method} is not implemented")
-        except httpx.ConnectError as exc:
-            raise HTTPException(status_code=503, detail=f"Module {module.name} is not available") from exc
-        
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            pass
+    try:
+        async with httpx.AsyncClient(base_url=module.url, timeout=600) as client:
+            if method == "POST":
+                response = await client.post(path, json=data, headers=headers)
+            elif method == "GET":
+                response = await client.get(path, headers=headers)
+            else:
+                raise NotImplementedError(f"Method {method} is not implemented")
+    except httpx.ConnectError as exc:
+        raise HTTPException(status_code=503, detail=f"Module {module.name} is not available") from exc
+    
+    try:
+        response_data = response.json()
+        meta = response_data.get('meta', {})
+        response_data = response_data.get('data', response_data)
+    except json.JSONDecodeError:
+        response_data = response.text
+        meta = None
 
-        try:
-            response_data = response.json()
-            meta = response_data.get('meta', {})
-            response_data = response_data.get('data', response_data)
-        except json.JSONDecodeError:
-            response_data = response.text
-            meta = {}
-        return ModuleResponse(module_name=module.name, status=response.status_code, data=response_data, meta=meta)
+    return ModuleResponse(module_name=module.name, status=response.status_code, data=response_data, meta=meta)
