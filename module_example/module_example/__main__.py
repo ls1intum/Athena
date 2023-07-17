@@ -77,7 +77,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
     # If you are not using module_config for your module, you can remove it from the function signature
     logger.info("Config: %s", module_config)
     if module_config.debug:
-        emit_meta('costs', '100.00€')
+        emit_meta("costs", "100.00€")
     
     return [
         Feedback(
