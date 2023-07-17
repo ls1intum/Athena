@@ -92,7 +92,7 @@ export default function RequestFeedbackSuggestions({
         <>
           <SubmissionSelect
             mode={mode}
-            exercise_id={exercise?.id}
+            exercise={exercise}
             submission={submission}
             onChange={setSubmission}
             disabled={isLoading}
