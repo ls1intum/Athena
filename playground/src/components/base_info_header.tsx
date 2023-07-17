@@ -1,6 +1,5 @@
-import useSWR from "swr";
-import athenaFetcher from "@/helpers/athena_fetcher";
 import { useBaseInfo, useBaseInfoDispatch } from "@/hooks/base_info_context";
+import { useConfigSchema } from "@/hooks/use_config_schema";
 
 import Health from "@/components/health";
 import ModuleSelect from "@/components/selectors/module_select";
@@ -17,11 +16,7 @@ export default function BaseInfoHeader() {
     moduleConfig,
   } = useBaseInfo();
   const dispatch = useBaseInfoDispatch();
-  
-  const url = module
-    ? `${athenaUrl}/modules/${module.type}/${module.name}/config_schema`
-    : null;
-  const { data, error, isLoading } = useSWR(url, athenaFetcher(athenaSecret));
+  const { data, error, isLoading } = useConfigSchema(module);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">

@@ -1,14 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import useSWR from "swr";
 import validator from "@rjsf/validator-ajv8";
 import { getDefaultFormState } from "@rjsf/utils";
 
+import { useConfigSchema } from "@/hooks/use_config_schema";
 import { ModuleMeta } from "@/model/health_response";
 
 import DefaultSchemaFormModuleConfig from "./default_schema_form";
 import ModuleLLMConfig from "./module_llm";
-import athenaFetcher from "@/helpers/athena_fetcher";
-import { useBaseInfo } from "@/hooks/base_info_context";
+
 
 // Need to customize the form for some modules?
 // You can do that here.
@@ -48,18 +47,13 @@ export default function ModuleConfigWrapper({
   moduleConfig,
   onChangeConfig,
 }: ModuleConfigWrapperProps) {
-  const { athenaUrl, athenaSecret } = useBaseInfo();
-
   const hasCustomModuleConfigComponent =
     module.name in customModuleConfigComponents;
   const CustomModuleConfigComponent =
     customModuleConfigComponents[module.name as CustomModuleConfig];
 
   const [formKey, setFormKey] = useState(0);
-  const { data, error, isLoading } = useSWR(
-    `${athenaUrl}/modules/${module.type}/${module.name}/config_schema`,
-    athenaFetcher(athenaSecret)
-  );
+  const { data, error, isLoading } = useConfigSchema(module);
 
   useEffect(() => {
     if (data) {
