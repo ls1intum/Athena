@@ -1,5 +1,5 @@
 import { useBaseInfo, useBaseInfoDispatch } from "@/hooks/base_info_context";
-import useConfigSchema from "@/hooks/config_schema";
+import useConfigSchema from "@/hooks/athena/config_schema";
 
 import Health from "@/components/health";
 import ModuleSelect from "@/components/selectors/module_select";
