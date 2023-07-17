@@ -1,11 +1,7 @@
-import useSWR from "swr";
 import { Exercise } from "@/model/exercise";
-import fetcher from "@/helpers/fetcher";
-import baseUrl from "@/helpers/base_url";
-import { Mode } from "@/model/mode";
+import useExercises from "@/hooks/playground/exercises";
 
 type ExerciseSelectProps = {
-  mode: Mode;
   exercise?: Exercise;
   exerciseType: string;
   onChange: (exercise: Exercise) => void;
@@ -13,14 +9,12 @@ type ExerciseSelectProps = {
 };
 
 export default function ExerciseSelect({
-  mode,
   exercise,
   exerciseType,
   onChange,
   disabled,
 }: ExerciseSelectProps) {
-  const apiURL = `${baseUrl}/api/mode/${mode}/exercises`;
-  const { data, error, isLoading } = useSWR(apiURL, fetcher);
+  const { data, error, isLoading } = useExercises()
   if (error) return <div className="text-red-500 text-sm">Failed to load</div>;
   if (isLoading) return <div className="text-gray-500 text-sm">Loading...</div>;
   return (
@@ -30,16 +24,12 @@ export default function ExerciseSelect({
         className="border border-gray-300 rounded-md p-2"
         value={exercise?.id ?? ""}
         disabled={disabled}
-        onChange={(e) =>
-          onChange(
-            data.find((ex: Exercise) => ex.id === parseInt(e.target.value))
-          )
-        }
+        onChange={(e) => onChange(data!.find((ex: Exercise) => ex.id === parseInt(e.target.value))!)}
       >
         <option value={""} disabled>
           Select an exercise
         </option>
-        {data
+        {data && data
           .sort((a: Exercise, b: Exercise) => a.id - b.id)
           .map((ex: Exercise) => {
             return ex.type === exerciseType ? (
