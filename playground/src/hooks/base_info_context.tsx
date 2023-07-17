@@ -18,7 +18,6 @@ type Action =
   | { type: 'SET_MODULE_CONFIG'; payload: any }
   | { type: 'SET_MODE'; payload: Mode };
 
-
 function createInitialState(): BaseInfo {
   let defaultUrl = "http://127.0.0.1:5000";
   if (

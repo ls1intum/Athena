@@ -8,7 +8,6 @@ import { ModuleMeta } from "@/model/health_response";
 import DefaultSchemaFormModuleConfig from "./default_schema_form";
 import ModuleLLMConfig from "./module_llm";
 
-
 // Need to customize the form for some modules?
 // You can do that here.
 //
