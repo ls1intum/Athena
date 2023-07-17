@@ -40,11 +40,11 @@ async def request_to_module(module: Module, module_config: Optional[str], path: 
     It raises appropriate FastAPI HTTPException if the request fails.
     """
     module_secret = env.MODULE_SECRETS[module.name]
-    headers = {'X-API-Secret': module_secret} if module_secret else None
-    if module_config:
-        if headers is None:
-            headers = {}
-        headers['X-Module-Config'] = module_config
+headers = {}
+if module_secret:
+    headers['X-API-Secret'] = module_secret
+if module_config:
+    headers['X-Module-Config'] = module_config
 
     try:
         async with httpx.AsyncClient(base_url=module.url, timeout=600) as client:
