@@ -57,7 +57,6 @@ async function requestFeedbackSuggestions(
         module_name: "Unknown",
         status: response.status,
         data: await response.text(),
-        meta: {},
       };
     }
     alert("Feedback suggestions requested successfully!");

@@ -68,7 +68,6 @@ async function sendFeedback(
         module_name: "Unknown",
         status: response.status,
         data: await response.text(),
-        meta: {},
       };
     }
     if (alertAfterSuccess) {

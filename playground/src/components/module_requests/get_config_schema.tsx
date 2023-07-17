@@ -34,7 +34,6 @@ async function getConfig(
         module_name: "Unknown",
         status: response.status,
         data: await response.text(),
-        meta: {},
       };
     }
     return await response.json();

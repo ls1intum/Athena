@@ -41,16 +41,18 @@ export default function ModuleResponseView({
         <span className="font-bold mb-4">Status code:</span>
         <span className="mb-4">{response.status}</span>
       </div>
-      <Disclosure
-        title="Meta:"
-        openedInitially
-        noContentIndent
-        className={{ trigger: "font-bold text-black" }}
-      >
-        <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto whitespace-pre-wrap">
-          {formattedMeta}
-        </pre>
-      </Disclosure>
+      {formattedMeta !== undefined && (
+        <Disclosure
+          title="Meta:"
+          openedInitially
+          noContentIndent
+          className={{ trigger: "font-bold text-black" }}
+        >
+          <pre className="mb-4 bg-gray-100 p-4 rounded-md overflow-x-auto whitespace-pre-wrap">
+            {formattedMeta}
+          </pre>
+        </Disclosure>
+      )}
       <Disclosure
         title="Data:"
         openedInitially
