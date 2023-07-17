@@ -1,7 +1,7 @@
 import { UseQueryOptions, useQuery } from "react-query";
 import baseUrl from "@/helpers/base_url";
 import { Exercise } from "@/model/exercise";
-import { Feedback } from "@/model/feedback";
+import Feedback from "@/model/feedback";
 import { useBaseInfo } from "@/hooks/base_info_context";
 
 
