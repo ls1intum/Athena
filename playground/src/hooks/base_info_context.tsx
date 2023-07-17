@@ -47,7 +47,7 @@ const BaseInfoContext = createContext<{
 function reducer(state: BaseInfo, action: Action): BaseInfo {
   switch (action.type) {
     case "SET_ATHENA_URL":
-      return { ...state, athenaUrl: action.payload };
+      return { ...state, athenaUrl: action.payload, module: undefined, moduleConfig: undefined };
     case "SET_ATHENA_SECRET":
       return { ...state, athenaSecret: action.payload };
     case "SET_MODULE":

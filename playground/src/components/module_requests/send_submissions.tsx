@@ -51,7 +51,7 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
           <SubmissionList exercise={exercise} />
         </div>
       )}
-      <ModuleResponseView response={response || error?.asModuleResponse()} />
+      <ModuleResponseView response={response || (error && error.asModuleResponse ? error.asModuleResponse() : undefined)} />
       <button
         className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600 disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed"
         onClick={() => {
