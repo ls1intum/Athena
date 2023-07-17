@@ -1,9 +1,5 @@
-import useSWR from "swr";
-import HealthResponse, { ModuleMeta } from "@/model/health_response";
-import fetcher from "@/helpers/fetcher";
-import baseUrl from "@/helpers/base_url";
-import { useBaseInfo } from "@/hooks/base_info_context";
-
+import { ModuleMeta } from "@/model/health_response";
+import useHealth from "@/hooks/health";
 
 export default function ModuleSelect({
   module,
@@ -12,11 +8,7 @@ export default function ModuleSelect({
   module: ModuleMeta | undefined;
   onChange: (module: ModuleMeta) => void;
 }) {
-  const { athenaUrl } = useBaseInfo();
-  const { data, error } = useSWR<HealthResponse>(
-    `${baseUrl}/api/health?url=${encodeURIComponent(athenaUrl)}`,
-    fetcher
-  );
+  const { data, error } = useHealth();
   if (error) return <div className="text-red-500 text-sm">Failed to load</div>;
   if (!data) return <div className="text-gray-500 text-sm">Loading...</div>;
   return (
