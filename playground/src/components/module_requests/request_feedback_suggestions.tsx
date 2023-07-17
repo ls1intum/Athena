@@ -86,6 +86,7 @@ export default function RequestFeedbackSuggestions({
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
+        disabled={isLoading}
       />
       {exercise && (
         <>
@@ -94,6 +95,7 @@ export default function RequestFeedbackSuggestions({
             exercise_id={exercise?.id}
             submission={submission}
             onChange={setSubmission}
+            disabled={isLoading}
           />
           <div className="space-y-1 mt-2">
             <ExerciseDetail exercise={exercise} mode={mode} />
