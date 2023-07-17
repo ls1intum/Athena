@@ -85,5 +85,5 @@ jobs:
             ATHENA_BRANCH=${{ steps.branch.outputs.branch }}
             ATHENA_PR_NUMBER=${{ github.event.pull_request.number }}
             ATHENA_PR_TITLE=${{ github.event.pull_request.title }}
-            ATHENA_COMMIT_SHA=${{ github.sha }}
-            ATHENA_COMMIT_MESSAGE=${{ github.event.head_commit.message }}
+            ATHENA_COMMIT_SHA=${{ github.event.pull_request.head.sha }}
+            ATHENA_COMMIT_MESSAGE=${{ github.event.pull_request.head.commit.message }}

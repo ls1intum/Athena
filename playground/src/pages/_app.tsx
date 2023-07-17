@@ -16,12 +16,12 @@ export default function App({ Component, pageProps }: AppProps) {
             <a href={`https://github.com/ls1intum/Athena/pull/${process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}`} target="_blank" className="hover:underline">
               PR&nbsp;#{process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}:&nbsp;
               {process.env.NEXT_PUBLIC_ATHENA_PR_TITLE}
-            </a>
+            </a>&nbsp;-&nbsp;
             <a href={`https://github.com/ls1intum/Athena/tree/${process.env.NEXT_PUBLIC_ATHENA_BRANCH}`} target="_blank" className="hover:underline">
-              Branch:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_BRANCH}&nbsp;-&nbsp;
-            </a>
+              Branch:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_BRANCH}
+            </a>&nbsp;-&nbsp;
             <a href={`https://github.com/ls1intum/Athena/pull/${process.env.NEXT_PUBLIC_ATHENA_PR_NUMBER}/commits/${process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA}`} className="hover:underline">
-              Commit:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA.slice(0, 7)}&nbsp;-&nbsp;
+              Commit:&nbsp;{process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA.slice(0, 7)}&nbsp;
               with message: {process.env.NEXT_PUBLIC_ATHENA_COMMIT_MESSAGE}
             </a>
           </> : (
