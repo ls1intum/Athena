@@ -33,7 +33,7 @@ def receive_submissions(exercise: Exercise, submissions: List[Submission], modul
     logger.info("Config: %s", module_config)
     if module_config.debug:
         emit_meta('debug', True)
-        emit_meta('_comment', 'You can add any meta data you want here')
+        emit_meta('_comment', 'You can add any metadata you want here')
 
     # Add data to exercise
     exercise.meta["some_data"] = "some_value"
