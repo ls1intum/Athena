@@ -12,7 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Component {...pageProps} />
       <footer className="p-4 text-white border-t border-opacity-10 text-xs">
         {
-          process.env.NEXT_PUBLIC_ATHENA_IS_DEVELOP ? <>
+          process.env.NEXT_PUBLIC_ATHENA_IS_DEVELOP === 'true' ? <>
             <span>develop</span>&nbsp;-&nbsp;
             <a href={`https://github.com/ls1intum/Athena/commit/${process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA}`} target="_blank" className="hover:underline">
               Commit:&nbsp;{(process.env.NEXT_PUBLIC_ATHENA_COMMIT_SHA ?? '').slice(0, 7)}
