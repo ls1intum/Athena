@@ -9,6 +9,7 @@ type ExerciseSelectProps = {
   exercise?: Exercise;
   exerciseType: string;
   onChange: (exercise: Exercise) => void;
+  disabled?: boolean;
 };
 
 export default function ExerciseSelect({
@@ -16,6 +17,7 @@ export default function ExerciseSelect({
   exercise,
   exerciseType,
   onChange,
+  disabled,
 }: ExerciseSelectProps) {
   const apiURL = `${baseUrl}/api/mode/${mode}/exercises`;
   const { data, error, isLoading } = useSWR(apiURL, fetcher);
@@ -27,6 +29,7 @@ export default function ExerciseSelect({
       <select
         className="border border-gray-300 rounded-md p-2"
         value={exercise?.id ?? ""}
+        disabled={disabled}
         onChange={(e) =>
           onChange(
             data.find((ex: Exercise) => ex.id === parseInt(e.target.value))

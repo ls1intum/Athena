@@ -20,7 +20,6 @@ import SubmissionList from "@/components/submission_list";
 
 import { ModuleRequestProps } from ".";
 
-
 export default function SendFeedback({ module }: ModuleRequestProps) {
   const { mode } = useBaseInfo();
 
@@ -71,6 +70,7 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
+        disabled={isLoading}
       />
       {exercise && (
         <>
@@ -81,6 +81,7 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
             onChange={setSubmission}
             isAllSubmissions={isAllSubmissions}
             setIsAllSubmissions={setIsAllSubmissions}
+            disabled={isLoading}
           />
           {!isAllSubmissions && (
             <FeedbackSelect
@@ -91,6 +92,7 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
               onChange={setFeedback}
               isAllFeedback={isAllFeedback}
               setIsAllFeedback={setIsAllFeedback}
+              disabled={isLoading}
             />
           )}
           <div className="space-y-1 mt-2">

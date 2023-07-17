@@ -12,6 +12,7 @@ type FeedbackSelectProps = {
   onChange: (feedback: Feedback) => void;
   isAllFeedback?: boolean;
   setIsAllFeedback?: (isAllFeedback: boolean) => void;
+  disabled?: boolean;
 };
 
 export default function FeedbackSelect({
@@ -22,6 +23,7 @@ export default function FeedbackSelect({
   onChange,
   isAllFeedback,
   setIsAllFeedback,
+  disabled,
 }: FeedbackSelectProps) {
   const apiURL = `${baseUrl}/api/mode/${mode}/${
     exercise_id === undefined
@@ -45,6 +47,7 @@ export default function FeedbackSelect({
       <select
         className="border border-gray-300 rounded-md p-2"
         value={isAllFeedback ? "all" : feedback?.id || ""}
+        disabled={disabled}
         onChange={(e) => {
           const value = e.target.value;
           if (value === "all") {

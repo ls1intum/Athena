@@ -15,6 +15,7 @@ type SubmissionSelectProps = {
   onChange: (submission: Submission) => void;
   isAllSubmissions?: boolean;
   setIsAllSubmissions?: (isAllSubmissions: boolean) => void;
+  disabled?: boolean;
 };
 
 export default function SubmissionSelect({
@@ -24,6 +25,7 @@ export default function SubmissionSelect({
   onChange,
   isAllSubmissions,
   setIsAllSubmissions,
+  disabled,
 }: SubmissionSelectProps) {
   const apiURL = `${baseUrl}/api/mode/${mode}/${
     exercise_id === undefined
@@ -40,6 +42,7 @@ export default function SubmissionSelect({
       <select
         className="border border-gray-300 rounded-md p-2"
         value={isAllSubmissions ? "all" : submission?.id || ""}
+        disabled={disabled}
         onChange={(e) => {
           const value = e.target.value;
           if (value === "all") {

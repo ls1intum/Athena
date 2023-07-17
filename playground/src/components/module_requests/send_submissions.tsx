@@ -12,7 +12,6 @@ import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionList from "@/components/submission_list";
 import { ModuleRequestProps } from ".";
 
-
 export default function SendSubmissions({ module }: ModuleRequestProps) {
   const { mode } = useBaseInfo();
 
@@ -45,6 +44,7 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
         exerciseType={module.type}
         exercise={exercise}
         onChange={setExercise}
+        disabled={isLoading}
       />
       {exercise && (
         <div className="space-y-1 mt-2">
