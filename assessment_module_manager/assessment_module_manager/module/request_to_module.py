@@ -9,6 +9,7 @@ from .module import Module
 from .available_module_enum import AvailableModuleNames
 from .list_modules import list_modules
 from assessment_module_manager import env
+from assessment_module_manager.logger import logger
 
 D = TypeVar('D')
 M = TypeVar('M')
@@ -64,5 +65,6 @@ async def request_to_module(module: Module, module_config: Optional[str], path: 
     except json.JSONDecodeError:
         response_data = response.text
         meta = None
+        logger.warning("Module %s returned non-JSON response: %s", module.name, response.text)
 
     return ModuleResponse(module_name=module.name, status=response.status_code, data=response_data, meta=meta)
