@@ -49,7 +49,7 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
       {exercise && (
         <div className="space-y-1 mt-2">
           <ExerciseDetail exercise={exercise} mode={mode} />
-          <SubmissionList exercise={exercise} mode={mode} />
+          <SubmissionList exercise={exercise} />
         </div>
       )}
       <ModuleResponseView response={response || error?.asModuleResponse()} />
@@ -69,7 +69,7 @@ export default function SendSubmissions({ module }: ModuleRequestProps) {
             submissions,
           });
         }}
-        disabled={isLoading || isLoadingSubmissions}
+        disabled={!exercise || isLoading || isLoadingSubmissions}
       >
         {exercise
           ? isLoading || isLoadingSubmissions

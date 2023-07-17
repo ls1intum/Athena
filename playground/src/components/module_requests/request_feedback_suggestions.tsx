@@ -15,17 +15,28 @@ import SubmissionDetail from "@/components/details/submission_detail";
 import Disclosure from "@/components/disclosure";
 import { ModuleRequestProps } from ".";
 
-
-export default function RequestFeedbackSuggestions({ module }: ModuleRequestProps) {
+export default function RequestFeedbackSuggestions({
+  module,
+}: ModuleRequestProps) {
   const { mode } = useBaseInfo();
 
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
-  const [submission, setSubmission] = useState<Submission | undefined>(undefined);
+  const [submission, setSubmission] = useState<Submission | undefined>(
+    undefined
+  );
 
-  const { data: response, isLoading, error, mutate, reset } = useRequestFeedbackSuggestions(module, {
+  const {
+    data: response,
+    isLoading,
+    error,
+    mutate,
+    reset,
+  } = useRequestFeedbackSuggestions(module, {
     onError: (error) => {
       console.error(error);
-      alert(`Failed to request feedback suggestions from Athena: ${error.message}. Is the URL correct?`);
+      alert(
+        `Failed to request feedback suggestions from Athena: ${error.message}. Is the URL correct?`
+      );
     },
     onSuccess: () => {
       alert(`Feedback suggestions requested successfully!`);
@@ -113,13 +124,15 @@ export default function RequestFeedbackSuggestions({ module }: ModuleRequestProp
             submission,
           });
         }}
-        disabled={isLoading}
+        disabled={!exercise || !submission || isLoading}
       >
-        {exercise
+        {exercise && submission
           ? isLoading
             ? "Loading..."
             : "Request feedback suggestions"
-          : "Please select an exercise & submission"}
+          : exercise
+          ? "Please select a submission"
+          : "Please select an exercise"}
       </button>
     </div>
   );

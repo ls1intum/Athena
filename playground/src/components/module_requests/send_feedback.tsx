@@ -106,7 +106,7 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
               </Disclosure>
             ) : (
               isAllFeedback && (
-                <SubmissionList exercise={exercise} mode={mode} feedbacks={feedback ? [feedback] : feedbacks} />
+                <SubmissionList exercise={exercise} feedbacks={feedback ? [feedback] : feedbacks} />
               )
             )}
             {isLoadingFeedbacks && (
@@ -174,7 +174,7 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
           }
           mutate(items);
         }}
-        disabled={isLoading || isLoadingSubmissions || isLoadingFeedbacks}
+        disabled={!exercise || isLoading || isLoadingSubmissions || isLoadingFeedbacks}
       >
         {exercise
           ? isLoading || isLoadingSubmissions || isLoadingFeedbacks
