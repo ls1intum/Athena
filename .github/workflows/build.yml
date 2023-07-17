@@ -82,7 +82,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
+            ATHENA_IS_DEVELOP=${{ github.ref == 'refs/heads/develop' && 'true' || 'false' }}
+            ATHENA_COMMIT_SHA=${{ github.event.sha }}
             ATHENA_PR_NUMBER=${{ github.event.pull_request.number }}
             ATHENA_PR_TITLE=${{ github.event.pull_request.title }}
-            ATHENA_COMMIT_SHA=${{ github.event.pull_request.head.sha }}
-            ATHENA_LAST_UPDATE=${{ github.event.pull_request.updated_at }}
+            ATHENA_PR_LAST_UPDATE=${{ github.event.pull_request.updated_at }}
