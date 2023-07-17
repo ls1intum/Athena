@@ -1,4 +1,4 @@
-import { useConfigSchema } from "@/hooks/use_config_schema";
+import { useConfigSchema } from "@/hooks/config_schema";
 import ModuleResponseView from "@/components/module_response_view";
 import { ModuleRequestProps } from ".";
 

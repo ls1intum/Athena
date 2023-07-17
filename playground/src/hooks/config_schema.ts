@@ -1,5 +1,5 @@
 import { UseQueryOptions, useQuery } from "react-query";
-import { AthenaError, useAthenaFetcher } from "@/hooks/use_athena_fetcher";
+import { AthenaError, useAthenaFetcher } from "@/hooks/athena_fetcher";
 import { ModuleMeta } from "@/model/health_response";
 import ModuleResponse from "@/model/module_response";
 
