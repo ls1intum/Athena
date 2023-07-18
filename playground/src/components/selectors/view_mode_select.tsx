@@ -8,7 +8,7 @@ export default function ViewModeSelect({
   onChangeViewMode: (viewMode: ViewMode) => void;
 }) {
   return (
-    <label className="flex flex-col">
+    <div className="flex flex-col">
       <span className="text-lg font-bold">Select Mode</span>
       <div className="flex flex-row mb-2">
         <button
@@ -45,6 +45,6 @@ export default function ViewModeSelect({
           </>
         )}
       </p>
-    </label>
+    </div>
   );
 }

@@ -8,7 +8,7 @@ export default function DataModeSelect({
   onChangeDataMode: (dataMode: DataMode) => void;
 }) {
   return (
-    <label className="flex flex-col">
+    <div className="flex flex-col">
       <span className="text-lg font-bold">Dataset</span>
       <div className="flex flex-row mb-2">
         <button
@@ -19,7 +19,7 @@ export default function DataModeSelect({
           }`}
           onClick={() => onChangeDataMode("example")}
         >
-          Example data
+          Example Data
         </button>
         <button
           className={`p-2 rounded-r-md ${
@@ -29,13 +29,13 @@ export default function DataModeSelect({
           }`}
           onClick={() => onChangeDataMode("evaluation")}
         >
-          Evaluation data
+          Evaluation Data
         </button>
       </div>
       <p className="text-gray-500">
         Data in <code className="bg-gray-100 p-1 rounded-sm">data/{dataMode}/</code>{" "}
         directory will be used.
       </p>
-    </label>
+    </div>
   );
 }
