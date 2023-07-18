@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Exercise } from "@/model/exercise";
 import useSubmissions from "@/hooks/playground/submissions";
 import { useBaseInfo } from "@/hooks/base_info_context";
+import useSendSubmissions from "@/hooks/athena/send_submissions";
 
 type DefineExperimentProps = {
   onStartExperiment: (experiment: Experiment) => void;
@@ -13,6 +14,14 @@ export default function DefineExperiment({ onStartExperiment }: DefineExperiment
   const { module } = useBaseInfo();
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions(exercise);
+  const { mutate: sendSubmissions, isLoading: isLoadingSendSubmissions } = useSendSubmissions(module, {
+    onSuccess: (_, { exercise, submissions}) => {
+      onStartExperiment({
+        exercise,
+        submissions,
+      });
+    },
+  })
 
   if (!module) {
     return null;
@@ -37,15 +46,15 @@ export default function DefineExperiment({ onStartExperiment }: DefineExperiment
             alert("Failed to fetch submissions or no submissions found");
             return;
           }
-          onStartExperiment({
+          sendSubmissions({
             exercise,
             submissions,
           });
         }}
-        disabled={!exercise || isLoadingSubmissions}
+        disabled={!exercise || isLoadingSubmissions || isLoadingSendSubmissions}
       >
         {exercise
-          ? isLoadingSubmissions
+          ? (isLoadingSubmissions || isLoadingSendSubmissions)
             ? "Loading..."
             : "Start Experiment"
           : "Please select an exercise"}
