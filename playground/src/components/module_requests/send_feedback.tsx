@@ -26,10 +26,10 @@ async function sendFeedbacks(
   athenaSecret: string,
   module: ModuleMeta,
   moduleConfig: any,
-  exercise: Exercise | undefined,
-  submission: Submission | undefined,
+  exercise?: Exercise,
+  submission?: Submission,
   feedbacks: Feedback[],
-  alertAfterSuccess: boolean
+  alertAfterSuccess: boolean = true
 ): Promise<ModuleResponse | undefined> {
   if (!exercise) {
     alert("Please select an exercise");

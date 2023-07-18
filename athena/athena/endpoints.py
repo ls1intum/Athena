@@ -100,6 +100,13 @@ def submissions_consumer(func: Union[
         if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
+        store_exercise(exercise)
+        store_submissions(submissions)
+
+        kwargs = {}
+        if "module_config" in inspect.signature(func).parameters:
+            kwargs["module_config"] = module_config
+
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
             await func(exercise, submissions, **kwargs)
@@ -252,6 +259,10 @@ def feedback_consumer(func: Union[
         for feedback in feedbacks:
             feedback.meta.update(get_stored_feedback_meta(feedback) or {})
             store_feedback(feedback)
+
+        kwargs = {}
+        if "module_config" in inspect.signature(func).parameters:
+            kwargs["module_config"] = module_config
 
         kwargs = {}
         if "module_config" in inspect.signature(func).parameters:
