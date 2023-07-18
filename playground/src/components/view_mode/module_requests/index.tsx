@@ -1,9 +1,9 @@
 import { ModuleMeta } from "@/model/health_response";
-import GetConfigSchema from "@/components/module_requests/get_config_schema";
-import SendSubmissions from "@/components/module_requests/send_submissions";
-import SendFeedback from "@/components/module_requests/send_feedback";
-import RequestFeedbackSuggestions from "@/components/module_requests/request_feedback_suggestions";
-import SelectSubmission from "@/components/module_requests/request_submission_selection";
+import GetConfigSchema from "@/components/view_mode/module_requests/get_config_schema";
+import SendSubmissions from "@/components/view_mode/module_requests/send_submissions";
+import SendFeedback from "@/components/view_mode/module_requests/send_feedback";
+import RequestFeedbackSuggestions from "@/components/view_mode/module_requests/request_feedback_suggestions";
+import SelectSubmission from "@/components/view_mode/module_requests/request_submission_selection";
 
 export type ModuleRequestProps = {
   module: ModuleMeta;
