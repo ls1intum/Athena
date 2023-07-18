@@ -15,7 +15,7 @@ export default function Playground() {
         (viewMode === "module_requests" ? (
           <ModuleRequests module={module} />
         ) : (
-          <EvaluationMode module={module} />
+          <EvaluationMode />
         ))}
     </main>
   );
