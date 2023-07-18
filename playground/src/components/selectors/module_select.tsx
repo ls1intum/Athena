@@ -24,7 +24,7 @@ export default function ModuleSelect({
         </option>
         {Object.entries(data.modules).map(([moduleName, { healthy, type }]) => {
           return (
-            <option key={moduleName} value={moduleName}>
+            <option key={moduleName} value={moduleName} disabled={!healthy}>
               {moduleName}
               {healthy ? "" : " (not healthy!)"}
             </option>
