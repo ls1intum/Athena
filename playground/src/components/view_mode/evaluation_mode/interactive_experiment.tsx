@@ -7,6 +7,7 @@ import Feedback from "@/model/feedback";
 import { Submission } from "@/model/submission";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import { Allotment } from "allotment";
+import useRequestFeedbackSuggestions from "@/hooks/athena/request_feedback_suggestions";
 
 export default function InteractiveExperiment({
   experiment,
@@ -14,8 +15,8 @@ export default function InteractiveExperiment({
   experiment: Experiment;
 }) {
   const { module } = useBaseInfo();
-  const { mutate: selectSubmission, isLoading: isLoadingSubmissionSelection } =
-    useRequestSubmissionSelection(module);
+  const { mutate: selectSubmission, isLoading: isLoadingSubmissionSelection } = useRequestSubmissionSelection(module);
+  const { mutate: requestFeedbackSuggestions, isLoading: isLoadingFeedbackSuggestions } = useRequestFeedbackSuggestions(module);
   const [submissionsAndFeedbacks, setSubmissionsAndFeedbacks] = useState<
     { submission: Submission; feedbacks: Feedback[] }[]
   >([]);
@@ -73,11 +74,18 @@ export default function InteractiveExperiment({
                       if (!submission) {
                         throw new Error("Failed to find submission");
                       }
-                      setSubmissionsAndFeedbacks([
-                        ...submissionsAndFeedbacks,
-                        { submission, feedbacks: [] },
-                      ]);
-                      setCurrentSubmissionIndex(nextIndex);
+                      requestFeedbackSuggestions({ exercise: experiment.exercise, submission },
+                        {
+                          onSuccess: (response) => {
+                            const { data: feedbacks } = response as { data: Feedback[] };
+                            setSubmissionsAndFeedbacks([
+                              ...submissionsAndFeedbacks,
+                              { submission, feedbacks },
+                            ]);
+                            setCurrentSubmissionIndex(nextIndex);
+                          }
+                        }
+                      );
                     },
                   }
                 );
@@ -92,13 +100,12 @@ export default function InteractiveExperiment({
       </div>
       <div className="h-screen">
         <Allotment vertical={false} >
-        <div className="mr-2">
+        <div className="mr-4">
           {submissionsAndFeedbacks[currentIndex]?.submission ? (
               <SubmissionDetail
                 submission={submissionsAndFeedbacks[currentIndex]?.submission}
                 feedbacks={submissionsAndFeedbacks[currentIndex]?.feedbacks}
               />
-            
           ) : (
             <p className="text-gray-500">
               No submission selected. Please click next to select a submission.
@@ -106,7 +113,7 @@ export default function InteractiveExperiment({
           )
         }
           </div>
-          <div className="ml-2">
+          <div className="ml-4">
             <ExerciseDetail exercise={experiment.exercise} hideDisclosure openedInitially />
           </div>
         </Allotment>
