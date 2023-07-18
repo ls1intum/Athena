@@ -8,18 +8,20 @@ import ProgrammingExerciseDetail from "./programming";
 type ExerciseDetailProps = {
   exercise: Exercise;
   hideDisclosure?: boolean;
+  openedInitially?: boolean;
 };
 
 export default function ExerciseDetail({
   exercise,
   hideDisclosure,
+  openedInitially,
 }: ExerciseDetailProps) {
   const specificExerciseDetail = (() => {
     switch (exercise.type) {
       case "text":
-        return <TextExerciseDetail exercise={exercise} />;
+        return <TextExerciseDetail exercise={exercise} openedInitially />;
       case "programming":
-        return <ProgrammingExerciseDetail exercise={exercise} />;
+        return <ProgrammingExerciseDetail exercise={exercise} openedInitially />;
       default:
         return null;
     }
@@ -27,13 +29,14 @@ export default function ExerciseDetail({
 
   return hideDisclosure ? (
     <div className="mt-2 space-y-1">
-      <CommonExerciseDetail exercise={exercise} />
+      <CommonExerciseDetail exercise={exercise} openedInitially />
       {specificExerciseDetail}
     </div>
   ) : (
     <Disclosure
       title="Exercise Detail"
       className={{ root: "mt-2", content: "space-y-1" }}
+      openedInitially={openedInitially}
     >
       <>
         <CommonExerciseDetail exercise={exercise} />

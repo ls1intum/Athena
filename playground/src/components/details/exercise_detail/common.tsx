@@ -4,16 +4,17 @@ import Disclosure from "@/components/disclosure";
 
 type CommonExerciseDetailProps = {
   exercise: Exercise;
+  openedInitially?: boolean;
 };
 
-export default function CommonExerciseDetail({ exercise }: CommonExerciseDetailProps) {
+export default function CommonExerciseDetail({ exercise, openedInitially }: CommonExerciseDetailProps) {
   return (
     <>
       <div className="text-gray-500 font-medium">
         {exercise.max_points} Points and {exercise.bonus_points} Bonus Points
       </div>
       {/* Problem Statement */}
-      <Disclosure title="Problem Statement">
+      <Disclosure title="Problem Statement" openedInitially={openedInitially}>
         {exercise.problem_statement.length > 0 ? (
           <Markdown
             content={exercise.problem_statement}
@@ -25,7 +26,7 @@ export default function CommonExerciseDetail({ exercise }: CommonExerciseDetailP
       </Disclosure>
 
       {/* Grading Instructions */}
-      <Disclosure title="Grading Instructions">
+      <Disclosure title="Grading Instructions" openedInitially={openedInitially}>
         {exercise.grading_instructions.length > 0 ? (
           <Markdown
             content={exercise.grading_instructions}

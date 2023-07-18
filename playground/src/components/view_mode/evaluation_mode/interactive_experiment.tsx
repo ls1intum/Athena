@@ -107,7 +107,7 @@ export default function InteractiveExperiment({
         }
           </div>
           <div className="ml-2">
-            <ExerciseDetail exercise={experiment.exercise} hideDisclosure />
+            <ExerciseDetail exercise={experiment.exercise} hideDisclosure openedInitially />
           </div>
         </Allotment>
       </div>
