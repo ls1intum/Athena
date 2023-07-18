@@ -40,7 +40,7 @@ export default function Markdown({
         )}
         onClick={() => setView("plaintext")}
       >
-        Plain Text
+        Plain&nbsp;Text
       </button>
     </div>
   );

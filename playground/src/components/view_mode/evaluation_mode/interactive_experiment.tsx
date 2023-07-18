@@ -14,8 +14,11 @@ export default function InteractiveExperiment({
   experiment: Experiment;
 }) {
   const { module } = useBaseInfo();
-  const { mutate: selectSubmission, isLoading: isLoadingSubmissionSelection } = useRequestSubmissionSelection(module);
-  const [submissionsAndFeedbacks, setSubmissionsAndFeedbacks] = useState<{ submission: Submission; feedbacks: Feedback[] }[]>([]);
+  const { mutate: selectSubmission, isLoading: isLoadingSubmissionSelection } =
+    useRequestSubmissionSelection(module);
+  const [submissionsAndFeedbacks, setSubmissionsAndFeedbacks] = useState<
+    { submission: Submission; feedbacks: Feedback[] }[]
+  >([]);
   const [currentIndex, setCurrentSubmissionIndex] = useState(-1);
 
   return (
@@ -40,26 +43,44 @@ export default function InteractiveExperiment({
             if (currentIndex >= submissionsAndFeedbacks.length - 1) {
               if (isLoadingSubmissionSelection) {
                 return;
-              } else if (submissionsAndFeedbacks.length < experiment.submissions.length) {
-                const submissionsToSelectFrom = experiment.submissions.filter((submission) => {
-                  return !submissionsAndFeedbacks.some((submissionAndFeedback) => {
-                    return submissionAndFeedback.submission.id === submission.id;
-                  });
-                });
-                selectSubmission({
-                  exercise: experiment.exercise,
-                  submissions: submissionsToSelectFrom,
-                }, {
-                  onSuccess: (reponse) => {
-                    const { data: submissionId } = reponse as { data: number }
-                    const submission = submissionsToSelectFrom.find((submission) => submission.id === submissionId);
-                    if (!submission) {
-                      throw new Error("Failed to find submission");
-                    }
-                    setSubmissionsAndFeedbacks([...submissionsAndFeedbacks, { submission, feedbacks: [] }]);
-                    setCurrentSubmissionIndex(nextIndex);
+              } else if (
+                submissionsAndFeedbacks.length < experiment.submissions.length
+              ) {
+                const submissionsToSelectFrom = experiment.submissions.filter(
+                  (submission) => {
+                    return !submissionsAndFeedbacks.some(
+                      (submissionAndFeedback) => {
+                        return (
+                          submissionAndFeedback.submission.id === submission.id
+                        );
+                      }
+                    );
                   }
-                });
+                );
+                selectSubmission(
+                  {
+                    exercise: experiment.exercise,
+                    submissions: submissionsToSelectFrom,
+                  },
+                  {
+                    onSuccess: (reponse) => {
+                      const { data: submissionId } = reponse as {
+                        data: number;
+                      };
+                      const submission = submissionsToSelectFrom.find(
+                        (submission) => submission.id === submissionId
+                      );
+                      if (!submission) {
+                        throw new Error("Failed to find submission");
+                      }
+                      setSubmissionsAndFeedbacks([
+                        ...submissionsAndFeedbacks,
+                        { submission, feedbacks: [] },
+                      ]);
+                      setCurrentSubmissionIndex(nextIndex);
+                    },
+                  }
+                );
               }
             } else {
               setCurrentSubmissionIndex(nextIndex);
@@ -69,11 +90,25 @@ export default function InteractiveExperiment({
           Next
         </button>
       </div>
-      <div className="w-full h-screen">
-        <Allotment vertical={false}>
-          {submissionsAndFeedbacks[currentIndex]?.submission
-            && <SubmissionDetail submission={submissionsAndFeedbacks[currentIndex]?.submission} feedbacks={submissionsAndFeedbacks[currentIndex]?.feedbacks} />}
-          <ExerciseDetail exercise={experiment.exercise} />
+      <div className="h-screen">
+        <Allotment vertical={false} >
+        <div className="mr-2">
+          {submissionsAndFeedbacks[currentIndex]?.submission ? (
+              <SubmissionDetail
+                submission={submissionsAndFeedbacks[currentIndex]?.submission}
+                feedbacks={submissionsAndFeedbacks[currentIndex]?.feedbacks}
+              />
+            
+          ) : (
+            <p className="text-gray-500">
+              No submission selected. Please click next to select a submission.
+            </p>
+          )
+        }
+          </div>
+          <div className="ml-2">
+            <ExerciseDetail exercise={experiment.exercise} hideDisclosure />
+          </div>
         </Allotment>
       </div>
       {/* 3. Feedback suggestions */}

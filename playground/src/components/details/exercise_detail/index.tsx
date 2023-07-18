@@ -7,9 +7,13 @@ import ProgrammingExerciseDetail from "./programming";
 
 type ExerciseDetailProps = {
   exercise: Exercise;
+  hideDisclosure?: boolean;
 };
 
-export default function ExerciseDetail({ exercise }: ExerciseDetailProps) {
+export default function ExerciseDetail({
+  exercise,
+  hideDisclosure,
+}: ExerciseDetailProps) {
   const specificExerciseDetail = (() => {
     switch (exercise.type) {
       case "text":
@@ -21,7 +25,12 @@ export default function ExerciseDetail({ exercise }: ExerciseDetailProps) {
     }
   })();
 
-  return (
+  return hideDisclosure ? (
+    <div className="mt-2 space-y-1">
+      <CommonExerciseDetail exercise={exercise} />
+      {specificExerciseDetail}
+    </div>
+  ) : (
     <Disclosure
       title="Exercise Detail"
       className={{ root: "mt-2", content: "space-y-1" }}
