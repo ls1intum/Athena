@@ -3,12 +3,12 @@ import type { Submission } from "@/model/submission";
 import { getSubmissions } from "@/helpers/get_data";
 import getOriginFromRequest from "@/helpers/origin_from_req";
 import { validateModeMiddleware } from "@/helpers/validate_mode_middleware";
-import { Mode } from "@/model/mode";
+import { DataMode } from "@/model/data_mode";
 
 function handler(req: NextApiRequest, res: NextApiResponse<Submission[]>) {
-  const { mode } = req.query as { mode: Mode };
+  const { mode: dataMode } = req.query as { mode: DataMode };
   const submissions = getSubmissions(
-    mode,
+    dataMode,
     undefined,
     getOriginFromRequest(req)
   );

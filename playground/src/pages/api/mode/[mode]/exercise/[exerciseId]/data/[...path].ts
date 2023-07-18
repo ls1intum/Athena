@@ -3,11 +3,11 @@ import { promises as fs } from "fs";
 import { join } from "path";
 import Archiver from "archiver";
 import { validateModeMiddleware } from "@/helpers/validate_mode_middleware";
-import { Mode } from "@/model/mode";
+import { DataMode } from "@/model/data_mode";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { mode, exerciseId, path } = req.query as {
-    mode: Mode;
+  const { mode: dataMode, exerciseId, path } = req.query as {
+    mode: DataMode;
     exerciseId: string;
     path: string[];
   };
@@ -21,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const folderPath = join(
     process.cwd(),
     "data",
-    mode,
+    dataMode,
     "exercise-" + exerciseId,
     ...path
   );

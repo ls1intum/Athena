@@ -17,7 +17,7 @@ import SubmissionList from "@/components/submission_list";
 import { ModuleRequestProps } from ".";
 
 export default function SelectSubmission({ module }: ModuleRequestProps) {
-  const { mode } = useBaseInfo();
+  const { dataMode } = useBaseInfo();
   
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions(exercise);
@@ -32,7 +32,7 @@ export default function SelectSubmission({ module }: ModuleRequestProps) {
   });
   
   useEffect(() => reset(), [exercise, reset]);
-  useEffect(() => setExercise(undefined), [module, mode]);
+  useEffect(() => setExercise(undefined), [module, dataMode]);
 
   const responseSubmissionView = (response: ModuleResponse | undefined) => {
     if (!response || response.status !== 200 || typeof response.data !== "number") {

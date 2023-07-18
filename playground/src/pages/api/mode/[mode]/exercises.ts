@@ -3,11 +3,11 @@ import type { Exercise } from "@/model/exercise";
 import { getExercises } from "@/helpers/get_data";
 import getOriginFromRequest from "@/helpers/origin_from_req";
 import { validateModeMiddleware } from "@/helpers/validate_mode_middleware";
-import { Mode } from "@/model/mode";
+import { DataMode } from "@/model/data_mode";
 
 function handler(req: NextApiRequest, res: NextApiResponse<Exercise[]>) {
-  const { mode } = req.query as { mode: Mode };
-  res.status(200).json(getExercises(mode, getOriginFromRequest(req)));
+  const { mode: dataMode } = req.query as { mode: DataMode };
+  res.status(200).json(getExercises(dataMode, getOriginFromRequest(req)));
 }
 
 export default function handlerWithMiddleware(

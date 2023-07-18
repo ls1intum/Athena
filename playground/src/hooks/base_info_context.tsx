@@ -1,14 +1,16 @@
 import { ReactNode, createContext, useContext, useReducer } from 'react';
 
 import { ModuleMeta } from '@/model/health_response';
-import { Mode } from '@/model/mode';
+import { DataMode } from '@/model/data_mode';
+import { ViewMode } from '@/model/view_mode';
 
 export type BaseInfo = {
   athenaUrl: string;
   athenaSecret: string;
   module?: ModuleMeta;
   moduleConfig: any;
-  mode: Mode;
+  dataMode: DataMode;
+  viewMode: ViewMode;
 };
 
 type Action =
@@ -16,7 +18,8 @@ type Action =
   | { type: 'SET_ATHENA_SECRET'; payload: string }
   | { type: 'SET_MODULE'; payload: ModuleMeta }
   | { type: 'SET_MODULE_CONFIG'; payload: any }
-  | { type: 'SET_MODE'; payload: Mode };
+  | { type: 'SET_DATA_MODE'; payload: DataMode }
+  | { type: 'SET_VIEW_MODE'; payload: ViewMode };
 
 function createInitialState(): BaseInfo {
   let defaultUrl = "http://127.0.0.1:5000";
@@ -32,7 +35,8 @@ function createInitialState(): BaseInfo {
     athenaSecret: "",
     module: undefined,
     moduleConfig: {},
-    mode: "example",
+    dataMode: "example",
+    viewMode: "module_requests",
   };
 }
 
@@ -54,8 +58,10 @@ function reducer(state: BaseInfo, action: Action): BaseInfo {
       return { ...state, module: action.payload, moduleConfig: undefined };
     case "SET_MODULE_CONFIG":
       return { ...state, moduleConfig: action.payload };
-    case "SET_MODE":
-      return { ...state, mode: action.payload };
+    case "SET_DATA_MODE":
+      return { ...state, dataMode: action.payload };
+    case "SET_VIEW_MODE":
+      return { ...state, viewMode: action.payload };
     default:
       throw new Error(`Unhandled action: ${action}`);
   }

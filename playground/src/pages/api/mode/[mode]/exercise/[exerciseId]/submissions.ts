@@ -3,10 +3,10 @@ import type { Submission } from "@/model/submission";
 import { getSubmissions } from "@/helpers/get_data";
 import getOriginFromRequest from "@/helpers/origin_from_req";
 import { validateModeMiddleware } from "@/helpers/validate_mode_middleware";
-import { Mode } from "@/model/mode";
+import { DataMode } from "@/model/data_mode";
 
 function handler(req: NextApiRequest, res: NextApiResponse<Submission[]>) {
-  const { mode, exerciseId } = req.query as { mode: Mode; exerciseId: string };
+  const { mode: dataMode, exerciseId } = req.query as { mode: DataMode; exerciseId: string };
   const parsedExerciseId = exerciseId ? parseInt(exerciseId) : undefined;
   if (parsedExerciseId === undefined) {
     res.status(404).json([]);
@@ -14,7 +14,7 @@ function handler(req: NextApiRequest, res: NextApiResponse<Submission[]>) {
   }
   try {
     const submissions = getSubmissions(
-      mode,
+      dataMode,
       parsedExerciseId,
       getOriginFromRequest(req)
     );
