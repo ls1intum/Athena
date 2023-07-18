@@ -11,7 +11,12 @@ export default function Playground() {
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-6xl font-bold text-white mb-8">Playground</h1>
       <BaseInfoHeader />
-      {module && (viewMode === "module_requests" ? <ModuleRequests module={module} /> : <EvaluationMode />)}
+      {module &&
+        (viewMode === "module_requests" ? (
+          <ModuleRequests module={module} />
+        ) : (
+          <EvaluationMode module={module} />
+        ))}
     </main>
   );
 }
