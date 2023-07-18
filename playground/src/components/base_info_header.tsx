@@ -3,7 +3,7 @@ import useConfigSchema from "@/hooks/athena/config_schema";
 
 import Health from "@/components/health";
 import ModuleSelect from "@/components/selectors/module_select";
-import DataSelect from "@/components/selectors/data_select";
+import DataModeSelect from "@/components/selectors/data_mode_select";
 import ModuleConfig from "@/components/module_config";
 import Disclosure from "@/components/disclosure";
 
@@ -98,7 +98,7 @@ export default function BaseInfoHeader() {
         </div>
       )}
       <br />
-      <DataSelect 
+      <DataModeSelect 
         dataMode={dataMode} 
         onChangeDataMode={(dataMode) => dispatch({ type: "SET_DATA_MODE", payload: dataMode })} 
       />
