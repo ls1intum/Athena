@@ -6,11 +6,17 @@ export default function ModuleSelect({
   onChange,
 }: {
   module: ModuleMeta | undefined;
-  onChange: (module: ModuleMeta) => void;
+  onChange: (module: ModuleMeta | undefined) => void;
 }) {
   const { data, error } = useHealth();
   if (error) return <div className="text-red-500 text-sm">Failed to load</div>;
   if (!data) return <div className="text-gray-500 text-sm">Loading...</div>;
+
+  const currentModule = data.modules[module?.name ?? ""];
+  if (currentModule && currentModule.healthy === false) {
+    onChange(undefined);
+  }
+
   return (
     <label className="flex flex-col">
       <span className="text-lg font-bold">Module</span>
@@ -24,7 +30,7 @@ export default function ModuleSelect({
         </option>
         {Object.entries(data.modules).map(([moduleName, { healthy }]) => {
           return (
-            <option key={moduleName} value={moduleName}>
+            <option key={moduleName} value={moduleName} disabled={!healthy}>
               {moduleName}
               {healthy ? "" : " (not healthy!)"}
             </option>
