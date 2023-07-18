@@ -25,6 +25,7 @@ async function sendFeedbacks(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
+  moduleConfig: any,
   exercise: Exercise | undefined,
   submission: Submission | undefined,
   feedbacks: Feedback[],
@@ -49,6 +50,9 @@ async function sendFeedbacks(
         headers: {
           "Content-Type": "application/json",
           "Authorization": athenaSecret,
+          ...(moduleConfig && {
+            "X-Module-Config": JSON.stringify(moduleConfig),
+          }),
         },
         body: JSON.stringify({ exercise, submission, feedbacks }),
       }
@@ -79,9 +83,10 @@ async function sendAllExerciseFeedbacks(
   athenaUrl: string,
   athenaSecret: string,
   module: ModuleMeta,
+  moduleConfig: any,
   exercise?: Exercise,
   submission?: Submission
-): Promise<ModuleResponse | undefined> {
+): Promise<ModuleResponse[] | undefined> {
   if (!exercise) {
     alert("Please select an exercise");
     return;
@@ -111,15 +116,26 @@ async function sendAllExerciseFeedbacks(
     alert(`No feedbacks found for ${submission ? "submission" : "exercise"}`);
     return;
   }
-  const responses = await sendFeedbacks(
-    athenaUrl,
-    athenaSecret,
-    module,
-    exercise,
-    submission!,
-    feedbacks,
-    false
-  );
+  const responses: ModuleResponse[] = [];
+  for (const feedback of feedbacks) {
+    const submission = submissions.find((s) => s.id === feedback.submission_id);
+    const response = await sendFeedbacks(
+      athenaUrl,
+      athenaSecret,
+      module,
+      moduleConfig,
+      exercise,
+      submission!,
+      feedbacks,
+      false
+    );
+    if (response) {
+      responses.push(response);
+    } else {
+      // something went wrong, abort
+      return;
+    }
+  }
   alert(`${feedbacks.length} feedbacks sent`);
   return responses;
 }
@@ -129,6 +145,7 @@ export default function SendFeedback({
   athenaUrl,
   athenaSecret,
   module,
+  moduleConfig,
 }: ModuleRequestProps) {
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
 
@@ -141,7 +158,7 @@ export default function SendFeedback({
   const [feedback, setFeedback] = useState<Feedback | undefined>(undefined);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<ModuleResponse | undefined>(
+  const [responses, setResponses] = useState<ModuleResponse[] | undefined>(
     undefined
   );
 
@@ -153,7 +170,7 @@ export default function SendFeedback({
 
   useEffect(() => {
     // Reset
-    setResponse(undefined);
+    setResponses(undefined);
     setIsAllSubmissions(true);
     setSubmission(undefined);
     setIsAllFeedback(true);
@@ -178,7 +195,7 @@ export default function SendFeedback({
         exercise. This usually happens when someone gives feedback on the
         submission in the LMS. The matching module for the exercise will receive
         the feedback at the function annotated with{" "}
-        <code>@feedbacks_consumer</code>.
+        <code>@feedback_consumer</code>.
       </p>
       <ExerciseSelect
         mode={mode}
@@ -247,9 +264,11 @@ export default function SendFeedback({
           )}
         </>
       )}
-      <ModuleResponseView response={response} />
+      {responses?.map((response, i) => (
+        <ModuleResponseView key={i} response={response} />
+      ))}
       <button
-        className="bg-blue-500 text-white rounded-md p-2 mt-4"
+        className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600"
         onClick={() => {
           setLoading(true);
           if (isAllSubmissions) {
@@ -258,9 +277,10 @@ export default function SendFeedback({
               athenaUrl,
               athenaSecret,
               module,
+              moduleConfig,
               exercise!
             )
-              .then(setResponse)
+              .then(setResponses)
               .finally(() => setLoading(false));
           } else if (isAllFeedback) {
             sendAllExerciseFeedbacks(
@@ -268,22 +288,24 @@ export default function SendFeedback({
               athenaUrl,
               athenaSecret,
               module,
+              moduleConfig,
               exercise!,
               submission!
             )
-              .then(setResponse)
+              .then(setResponses)
               .finally(() => setLoading(false));
           } else {
             sendFeedbacks(
               athenaUrl,
               athenaSecret,
               module,
+              moduleConfig,
               exercise,
               submission,
               [feedback!],
               true
             )
-              .then((resp) => setResponse(resp))
+              .then((resp) => setResponses([resp!]))
               .finally(() => setLoading(false));
           }
         }}

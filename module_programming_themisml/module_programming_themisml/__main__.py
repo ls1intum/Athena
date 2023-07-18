@@ -3,7 +3,7 @@ Entry point for the module_programming_themisml module.
 """
 from typing import List, cast
 
-from athena import app, submissions_consumer, submission_selector, feedbacks_consumer, feedback_provider
+from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
 from athena.database import get_db
 from athena.models import DBProgrammingFeedback
 from athena.programming import Exercise, Submission, Feedback
@@ -28,7 +28,7 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@feedbacks_consumer
+@feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
     logger.info("process_feedback: Received feedbacks for submission %d of exercise %d", submission.id, exercise.id)
     logger.info("process_feedback: Feedbacks: %s", feedbacks)

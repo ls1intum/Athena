@@ -2,10 +2,11 @@ from typing import List
 
 import nltk
 
-from athena import app, submission_selector, submissions_consumer, feedbacks_consumer, feedback_provider
+from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
+from module_text_llm.config import Configuration
 from .suggest_feedback_basic import suggest_feedback_basic
 
 
@@ -20,15 +21,15 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@feedbacks_consumer
+@feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
     logger.info("process_feedback: Received feedbacks for submission %d of exercise %d.", submission.id, exercise.id)
 
 
 @feedback_provider
-async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
-    return await suggest_feedback_basic(exercise, submission)
+    return await suggest_feedback_basic(exercise, submission, module_config.approach, module_config.debug)
 
 
 if __name__ == "__main__":
