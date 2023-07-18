@@ -4,12 +4,14 @@ import useConfigSchema from "@/hooks/athena/config_schema";
 import Health from "@/components/health";
 import ModuleSelect from "@/components/selectors/module_select";
 import DataModeSelect from "@/components/selectors/data_mode_select";
+import ViewModeSelect from "@/components/selectors/view_mode_select";
 import ModuleConfig from "@/components/module_config";
 import Disclosure from "@/components/disclosure";
 
 export default function BaseInfoHeader() {
   const {
     dataMode,
+    viewMode,
     athenaUrl,
     athenaSecret,
     module,
@@ -101,6 +103,11 @@ export default function BaseInfoHeader() {
       <DataModeSelect 
         dataMode={dataMode} 
         onChangeDataMode={(dataMode) => dispatch({ type: "SET_DATA_MODE", payload: dataMode })} 
+      />
+      <br />
+      <ViewModeSelect 
+        viewMode={viewMode} 
+        onChangeViewMode={(viewMode) => dispatch({ type: "SET_VIEW_MODE", payload: viewMode })} 
       />
     </div>
   );
