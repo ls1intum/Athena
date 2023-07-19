@@ -7,6 +7,7 @@ import { editor } from "monaco-editor";
 const TextAreaWidget = ({ id, value, onChange, options }: WidgetProps) => {
   const [height, setHeight] = useState(100);
   const lineNumbers: editor.LineNumbersType = options.showLineNumbers ? "on" : "off";
+  const language = options.language as string | undefined || "plaintext";
   const customizeMonaco = options.customizeMonaco as ((monaco: Monaco) => void) | undefined;
 
   const handleEditorDidMount = (
@@ -43,7 +44,7 @@ const TextAreaWidget = ({ id, value, onChange, options }: WidgetProps) => {
           }}
           value={value}
           onMount={handleEditorDidMount}
-          defaultLanguage="placeholder"
+          defaultLanguage={language}
           onChange={(value) => onChange(value)}
         />
       </div>
@@ -55,6 +56,7 @@ TextAreaWidget.defaultProps = {
   options: {
     showLineNumbers: false,
     customizeMonaco: (monaco: Monaco) => {},
+    language: undefined,
   },
 };
 

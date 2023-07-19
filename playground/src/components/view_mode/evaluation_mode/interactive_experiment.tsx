@@ -1,13 +1,16 @@
 import { useState } from "react";
-import SubmissionDetail from "@/components/details/submission_detail";
-import useRequestSubmissionSelection from "@/hooks/athena/request_submission_selection";
-import { useBaseInfo } from "@/hooks/base_info_context";
+import { Allotment } from "allotment";
+
 import Experiment from "@/model/experiment";
 import Feedback from "@/model/feedback";
 import { Submission } from "@/model/submission";
-import ExerciseDetail from "@/components/details/exercise_detail";
-import { Allotment } from "allotment";
+
+import { useBaseInfo } from "@/hooks/base_info_context";
+import useRequestSubmissionSelection from "@/hooks/athena/request_submission_selection";
 import useRequestFeedbackSuggestions from "@/hooks/athena/request_feedback_suggestions";
+
+import SubmissionDetail from "@/components/details/submission_detail";
+import ExerciseDetail from "@/components/details/exercise_detail";
 
 export default function InteractiveExperiment({
   experiment,
@@ -118,7 +121,6 @@ export default function InteractiveExperiment({
           </div>
         </Allotment>
       </div>
-      {/* 3. Feedback suggestions */}
       {/* 4. Assessment */}
       {/* 5. Send feedback */}
       {/* Go to 2. */}

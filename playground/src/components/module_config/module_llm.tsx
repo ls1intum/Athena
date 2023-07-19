@@ -1,10 +1,10 @@
+import { Monaco } from "@monaco-editor/react";
 import { getDefaultFormState } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 
 import Form from "@/components/form";
 import { getUISchema } from "@/components/form/utils";
 import { ModuleConfigProps } from ".";
-import { Monaco } from "@monaco-editor/react";
 
 export default function ModuleLLMConfig({
   moduleConfig,
@@ -33,6 +33,7 @@ export default function ModuleLLMConfig({
                 "ui:widget": "textarea",
                 "ui:options": {
                   showLineNumbers: true,
+                  language: "placeholder",
                   customizeMonaco: (monaco: Monaco) => {
                     monaco.languages.register({ id: "placeholder" });
                     monaco.languages.setMonarchTokensProvider("placeholder", {
