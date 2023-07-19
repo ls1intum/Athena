@@ -24,7 +24,6 @@ export default function CodeView({ repository_url }: CodeViewProps) {
       repository.zip.file(selectedFile)?.async("string").then(setFileContent);
       // editorRef.current?.setModel(model);
       // const model = monaco.editor.createModel(fileContent, undefined, monaco.Uri.file(fileName));
-
     }
   }, [selectedFile, repository]);
 
@@ -47,11 +46,14 @@ export default function CodeView({ repository_url }: CodeViewProps) {
   }
 
   return (
-    <div className="h-[400px]">
-      <Allotment vertical={false} defaultSizes={[20, 80]}>
-        <FileTree tree={repository.tree} selectedFile={selectedFile} onSelectFile={setSelectedFile} />
+    <div className="h-[50vh]">
+      <Allotment vertical={false} defaultSizes={[1,4]}>
+        <Allotment.Pane preferredSize={"20%"}>
+          <div className="h-full overflow-y-auto">
+            <FileTree tree={repository.tree} selectedFile={selectedFile} onSelectFile={setSelectedFile} />
+          </div>
+        </Allotment.Pane>
         <Editor
-          height="80vh"
           options={{
             automaticLayout: true,
             scrollbar: {
@@ -65,6 +67,7 @@ export default function CodeView({ repository_url }: CodeViewProps) {
           }}
           value={fileContent}
           path={selectedFile}
+          defaultValue="Please select a file"
           onMount={handleEditorDidMount}
           // onChange={(value) => onChange(value)}
         />
