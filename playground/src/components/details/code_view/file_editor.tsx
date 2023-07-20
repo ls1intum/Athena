@@ -24,42 +24,50 @@ type EditorFeedbackProps = {
 function EditorFeedback({ feedback, editor }: EditorFeedbackProps) {
   const widgetId = useId();
   const [viewZoneId, setViewZoneId] = useState<string | undefined>(undefined);
-  const portalNode = useMemo(() => portals.createHtmlPortalNode(), []);
+  const [portalNode, domNode] = useMemo(() => {
+    const portalNode = portals.createHtmlPortalNode();
 
+    const overlayDom = document.createElement("div");
+    overlayDom.style.background = '#0000ff';
+    overlayDom.style.width = "100%";
+
+    const root = createRoot(overlayDom);
+    root.render(<portals.OutPortal node={portalNode} />);
+    return [portalNode, overlayDom];
+  }, []);
+
+  console.log("rendering EditorFeedback", feedback);
   useEffect(() => {
+
     editor.changeViewZones((changeAccessor) => {
       if (viewZoneId) {
         changeAccessor.removeZone(viewZoneId);
       }
 
-      const overlayDom = document.createElement("div");
-      overlayDom.style.background = '#0000ff';
-      overlayDom.style.width = "100%";
-
-      const root = createRoot(overlayDom);
-      root.render(<portals.OutPortal node={portalNode} />);
-
       const overlayWidget = {
         getId: () => widgetId,
-        getDomNode: () => overlayDom,
+        getDomNode: () => domNode,
         getPosition: () => null,
       };
       editor.addOverlayWidget(overlayWidget);
 
       const zoneNode = document.createElement('div');
-      changeAccessor.addZone({
+      zoneNode.style.background = '#ff0000';
+      zoneNode.id = `feedback-${feedback.id}`
+      const zoneId = changeAccessor.addZone({
         afterLineNumber: 3,
         heightInLines: 3,
         domNode: zoneNode,
         onDomNodeTop: top => {
-          overlayDom.style.top = top + "px";
+          domNode.style.top = top + "px";
         },
         onComputedHeight: height => {
-          overlayDom.style.height = height + "px";
+          domNode.style.height = height + "px";
         }
       });
+      setViewZoneId(zoneId);
     });
-  }, [editor, feedback, portalNode, viewZoneId, widgetId]);
+  }, [editor, feedback, portalNode, widgetId]);
 
   return (
     <portals.InPortal node={portalNode}>
@@ -71,20 +79,29 @@ function EditorFeedback({ feedback, editor }: EditorFeedbackProps) {
 type FileEditorProps = {
   content: string;
   filePath?: string;
-  feedback?: Feedback[];
+  feedbacks?: Feedback[];
   onFeedbackChange: (feedback: Feedback[]) => void;
 };
 
 export default function FileEditor({
   content,
   filePath,
-  feedback,
+  feedbacks,
   onFeedbackChange,
 }: FileEditorProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor>();
+  const monaco = useMonaco();
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
     editorRef.current = editor;
   }
+
+  useEffect(() => {
+    if (!monaco || !filePath || !editorRef.current) return;
+    const path = monaco.Uri.parse(filePath)
+    monaco.editor.getModel(path)?.dispose()
+    const model = monaco.editor.createModel(content, undefined, path)
+    editorRef.current.setModel(model);
+  }, [monaco, editorRef, content, filePath]);
 
   return (
     <div className="h-full">
@@ -101,7 +118,7 @@ export default function FileEditor({
         defaultValue="Please select a file"
         onMount={handleEditorDidMount}
       />
-      {editorRef.current && feedback?.map((feedback, index) => (
+      {editorRef.current && feedbacks?.map((feedback, index) => (
         <EditorFeedback key={index} feedback={feedback} editor={editorRef.current!} />
       ))}
     </div>

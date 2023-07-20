@@ -14,7 +14,7 @@ export default function ProgrammingSubmissionDetail({
 }: ProgrammingSubmissionDetailProps) {
   return (
     <>
-      <CodeView repository_url={submission.repository_url} />
+      <CodeView repository_url={submission.repository_url} feedbacks={feedbacks} />
       {feedbacks && feedbacks.length > 0 && (
         <div className="space-y-1 mt-2">
           {feedbacks.map((feedback) => (
