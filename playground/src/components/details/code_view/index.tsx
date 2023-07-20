@@ -7,10 +7,12 @@ import { createRoot } from "react-dom/client";
 import { useFetchAndUnzip } from "@/helpers/fetch_and_unzip";
 import FileTree from "./file_tree";
 import * as portals from 'react-reverse-portal';
+import Feedback from "@/model/feedback";
 
 
 type CodeViewProps = {
   repository_url: string;
+  feedback?: Feedback[]
 };
 
 export default function CodeView({ repository_url }: CodeViewProps) {
