@@ -93,30 +93,32 @@ export default function CodeView({ repository_url }: CodeViewProps) {
     <div className="h-[50vh]">
       <Allotment vertical={false} defaultSizes={[1,4]}>
         <Allotment.Pane preferredSize={"20%"}>
-          <div className="h-full overflow-y-auto">
+          <div className="h-full overflow-y-auto mr-2">
             <FileTree tree={repository.tree} selectedFile={selectedFile} onSelectFile={setSelectedFile} />
           </div>
         </Allotment.Pane>
-        <Editor
-          options={{
-            automaticLayout: true,
-            scrollbar: {
-              vertical: "hidden",
-              horizontal: "hidden",
-            },
-            minimap: {
-              enabled: false,
-            },
-            readOnly: true,
-          }}
-          value={fileContent}
-          path={selectedFile}
-          defaultValue="Please select a file"
-          onMount={handleEditorDidMount}
-          // onChange={(value) => onChange(value)}
-        />
+        <div className="h-full">
+          <Editor
+            options={{
+              automaticLayout: true,
+              scrollbar: {
+                vertical: "hidden",
+                horizontal: "hidden",
+              },
+              minimap: {
+                enabled: false,
+              },
+              readOnly: true,
+            }}
+            value={fileContent}
+            path={selectedFile}
+            defaultValue="Please select a file"
+            onMount={handleEditorDidMount}
+            // onChange={(value) => onChange(value)}
+          />
+          <portals.InPortal node={portalNode}><MyComponent /></portals.InPortal>
+        </div>
       </Allotment>
-      <portals.InPortal node={portalNode}><MyComponent /></portals.InPortal>
     </div>
   );
 }
