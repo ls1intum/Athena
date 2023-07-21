@@ -52,7 +52,7 @@ export default function ModuleConfigWrapper({
     customModuleConfigComponents[module.name as CustomModuleConfig];
 
   const [formKey, setFormKey] = useState(0);
-  const { data, error, isLoading } = useConfigSchema(module);
+  const { data, error, isLoading } = useConfigSchema();
 
   useEffect(() => {
     if (data) {

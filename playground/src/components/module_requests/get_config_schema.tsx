@@ -3,7 +3,7 @@ import ModuleResponseView from "@/components/module_response_view";
 import { ModuleRequestProps } from ".";
 
 export default function GetConfigSchema({ module }: ModuleRequestProps) {
-  const { data, error, isLoading, refetch, remove } = useConfigSchema(module, {
+  const { data, error, isLoading, refetch, remove } = useConfigSchema({
     onError: (error) => {
       console.error(error);
       alert(`Failed to get config from Athena: ${error.message}. Is the URL correct?`);

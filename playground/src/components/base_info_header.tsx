@@ -16,7 +16,7 @@ export default function BaseInfoHeader() {
     moduleConfig,
   } = useBaseInfo();
   const dispatch = useBaseInfoDispatch();
-  const { data, error, isLoading } = useConfigSchema(module);
+  const { data, error, isLoading } = useConfigSchema();
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">

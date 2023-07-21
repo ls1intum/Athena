@@ -31,7 +31,7 @@ export default function RequestFeedbackSuggestions({
     error,
     mutate,
     reset,
-  } = useRequestFeedbackSuggestions(module, {
+  } = useRequestFeedbackSuggestions({
     onError: (error) => {
       console.error(error);
       alert(

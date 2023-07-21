@@ -1,30 +1,22 @@
 import { UseQueryOptions, useQuery } from "react-query";
 import { AthenaError, useAthenaFetcher } from "@/hooks/athena_fetcher";
-import { ModuleMeta } from "@/model/health_response";
+import { useBaseInfo } from "@/hooks/base_info_context";
 import ModuleResponse from "@/model/module_response";
 
 /**
  * Fetches the config schema from an Athena module.
  *
  * @example
- * const { data, isLoading, error } = useConfigSchema(module);
+ * const { data, isLoading, error } = useConfigSchema();
  * 
- * @param module The module to fetch the config schema for.
  * @param options The react-query options.
  */
-export default function useConfigSchema<Data = ModuleResponse, Error = AthenaError>(
-  module?: ModuleMeta,
-  options: Omit<UseQueryOptions<Data, Error, Data>, 'queryFn'> = {}
-) {
-  const athenaFetcher = useAthenaFetcher(module);
-  return useQuery<Data, Error, Data, any>({
+export default function useConfigSchema(options: Omit<UseQueryOptions<ModuleResponse, Error, ModuleResponse>, 'queryFn'> = {}) {
+  const { module } = useBaseInfo();
+  const athenaFetcher = useAthenaFetcher();
+  return useQuery<ModuleResponse, AthenaError, ModuleResponse, any>({
     queryKey: ["config_schema", module?.name],
-    queryFn: async () => {
-      if (athenaFetcher === undefined) {
-        throw new AthenaError("No module set.", 0, undefined);
-      }
-      return await athenaFetcher("/config_schema");
-    },
+    queryFn: athenaFetcher("/config_schema"),
     ...options,
   });
 }

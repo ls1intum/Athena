@@ -1,6 +1,5 @@
 import baseUrl from "@/helpers/base_url";
 import { useBaseInfo } from "@/hooks/base_info_context";
-import { ModuleMeta } from "@/model/health_response";
 import ModuleResponse from "@/model/module_response";
 
 export class AthenaError extends Error {
@@ -28,21 +27,20 @@ export class AthenaError extends Error {
  * Fetches data from an Athena module.
  * 
  * @example
- * const fetcher = useAthenaFetcher(module);
+ * const fetcher = useAthenaFetcher();
  * const data = await fetcher("request_feedback_suggestions", body);
  * 
- * @param module The module to fetch data from.
- * @returns A function that can be used to fetch data from the module or undefined if the module is not set.
+ * @returns A function that can be used to fetch data from the module or that returns undefined if the module is not set.
  */
-export function useAthenaFetcher(module?: ModuleMeta) {
-  const { athenaUrl, athenaSecret, moduleConfig } = useBaseInfo();  
-
-  if (!module) {
-    return undefined;
-  }
+export function useAthenaFetcher() {
+  const { athenaUrl, athenaSecret, module, moduleConfig } = useBaseInfo();  
 
   return (
     async (moduleRoute: string, body?: any) => {
+      if (module === undefined) {
+        return undefined;
+      }
+
       const url = `${athenaUrl}/modules/${module.type}/${module.name}` + moduleRoute;
       const response = await fetch(
         `${baseUrl}/api/athena_request?${new URLSearchParams({

@@ -21,7 +21,7 @@ export default function SelectSubmission({ module }: ModuleRequestProps) {
   
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
   const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions(exercise);
-  const { data: response, isLoading, error, mutate, reset } = useRequestSubmissionSelection(module, {
+  const { data: response, isLoading, error, mutate, reset } = useRequestSubmissionSelection({
     onError: (error) => {
       console.error(error);
       alert(`Failed to request submission selection from Athena: ${error.message}. Is the URL correct?`);

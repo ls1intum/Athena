@@ -31,7 +31,7 @@ export default function SendFeedback({ module }: ModuleRequestProps) {
 
   const { data: submissions, isLoading: isLoadingSubmissions, isError: isErrorFeedbacks } = useSubmissions(exercise);
   const { data: feedbacks, isLoading: isLoadingFeedbacks } = useFeedbacks(exercise);
-  const { data: responses, isLoading, error, mutate, reset } = useSendFeedbacks(module, {
+  const { data: responses, isLoading, error, mutate, reset } = useSendFeedbacks({
     onError: (error) => {
       console.error(error);
       alert(`Failed to send feedback(s) to Athena: ${error.message}. Is the URL correct?`);
