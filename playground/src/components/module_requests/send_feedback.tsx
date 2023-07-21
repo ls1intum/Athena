@@ -28,7 +28,7 @@ async function sendFeedbacks(
   moduleConfig: any,
   exercise?: Exercise,
   submission?: Submission,
-  feedbacks: Feedback[],
+  feedbacks: Feedback[] = [],
   alertAfterSuccess: boolean = true
 ): Promise<ModuleResponse | undefined> {
   if (!exercise) {
