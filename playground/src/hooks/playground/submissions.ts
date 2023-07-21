@@ -23,7 +23,7 @@ export default function useSubmissions(
     queryKey: ["submissions", mode, exercise?.id],
     queryFn: async () => {
       if (exercise === undefined) {
-        throw new Error("No exercise set.");
+        return undefined;
       }
       const response = await fetch(`${baseUrl}/api/mode/${mode}/exercise/${exercise.id}/submissions`);
       return await response.json() as Submission[];

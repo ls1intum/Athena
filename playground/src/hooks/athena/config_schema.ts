@@ -16,7 +16,9 @@ export default function useConfigSchema(options: Omit<UseQueryOptions<ModuleResp
   const athenaFetcher = useAthenaFetcher();
   return useQuery<ModuleResponse, AthenaError, ModuleResponse, any>({
     queryKey: ["config_schema", module?.name],
-    queryFn: athenaFetcher("/config_schema"),
+    queryFn: async () => {
+      return await athenaFetcher("/config_schema");
+    },
     ...options,
   });
 }
