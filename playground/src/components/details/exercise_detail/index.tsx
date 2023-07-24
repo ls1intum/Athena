@@ -6,11 +6,7 @@ import CommonExerciseDetail from "./common";
 import TextExerciseDetail from "./text";
 import ProgrammingExerciseDetail from "./programming";
 
-type ExerciseDetailProps = {
-  exercise: Exercise;
-};
-
-export default function ExerciseDetail({ exercise }: ExerciseDetailProps) {
+export default function ExerciseDetail({ exercise }: { exercise: Exercise; }) {
   const specificExerciseDetail = (() => {
     switch (exercise.type) {
       case "text":
