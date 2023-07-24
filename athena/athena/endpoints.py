@@ -4,8 +4,6 @@ from fastapi import Depends
 from pydantic import BaseModel, ValidationError
 from typing import TypeVar, Callable, List, Union, Any, Coroutine, Type
 
-from pydantic import BaseModel
-
 from athena.app import app
 from athena.authenticate import authenticated
 from athena.metadata import with_meta
@@ -258,10 +256,8 @@ def feedback_consumer(func: Union[
         store_submissions([submission])
         for feedback in feedbacks:
             feedback.meta.update(get_stored_feedback_meta(feedback) or {})
-            store_feedback(feedback)
-
-        # Change the ID of the LMS to an internal ID
-        feedback = store_feedback(feedback, is_lms_id=True)
+            # Change the ID of the LMS to an internal ID
+            feedback.id = store_feedback(feedback, is_lms_id=True).id
 
         kwargs = {}
         if "module_config" in inspect.signature(func).parameters:
@@ -269,7 +265,7 @@ def feedback_consumer(func: Union[
 
         # Call the actual consumer
         if inspect.iscoroutinefunction(func):
-            await func(exercise, submission, feedback, **kwargs)
+            await func(exercise, submission, feedbacks, **kwargs)
         else:
             func(exercise, submission, feedbacks, **kwargs)
 
