@@ -319,6 +319,7 @@ def feedback_provider(func: Union[
     return wrapper
 
 
+config_schema_provider_used = False
 def config_schema_provider(cls: Type[C]) -> Type[C]:
     """
     Decorator for a class to provide an endpoint that returns the configuration class schema.
@@ -330,11 +331,13 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
         ... class MyConfig(BaseModel):
         ...     my_parameter: str = "default value"
     """
+    global config_schema_provider_used
+    if config_schema_provider_used:
+        raise RuntimeError("Only one config_schema_provider is allowed per module")
+    config_schema_provider_used = True
+
     if not issubclass(cls, BaseModel):
         raise TypeError("Decorated class must be a subclass of BaseModel")
-
-    if getattr(app.state, "config_schema_defined", False):
-        raise ValueError("@config_schema_provider can only be used once")
 
     # Try to initialize the class without parameters (default values will be used)
     try:
@@ -346,5 +349,4 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
     async def wrapper():
         return cls.schema()
 
-    app.state.config_schema_defined = True
     return cls
