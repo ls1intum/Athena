@@ -1,8 +1,9 @@
+import type { ModuleMeta } from "@/model/health_response";
+
 import useConfigSchema from "@/hooks/athena/config_schema";
 import ModuleResponseView from "@/components/module_response_view";
-import { ModuleRequestProps } from ".";
 
-export default function GetConfigSchema({ module }: ModuleRequestProps) {
+export default function GetConfigSchema({ module }: { module: ModuleMeta }) {
   const { data, error, isLoading, refetch, remove } = useConfigSchema({
     onError: (error) => {
       console.error(error);
@@ -32,7 +33,7 @@ export default function GetConfigSchema({ module }: ModuleRequestProps) {
         signature of all other decorators to provide the configuration to the
         function.
       </p>
-      <ModuleResponseView response={data || (error && error.asModuleResponse ? error.asModuleResponse() : undefined)} />
+      <ModuleResponseView response={data ?? (error?.asModuleResponse ? error.asModuleResponse() : undefined)} />
       <button
         className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600 disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed"
         onClick={() => {

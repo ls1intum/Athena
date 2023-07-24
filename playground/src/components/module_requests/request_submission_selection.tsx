@@ -1,5 +1,6 @@
 import type { Exercise } from "@/model/exercise";
-import type { ModuleResponse } from "@/model/module_response";
+import type ModuleResponse from "@/model/module_response";
+import type { ModuleMeta } from "@/model/health_response";
 
 import { useEffect, useState } from "react";
 
@@ -14,9 +15,7 @@ import Disclosure from "@/components/disclosure";
 import SubmissionDetail from "@/components/details/submission_detail";
 import SubmissionList from "@/components/submission_list";
 
-import { ModuleRequestProps } from ".";
-
-export default function SelectSubmission({ module }: ModuleRequestProps) {
+export default function SelectSubmission({ module }: { module: ModuleMeta }) {
   const { mode } = useBaseInfo();
   
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);

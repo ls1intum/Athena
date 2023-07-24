@@ -1,3 +1,4 @@
+import type { ModuleMeta } from "@/model/health_response";
 import type { Submission } from "@/model/submission";
 import type { Exercise } from "@/model/exercise";
 import type { Feedback } from "@/model/feedback";
@@ -17,9 +18,7 @@ import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionDetail from "@/components/details/submission_detail";
 import SubmissionList from "@/components/submission_list";
 
-import { ModuleRequestProps } from ".";
-
-export default function SendFeedback({ module }: ModuleRequestProps) {
+export default function SendFeedback({ module }: { module: ModuleMeta }) {
   const { mode } = useBaseInfo();
 
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);

@@ -1,4 +1,5 @@
 import type { Exercise } from "@/model/exercise";
+import type { ModuleMeta } from "@/model/health_response";
 
 import { useBaseInfo } from "@/hooks/base_info_context";
 import useSendSubmissions from "@/hooks/athena/send_submissions";
@@ -9,9 +10,8 @@ import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponseView from "@/components/module_response_view";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionList from "@/components/submission_list";
-import { ModuleRequestProps } from ".";
 
-export default function SendSubmissions({ module }: ModuleRequestProps) {
+export default function SendSubmissions({ module }: { module: ModuleMeta }) {
   const { mode } = useBaseInfo();
 
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);

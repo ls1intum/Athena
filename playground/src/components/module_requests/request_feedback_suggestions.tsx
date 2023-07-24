@@ -1,6 +1,7 @@
 import type { Submission } from "@/model/submission";
 import type { Exercise } from "@/model/exercise";
-import type { ModuleResponse } from "@/model/module_response";
+import type ModuleResponse from "@/model/module_response";
+import type { ModuleMeta } from "@/model/health_response";
 
 import { useEffect, useState } from "react";
 
@@ -13,11 +14,11 @@ import ModuleResponseView from "@/components/module_response_view";
 import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionDetail from "@/components/details/submission_detail";
 import Disclosure from "@/components/disclosure";
-import { ModuleRequestProps } from ".";
+
 
 export default function RequestFeedbackSuggestions({
   module,
-}: ModuleRequestProps) {
+}: { module: ModuleMeta }) {
   const { mode } = useBaseInfo();
 
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
