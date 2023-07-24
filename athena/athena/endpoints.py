@@ -260,9 +260,8 @@ def feedback_consumer(func: Union[
             feedback.meta.update(get_stored_feedback_meta(feedback) or {})
             store_feedback(feedback)
 
-        kwargs = {}
-        if "module_config" in inspect.signature(func).parameters:
-            kwargs["module_config"] = module_config
+        # Change the ID of the LMS to an internal ID
+        feedback = store_feedback(feedback, is_lms_id=True)
 
         kwargs = {}
         if "module_config" in inspect.signature(func).parameters:
@@ -340,8 +339,8 @@ def feedback_provider(func: Union[
         else:
             feedbacks = func(exercise, submission, **kwargs)
 
-        store_feedback_suggestions(feedbacks)
-
+        # Store feedback suggestions and assign internal IDs
+        feedbacks = store_feedback_suggestions(feedbacks)
         return feedbacks
     return wrapper
 
