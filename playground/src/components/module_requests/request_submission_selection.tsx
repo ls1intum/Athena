@@ -84,7 +84,7 @@ export default function SelectSubmission({ module }: { module: ModuleMeta }) {
           <SubmissionList exercise={exercise} />
         </div>
       )}
-      <ModuleResponseView response={response || (error && error.asModuleResponse ? error.asModuleResponse() : undefined)}>
+      <ModuleResponseView response={response ?? (error?.asModuleResponse ? error.asModuleResponse() : undefined)}>
         {responseSubmissionView(response)}
       </ModuleResponseView>
       <button

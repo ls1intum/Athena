@@ -131,7 +131,7 @@ export default function SendFeedback({ module }: { module: ModuleMeta }) {
         </>
       )}
       {responses?.map((response, i) => (<ModuleResponseView key={i} response={response} />))}
-      {error && error.asModuleResponse && (<ModuleResponseView response={error.asModuleResponse()} />)}
+      {error?.asModuleResponse && (<ModuleResponseView response={error.asModuleResponse()} />)}
       <button
         className="bg-primary-500 text-white rounded-md p-2 mt-4 hover:bg-primary-600 disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed"
         onClick={() => {

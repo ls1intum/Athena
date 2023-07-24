@@ -106,7 +106,7 @@ export default function RequestFeedbackSuggestions({
           </div>
         </>
       )}
-      <ModuleResponseView response={response || (error && error.asModuleResponse ? error.asModuleResponse() : undefined)}>
+      <ModuleResponseView response={response ?? (error?.asModuleResponse ? error.asModuleResponse() : undefined)}>
         {responseSubmissionView(response)}
       </ModuleResponseView>
       <button
