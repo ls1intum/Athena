@@ -41,7 +41,7 @@ export function useAthenaFetcher() {
         return undefined;
       }
 
-      const url = `${athenaUrl}/modules/${module.type}/${module.name}` + moduleRoute;
+      const url = `${athenaUrl}/modules/${module.type}/${module.name}${moduleRoute}`;
       const response = await fetch(
         `${baseUrl}/api/athena_request?${new URLSearchParams({
           url: url,
