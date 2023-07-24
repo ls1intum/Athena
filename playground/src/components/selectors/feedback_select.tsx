@@ -1,9 +1,8 @@
 import type { Feedback } from "@/model/feedback";
+import type { Submission } from "@/model/submission";
+import type { Exercise } from "@/model/exercise";
 
 import useFeedbacks from "@/hooks/playground/feedbacks";
-import { Submission } from "@/model/submission";
-import { Exercise } from "@/model/exercise";
-
 
 type FeedbackSelectProps = {
   exercise?: Exercise;

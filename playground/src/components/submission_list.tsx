@@ -6,7 +6,6 @@ import useSubmissions from "@/hooks/playground/submissions";
 import Disclosure from "@/components/disclosure";
 import SubmissionDetail from "@/components/details/submission_detail";
 
-
 type SubmissionListProps = {
   exercise: Exercise;
   feedbacks?: Feedback[];

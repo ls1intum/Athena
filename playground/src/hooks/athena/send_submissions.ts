@@ -1,8 +1,9 @@
+import type ModuleResponse from "@/model/module_response";
+import type { Exercise } from "@/model/exercise";
+import type { Submission } from "@/model/submission";
+
 import { UseMutationOptions, useMutation } from "react-query";
 import { AthenaError, useAthenaFetcher } from "@/hooks/athena_fetcher";
-import { Exercise } from "@/model/exercise";
-import { Submission } from "@/model/submission";
-import ModuleResponse from "@/model/module_response";
 
 /**
  * Sends submissions for an exercise to an Athena module.

@@ -3,7 +3,6 @@ import type { Exercise } from "@/model/exercise";
 
 import useSubmissions from "@/hooks/playground/submissions";
 
-
 type SubmissionSelectProps = {
   exercise?: Exercise;
   submission?: Submission;

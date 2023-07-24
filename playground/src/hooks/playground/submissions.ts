@@ -1,7 +1,8 @@
+import type { Exercise } from "@/model/exercise";
+import type { Submission } from "@/model/submission";
+
 import { UseQueryOptions, useQuery } from "react-query";
 import baseUrl from "@/helpers/base_url";
-import { Exercise } from "@/model/exercise";
-import { Submission } from "@/model/submission";
 import { useBaseInfo } from "@/hooks/base_info_context";
 
 /**

@@ -1,6 +1,7 @@
+import type ModuleResponse from "@/model/module_response";
+
 import baseUrl from "@/helpers/base_url";
 import { useBaseInfo } from "@/hooks/base_info_context";
-import ModuleResponse from "@/model/module_response";
 
 export class AthenaError extends Error {
   status: number;

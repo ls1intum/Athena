@@ -1,6 +1,7 @@
+import type { Exercise } from "@/model/exercise";
+
 import { UseQueryOptions, useQuery } from "react-query";
 import baseUrl from "@/helpers/base_url";
-import { Exercise } from "@/model/exercise";
 import { useBaseInfo } from "@/hooks/base_info_context";
 
 /**

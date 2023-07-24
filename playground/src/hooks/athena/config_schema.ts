@@ -1,7 +1,8 @@
+import type ModuleResponse from "@/model/module_response";
+
 import { UseQueryOptions, useQuery } from "react-query";
 import { AthenaError, useAthenaFetcher } from "@/hooks/athena_fetcher";
 import { useBaseInfo } from "@/hooks/base_info_context";
-import ModuleResponse from "@/model/module_response";
 
 /**
  * Fetches the config schema from an Athena module.

@@ -15,7 +15,6 @@ import ExerciseDetail from "@/components/details/exercise_detail";
 import SubmissionDetail from "@/components/details/submission_detail";
 import Disclosure from "@/components/disclosure";
 
-
 export default function RequestFeedbackSuggestions({
   module,
 }: { module: ModuleMeta }) {

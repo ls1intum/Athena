@@ -1,9 +1,10 @@
+import type { Feedback } from "@/model/feedback";
+import type { Submission } from "@/model/submission";
+import type { Exercise } from "@/model/exercise";
+
 import { UseQueryOptions, useQuery } from "react-query";
 import baseUrl from "@/helpers/base_url";
-import { Exercise } from "@/model/exercise";
-import Feedback from "@/model/feedback";
 import { useBaseInfo } from "@/hooks/base_info_context";
-import { Submission } from "@/model/submission";
 
 /**
  * Fetches the feedbacks (for an exercise) of the playground.

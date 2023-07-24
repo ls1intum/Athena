@@ -1,7 +1,7 @@
-import { ReactNode, createContext, useContext, useReducer } from 'react';
+import type { Mode } from '@/model/mode';
+import type { ModuleMeta } from '@/model/health_response';
 
-import { ModuleMeta } from '@/model/health_response';
-import { Mode } from '@/model/mode';
+import { ReactNode, createContext, useContext, useReducer } from 'react';
 
 export type BaseInfo = {
   athenaUrl: string;
