@@ -1,10 +1,8 @@
-import {
-  ProgrammingSubmission,
-  Submission,
-  TextSubmission,
-} from "@/model/submission";
+import type { ProgrammingSubmission, Submission, TextSubmission } from "@/model/submission";
+import type { Exercise } from "@/model/exercise";
+
 import useSubmissions from "@/hooks/playground/submissions";
-import { Exercise } from "@/model/exercise";
+
 
 type SubmissionSelectProps = {
   exercise?: Exercise;

@@ -1,5 +1,5 @@
-import { Exercise } from "@/model/exercise";
-import Feedback from "@/model/feedback";
+import type { Exercise } from "@/model/exercise";
+import type { Feedback } from "@/model/feedback";
 
 import useSubmissions from "@/hooks/playground/submissions";
 

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import type { Exercise } from "@/model/exercise";
+import type { ModuleResponse } from "@/model/module_response";
 
-import { Exercise } from "@/model/exercise";
-import ModuleResponse from "@/model/module_response";
+import { useEffect, useState } from "react";
 
 import { useBaseInfo } from "@/hooks/base_info_context";
 import useRequestSubmissionSelection from "@/hooks/athena/request_submission_selection";

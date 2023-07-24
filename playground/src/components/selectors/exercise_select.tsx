@@ -1,4 +1,4 @@
-import { Exercise } from "@/model/exercise";
+import type { Exercise } from "@/model/exercise";
 import useExercises from "@/hooks/playground/exercises";
 
 type ExerciseSelectProps = {

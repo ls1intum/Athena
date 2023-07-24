@@ -1,6 +1,7 @@
+import type { HealthResponse } from "@/model/health_response";
+
 import { UseQueryOptions, useQuery } from "react-query";
 import baseUrl from "@/helpers/base_url";
-import HealthResponse from "@/model/health_response";
 import { useBaseInfo } from "@/hooks/base_info_context";
 
 /**

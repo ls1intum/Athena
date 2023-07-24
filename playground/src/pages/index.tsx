@@ -3,7 +3,6 @@ import BaseInfoHeader from "@/components/base_info_header";
 import ModuleRequests from "@/components/module_requests";
 import { useBaseInfo } from "@/hooks/base_info_context";
 
-
 export default function Playground() {
   const { module } = useBaseInfo();
 

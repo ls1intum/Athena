@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-
-import { Exercise } from "@/model/exercise";
+import type { Exercise } from "@/model/exercise";
 
 import { useBaseInfo } from "@/hooks/base_info_context";
 import useSendSubmissions from "@/hooks/athena/send_submissions";
 import useSubmissions from "@/hooks/playground/submissions";
+import { useEffect, useState } from "react";
 
 import ExerciseSelect from "@/components/selectors/exercise_select";
 import ModuleResponseView from "@/components/module_response_view";

@@ -1,4 +1,5 @@
-import { ProgrammingExercise } from "@/model/exercise";
+import type { ProgrammingExercise } from "@/model/exercise";
+
 import Disclosure from "@/components/disclosure";
 import CodeView from "@/components/details/code_view";
 

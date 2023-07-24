@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import type { Submission } from "@/model/submission";
+import type { Exercise } from "@/model/exercise";
+import type { ModuleResponse } from "@/model/module_response";
 
-import { Submission } from "@/model/submission";
-import { Exercise } from "@/model/exercise";
-import ModuleResponse from "@/model/module_response";
+import { useEffect, useState } from "react";
 
 import { useBaseInfo } from "@/hooks/base_info_context";
 import useRequestFeedbackSuggestions from "@/hooks/athena/request_feedback_suggestions";

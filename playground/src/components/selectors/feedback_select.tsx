@@ -1,7 +1,9 @@
-import Feedback from "@/model/feedback";
+import type { Feedback } from "@/model/feedback";
+
 import useFeedbacks from "@/hooks/playground/feedbacks";
 import { Submission } from "@/model/submission";
 import { Exercise } from "@/model/exercise";
+
 
 type FeedbackSelectProps = {
   exercise?: Exercise;
@@ -56,9 +58,9 @@ export default function FeedbackSelect({
             ✨ All feedback
             </option>
           )}
-        {data && data.map((fb: Feedback) => (
-          <option key={fb.id} value={fb.id}>
-            {fb.id} ({fb.credits} credits) {fb.text || fb.detail_text || "N/A"}
+        {data?.map((feedback: Feedback) => (
+          <option key={feedback.id} value={feedback.id}>
+            {feedback.id} ({feedback.credits} credits) {feedback.title || feedback.description || "N/A"}
           </option>
         ))}
       </select>

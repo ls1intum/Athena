@@ -1,4 +1,5 @@
-import { Exercise } from "@/model/exercise";
+import type { Exercise } from "@/model/exercise";
+
 import Disclosure from "@/components/disclosure";
 
 import CommonExerciseDetail from "./common";

@@ -1,4 +1,4 @@
-import { ModuleMeta } from "@/model/health_response";
+import type { ModuleMeta } from "@/model/health_response";
 import useHealth from "@/hooks/health";
 
 export default function ModuleSelect({

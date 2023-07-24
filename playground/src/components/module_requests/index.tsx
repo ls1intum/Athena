@@ -1,4 +1,6 @@
-import { ModuleMeta } from "@/model/health_response";
+import type { ModuleMeta } from "@/model/health_response";
+import type { Mode } from "@/model/mode";
+
 import GetConfigSchema from "@/components/module_requests/get_config_schema";
 import SendSubmissions from "@/components/module_requests/send_submissions";
 import SendFeedback from "@/components/module_requests/send_feedback";
