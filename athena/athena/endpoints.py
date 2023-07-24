@@ -319,7 +319,6 @@ def feedback_provider(func: Union[
     return wrapper
 
 
-config_schema_provider_used = False
 def config_schema_provider(cls: Type[C]) -> Type[C]:
     """
     Decorator for a class to provide an endpoint that returns the configuration class schema.
@@ -331,11 +330,6 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
         ... class MyConfig(BaseModel):
         ...     my_parameter: str = "default value"
     """
-    global config_schema_provider_used
-    if config_schema_provider_used:
-        raise RuntimeError("Only one config_schema_provider is allowed per module")
-    config_schema_provider_used = True
-
     if not issubclass(cls, BaseModel):
         raise TypeError("Decorated class must be a subclass of BaseModel")
 
