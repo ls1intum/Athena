@@ -157,6 +157,7 @@ def submission_selector(func: Union[
     class SubmissionSelectorRequest(BaseModel):
         exercise: exercise_type
         submission_ids: List[int]
+        module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))
     
         class Config:
             # Allow camelCase field names in the API (converted to snake_case)
@@ -166,12 +167,12 @@ def submission_selector(func: Union[
     @app.post("/select_submission", responses=module_responses)
     @authenticated
     @with_meta
-    async def wrapper(
-            exercise: exercise_type,
-            submission_ids: List[int],
-            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
+    async def wrapper(request: SubmissionSelectorRequest):
         # The wrapper handles only transmitting submission IDs for efficiency, but the actual selection logic
         # only works with the full submission objects.
+        exercise = request.exercise
+        submission_ids = request.submission_ids
+        module_config = request.module_config
 
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         store_exercise(exercise)
