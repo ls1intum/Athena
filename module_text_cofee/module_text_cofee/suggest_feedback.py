@@ -67,8 +67,8 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
             "original_block_id": closest_block.id,
         }
         # adapt index numbers to new text block
-        copy.index_start = block.index_start
-        copy.index_end = block.index_end
+        copy.index_start = block.index_start  # type: ignore
+        copy.index_end = block.index_end  # type: ignore
         suggested_feedback.append(copy)
     return suggested_feedback
 
