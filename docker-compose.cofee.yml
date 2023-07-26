@@ -108,4 +108,4 @@ services:
     volumes:
       - ./module_text_cofee/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./data/cofee_db:/data/db
-    command: --quiet
+    command: --quiet > /dev/null
