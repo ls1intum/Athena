@@ -51,7 +51,7 @@ export function useSendFeedbacks(
     mutationFn: async (items) => {
       return await Promise.all(
         items.map(async ({ exercise, submission, feedback }) =>
-          athenaFetcher("/feedback", { exercise, submission, feedback })
+          athenaFetcher("/feedbacks", { exercise, submission, feedbacks: [feedback] })
         )
       );
     },
