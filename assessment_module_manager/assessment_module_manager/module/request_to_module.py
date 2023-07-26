@@ -6,7 +6,6 @@ from fastapi import HTTPException
 from pydantic.generics import GenericModel
 
 from .module import Module
-from .available_module_enum import AvailableModuleNames
 from .list_modules import list_modules
 from assessment_module_manager import env
 from assessment_module_manager.logger import logger
@@ -23,9 +22,7 @@ class ModuleResponse(GenericModel, Generic[D, M]):
     meta: M
 
 
-async def find_module_by_name(
-    module_name: AvailableModuleNames  # type: ignore
-) -> Optional[Module]:
+async def find_module_by_name(module_name: str) -> Optional[Module]:
     """
     Helper function to find a module by name.
     """

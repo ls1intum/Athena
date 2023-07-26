@@ -5,7 +5,7 @@ from starlette.responses import JSONResponse
 from athena.authenticate import authenticated
 from athena.schemas import ExerciseType
 from assessment_module_manager.app import app
-from assessment_module_manager.module import ModuleResponse, AvailableModuleNames, find_module_by_name, request_to_module
+from assessment_module_manager.module import ModuleResponse, find_module_by_name, request_to_module
 
 
 @app.api_route(
@@ -30,7 +30,7 @@ from assessment_module_manager.module import ModuleResponse, AvailableModuleName
 )
 @authenticated
 async def proxy_to_module(
-    module_type: ExerciseType, module_name: AvailableModuleNames, path: str, request: Request, data: Optional[Dict[Any, Any]] = Body(None),
+    module_type: ExerciseType, module_name: str, path: str, request: Request, data: Optional[Dict[Any, Any]] = Body(None),
 ) -> JSONResponse:
     """
     This endpoint is called by the LMS to proxy requests to modules.
