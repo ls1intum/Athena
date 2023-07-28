@@ -12,14 +12,11 @@ set -xe
 # Initialize an empty array to hold directories
 DIRS=()
 
-# Fetch the number of the current pull request from the GitHub context
-PR_NUMBER=${{ github.event.pull_request.number }}
-
 # Get a list of all files changed in the current pull request
 CHANGED_FILES=$(curl \
-  -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+  -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/files | jq -r '.[].filename')
+  https://api.github.com/repos/$GITHUB_REPO/pulls/$PR_NUMBER/files | jq -r '.[].filename')
 
 # Loop over all root level directories
 for DIR in */; do

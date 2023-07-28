@@ -28,6 +28,10 @@ jobs:
         id: set-matrix
         run: |
           chmod +x ./.github/scripts/images-to-build.sh
+          export PR_NUMBER=${{ github.event.pull_request.number }}
+          export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          export GITHUB_REPO=${{ github.repository }}
+          export GITHUB_REF=${{ github.ref }}
           IMAGE_NAMES=$(./.github/scripts/images-to-build.sh)
           IMAGE_NAMES_JSON=$(echo "$IMAGE_NAMES" | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=${IMAGE_NAMES_JSON}" > $GITHUB_OUTPUT
