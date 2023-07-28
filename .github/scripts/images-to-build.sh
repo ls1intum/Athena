@@ -24,6 +24,11 @@ for DIR in */; do
     if [[ -e "${DIR}Dockerfile" ]]; then
         DIR=${DIR%/} # Remove trailing slash
 
+        # athena is always built and does not need to be re-built
+        if [[ "$DIR" == "athena" ]]; then
+            continue
+        fi
+
         if [[ "$GITHUB_REF" == "refs/heads/develop" ]]; then
             # Build all images on develop branch
             DIRS+=("$DIR")
@@ -37,7 +42,7 @@ for DIR in */; do
         # Check if any file has changed in that directory since the pull request was created
         IS_CHANGED=$(echo "$CHANGED_FILES" | grep -q "^$DIR" && echo "true" || echo "false")
         # Check if Docker image exists on GitHub Packages
-        IMAGE_EXISTS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/ls1intum/Athena/packages/container/${IMAGE_NAME}/versions?version=${IMAGE_TAG}" | jq -r '.[].version' | grep -q "^$IMAGE_TAG" && echo "true" || echo "false")
+        IMAGE_EXISTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/ls1intum/Athena/packages/container/${IMAGE_NAME}/versions?version=${IMAGE_TAG}" | jq -r '.[].version' | grep -q "^$IMAGE_TAG" && echo "true" || echo "false")
         if [[ "$IS_CHANGED" == "true" || "$IMAGE_EXISTS" == "false" ]]; then
             # Add the directory to the array
             DIRS+=("$DIR")
