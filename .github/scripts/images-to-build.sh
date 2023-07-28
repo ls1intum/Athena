@@ -8,7 +8,7 @@
 # Otherwise, we want to skip the build for performance reasons.
 
 # Stop on error
-set -e
+set -xe
 
 # Fetch develop to find the commit hash of the branch creation
 git fetch origin develop:develop
