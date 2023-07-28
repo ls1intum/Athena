@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_images: ${{ steps.set-matrix.outputs.has_images }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,9 +36,11 @@ jobs:
           IMAGE_NAMES=$(./.github/scripts/images-to-build.sh)
           IMAGE_NAMES_JSON=$(echo "$IMAGE_NAMES" | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=${IMAGE_NAMES_JSON}" > $GITHUB_OUTPUT
+          echo "has_images=${IMAGE_NAMES_JSON != '[]'}" > $GITHUB_OUTPUT
 
   build_image:
     needs: find_images_to_build
+    if: needs.find_images_to_build.outputs.has_images == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -80,11 +83,6 @@ jobs:
             type=raw,value=${{ github.ref == 'refs/heads/develop' && 'develop' || github.sha }}
             type=raw,value=${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.sha }}
           if: steps.meta.outputs.tags != ''
-
-      - name: Get the current branch
-        id: branch
-        run: echo "branch=${GITHUB_REF#refs/heads/}" > $GITHUB_OUTPUT
-        if: steps.meta.outputs.tags != ''
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
