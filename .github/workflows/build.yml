@@ -36,7 +36,7 @@ jobs:
           IMAGE_NAMES=$(./.github/scripts/images-to-build.sh)
           IMAGE_NAMES_JSON=$(echo "$IMAGE_NAMES" | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=${IMAGE_NAMES_JSON}" > $GITHUB_OUTPUT
-          echo "has_images=${IMAGE_NAMES_JSON != '[]'}" > $GITHUB_OUTPUT
+          echo "has_images=$(if [ -z "$IMAGE_NAMES" ]; then echo false; else echo true; fi)" > $GITHUB_OUTPUT
 
   build_image:
     needs: find_images_to_build
