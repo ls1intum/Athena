@@ -45,6 +45,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        if: steps.meta.outputs.tags != ''
 
       - name: Build athena image
         id: set-image
@@ -52,11 +53,13 @@ jobs:
           cd athena
           docker build -t athena .
           cd ..
+        if: steps.meta.outputs.tags != ''
 
       - name: Docker Login
         id: docker-login
         run: |
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+        if: steps.meta.outputs.tags != ''
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -64,6 +67,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
+        if: steps.meta.outputs.tags != ''
       
       - name: Docker meta
         id: meta
@@ -75,10 +79,12 @@ jobs:
           tags: |
             type=raw,value=${{ github.ref == 'refs/heads/develop' && 'develop' || github.sha }}
             type=raw,value=${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.sha }}
+          if: steps.meta.outputs.tags != ''
 
       - name: Get the current branch
         id: branch
         run: echo "branch=${GITHUB_REF#refs/heads/}" > $GITHUB_OUTPUT
+        if: steps.meta.outputs.tags != ''
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
@@ -93,3 +99,4 @@ jobs:
             ATHENA_PR_NUMBER=${{ github.event.pull_request.number }}
             ATHENA_PR_TITLE=${{ github.event.pull_request.title }}
             ATHENA_PR_LAST_UPDATE=${{ github.event.pull_request.updated_at }}
+        if: steps.meta.outputs.tags != ''
