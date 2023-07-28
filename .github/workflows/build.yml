@@ -27,7 +27,7 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
-          IMAGE_NAMES=$(ls -d assessment_module_manager module_* playground | jq -R -s -c 'split("\n")[:-1]')
+          IMAGE_NAMES=$(./.github/scripts/images-to-build.sh)
           echo "matrix=${IMAGE_NAMES}" > $GITHUB_OUTPUT
 
   build_image:
