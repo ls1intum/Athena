@@ -7,6 +7,12 @@
 # 3. The current branch is develop
 # Otherwise, we want to skip the build for performance reasons.
 
+# Stop on error
+set -e
+
+# Fetch develop to find the commit hash of the branch creation
+git fetch origin develop:develop
+
 # Get the commit hash of the branch creation
 BASE_COMMIT=$(git merge-base develop $(git rev-parse --abbrev-ref HEAD))
 
