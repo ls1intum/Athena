@@ -4,6 +4,7 @@
 # We want to build a Docker image if at least one of the following conditions is true:
 # 1. The Dockerfile in the directory has changed since the branch was created
 # 2. The Docker image does not exist on GitHub Packages yet
+# 3. The current branch is develop
 # Otherwise, we want to skip the build for performance reasons.
 
 # Get the commit hash of the branch creation
@@ -17,6 +18,12 @@ for DIR in */; do
     # If a Dockerfile exists in the directory
     if [[ -e "${DIR}Dockerfile" ]]; then
         DIR=${DIR%/} # Remove trailing slash
+
+        if [[ "$CURRENT_BRANCH" == "develop" ]]; then
+            # Build all images on develop branch
+            DIRS+=("$DIR")
+            continue
+        fi
 
         # Check if any file has changed in that directory since the branch was created
         GIT_DIFF=$(git diff --name-only $BASE_COMMIT -- "${DIR}")
