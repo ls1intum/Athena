@@ -8,7 +8,7 @@
 # Otherwise, we want to skip the build for performance reasons.
 
 # Get the commit hash of the branch creation
-BASE_COMMIT=$(git merge-base master $(git rev-parse --abbrev-ref HEAD))
+BASE_COMMIT=$(git merge-base develop $(git rev-parse --abbrev-ref HEAD))
 
 # Initialize an empty array to hold directories
 DIRS=()
@@ -42,5 +42,5 @@ for DIR in */; do
     fi
 done
 
-# Print all directories that fulfill the conditions, separated by spaces
-echo "${DIRS[@]}"
+# Print all directories that fulfill the conditions, separated by newlines
+(IFS=$'\n'; echo "${DIRS[*]}")

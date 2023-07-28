@@ -27,8 +27,11 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
+          chmod +x ./.github/scripts/images-to-build.sh
+          export GITHUB_PR_NUMBER=${{ github.event.pull_request.number }}
           IMAGE_NAMES=$(./.github/scripts/images-to-build.sh)
-          echo "matrix=${IMAGE_NAMES}" > $GITHUB_OUTPUT
+          IMAGE_NAMES_JSON=$(echo "$IMAGE_NAMES" | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix=${IMAGE_NAMES_JSON}" > $GITHUB_OUTPUT
 
   build_image:
     needs: find_images_to_build
