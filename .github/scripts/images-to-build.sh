@@ -14,7 +14,14 @@ set -xe
 git fetch origin develop:develop
 
 # Get the commit hash of the branch creation
-BASE_COMMIT=$(git merge-base develop $(git rev-parse --abbrev-ref HEAD))
+BASE_COMMIT=$(git merge-base develop $(git rev-parse --abbrev-ref HEAD)) || true
+
+if [[ -z "$BASE_COMMIT" ]]; then
+    echo "No base commit found - the branch may not have any new commits yet."
+    # Decide here what you want to do when no base commit is found.
+    # For example, you might want to skip the rest of the script:
+    exit 0
+fi
 
 # Initialize an empty array to hold directories
 DIRS=()
