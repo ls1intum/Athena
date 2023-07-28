@@ -89,7 +89,6 @@ def submissions_consumer(func: Union[
                     submission_meta.update(stored_submission.meta)
                     submissions_dict[stored_submission.id].meta = submission_meta
         submissions = list(submissions_dict.values())
-        store_submissions(submissions)
 
         store_exercise(exercise)
         store_submissions(submissions)
