@@ -7,24 +7,19 @@
 # 3. The current branch is develop
 # Otherwise, we want to skip the build for performance reasons.
 
-# Stop on error
 set -xe
-
-# Fetch develop to find the commit hash of the branch creation
-git fetch origin develop:develop
-
-# Get the commit hash of the branch creation
-BASE_COMMIT=$(git merge-base develop $(git rev-parse --abbrev-ref HEAD)) || true
-
-if [[ -z "$BASE_COMMIT" ]]; then
-    echo "No base commit found - the branch may not have any new commits yet."
-    # Decide here what you want to do when no base commit is found.
-    # For example, you might want to skip the rest of the script:
-    exit 0
-fi
 
 # Initialize an empty array to hold directories
 DIRS=()
+
+# Fetch the number of the current pull request from the GitHub context
+PR_NUMBER=${{ github.event.pull_request.number }}
+
+# Get a list of all files changed in the current pull request
+CHANGED_FILES=$(curl \
+  -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/files | jq -r '.[].filename')
 
 # Loop over all root level directories
 for DIR in */; do
@@ -32,25 +27,25 @@ for DIR in */; do
     if [[ -e "${DIR}Dockerfile" ]]; then
         DIR=${DIR%/} # Remove trailing slash
 
-        if [[ "$CURRENT_BRANCH" == "develop" ]]; then
+        if [[ "$GITHUB_REF" == "refs/heads/develop" ]]; then
             # Build all images on develop branch
             DIRS+=("$DIR")
             continue
         fi
 
-        # Check if any file has changed in that directory since the branch was created
-        GIT_DIFF=$(git diff --name-only $BASE_COMMIT -- "${DIR}")
+        # Check if any file has changed in that directory since the pull request was created
+        if echo "$CHANGED_FILES" | grep -q "^$DIR"; then
+            # Construct Docker image name and tag
+            IMAGE_NAME="athena_${DIR}"
+            IMAGE_TAG="pr-$PR_NUMBER"
 
-        # Construct Docker image name and tag
-        IMAGE_NAME="athena_${DIR}"
-        IMAGE_TAG="pr-${GITHUB_PR_NUMBER}"
+            # Check if Docker image exists on GitHub using API
+            API_RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/ls1intum/Athena/packages/container/${IMAGE_NAME}/versions?version=${IMAGE_TAG}")
 
-        # Check if Docker image exists on GitHub using API
-        API_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/ls1intum/Athena/packages/container/${IMAGE_NAME}/versions?version=${IMAGE_TAG}")
-
-        # If there are changes in the directory or the Docker image does not exist, add the directory to the array
-        if [[ "$GIT_DIFF" != "" || "$API_RESPONSE" == "[]" ]]; then
-            DIRS+=("$DIR")
+            # If the Docker image does not exist, add the directory to the array
+            if [[ "$API_RESPONSE" == "[]" ]]; then
+                DIRS+=("$DIR")
+            fi
         fi
     fi
 done
