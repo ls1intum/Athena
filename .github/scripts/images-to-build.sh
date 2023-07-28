@@ -30,19 +30,17 @@ for DIR in */; do
             continue
         fi
 
+        # Construct Docker image name and tag
+        IMAGE_NAME="athena_${DIR}"
+        IMAGE_TAG="pr-$PR_NUMBER"
+
         # Check if any file has changed in that directory since the pull request was created
-        if echo "$CHANGED_FILES" | grep -q "^$DIR"; then
-            # Construct Docker image name and tag
-            IMAGE_NAME="athena_${DIR}"
-            IMAGE_TAG="pr-$PR_NUMBER"
-
-            # Check if Docker image exists on GitHub using API
-            API_RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/ls1intum/Athena/packages/container/${IMAGE_NAME}/versions?version=${IMAGE_TAG}")
-
-            # If the Docker image does not exist, add the directory to the array
-            if [[ "$API_RESPONSE" == "[]" ]]; then
-                DIRS+=("$DIR")
-            fi
+        $IS_CHANGED=$(echo "$CHANGED_FILES" | grep -q "^$DIR" && echo "true" || echo "false")
+        # Check if Docker image exists on GitHub Packages
+        $IMAGE_EXISTS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/ls1intum/Athena/packages/container/${IMAGE_NAME}/versions?version=${IMAGE_TAG}" | jq -r '.[].version' | grep -q "^$IMAGE_TAG" && echo "true" || echo "false")
+        if [[ "$IS_CHANGED" == "true" || "$IMAGE_EXISTS" == "false" ]]; then
+            # Add the directory to the array
+            DIRS+=("$DIR")
         fi
     fi
 done
