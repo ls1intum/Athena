@@ -47,7 +47,10 @@ for DIR in */; do
         # Check if any file has changed in that directory since the pull request was created
         IS_CHANGED=$(echo "$CHANGED_FILES" | grep -q "^$DIR" && echo "true" || echo "false")
         # Check if Docker image exists on GitHub Packages
-        IMAGE_EXISTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/ls1intum/Athena/packages/container/${IMAGE_NAME}/versions?version=${IMAGE_TAG}" | jq -r '.[].version' | grep -q "^$IMAGE_TAG" && echo "true" || echo "false")
+        IMAGE_EXISTS=$(curl \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        https://api.github.com/repos/$GITHUB_REPO/packages?package_type=docker | jq -r ".[].name" | grep -q "$IMAGE_NAME:$IMAGE_TAG" && echo "true" || echo "false")
         if [[ "$IS_CHANGED" == "true" || "$IMAGE_EXISTS" == "false" ]]; then
             # Add the directory to the array
             DIRS+=("$DIR")
