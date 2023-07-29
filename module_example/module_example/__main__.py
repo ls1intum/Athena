@@ -14,6 +14,7 @@ from athena.storage import store_exercise, store_submissions, store_feedback
 class Configuration(BaseModel):
     """Example configuration for the module_example module."""
     debug: bool = Field(False, description="Whether the module is in **debug mode**. This is an example config option.")
+    test: str = Field("test", description="This is another example config option.")
 
 
 @submissions_consumer
