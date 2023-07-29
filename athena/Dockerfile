@@ -8,7 +8,7 @@ FROM python:3.11 as athena
 WORKDIR /code
 
 # Poetry
-RUN pip install --no-cache-dir poetry==1.5.0
+RUN pip install --no-cache-dir poetry==1.5.0 
 
 # Dependencies
 COPY pyproject.toml poetry.lock ./
