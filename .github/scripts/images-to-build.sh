@@ -15,7 +15,7 @@ DIRS=()
 
 # Get a list of all files changed in the current pull request
 git fetch origin $GITHUB_BASE_REF # Make sure we have the older ref as well
-CHANGED_FILES=$(git diff --name-only HEAD $(git merge-base HEAD $LAST_REF_BEFORE_PUSH) 2>&1)
+CHANGED_FILES=$(git diff --name-only HEAD $LAST_REF_BEFORE_PUSH 2>&1)
 
 if [ $? -ne 0 ]; then
     # The command failed. Print the error message.
