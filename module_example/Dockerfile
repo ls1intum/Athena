@@ -3,7 +3,7 @@
 # This is the Dockerfile for the module_example.
 
 FROM python:3.11
-LABEL org.opencontainers.image.source=https://github.com/ls1intum/Athena
+LABEL org.opencontainers.image.source=https://github.com/ls1intum/Athena 
 
 # Environment variable Python in Docker
 ENV PYTHONUNBUFFERED=1
