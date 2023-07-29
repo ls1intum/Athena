@@ -32,6 +32,7 @@ jobs:
           export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           export GITHUB_REPO=${{ github.repository }}
           export GITHUB_REF=${{ github.ref }}
+          export ORGANIZATION_NAME=${{ github.repository_owner }}
           chmod +x ./.github/scripts/images-to-build.sh
           IMAGE_NAMES=$(./.github/scripts/images-to-build.sh)
           IMAGE_NAMES_JSON=$(echo "$IMAGE_NAMES" | jq -R -s -c 'split("\n")[:-1]')
