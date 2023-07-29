@@ -33,6 +33,7 @@ jobs:
           export GITHUB_REPO=${{ github.repository }}
           export GITHUB_REF=${{ github.ref }}
           export ORGANIZATION_NAME=${{ github.repository_owner }}
+          export LAST_REF_BEFORE_PUSH=${{ github.event.before }}
           chmod +x ./.github/scripts/images-to-build.sh
           IMAGE_NAMES=$(./.github/scripts/images-to-build.sh)
           IMAGE_NAMES_JSON=$(echo "$IMAGE_NAMES" | jq -R -s -c 'split("\n")[:-1]')
