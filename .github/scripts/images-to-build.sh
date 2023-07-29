@@ -14,10 +14,15 @@ set -xe
 DIRS=()
 
 # Get a list of all files changed in the current pull request
-CHANGED_FILES=$(curl \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/$GITHUB_REPO/pulls/$PR_NUMBER/files | jq -r '.[].filename')
+CHANGED_FILES=$(git diff --name-only HEAD $(git merge-base HEAD $LAST_REF_BEFORE_PUSH) 2>&1)
+
+if [ $? -ne 0 ]; then
+    # The command failed. Print the error message.
+    echo "Error getting changed files: $CHANGED_FILES"
+
+    # Set CHANGED_FILES to list all files
+    CHANGED_FILES=$(git ls-files)
+fi
 
 # Check if athena folder was changed (then we need to build all module_* images)
 ATHENA_CHANGED=$(echo "$CHANGED_FILES" | grep -q "^athena" && echo "true" || echo "false")
