@@ -37,6 +37,8 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 @feedback_provider
 async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
+    # Do something with the submission and return a list of feedback
+
     # Check if file based grading instructions and problem statements are available
     if 'file_grading_instructions' in exercise.meta and 'file_problem_statements' in exercise.meta:
         return await suggest_feedback_basic(exercise, submission)
