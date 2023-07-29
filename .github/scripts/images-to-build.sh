@@ -4,7 +4,8 @@
 # We want to build a Docker image if at least one of the following conditions is true:
 # 1. The Dockerfile in the directory has changed since the branch was created
 # 2. The Docker image does not exist on GitHub Packages yet
-# 3. The current branch is develop
+# 3. The image is for a module and the athena package was updated
+# 4. The current branch is develop
 # Otherwise, we want to skip the build for performance reasons.
 
 set -xe
@@ -17,6 +18,9 @@ CHANGED_FILES=$(curl \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/repos/$GITHUB_REPO/pulls/$PR_NUMBER/files | jq -r '.[].filename')
+
+# Check if athena folder was changed (then we need to build all module_* images)
+ATHENA_CHANGED=$(echo "$CHANGED_FILES" | grep -q "^athena" && echo "true" || echo "false")
 
 # Loop over all root level directories
 for DIR in */; do
@@ -34,8 +38,14 @@ for DIR in */; do
             continue
         fi
 
+        # Build all images on develop branch
         if [[ "$GITHUB_REF" == "refs/heads/develop" ]]; then
-            # Build all images on develop branch
+            DIRS+=("$DIR")
+            continue
+        fi
+
+        # If athena was changed, build all docker images starting with module_*
+        if [[ "$ATHENA_CHANGED" == "true" && "$DIR" == module_* ]]; then
             DIRS+=("$DIR")
             continue
         fi
