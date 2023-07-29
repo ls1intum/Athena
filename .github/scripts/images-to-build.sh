@@ -41,7 +41,7 @@ for DIR in */; do
         fi
 
         # Construct Docker image name and tag
-        IMAGE_NAME="athena_${DIR}"
+        IMAGE_NAME="athena/${DIR}"
         IMAGE_TAG="pr-$PR_NUMBER"
 
         # Check if any file has changed in that directory since the pull request was created
