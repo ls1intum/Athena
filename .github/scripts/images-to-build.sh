@@ -50,7 +50,7 @@ for DIR in */; do
         AVAILABLE_IMAGES=$(curl \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/$GITHUB_REPO/packages
+            https://api.github.com/orgs/ls1intum/packages
         )
         IMAGE_EXISTS=$($AVAILABLE_IMAGES | jq -r ".packages[].name" | grep -q "$IMAGE_NAME" && echo "true" || echo "false")
         if [[ "$IS_CHANGED" == "true" || "$IMAGE_EXISTS" == "false" ]]; then
