@@ -29,6 +29,11 @@ for DIR in */; do
             continue
         fi
 
+        # no need to build docs
+        if [[ "$DIR" == "docs" ]]; then
+            continue
+        fi
+
         if [[ "$GITHUB_REF" == "refs/heads/develop" ]]; then
             # Build all images on develop branch
             DIRS+=("$DIR")
