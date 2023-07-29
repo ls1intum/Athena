@@ -50,7 +50,7 @@ for DIR in */; do
         URL="https://api.github.com/orgs/$ORGANIZATION_NAME/packages/container/$IMAGE_NAME"
         RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -L \
         -H "Accept: application/vnd.github+json" \
-        -H "Authorization: Bearer ${GITLAB_TOKEN}" \
+        -H "Authorization: Bearer $GITHUB_TOKEN" \
         https://api.github.com/orgs/$ORGANIZATION_NAME/packages/container/$IMAGE_NAME)
         # Check if the image exists
         if [ $RESPONSE -eq 200 ]; then
