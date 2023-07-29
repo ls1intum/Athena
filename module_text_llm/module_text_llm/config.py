@@ -8,9 +8,9 @@ from .prompts.suggest_feedback_basic import system_template, human_template
 class BasicPrompt(BaseModel):
     """Features available: **{problem_statement}**, **{grading_instructions}**, **{submission}**, **{max_points}**, **{bonus_points}**"""
     system_message: str = Field(default=system_template,
-                                description="A Message for priming AI behavior, usually passed in as the first of a sequence of input messages.")
+                                description="A message for priming AI behavior, usually passed in as the first of a sequence of input messages.")
     human_message: str = Field(default=human_template,
-                               description="A Message from a human. Usually the input on which the AI is supposed to act.")
+                               description="A message from a human. Usually the input on which the AI is supposed to act.")
 
 
 class BasicApproachConfig(BaseModel):

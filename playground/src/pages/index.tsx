@@ -8,7 +8,9 @@ export default function Playground() {
 
   return (
     <main className="flex min-h-screen flex-col p-24">
-      <h1 className="text-6xl font-bold text-white mb-8">Playground</h1>
+      <h1 className="text-6xl font-bold text-white mb-8">
+        Playground
+      </h1>
       <BaseInfoHeader />
       {module && (<ModuleRequests module={module} />)}
     </main>
