@@ -112,7 +112,7 @@ async function downloadMaterial(exerciseId) {
     const repositoryData = await JSZip.loadAsync(data);
     await Promise.all(
       Object.values(repositoryData.files).map(async (file) => {
-        if (!file.dir) {
+        if (!file.dir && !file.name.startsWith(".git/")) {
           const data = await file.async("nodebuffer");
           const filePath = path.join(outputDir, file.name);
           await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
@@ -183,7 +183,7 @@ async function downloadSubmissions(exerciseId) {
       const submissionData = await JSZip.loadAsync(submissionZip);
       await Promise.all(
         Object.values(submissionData.files).map(async (file) => {
-          if (!file.dir) {
+          if (!file.dir && !file.name.startsWith(".git/")) {
             const data = await file.async("nodebuffer");
             const filePath = path.join(outputDir, file.name);
             await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
