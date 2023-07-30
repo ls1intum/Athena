@@ -12,6 +12,40 @@ import {
 let baseURL = "";
 let authCookie = "";
 
+// Number of times to retry a fetch if it fails
+const fetchRetryCount = 3;
+// Delay between fetch retries in milliseconds
+const fetchRetryDelay = 1000;
+
+/**
+ * Fetch a URL, retrying the fetch a specified number of times if it fails.
+ * 
+ * @param {string} url The URL to fetch
+ * @param {object} options Options to pass to fetch
+ * @param {number} retryCount The number of times to retry the fetch if it fails
+ * @param {number} retryDelay The delay between retries in milliseconds
+ * @returns {Promise<Response>} The fetch response
+ * @throws {Error} If the fetch fails after all retries
+ */
+async function fetchWithRetry(url, options, retryCount = fetchRetryCount, retryDelay = fetchRetryDelay) {
+  for (let i = 0; i <= retryCount; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) {
+        return response;
+      }
+      throw new Error(`HTTP ${response.status} for ${url}: ${response.statusText}\n${await response.text()}`);
+    } catch (error) {
+      if (i < retryCount) {
+        console.log(`Fetch failed for ${url}, retrying in ${retryDelay}ms... (${i + 1}/${retryCount})`);
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
 /**
  * Authenticate with Artemis
  */
@@ -72,7 +106,7 @@ async function auth() {
  * @param {number} exerciseId The ID of the exercise
  */
 async function downloadMaterial(exerciseId) {
-  const response = await fetch(`${baseURL}/programming-exercises/${exerciseId}/export-instructor-exercise`,
+  const response = await fetchWithRetry(`${baseURL}/programming-exercises/${exerciseId}/export-instructor-exercise`,
     {
       method: "GET",
       headers: {
@@ -141,7 +175,7 @@ async function downloadMaterial(exerciseId) {
  * @param {number} exerciseId The ID of the exercise
  */
 async function downloadSubmissions(exerciseId) {
-  const response = await fetch(`${baseURL}/programming-exercises/${exerciseId}/export-repos-by-participant-identifiers/0`,
+  const response = await fetchWithRetry(`${baseURL}/programming-exercises/${exerciseId}/export-repos-by-participant-identifiers/0`,
     {
       method: "POST",
       headers: {
