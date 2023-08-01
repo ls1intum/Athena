@@ -64,7 +64,7 @@ services:
   # http://localhost/upload
   # http://localhost/feedback_consistency
   embedding:
-    image: ghcr.io/ls1intum/athena/embedding
+    image: ghcr.io/ls1intum/athena/embedding:speed-up-embedding-start
     container_name: cofee-embedding
     restart: unless-stopped
     depends_on:
@@ -82,7 +82,7 @@ services:
       - traefik.http.services.cofee-embedding.loadbalancer.server.port=8000 # set service name this way
 
   clustering:
-    image: ghcr.io/ls1intum/athena/clustering
+    image: ghcr.io/ls1intum/athena/clustering:speed-up-embedding-start
     container_name: cofee-clustering
     restart: unless-stopped
     depends_on:
