@@ -50,7 +50,9 @@ def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedbac
         "suggest_feedback: Suggestions for submission %d of exercise %d were requested",
         submission.id, exercise.id
     )
-    return suggest_feedback_for_submission(submission)
+    suggestions = suggest_feedback_for_submission(submission)
+    logger.info("suggest_feedback: Returning %d suggestions", len(suggestions))
+    return suggestions
 
 
 if __name__ == "__main__":
