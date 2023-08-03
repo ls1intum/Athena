@@ -59,4 +59,3 @@ def process_results(clusters: List[cofee_pb2.Cluster], exercise_id: int):  # typ
             db.merge(model)
             db.commit()
     logger.debug("Finished processing CoFee results")
-
