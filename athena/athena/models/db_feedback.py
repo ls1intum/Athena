@@ -7,7 +7,7 @@ class DBFeedback(Model):
     __table_args__ = (UniqueConstraint('lms_id'),)
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    lms_id = Column(Integer, )
+    lms_id = Column(Integer)
     title = Column(String)
     description = Column(String, nullable=False)
     credits = Column(Float, nullable=False)
