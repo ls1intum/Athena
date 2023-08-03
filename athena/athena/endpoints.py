@@ -88,16 +88,13 @@ def submissions_consumer(func: Union[
                     submission_meta = get_stored_submission_meta(stored_submission) or {}
                     submission_meta.update(stored_submission.meta)
                     submissions_dict[stored_submission.id].meta = submission_meta
-        submissions = list(submissions_dict.values())
-
-        store_exercise(exercise)
-        store_submissions(submissions)
 
         kwargs = {}
         if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
         store_exercise(exercise)
+        submissions = list(submissions_dict.values())
         store_submissions(submissions)
 
         kwargs = {}
