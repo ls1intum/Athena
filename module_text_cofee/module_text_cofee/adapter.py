@@ -77,5 +77,4 @@ async def save_athene_result(exercise_id: int, request: Request):
         logger.warning("DEBUG MODE: Ignoring invalid API secret.")
     cofee_resp = cofee_pb2.AtheneResponse.FromString(await request.body()) # type: ignore
     clusters = cofee_resp.clusters
-    segments = cofee_resp.segments
-    process_results(clusters, segments, exercise_id)
+    process_results(clusters, exercise_id)
