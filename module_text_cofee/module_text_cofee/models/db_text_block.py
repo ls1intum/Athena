@@ -55,6 +55,8 @@ class DBTextBlock(Base):
         """
         distance_matrix = self.cluster.distance_matrix
         block_index = self.cluster.blocks.index(self)
+        if len(distance_matrix) <= block_index:
+            return 999
         distance_matrix_row = distance_matrix[block_index]
         # subtract 1 because the statement also included the distance to itself, but it shouldn't be included
         return sum(1 - distance for distance in distance_matrix_row) - 1
