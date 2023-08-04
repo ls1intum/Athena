@@ -15,12 +15,17 @@ except ImportError:
 from module_text_cofee.models.db_text_block import DBTextBlock
 
 
-def store_text_blocks(cluster: cofee_pb2.Cluster):  # type: ignore
+def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb2.Cluster]):  # type: ignore
     """Convert segments to text blocks and store them in the DB."""
-    for segment in cluster.segments:
-        cluster_id = cluster.treeId
+    for segment in segments:
+        cluster_id = None
+        for cluster in clusters:
+            for s in cluster.segments:
+                if s.id == segment.id:
+                    cluster_id = cluster.treeId
+                    break
         if cluster_id is None:
-            logger.warning("Segment %s has no cluster", segment.id)
+            logger.warning("Segment %d has no cluster", segment.id)
         # store text block in DB
         with get_db() as db:
             model = DBTextBlock(
@@ -35,17 +40,9 @@ def store_text_blocks(cluster: cofee_pb2.Cluster):  # type: ignore
             db.commit()
 
 
-def float_matrix_to_bytes(floats: List[List[float]]) -> bytes:
-    """Convert a matrix of floats to a bytes object."""
-    return struct.pack(f"{len(floats) * len(floats[0])}f", *sum(floats, []))
-
-
-def process_results(clusters: List[cofee_pb2.Cluster], exercise_id: int):  # type: ignore
-    """Processes results coming back from the CoFee system via callbackUrl"""
-    logger.debug("Received %d clusters from CoFee", len(clusters))
+def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster]):  # type: ignore
+    """Store text clusters in the DB."""
     for cluster in clusters:
-        logger.debug("Cluster %d has %d segments", cluster.treeId, len(cluster.segments))
-        store_text_blocks(cluster)
         distance_matrix: List[List[float]] = [[0.0 for _ in range(len(cluster.segments))] for _ in range(len(cluster.segments))]
         for entry in cluster.distanceMatrix:
             distance_matrix[entry.x][entry.y] = entry.value
@@ -58,4 +55,11 @@ def process_results(clusters: List[cofee_pb2.Cluster], exercise_id: int):  # typ
             model.distance_matrix = distance_matrix
             db.merge(model)
             db.commit()
+
+
+def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.Segment], exercise_id):  # type: ignore
+    """Processes results coming back from the CoFee system via callbackUrl"""
+    logger.debug("Received %d clusters and %d segments from CoFee", len(clusters), len(segments))
+    store_text_blocks(segments, clusters)
+    store_text_clusters(exercise_id, clusters)
     logger.debug("Finished processing CoFee results")
