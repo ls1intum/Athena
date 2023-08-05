@@ -14,6 +14,7 @@ class DBTextBlock(Base):
     text = Column(String)  # type: ignore
     index_start = Column(Integer)  # type: ignore
     index_end = Column(Integer)  # type: ignore
+    position_in_cluster = Column(Integer)  # type: ignore
 
     # foreign keys
     submission_id = Column(Integer, ForeignKey("text_submissions.id"))  # FK to athena-native table

@@ -57,9 +57,26 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
             db.commit()
 
 
+def store_positions_in_cluster(clusters: List[cofee_pb2.Cluster]):  # type: ignore
+    """
+    Store the positions of the text blocks in the clusters in the DB, in the same order that Athena-CoFee provides.
+    This is necessary because the distance matrix is ordered in the same way. When we later the distance between
+    two text blocks, we need to know their positions in the cluster because that's the place where we need to look 
+    up the distance in the distance matrix.
+    """
+    for cluster in clusters:
+        with get_db() as db:
+            for i, segment in enumerate(cluster.segments):
+                model = DBTextBlock.get(segment.id)
+                model.position_in_cluster = i
+                db.merge(model)
+            db.commit()
+
+
 def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.Segment], exercise_id):  # type: ignore
     """Processes results coming back from the CoFee system via callbackUrl"""
     logger.debug("Received %d clusters and %d segments from CoFee", len(clusters), len(segments))
     store_text_clusters(exercise_id, clusters)
     store_text_blocks(segments, clusters)
+    store_positions_in_cluster(clusters)
     logger.debug("Finished processing CoFee results")

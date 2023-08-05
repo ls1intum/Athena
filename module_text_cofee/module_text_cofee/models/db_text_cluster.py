@@ -17,7 +17,7 @@ class DBTextCluster(Base):
     disabled: bool = Column(Boolean, default=False)  # type: ignore
 
     # Define the relationship to DBTextBlock
-    blocks = relationship("DBTextBlock", back_populates="cluster")
+    blocks = relationship("DBTextBlock", back_populates="cluster", order_by="DBTextBlock.position_in_cluster")  # type: ignore
 
     # Define the relationship to DBTextExercise
     exercise_id = Column(Integer, ForeignKey('text_exercises.id'))
