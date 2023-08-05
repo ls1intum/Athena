@@ -17,14 +17,6 @@ from module_text_cofee.models.db_text_block import DBTextBlock
 def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb2.Cluster]):  # type: ignore
     """Convert segments to text blocks and store them in the DB."""
     for segment in segments:
-        cluster_id = None
-        for cluster in clusters:
-            for s in cluster.segments:
-                if s.id == segment.id:
-                    cluster_id = cluster.treeId
-                    break
-        if cluster_id is None:
-            logger.warning("Segment %s has no cluster", segment.id)
         # store text block in DB
         with get_db() as db:
             model = DBTextBlock(
@@ -33,7 +25,7 @@ def store_text_blocks(segments: List[cofee_pb2.Segment], clusters: List[cofee_pb
                 text=segment.text,
                 index_start=segment.startIndex,
                 index_end=segment.endIndex,
-                cluster_id=cluster_id,
+                cluster_id=None,
             )
             db.merge(model)
             db.commit()
@@ -48,7 +40,6 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
         # store text cluster in DB
         with get_db() as db:
             model = DBTextCluster(
-                id=cluster.treeId,
                 exercise_id=exercise_id
             )
             model.distance_matrix = distance_matrix
@@ -56,9 +47,10 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
             db.commit()
 
 
-def store_positions_in_cluster(clusters: List[cofee_pb2.Cluster]):  # type: ignore
+def connect_text_blocks_to_clusters(clusters: List[cofee_pb2.Cluster]):  # type: ignore
     """
-    Store the positions of the text blocks in the clusters in the DB, in the same order that Athena-CoFee provides.
+    Connect text blocks to clusters via the cluster_id field.
+    Also store the positions of the text blocks in the clusters in the DB, in the same order that Athena-CoFee provides.
     This is necessary because the distance matrix is ordered in the same way. When we later the distance between
     two text blocks, we need to know their positions in the cluster because that's the place where we need to look 
     up the distance in the distance matrix.
@@ -68,6 +60,7 @@ def store_positions_in_cluster(clusters: List[cofee_pb2.Cluster]):  # type: igno
             for i, segment in enumerate(cluster.segments):
                 model = db.query(DBTextBlock).filter(DBTextBlock.id == segment.id).one()
                 model.position_in_cluster = i
+                model.cluster_id = cluster.id
                 db.merge(model)
             db.commit()
 
@@ -77,5 +70,5 @@ def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.
     logger.debug("Received %d clusters and %d segments from CoFee", len(clusters), len(segments))
     store_text_clusters(exercise_id, clusters)
     store_text_blocks(segments, clusters)
-    store_positions_in_cluster(clusters)
+    connect_text_blocks_to_clusters(clusters)
     logger.debug("Finished processing CoFee results")
