@@ -47,6 +47,7 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
             db.merge(model)
             db.flush()
             db.refresh(model)
+            print(model.__dict__)
             cluster_ids.append(model.id)
             db.commit()
     return cluster_ids
