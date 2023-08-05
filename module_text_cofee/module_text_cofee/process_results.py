@@ -1,4 +1,3 @@
-import struct
 from typing import List, Iterable
 
 from athena.database import get_db
@@ -67,7 +66,7 @@ def store_positions_in_cluster(clusters: List[cofee_pb2.Cluster]):  # type: igno
     for cluster in clusters:
         with get_db() as db:
             for i, segment in enumerate(cluster.segments):
-                model = DBTextBlock.get(segment.id)
+                model = db.query(DBTextBlock).filter(DBTextBlock.id == segment.id).one()
                 model.position_in_cluster = i
                 db.merge(model)
             db.commit()
