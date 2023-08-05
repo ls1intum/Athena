@@ -45,8 +45,9 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
             )
             model.distance_matrix = distance_matrix
             db.merge(model)
-            db.commit()
+            db.flush()
             cluster_ids.append(model.id)
+            db.commit()
     return cluster_ids
 
 
@@ -72,6 +73,7 @@ def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.
     """Processes results coming back from the CoFee system via callbackUrl"""
     logger.debug("Received %d clusters and %d segments from CoFee", len(clusters), len(segments))
     cluster_ids = store_text_clusters(exercise_id, clusters)
+    logger.debug("Cluster IDs: %s", cluster_ids)
     store_text_blocks(segments, clusters)
     connect_text_blocks_to_clusters(clusters, cluster_ids)
     logger.debug("Finished processing CoFee results")
