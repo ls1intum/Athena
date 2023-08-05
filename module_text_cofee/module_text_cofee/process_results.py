@@ -60,6 +60,6 @@ def store_text_clusters(exercise_id: int, clusters: Iterable[cofee_pb2.Cluster])
 def process_results(clusters: List[cofee_pb2.Cluster], segments: List[cofee_pb2.Segment], exercise_id):  # type: ignore
     """Processes results coming back from the CoFee system via callbackUrl"""
     logger.debug("Received %d clusters and %d segments from CoFee", len(clusters), len(segments))
-    store_text_blocks(segments, clusters)
     store_text_clusters(exercise_id, clusters)
+    store_text_blocks(segments, clusters)
     logger.debug("Finished processing CoFee results")
