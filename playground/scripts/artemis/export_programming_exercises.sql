@@ -69,7 +69,6 @@ join (
 -- Create temporary table for latest rated programming submissions
 CREATE TEMPORARY TABLE latest_rated_programming_submissions as
 select s.*
-select s.*
 from latest_rated_programming_results r
 join submission s on r.submission_id = s.id;
 
