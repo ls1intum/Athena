@@ -16,6 +16,7 @@ let authCookie = "";
 const fetchRetryCount = 3;
 // Delay between fetch retries in milliseconds
 const fetchRetryDelay = 1000;
+const exponentialBackoffFactor = 5; // 1, 5, 25 (seconds)
 
 /**
  * Fetch a URL, retrying the fetch a specified number of times if it fails.
@@ -37,8 +38,9 @@ async function fetchWithRetry(url, options, retryCount = fetchRetryCount, retryD
       throw new Error(`HTTP ${response.status} for ${url}: ${response.statusText}\n${await response.text()}`);
     } catch (error) {
       if (i < retryCount) {
-        console.log(`Fetch failed for ${url}, retrying in ${retryDelay}ms... (${i + 1}/${retryCount})`);
-        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        const delay = retryDelay * Math.pow(exponentialBackoffFactor, i);
+        console.log(`Fetch failed for ${url}, retrying in ${delay}ms... (${i + 1}/${retryCount})`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
         throw error;
       }
