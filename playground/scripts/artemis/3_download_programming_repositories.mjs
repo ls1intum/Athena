@@ -17,10 +17,11 @@ const fetchRetryCount = 3;
 // Delay between fetch retries in milliseconds
 const fetchRetryDelay = 1000;
 const exponentialBackoffFactor = 5; // 1, 5, 25 (seconds)
+const concurrentDownloads = 5;
 
 /**
  * Fetch a URL, retrying the fetch a specified number of times if it fails.
- * 
+ *
  * @param {string} url The URL to fetch
  * @param {object} options Options to pass to fetch
  * @param {number} retryCount The number of times to retry the fetch if it fails
@@ -28,18 +29,31 @@ const exponentialBackoffFactor = 5; // 1, 5, 25 (seconds)
  * @returns {Promise<Response>} The fetch response
  * @throws {Error} If the fetch fails after all retries
  */
-async function fetchWithRetry(url, options, retryCount = fetchRetryCount, retryDelay = fetchRetryDelay) {
+async function fetchWithRetry(
+  url,
+  options,
+  retryCount = fetchRetryCount,
+  retryDelay = fetchRetryDelay
+) {
   for (let i = 0; i <= retryCount; i++) {
     try {
       const response = await fetch(url, options);
       if (response.ok) {
         return response;
       }
-      throw new Error(`HTTP ${response.status} for ${url}: ${response.statusText}\n${await response.text()}`);
+      throw new Error(
+        `HTTP ${response.status} for ${url}: ${
+          response.statusText
+        }\n${await response.text()}`
+      );
     } catch (error) {
       if (i < retryCount) {
         const delay = retryDelay * Math.pow(exponentialBackoffFactor, i);
-        console.log(`Fetch failed for ${url}, retrying in ${delay}ms... (${i + 1}/${retryCount})`);
+        console.log(
+          `Fetch failed for ${url}, retrying in ${delay}ms... (${
+            i + 1
+          }/${retryCount})`
+        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
         throw error;
@@ -79,10 +93,10 @@ async function auth() {
     process.exit(1);
   }
 
-  const setCookie = response.headers.get('Set-Cookie');
+  const setCookie = response.headers.get("Set-Cookie");
   if (setCookie) {
-    const cookieArray = setCookie.split(';');
-    authCookie = cookieArray.find((cookie) => cookie.trim().startsWith('jwt='));
+    const cookieArray = setCookie.split(";");
+    authCookie = cookieArray.find((cookie) => cookie.trim().startsWith("jwt="));
   }
   if (authCookie) {
     console.log("Authenticated successfully");
@@ -90,11 +104,11 @@ async function auth() {
     console.error("Failed to authenticate: No cookie received");
     process.exit(1);
   }
-};
+}
 
 /**
  * Download all material repositories for a given exercise.
- * 
+ *
  * The material repositories are downloaded to the `evaluationOutputDirPath` directory in the following structure:
  * {evaluationOutputDirPath}
  * ├── exercise-{exerciseId}
@@ -104,16 +118,17 @@ async function auth() {
  * │   │   ├── ...
  * │   ├── tests
  * │   │   ├── ...
- * 
+ *
  * @param {number} exerciseId The ID of the exercise
  */
 async function downloadMaterial(exerciseId) {
-  const response = await fetchWithRetry(`${baseURL}/programming-exercises/${exerciseId}/export-instructor-exercise`,
+  const response = await fetchWithRetry(
+    `${baseURL}/programming-exercises/${exerciseId}/export-instructor-exercise`,
     {
       method: "GET",
       headers: {
-        "Cookie": authCookie
-      }
+        Cookie: authCookie,
+      },
     }
   );
 
@@ -123,18 +138,23 @@ async function downloadMaterial(exerciseId) {
   }
 
   console.log(`Downloading exercise ${exerciseId}'s material`);
-  const exercisePath = path.join(evaluationOutputDirPath, `exercise-${exerciseId}`);
+  const exercisePath = path.join(
+    evaluationOutputDirPath,
+    `exercise-${exerciseId}`
+  );
   const data = await response.arrayBuffer();
   const materialData = await JSZip.loadAsync(data);
 
   // There is only one zip file in the material zip, which contains the exercise, solution and tests zips
   // The material zip also contains problemstatement.md and details.json but we don't need them
-  const zipFile = Object.values(materialData.files).find((file) => file.name.endsWith(".zip"));
+  const zipFile = Object.values(materialData.files).find((file) =>
+    file.name.endsWith(".zip")
+  );
   const zip = await zipFile.async("nodebuffer");
   const materialZipData = await JSZip.loadAsync(zip);
 
   const writeRepositoryZip = async (zipFile) => {
-     // Should either be "exercise", "solution", or "tests"
+    // Should either be "exercise", "solution", or "tests"
     const kind = zipFile.name.match(/-(\w+).zip$/)[1];
     if (!["exercise", "solution", "tests"].includes(kind)) {
       console.warn(`Unknown zip file ${zipFile.name} in material zip`);
@@ -142,7 +162,10 @@ async function downloadMaterial(exerciseId) {
     }
 
     // Destination path for unzipping (solution, template, tests)
-    const outputDir = path.join(exercisePath, kind === "exercise" ? "template" : kind); // Rename `exercise` to `template`
+    const outputDir = path.join(
+      exercisePath,
+      kind === "exercise" ? "template" : kind
+    ); // Rename `exercise` to `template`
 
     const data = await zipFile.async("nodebuffer");
     const repositoryData = await JSZip.loadAsync(data);
@@ -158,12 +181,14 @@ async function downloadMaterial(exerciseId) {
     );
   };
 
-  await Promise.all(Object.values(materialZipData.files).map(writeRepositoryZip));
-};
+  await Promise.all(
+    Object.values(materialZipData.files).map(writeRepositoryZip)
+  );
+}
 
 /**
  * Download all submission repositories for a given exercise.
- * 
+ *
  * The submission repositories are downloaded to the `evaluationOutputDirPath` directory in the following structure:
  * {evaluationOutputDirPath}
  * ├── exercise-{exerciseId}
@@ -173,22 +198,23 @@ async function downloadMaterial(exerciseId) {
  * │   │   ├── {submissionId2}
  * │   │   │   ├── ...
  * │   │   ├── ...
- *  
+ *
  * @param {number} exerciseId The ID of the exercise
  */
 async function downloadSubmissions(exerciseId) {
-  const response = await fetchWithRetry(`${baseURL}/programming-exercises/${exerciseId}/export-repos-by-participant-identifiers/0`,
+  const response = await fetchWithRetry(
+    `${baseURL}/programming-exercises/${exerciseId}/export-repos-by-participant-identifiers/0`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Cookie": authCookie
+        Cookie: authCookie,
       },
       body: JSON.stringify({
         excludePracticeSubmissions: true,
         exportAllParticipants: true,
         anonymizeRepository: true,
-      })
+      }),
     }
   );
 
@@ -198,7 +224,11 @@ async function downloadSubmissions(exerciseId) {
   }
 
   console.log(`Downloaded exercise ${exerciseId}'s submissions`);
-  const submissionsPath = path.join(evaluationOutputDirPath, `exercise-${exerciseId}`, "submissions");
+  const submissionsPath = path.join(
+    evaluationOutputDirPath,
+    `exercise-${exerciseId}`,
+    "submissions"
+  );
 
   // The response is a zip file containing a zip file for each submission
   const data = await response.arrayBuffer();
@@ -210,7 +240,9 @@ async function downloadSubmissions(exerciseId) {
         return;
       }
 
-      const submissionId = zipFile.name.match(/-(\d+)-student-submission.git.zip$/)[1];
+      const submissionId = zipFile.name.match(
+        /-(\d+)-student-submission.git.zip$/
+      )[1];
       const submissionZip = await zipFile.async("nodebuffer");
 
       // Destination path for unzipping the submission repository
@@ -222,18 +254,20 @@ async function downloadSubmissions(exerciseId) {
           if (!file.dir && !file.name.includes(".git/")) {
             const data = await file.async("nodebuffer");
             const filePath = path.join(outputDir, file.name);
-            await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+            await fs.promises.mkdir(path.dirname(filePath), {
+              recursive: true,
+            });
             await fs.promises.writeFile(filePath, data);
           }
         })
       );
     })
   );
-};
+}
 
 /**
  * Download an exercise's material and submission repositories.
- * 
+ *
  * @param {number} exerciseId The ID of the exercise
  * @returns {boolean} Whether the exercise was downloaded successfully
  */
@@ -245,10 +279,29 @@ async function download(exerciseId) {
   } catch (e) {
     console.error(`Error downloading exercise ${exerciseId}`);
     console.error(` > ${e.message}`);
-    console.error(" > Either the exercise does not exist or you do not have access to it, skipping");
+    console.error(
+      " > Either the exercise does not exist or you do not have access to it, skipping"
+    );
     return false;
   }
-};
+}
+
+/**
+ * Helper function to create a promise that resolves after a task is done.
+ */
+const taskPromise = (idx, task = null) =>
+  new Promise((resolve) => {
+    if (!task) {
+      resolve(idx);
+    }
+    task
+      .then(() => {
+        resolve(idx);
+      })
+      .catch(() => {
+        resolve(idx);
+      });
+  });
 
 /**
  * Main entry point.
@@ -269,7 +322,10 @@ async function main() {
     JSON.parse(await fs.promises.readFile(programming.inputDataPath, "utf8"))
   );
 
-  console.log(`Found the following exercise IDs in ${programming.inputDataPath}:`, exerciseIds);
+  console.log(
+    `Found the following exercise IDs in ${programming.inputDataPath}:`,
+    exerciseIds
+  );
 
   const { shouldDownloadAll } = await inquirer.prompt({
     type: "confirm",
@@ -279,20 +335,33 @@ async function main() {
 
   try {
     if (shouldDownloadAll) {
-      const results = await Promise.all(
-        exerciseIds.map(async (exerciseId) => {
-          return await download(exerciseId);
-        })
+      // Only download concurrentDownloads exercises at a time
+      const downloadPromises = Array.from({ length: concurrentDownloads }, () =>
+        Promise.resolve()
       );
+      const resultPromises = [];
+
+      for (const exerciseId of exerciseIds) {
+        const idx = await Promise.race(downloadPromises);
+        const downloadPromise = download(exerciseId);
+        resultPromises.push(downloadPromise);
+        downloadPromises[idx] = taskPromise(idx, downloadPromise);
+      }
+
+      const results = await Promise.all(results);
       const failed = results.filter((result) => !result);
-      console.log(`Downloaded ${exerciseIds.length - failed.length} exercises, ${failed.length} failed`);
+      console.log(
+        `Downloaded ${exerciseIds.length - failed.length} exercises, ${
+          failed.length
+        } failed`
+      );
     } else {
       const { exerciseId } = await inquirer.prompt({
         type: "input",
         name: "exerciseId",
         message: "Enter the exercise ID to download:",
       });
-      if (!await download(exerciseId)) {
+      if (!(await download(exerciseId))) {
         console.log("No exercise was downloaded");
       }
     }
@@ -301,6 +370,6 @@ async function main() {
   }
 
   console.log("Done!");
-};
+}
 
 main();
