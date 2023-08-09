@@ -6,6 +6,7 @@ import path from "path";
 import {
   programming,
   findExerciseIds,
+  getExercisesGroupedByCourse,
   evaluationOutputDirPath,
 } from "./utils.mjs";
 
@@ -52,7 +53,7 @@ async function fetchWithRetry(
         console.log(
           `Fetch failed for ${url}, retrying in ${delay}ms... (${
             i + 1
-          }/${retryCount})`
+          }/${retryCount + 1})`
         );
         await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
@@ -318,53 +319,62 @@ async function main() {
 
   await auth();
 
-  const exerciseIds = findExerciseIds(
-    JSON.parse(await fs.promises.readFile(programming.inputDataPath, "utf8"))
-  );
+  const evaluationData = JSON.parse(await fs.promises.readFile(programming.inputDataPath, "utf8"))
+  const exercises = [];
+  const entries = Object.entries(evaluationData);
+  for (let index = 0; index < entries.length; index++) {
+    const [courseTitle, course] = entries[index];
+    const { selectedExercises } = await inquirer.prompt({
+      type: 'checkbox',
+      name: 'selectedExercises',
+      message: `${course.course_id} - ${courseTitle}: Which exercises would you like to download? (Course ${index + 1}/${entries.length})`,
+      choices: course.exercises.map(exercise => ({
+        name: `${exercise.id} - ${exercise.title}`,
+        value: exercise
+      }))
+    });
+    exercises.push(...selectedExercises);
+  }
 
-  console.log(
-    `Found the following exercise IDs in ${programming.inputDataPath}:`,
-    exerciseIds
-  );
-
-  const { shouldDownloadAll } = await inquirer.prompt({
-    type: "confirm",
-    name: "shouldDownloadAll",
-    message: "Download all exercises?",
+  console.log(`\nYou selected the following exercises:`);
+  exercises.forEach(exercise => {
+    console.log(` - ${exercise.id} - ${exercise.title}`);
   });
 
+  const { confirmDownload } = await inquirer.prompt({
+    type: "confirm",
+    name: "confirmDownload",
+    message: `Confirm and start downloading ${exercises.length} exercises (this may take a while)?`,
+  });
+
+  if (!confirmDownload) {
+    console.log("Aborting!");
+    process.exit(0);
+  }
+
+  const exerciseIds = exercises.map((exercise) => exercise.id);
+
   try {
-    if (shouldDownloadAll) {
-      // Only download concurrentDownloads exercises at a time
-      const downloadPromises = Array.from({ length: concurrentDownloads }, () =>
-        Promise.resolve()
-      );
-      const resultPromises = [];
+    // Only download limited exercises at a time
+    const downloadPromises = Array.from({ length: concurrentDownloads }, () =>
+      Promise.resolve()
+    );
+    const resultPromises = [];
 
-      for (const exerciseId of exerciseIds) {
-        const idx = await Promise.race(downloadPromises);
-        const downloadPromise = download(exerciseId);
-        resultPromises.push(downloadPromise);
-        downloadPromises[idx] = taskPromise(idx, downloadPromise);
-      }
-
-      const results = await Promise.all(results);
-      const failed = results.filter((result) => !result);
-      console.log(
-        `Downloaded ${exerciseIds.length - failed.length} exercises, ${
-          failed.length
-        } failed`
-      );
-    } else {
-      const { exerciseId } = await inquirer.prompt({
-        type: "input",
-        name: "exerciseId",
-        message: "Enter the exercise ID to download:",
-      });
-      if (!(await download(exerciseId))) {
-        console.log("No exercise was downloaded");
-      }
+    for (const exerciseId of exerciseIds) {
+      const idx = await Promise.race(downloadPromises);
+      const downloadPromise = download(exerciseId);
+      resultPromises.push(downloadPromise);
+      downloadPromises[idx] = taskPromise(idx, downloadPromise);
     }
+
+    const results = await Promise.all(results);
+    const failed = results.filter((result) => !result);
+    console.log(
+      `Downloaded ${exerciseIds.length - failed.length} exercises, ${
+        failed.length
+      } failed`
+    );
   } catch (e) {
     console.error(`Error downloading exercise ${e.message}`);
   }
