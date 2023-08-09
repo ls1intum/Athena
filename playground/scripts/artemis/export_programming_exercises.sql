@@ -17,6 +17,7 @@ FROM
 WHERE
   e.discriminator = 'P'
   AND c.test_course = 0
+  and c.id <> 39 -- tutorial course
   AND e.included_in_overall_score <> 'NOT_INCLUDED'
   AND e.course_id is not NULL
   AND c.id <> 12; -- old Software Engineering Essentials course
@@ -35,6 +36,7 @@ FROM
 WHERE
   e.discriminator = 'P'
   AND c.test_course = 0
+  and c.id <> 39 -- tutorial course
   AND e.included_in_overall_score <> 'NOT_INCLUDED'
   AND e.course_id is NULL
   AND ex.course_id = c.id
@@ -52,35 +54,24 @@ SELECT * FROM temp_exam_programming_exercises;
 -- Create temporary table for latest rated programming results
 CREATE TEMPORARY TABLE latest_rated_programming_results as
 select r.* 
-from result r
+from `result` r
 join (
 	select 
 		r1.participation_id,
-		r1.submission_id,
 		MAX(r1.completion_date) as latest_completion_date
 	from relevant_programming_exercises pe
 	join participation p on p.exercise_id = pe.id 
-	join result r1 on r1.participation_id = p.id
+	join `result` r1 on r1.participation_id = p.id
 	where r1.rated = 1
-	group by r1.participation_id, r1.submission_id
-) r1 on r1.participation_id = r.participation_id and r1.submission_id = r.submission_id and r1.latest_completion_date = r.completion_date;
+	group by r1.participation_id
+) r1 on r1.participation_id = r.participation_id and r1.latest_completion_date = r.completion_date;
 
 -- Create temporary table for latest rated programming submissions
 CREATE TEMPORARY TABLE latest_rated_programming_submissions as
 select s.*
-from submission s 
-join (
-	select 
-	    s1.participation_id,
-	    MAX(s1.submission_date) as latest_submission
-	from relevant_programming_exercises pe
-	join participation p on p.exercise_id = pe.id 
-	join submission s1 on s1.participation_id = p.id 
-	join `result` r on r.submission_id = s1.id
-	where s1.submitted = 1 and r.rated = 1 and r.assessment_type <> 'AUTOMATIC'
-	group by s1.participation_id
-) s1 on s1.participation_id = s.participation_id and s1.latest_submission = s.submission_date;
-
+select s.*
+from latest_rated_programming_results r
+join submission s on r.submission_id = s.id;
 
 -- Make sure we don't run into the group_concat_max_len limit
 SET SESSION group_concat_max_len = 1000000;

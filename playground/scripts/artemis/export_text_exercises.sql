@@ -17,6 +17,7 @@ FROM
 WHERE
   e.discriminator = 'T'
   AND c.test_course = 0
+  and c.id <> 39 -- tutorial course
   AND e.included_in_overall_score <> 'NOT_INCLUDED'
   AND e.course_id is not NULL;
 
@@ -34,6 +35,7 @@ FROM
 WHERE
   e.discriminator = 'T'
   AND c.test_course = 0
+  and c.id <> 39 -- tutorial course
   AND e.included_in_overall_score <> 'NOT_INCLUDED'
   AND e.course_id is NULL
   AND ex.course_id = c.id
@@ -59,7 +61,8 @@ join (
 	from relevant_text_exercises te
 	join participation p on p.exercise_id = te.id 
 	join result r1 on r1.participation_id = p.id
-	where r1.rated = 1
+	join submission s on r1.submission_id = s.id
+	where r1.rated = 1 and s.submitted = 1 and s.`text` IS NOT NULL AND TRIM(s.`text`) <> ''
 	group by r1.participation_id, r1.submission_id
 ) r1 on r1.participation_id = r.participation_id and r1.submission_id = r.submission_id and r1.latest_completion_date = r.completion_date;
 
@@ -72,10 +75,10 @@ join (
 	    s1.participation_id,
 	    MAX(s1.submission_date) as latest_submission
 	from relevant_text_exercises te
-	join participation p on p.exercise_id = te.id 
-	join submission s1 on s1.participation_id = p.id 
-	join `result` r on r.submission_id = s1.id
-	where s1.submitted = 1 and r.rated = 1 and r.assessment_type <> 'AUTOMATIC'
+	join participation p on p.exercise_id = te.id  
+	join latest_rated_text_results r on r.participation_id = p.id
+	join submission s1 on r.submission_id = s1.id 
+	where s1.submitted = 1 and r.rated = 1 and s1.`text` IS NOT NULL AND TRIM(s1.`text`) <> ''
 	group by s1.participation_id
 ) s1 on s1.participation_id = s.participation_id and s1.latest_submission = s.submission_date;
 
