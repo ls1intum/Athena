@@ -156,7 +156,7 @@ SELECT
       JSON_OBJECT(
         'id',
         p.id,
-        'content',
+        'text',
         s.`text`,
         'student_id',
         p.student_id,
@@ -191,6 +191,8 @@ SELECT
                   WHEN tb.end_index IS NOT NULL AND tb.end_index > 0 THEN tb.end_index - 1
                   ELSE 0
                 END,
+                'grading_instruction_id',
+                f.grading_instruction_id,
                 'credits',
                 f.credits,
                 'type',
