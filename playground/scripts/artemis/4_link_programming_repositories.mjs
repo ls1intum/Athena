@@ -27,7 +27,7 @@ for (let exercise of exercises) {
   const exercisePath = path.join(evaluationOutputDirPath, `exercise-${exercise.id}`);
   if (!fs.existsSync(exercisePath)) {
     console.log(`Exercise ${exercise.id} has no directory at ${exercisePath}`);
-    process.exit(1);
+    continue;
   }
 
   if (!fs.existsSync(path.join(exercisePath, "solution"))) {
