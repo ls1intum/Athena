@@ -10,9 +10,9 @@
         "is_exam_exercise": 0
       },
       { "id": 3187, "title": "P02 - Taschenrechner", "is_exam_exercise": 0 },
+      { "id": 2104, "title": "H03 - Grafikspeicher", "is_exam_exercise": 0 },
       { "id": 3781, "title": "Ampelsteuerung", "is_exam_exercise": 1 },
-      { "id": 3782, "title": "ASM Backpack", "is_exam_exercise": 1 },
-      { "id": 2104, "title": "H03 - Grafikspeicher", "is_exam_exercise": 0 }
+      { "id": 3782, "title": "ASM Backpack", "is_exam_exercise": 1 }
     ]
   },
   "Functional Programming and Verification (WS20/21)": {
@@ -23,15 +23,29 @@
       { "id": 3942, "title": "Expressions", "is_exam_exercise": 1 }
     ]
   },
+  "Erstklausur zur Einführung in die Informatik 1 WS20/21": {
+    "semester": "WS20/21",
+    "course_id": 104,
+    "exercises": [
+      {
+        "id": 3184,
+        "title": "Objektorientierung mit Verkehrsmitteln",
+        "is_exam_exercise": 1
+      },
+      {
+        "id": 3185,
+        "title": "Objektorientierung mit Transportmitteln",
+        "is_exam_exercise": 1
+      }
+    ]
+  },
   "Nachklausur zum Praktikum: Grundlagen der Programmierung WS20/21": {
     "semester": "WS20/21",
     "course_id": 125,
     "exercises": [
       { "id": 3914, "title": "Konsumierende Eisbaeren", "is_exam_exercise": 1 },
       { "id": 3908, "title": "Aktor-Threads", "is_exam_exercise": 1 },
-      { "id": 3913, "title": "Shoppende Pinguine", "is_exam_exercise": 1 },
-      { "id": 3904, "title": "Tree-Iterator", "is_exam_exercise": 1 },
-      { "id": 3803, "title": "Baum-Iterator", "is_exam_exercise": 1 }
+      { "id": 3913, "title": "Shoppende Pinguine", "is_exam_exercise": 1 }
     ]
   },
   "Security Engineering (IN2178) SS21": {
