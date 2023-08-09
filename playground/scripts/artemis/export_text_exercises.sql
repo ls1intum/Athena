@@ -198,10 +198,7 @@ SELECT
                 'type',
                 f.`type`,
                 'meta',
-                JSON_OBJECT(
-                  'grading_instruction_id',
-                  f.grading_instruction_id
-                )
+                JSON_OBJECT()
               )
             )
           from

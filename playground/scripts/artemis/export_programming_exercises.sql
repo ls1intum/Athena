@@ -187,16 +187,15 @@ SELECT
                   NULL
                 ),
                 'line_end',
+                'grading_instruction_id',
+                f.grading_instruction_id
                 NULL,
                 'credits',
                 f.credits,
                 'type',
                 f.`type`,
                 'meta',
-                JSON_OBJECT(
-                  'grading_instruction_id',
-                  f.grading_instruction_id
-                )
+                JSON_OBJECT()
               )
             )
           from
