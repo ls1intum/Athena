@@ -186,9 +186,9 @@ SELECT
                   NULL
                 ),
                 'line_end',
-                'grading_instruction_id',
-                f.grading_instruction_id
                 NULL,
+                'grading_instruction_id',
+                f.grading_instruction_id,
                 'credits',
                 f.credits,
                 'type',
