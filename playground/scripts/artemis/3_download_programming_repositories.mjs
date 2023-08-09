@@ -5,8 +5,6 @@ import path from "path";
 
 import {
   programming,
-  findExerciseIds,
-  getExercisesGroupedByCourse,
   evaluationOutputDirPath,
 } from "./utils.mjs";
 
@@ -344,6 +342,7 @@ async function main() {
   const { confirmDownload } = await inquirer.prompt({
     type: "confirm",
     name: "confirmDownload",
+    default: true,
     message: `Confirm and start downloading ${exercises.length} exercises (this may take a while)?`,
   });
 
@@ -354,31 +353,26 @@ async function main() {
 
   const exerciseIds = exercises.map((exercise) => exercise.id);
 
-  try {
-    // Only download limited exercises at a time
-    const downloadPromises = Array.from({ length: concurrentDownloads }, () =>
-      Promise.resolve()
-    );
-    const resultPromises = [];
+  // Only download limited exercises at a time
+  const downloadPromises = Array.from({ length: concurrentDownloads }, () =>
+    Promise.resolve()
+  );
+  const resultPromises = [];
 
-    for (const exerciseId of exerciseIds) {
-      const idx = await Promise.race(downloadPromises);
-      const downloadPromise = download(exerciseId);
-      resultPromises.push(downloadPromise);
-      downloadPromises[idx] = taskPromise(idx, downloadPromise);
-    }
-
-    const results = await Promise.all(results);
-    const failed = results.filter((result) => !result);
-    console.log(
-      `Downloaded ${exerciseIds.length - failed.length} exercises, ${
-        failed.length
-      } failed`
-    );
-  } catch (e) {
-    console.error(`Error downloading exercise ${e.message}`);
+  for (const exerciseId of exerciseIds) {
+    const idx = await Promise.race(downloadPromises);
+    const downloadPromise = download(exerciseId);
+    resultPromises.push(downloadPromise);
+    downloadPromises[idx] = taskPromise(idx, downloadPromise);
   }
 
+  const results = await Promise.all(resultPromises);
+  const failed = results.filter((result) => !result);
+  console.log(
+    `Downloaded ${exerciseIds.length - failed.length} exercises, ${
+      failed.length
+    } failed`
+  );
   console.log("Done!");
 }
 
