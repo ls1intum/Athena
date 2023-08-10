@@ -43,11 +43,8 @@ export default function FeedbackEditorTest({
   }, [submission, loadedFeedbacks]);
 
   useEffect(() => {
-    setSubmission(undefined);
-  }, [exercise]);
-
-  useEffect(() => {
     setExercise(undefined);
+    setSubmission(undefined);
   }, [module, mode]);
 
   return (
@@ -56,7 +53,10 @@ export default function FeedbackEditorTest({
       <ExerciseSelect
         exerciseType={module.type}
         exercise={exercise}
-        onChange={setExercise}
+        onChange={(exercise) => {
+          setExercise(exercise);
+          setSubmission(undefined);
+        }}
       />
       {exercise && (
         <>
