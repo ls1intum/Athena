@@ -45,15 +45,17 @@ export default function FileEditor({
     }
     if ("file_path" in feedback) {
       return feedback.file_path === filePath;
-    } else {
-      return true;
     }
+    return true;
   });
-  const modelPath = (identifier ? `${identifier}/` : "") + (filePath ?? "default");
+  const modelPath =
+    (identifier ? `${identifier}/` : "") + (filePath ?? "default");
 
   // Height used for autoHeight
   const [height, setHeight] = useState<number>(18);
-  const [hoverPosition, setHoverPosition] = useState<Position | undefined>(undefined);
+  const [hoverPosition, setHoverPosition] = useState<Position | undefined>(
+    undefined
+  );
   const [selection, setSelection] = useState<Selection | undefined>(undefined);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -81,59 +83,40 @@ export default function FileEditor({
     if (referenceType === "referenced") {
       if (newFeedback.type === "text") {
         if (selection && !selection.isEmpty()) {
-          const startIndex = model.getOffsetAt({
+          newFeedback.index_start = model.getOffsetAt({
             lineNumber: selection.startLineNumber,
             column: selection.startColumn,
           });
-          const endIndex = model.getOffsetAt({
+          newFeedback.index_end = model.getOffsetAt({
             lineNumber: selection.endLineNumber,
             column: selection.endColumn,
           });
-          newFeedback = {
-            ...newFeedback,
-            index_start: startIndex,
-            index_end: endIndex,
-          };
         } else if (hoverPosition) {
-          const startIndex = model.getOffsetAt({
+          newFeedback.index_start = model.getOffsetAt({
             lineNumber: hoverPosition.lineNumber,
             column: model.getLineMinColumn(hoverPosition.lineNumber),
           });
-          const endIndex = model.getOffsetAt({
+          newFeedback.index_end = model.getOffsetAt({
             lineNumber: hoverPosition.lineNumber,
             column: model.getLineMaxColumn(hoverPosition.lineNumber),
           });
-          newFeedback = {
-            ...newFeedback,
-            index_start: startIndex,
-            index_end: endIndex,
-          };
         }
       } else if (newFeedback.type === "programming") {
         if (selection && !selection.isEmpty()) {
-          newFeedback = {
-            ...newFeedback,
-            file_path: filePath,
-            line_start: selection.startLineNumber,
-            line_end:
-              selection.startLineNumber !== selection.endLineNumber
-                ? selection.endLineNumber
-                : undefined,
-          };
+          newFeedback.file_path = filePath;
+          newFeedback.line_start = selection.startLineNumber;
+          newFeedback.line_end =
+            selection.startLineNumber !== selection.endLineNumber
+              ? selection.endLineNumber
+              : undefined;
         } else if (hoverPosition) {
-          newFeedback = {
-            ...newFeedback,
-            file_path: filePath,
-            line_start: hoverPosition.lineNumber,
-          };
+          newFeedback.file_path = filePath;
+          newFeedback.line_start = hoverPosition.lineNumber;
         }
       }
     } else if (referenceType === "unreferenced_file") {
       if (newFeedback.type === "programming") {
-        newFeedback = {
-          ...newFeedback,
-          file_path: filePath,
-        };
+        newFeedback.file_path = filePath;
       }
     }
     onFeedbacksChange([...(feedbacks ?? []), newFeedback]);
@@ -141,7 +124,9 @@ export default function FileEditor({
 
   // Setup listeners for adding feedback
   // Listening for mouse and selection events for adding feedback
-  const setupAddFeedbackHoverListeners = (editor: editor.IStandaloneCodeEditor) => {
+  const setupAddFeedbackHoverListeners = (
+    editor: editor.IStandaloneCodeEditor
+  ) => {
     editor.onMouseMove(function (e) {
       setHoverPosition(e.target.position ?? undefined);
     });
@@ -180,7 +165,9 @@ export default function FileEditor({
     }
 
     if (selection && !selection.isEmpty()) {
-      addFeedbackHoverDecorations.current = model.deltaDecorations(addFeedbackHoverDecorations.current, [
+      addFeedbackHoverDecorations.current = model.deltaDecorations(
+        addFeedbackHoverDecorations.current,
+        [
           {
             range: new monaco.Range(
               selection.startLineNumber,
@@ -203,31 +190,35 @@ export default function FileEditor({
               linesDecorationsClassName: "comment-range-button",
             },
           },
-      ]);
+        ]
+      );
     } else if (hoverPosition) {
-      addFeedbackHoverDecorations.current = model.deltaDecorations(addFeedbackHoverDecorations.current, [
-        {
-          range: new monaco.Range(
-            hoverPosition.lineNumber,
-            1,
-            hoverPosition.lineNumber,
-            1
-          ),
-          options: {
-            isWholeLine: true,
-            linesDecorationsClassName: "comment-range",
+      addFeedbackHoverDecorations.current = model.deltaDecorations(
+        addFeedbackHoverDecorations.current,
+        [
+          {
+            range: new monaco.Range(
+              hoverPosition.lineNumber,
+              1,
+              hoverPosition.lineNumber,
+              1
+            ),
+            options: {
+              isWholeLine: true,
+              linesDecorationsClassName: "comment-range",
+            },
           },
-        },
-        {
-          range: new monaco.Range(
-            hoverPosition.lineNumber,
-            hoverPosition.column,
-            hoverPosition.lineNumber,
-            hoverPosition.column
-          ),
-          options: { linesDecorationsClassName: "comment-range-button" },
-        },
-      ]);
+          {
+            range: new monaco.Range(
+              hoverPosition.lineNumber,
+              hoverPosition.column,
+              hoverPosition.lineNumber,
+              hoverPosition.column
+            ),
+            options: { linesDecorationsClassName: "comment-range-button" },
+          },
+        ]
+      );
     } else {
       model.deltaDecorations(addFeedbackHoverDecorations.current, []);
     }
@@ -268,7 +259,7 @@ export default function FileEditor({
 
   // Update add feedback decorations when the hover position or selection changes
   useEffect(() => {
-    if (!onFeedbacksChange ||  !editorRef.current || !monaco) return;
+    if (!onFeedbacksChange || !editorRef.current || !monaco) return;
     updateAddFeedbackHoverDecorations(editorRef.current, monaco);
     latestAddFeedbackState.current = {
       ...latestAddFeedbackState.current,
