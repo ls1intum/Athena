@@ -43,9 +43,16 @@ export default function FeedbackEditorTest({
   }, [submission, loadedFeedbacks]);
 
   useEffect(() => {
-    setExercise(undefined);
+    if (exercise && exercise.type !== module.type) {
+      setSubmission(undefined);
+      setExercise(undefined);
+    }
+  }, [module]);
+
+  useEffect(() => {
     setSubmission(undefined);
-  }, [module, mode]);
+    setExercise(undefined);
+  }, [mode]);
 
   return (
     <div className="bg-white rounded-md p-4 mb-8">
