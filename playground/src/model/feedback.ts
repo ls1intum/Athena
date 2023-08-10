@@ -1,5 +1,6 @@
 import type { IRange, editor } from "monaco-editor";
 import type { ExerciseType } from "./exercise";
+import type { Submission } from "./submission";
 
 type FeedbackBase = {
   id: number;
@@ -154,3 +155,23 @@ export function getOnFeedbackChange(
     onFeedbacksChange(newFeedbacks);
   };
 }
+
+/**
+ * Creates a new feedback for the given submission
+ * 
+ * @param submission - the submission for which a new feedback should be created
+ * @returns a new feedback
+ */
+export const createNewFeedback = (submission: Submission): Feedback => {
+  return {
+    id: Date.now(), // Good enough for the playground
+    credits: 0,
+    title: "",
+    description: "",
+    type: submission.type,
+    exercise_id: submission.exercise_id,
+    submission_id: submission.id,
+    is_new: true,
+    meta: {},
+  };
+};
