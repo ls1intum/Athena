@@ -5,8 +5,8 @@ import type { Submission } from "./submission";
 type FeedbackBase = {
   id: number;
   type: ExerciseType; // Playground only
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   credits: number;
   exercise_id: number;
   submission_id: number;
