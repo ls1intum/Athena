@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Dict, Tuple, Union, cast
 
 from code_bert_score import score
+import torch
 
 from athena.logger import logger
 
@@ -23,7 +24,6 @@ def get_model_params(lang: str) -> dict:
 
 
 def get_optimal_torch_device():
-    import torch
     if torch.cuda.is_available():
         return torch.device("cuda")
     if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():  # type: ignore # MacOS devices with Metal programming framework

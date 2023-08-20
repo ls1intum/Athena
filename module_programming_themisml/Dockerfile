@@ -22,6 +22,9 @@ RUN poetry config virtualenvs.create true \
     && poetry config virtualenvs.in-project true \
     && poetry install --no-interaction --no-ansi
 
+# install pytorch in the CPU version because we don't have a GPU
+RUN pip install torch==2.0.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
 # Project files
 COPY . ./
 
