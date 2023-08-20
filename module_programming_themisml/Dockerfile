@@ -22,7 +22,8 @@ RUN poetry config virtualenvs.create true \
     && poetry config virtualenvs.in-project true \
     && poetry install --no-interaction --no-ansi
 
-# install pytorch in the CPU version because we don't have a GPU
+# re-install pytorch in the CPU version because we don't have a GPU
+RUN pip uninstall torch
 RUN pip install MarkupSafe==2.0 # We need this version of MarkupSafe for torch
 RUN pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
 
