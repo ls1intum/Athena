@@ -1,6 +1,6 @@
 # type: ignore # too much weird behavior of mypy with decorators
 import inspect
-from fastapi import Depends
+from fastapi import Depends, BackgroundTasks
 from pydantic import BaseModel, ValidationError
 from typing import TypeVar, Callable, List, Union, Any, Coroutine, Type
 
@@ -73,7 +73,8 @@ def submissions_consumer(func: Union[
     async def wrapper(
             exercise: exercise_type,
             submissions: List[submission_type],
-            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type)),
+            background_tasks: BackgroundTasks = Depends()):
         
         # Retrieve existing metadata for the exercise and submissions
         exercise_meta = get_stored_exercise_meta(exercise) or {}
@@ -101,11 +102,8 @@ def submissions_consumer(func: Union[
         if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
-        # Call the actual consumer
-        if inspect.iscoroutinefunction(func):
-            await func(exercise, submissions, **kwargs)
-        else:
-            func(exercise, submissions, **kwargs)
+        # Call the actual consumer asynchronously
+        background_tasks.add_task(func, exercise, submissions, **kwargs)
 
         return None
     return wrapper
@@ -244,7 +242,8 @@ def feedback_consumer(func: Union[
             exercise: exercise_type,
             submission: submission_type,
             feedbacks: List[feedback_type],
-            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type)),
+            background_tasks: BackgroundTasks = Depends()):
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
@@ -260,11 +259,8 @@ def feedback_consumer(func: Union[
         if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
-        # Call the actual consumer
-        if inspect.iscoroutinefunction(func):
-            await func(exercise, submission, feedbacks, **kwargs)
-        else:
-            func(exercise, submission, feedbacks, **kwargs)
+        # Call the actual consumer asynchronously
+        background_tasks.add_task(func, exercise, submission, feedbacks, **kwargs)
 
         return None
     return wrapper
