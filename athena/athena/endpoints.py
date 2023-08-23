@@ -71,10 +71,10 @@ def submissions_consumer(func: Union[
     @authenticated
     @with_meta
     async def wrapper(
+            background_tasks: BackgroundTasks,
             exercise: exercise_type,
             submissions: List[submission_type],
-            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type)),
-            background_tasks: BackgroundTasks = Depends()):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
         
         # Retrieve existing metadata for the exercise and submissions
         exercise_meta = get_stored_exercise_meta(exercise) or {}
@@ -239,11 +239,11 @@ def feedback_consumer(func: Union[
     @authenticated
     @with_meta
     async def wrapper(
+            background_tasks: BackgroundTasks,
             exercise: exercise_type,
             submission: submission_type,
             feedbacks: List[feedback_type],
-            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type)),
-            background_tasks: BackgroundTasks = Depends()):
+            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
 
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
