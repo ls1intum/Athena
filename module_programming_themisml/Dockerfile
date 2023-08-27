@@ -23,10 +23,11 @@ RUN poetry config virtualenvs.create true \
     && poetry config virtualenvs.in-project true \
     && poetry install --no-interaction --no-ansi
 
-# re-install pytorch in the CPU version because we don't have a GPU
-RUN poetry source add --priority=supplemental torch-stable https://download.pytorch.org/whl/ # Add the PyTorch repo
-RUN poetry add torch==2.0.0+cpu # Install PyTorch
-# somehow, the torch library needs sympy to be installed manually as well
+# Re-install pytorch in the CPU version because we don't have a GPU
+RUN poetry source add --priority=supplemental torch-stable https://download.pytorch.org/whl/
+# Install PyTorch:
+RUN poetry add torch==2.0.0+cpu
+# Somehow, the torch library needs sympy to be installed manually as well
 RUN poetry add sympy==1.12
 
 # Project files
