@@ -10,7 +10,7 @@ python = "^3.10"
 fastapi = "^0.96.0"
 uvicorn = "^0.23.0"
 httpx = "^0.24.1"
-gitpython = "^3.1.31"
+gitpython = "^3.1.35"
 sqlalchemy = {extras = ["mypy"], version = "^2.0.15"}
 psycopg2 = "^2.9.6"
 
