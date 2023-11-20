@@ -18,7 +18,7 @@ class DBTextBlock(Base):
 
     # foreign keys
     submission_id = Column(Integer, ForeignKey("text_submissions.id"))  # FK to athena-native table
-    cluster_id = Column(Integer, ForeignKey("text_clusters.id"))  # FK to custom table
+    cluster_id = Column(Integer, ForeignKey("cofee_text_clusters.id"))  # FK to custom table
 
     submission = relationship("DBTextSubmission")
     cluster = relationship("DBTextCluster", back_populates="blocks")
