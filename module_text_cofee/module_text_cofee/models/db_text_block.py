@@ -8,7 +8,7 @@ from athena.logger import logger
 
 
 class DBTextBlock(Base):
-    __tablename__ = "text_blocks"
+    __tablename__ = "cofee_text_blocks"
 
     id = Column(String, primary_key=True, index=True)  # type: ignore
     text = Column(String)  # type: ignore
