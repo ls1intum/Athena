@@ -56,7 +56,7 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
             "Authorization": COFEE_AUTH_TOKEN,
         },
         timeout=60,
-        verify=True if env.PRODUCTION else False,
+        verify=env.PRODUCTION,
     )
     resp.raise_for_status()
     logger.info("Submissions sent to CoFee")
@@ -68,17 +68,17 @@ async def save_athene_result(exercise_id: int, request: Request):
     Saves automatic textAssessments of Athena.
     """
     logger.info("Received callback from CoFee")
-    
+
     # check if auth token is present
     if 'Authorization' not in request.headers:
         raise HTTPException(status_code=401, detail="Authorization header is missing.")
-    
+
     # validate auth token
     if request.headers['Authorization'] != COFEE_AUTH_TOKEN:
         if env.PRODUCTION:
             raise HTTPException(status_code=401, detail="Invalid API secret.")
         logger.warning("DEBUG MODE: Ignoring invalid API secret.")
-    
+
     # TODO: check if exercise id actually exists
 
     cofee_resp = cofee_pb2.AtheneResponse.FromString(await request.body()) # type: ignore
