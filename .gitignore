@@ -7,5 +7,5 @@ dist
 data/*
 !data/.gitkeep
 .idea
-.env
+module_text_llm/.env
 **/.env
