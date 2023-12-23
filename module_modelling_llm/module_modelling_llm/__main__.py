@@ -9,10 +9,10 @@ from athena import app, submission_selector, submissions_consumer, feedback_cons
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.config import Configuration
-from module_text_llm.evaluation import get_feedback_statistics, get_llm_statistics
-from module_text_llm.generate_suggestions import generate_suggestions
-from module_text_llm.generate_evaluation import generate_evaluation
+from module_modelling_llm.config import Configuration
+from module_modelling_llm.evaluation import get_feedback_statistics, get_llm_statistics
+from module_modelling_llm.generate_suggestions import generate_suggestions
+from module_modelling_llm.generate_evaluation import generate_evaluation
 
 
 @submissions_consumer
@@ -54,7 +54,7 @@ async def evaluate_feedback(
     if len(predicted_feedbacks) > 0 and bool(os.environ.get("LLM_ENABLE_LLM_AS_A_JUDGE")):
         evaluation["llm_as_a_judge"] = await generate_evaluation(exercise, submission, true_feedbacks, predicted_feedbacks)
 
-    # 2. LangSmith runs, token usage, and respose times
+    # 2. LangSmith runs, token usage, and response times
     if bool(os.environ.get("LANGCHAIN_TRACING_V2")):
         evaluation["llm_statistics"] = get_llm_statistics(submission)
 

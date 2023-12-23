@@ -2,17 +2,17 @@ from typing import List, Sequence, Dict, Literal
 from pydantic import BaseModel, Field
 import json
 
-from athena.text import Exercise, Submission, Feedback
+from athena.modelling import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.helpers.models import evaluation_model
-from module_text_llm.helpers.llm_utils import (
+from module_modelling_llm.helpers.models import evaluation_model
+from module_modelling_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
     check_prompt_length_and_omit_features_if_necessary,
     predict_and_parse
 )
-from module_text_llm.helpers.utils import add_sentence_numbers, get_line_range_from_index_range
-from module_text_llm.prompts.generate_evaluation import system_message, human_message
+from module_modelling_llm.helpers.serializers.diagram_model_serializer import DiagramModelSerializer
+from module_modelling_llm.prompts.generate_evaluation import system_message, human_message
 
 
 class AccuracyMetric(BaseModel):
@@ -20,6 +20,7 @@ class AccuracyMetric(BaseModel):
     reasoning: str = Field(..., description="Step-by-step critical reasoning of the labels")
     acceptance_label: Literal["accepted", "rejected"] = Field(..., description="Estimated acceptance label")
     level_of_needed_modification_label: Literal["no", "minor", "major"] = Field(..., description="Estimated level of needed modification")
+
 
 class Evaluation(BaseModel):
     metrics: Sequence[AccuracyMetric] = Field(...)
@@ -38,19 +39,15 @@ async def generate_evaluation(
     max_input_tokens = 3000
 
     def feedback_to_dict(feedback: Feedback):
-        line_start, line_end = get_line_range_from_index_range(
-            feedback.index_start, feedback.index_end, submission.text)
         return {
             "id": feedback.id,
             "title": feedback.title,
             "description": feedback.description,
-            "line_start": line_start,
-            "line_end": line_end,
             "credits": feedback.credits
         }
 
     prompt_input = {
-        "submission": add_sentence_numbers(submission.text),
+        "submission": DiagramModelSerializer.serialize_model_for_submission(submission),
         "true_feedbacks": json.dumps([feedback_to_dict(feedback) for feedback in true_feedbacks]),
         "predicted_feedbacks": json.dumps([feedback_to_dict(feedback) for feedback in predicted_feedbacks]),
     }

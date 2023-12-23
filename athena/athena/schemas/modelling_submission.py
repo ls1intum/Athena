@@ -6,6 +6,6 @@ from pydantic import Field
 from .submission import Submission
 
 
-class TextSubmission(Submission):
-    """Submission on a text exercise."""
+class ModellingSubmission(Submission):
+    """Submission on a modelling exercise."""
     model: str = Field()

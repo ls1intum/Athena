@@ -1,24 +1,28 @@
 from typing import List, Optional, Sequence
+
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
-from athena.text import Exercise, Submission, Feedback
+from athena.modelling import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.config import BasicApproachConfig
-from module_text_llm.helpers.llm_utils import (
+from module_modelling_llm.config import BasicApproachConfig
+from module_modelling_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions, 
     check_prompt_length_and_omit_features_if_necessary, 
     num_tokens_from_prompt,
     predict_and_parse
 )
-from module_text_llm.helpers.utils import add_sentence_numbers, get_index_range_from_line_range, format_grading_instructions
+from module_modelling_llm.helpers.models.diagram_types import DiagramType
+from module_modelling_llm.helpers.serializers.diagram_model_serializer import DiagramModelSerializer
+from module_modelling_llm.helpers.utils import format_grading_instructions
+
+from module_modelling_llm.helpers.serializers.bpmn_serializer import BPMNSerializer
+
 
 class FeedbackModel(BaseModel):
     title: str = Field(description="Very short title, i.e. feedback category or similar", example="Logic Error")
     description: str = Field(description="Feedback description")
-    line_start: Optional[int] = Field(description="Referenced line number start, or empty if unreferenced")
-    line_end: Optional[int] = Field(description="Referenced line number end, or empty if unreferenced")
     credits: float = Field(0.0, description="Number of points received/deducted")
     grading_instruction_id: Optional[int] = Field(
         description="ID of the grading instruction that was used to generate this feedback, or empty if no grading instruction was used"
@@ -44,9 +48,10 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
         "max_points": exercise.max_points,
         "bonus_points": exercise.bonus_points,
         "grading_instructions": format_grading_instructions(exercise.grading_instructions, exercise.grading_criteria),
+
         "problem_statement": exercise.problem_statement or "No problem statement.",
         "example_solution": exercise.example_solution,
-        "submission": add_sentence_numbers(submission.text)
+        "submission": DiagramModelSerializer.serialize_model_for_submission(submission)
     }
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
@@ -102,15 +107,12 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
 
     feedbacks = []
     for feedback in result.feedbacks:
-        index_start, index_end = get_index_range_from_line_range(feedback.line_start, feedback.line_end, submission.text)
         grading_instruction_id = feedback.grading_instruction_id if feedback.grading_instruction_id in grading_instruction_ids else None
         feedbacks.append(Feedback(
             exercise_id=exercise.id,
             submission_id=submission.id,
             title=feedback.title,
             description=feedback.description,
-            index_start=index_start,
-            index_end=index_end,
             credits=feedback.credits,
             structured_grading_instruction_id=grading_instruction_id,
             meta={}
