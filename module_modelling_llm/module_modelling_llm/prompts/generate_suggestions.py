@@ -8,8 +8,8 @@ Meaning, the feedback you provide should be applicable to the submission with li
 # Style
 1. Constructive, 2. Specific, 3. Balanced, 4. Clear and Concise, 5. Actionable, 6. Educational, 7. Contextual
 
-# Exercise type
-{exercise_type}
+# Submission format remarks
+{submission_format_remarks}
 
 # Problem statement
 {problem_statement}
@@ -23,7 +23,7 @@ Max points: {max_points}, bonus points: {bonus_points}\
 """
 
 human_message = """\
-Student\'s submission to grade (with sentence numbers <number>: <sentence>):
+Student\'s submission to grade:
 \"\"\"
 {submission}
 \"\"\"\

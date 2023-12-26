@@ -216,7 +216,7 @@ _model_aliases = {
 # Hardcoded because openai can't provide a trustworthly api to get the list of models and capabilities...
 openai_models = {
     "chat_completion": [
-        "gpt-4",
+        # "gpt-4",
         # "gpt-4-32k", # Not publicly available
         "gpt-3.5-turbo",
         "gpt-3.5-turbo-16k"
@@ -236,8 +236,6 @@ openai_models = {
 }
 available_deployments = _get_available_deployments(openai_models, _model_aliases)
 available_models = _get_available_models(openai_models, available_deployments)
-
-print("available_models", available_models)
 
 if available_models:
     logger.info("Available openai models: %s", ", ".join(available_models.keys()))

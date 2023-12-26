@@ -1,0 +1,19 @@
+{
+  "id": 5,
+  "course_id": 2,
+  "title": "Process Modelling with BPMN: Pizza delivery",
+  "type": "modelling",
+  "max_points": 5.0,
+  "bonus_points": 0,
+  "grading_instructions": "For every correct diagram element, give 1 point.",
+  "problem_statement": "Create a BPMN-Diagram for the following process description: 'As soon as we receive an order, we bake the pizza. Our delivery person takes it to the customer and collects the money, whereby the process completes successfully.'",
+  "example_solution": "",
+  "meta": {},
+  "submissions": [
+    {
+      "id": 1,
+      "model": "{\"version\":\"3.0.0\",\"type\":\"BPMN\",\"size\":{\"width\":900,\"height\":600},\"interactive\":{\"elements\":{},\"relationships\":{}},\"elements\":{\"b83370ae-4c60-48de-b2e7-b472c100e500\":{\"id\":\"b83370ae-4c60-48de-b2e7-b472c100e500\",\"name\":\"\",\"type\":\"BPMNStartEvent\",\"owner\":null,\"bounds\":{\"x\":0,\"y\":10,\"width\":40,\"height\":40},\"eventType\":\"message\"},\"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c\":{\"id\":\"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c\",\"name\":\"Bake Pizza\",\"type\":\"BPMNTask\",\"owner\":null,\"bounds\":{\"x\":100,\"y\":0,\"width\":160,\"height\":60},\"taskType\":\"default\",\"marker\":\"none\"},\"001ff705-6703-49f4-ab68-e79a066596b8\":{\"id\":\"001ff705-6703-49f4-ab68-e79a066596b8\",\"name\":\"Deliver Pizza\",\"type\":\"BPMNTask\",\"owner\":null,\"bounds\":{\"x\":330,\"y\":0,\"width\":160,\"height\":60},\"taskType\":\"default\",\"marker\":\"none\"},\"561c077d-b2e0-4788-8436-278ee6b50adb\":{\"id\":\"561c077d-b2e0-4788-8436-278ee6b50adb\",\"name\":\"\",\"type\":\"BPMNEndEvent\",\"owner\":null,\"bounds\":{\"x\":550,\"y\":10,\"width\":40,\"height\":40},\"eventType\":\"default\"}},\"relationships\":{\"22cbf288-11a6-462f-9540-c3d38b6dcfa8\":{\"id\":\"22cbf288-11a6-462f-9540-c3d38b6dcfa8\",\"name\":\"\",\"type\":\"BPMNFlow\",\"owner\":null,\"bounds\":{\"x\":40,\"y\":30,\"width\":60,\"height\":1},\"path\":[{\"x\":0,\"y\":0},{\"x\":60,\"y\":0}],\"source\":{\"direction\":\"Right\",\"element\":\"b83370ae-4c60-48de-b2e7-b472c100e500\"},\"target\":{\"direction\":\"Left\",\"element\":\"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c\"},\"isManuallyLayouted\":false,\"flowType\":\"sequence\"},\"c0fcff31-a656-4d2a-8bd9-5ef6bec80646\":{\"id\":\"c0fcff31-a656-4d2a-8bd9-5ef6bec80646\",\"name\":\"\",\"type\":\"BPMNFlow\",\"owner\":null,\"bounds\":{\"x\":260,\"y\":30,\"width\":70,\"height\":1},\"path\":[{\"x\":0,\"y\":0},{\"x\":70,\"y\":0}],\"source\":{\"direction\":\"Right\",\"element\":\"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c\"},\"target\":{\"direction\":\"Left\",\"element\":\"001ff705-6703-49f4-ab68-e79a066596b8\"},\"isManuallyLayouted\":false,\"flowType\":\"sequence\"},\"335069fe-4456-40df-bfc5-f1e1379e4010\":{\"id\":\"335069fe-4456-40df-bfc5-f1e1379e4010\",\"name\":\"\",\"type\":\"BPMNFlow\",\"owner\":null,\"bounds\":{\"x\":490,\"y\":30,\"width\":60,\"height\":1},\"path\":[{\"x\":0,\"y\":0},{\"x\":60,\"y\":0}],\"source\":{\"direction\":\"Right\",\"element\":\"001ff705-6703-49f4-ab68-e79a066596b8\"},\"target\":{\"direction\":\"Left\",\"element\":\"561c077d-b2e0-4788-8436-278ee6b50adb\"},\"isManuallyLayouted\":false,\"flowType\":\"sequence\"}},\"assessments\":{}}",
+      "meta": {}
+    }
+  ]
+}

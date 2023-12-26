@@ -6,7 +6,7 @@ from langsmith import Client as LangSmithClient
 from langsmith.schemas import Run
 
 from athena import get_experiment_environment
-from athena.text import Exercise, Submission, Feedback
+from athena.modelling import Exercise, Submission, Feedback
 
 
 def get_llm_statistics(submission: Submission):

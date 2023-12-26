@@ -8,7 +8,7 @@ from .schemas import ModellingExercise, ModellingFeedback, ModellingSubmission
 
 module_type = get_module_config().type
 if module_type.name != "modelling":
-    raise ImportError(f"Importing athena.programming from a module of type {module_type}. This is probably a mistake, "
+    raise ImportError(f"Importing athena.modelling from a module of type {module_type}. This is probably a mistake, "
                       f"you should only import the file related to the exercise type that your module handles")
 
 # re-export with shorter names, because the module will only use these

@@ -2,6 +2,7 @@ import json
 import uuid
 import xml.etree.ElementTree as ElementTree
 from enum import Enum
+from xml.dom import minidom
 
 
 class BPMNElementType(str, Enum):
@@ -473,17 +474,72 @@ if __name__ == "__main__":
     "version": "3.0.0",
     "type": "BPMN",
     "size": {
-      "width": 900,
-      "height": 600
+      "width": 780,
+      "height": 100
     },
     "interactive": {
       "elements": {},
       "relationships": {}
     },
     "elements": {
-      "b83370ae-4c60-48de-b2e7-b472c100e500": {
-        "id": "b83370ae-4c60-48de-b2e7-b472c100e500",
+      "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa": {
+        "id": "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa",
+        "name": "Bake pizza",
+        "type": "BPMNTask",
+        "owner": null,
+        "bounds": {
+          "x": 90,
+          "y": 0,
+          "width": 150,
+          "height": 60
+        },
+        "taskType": "default",
+        "marker": "none"
+      },
+      "1b74b030-904b-42a5-b7cb-d8d7b61e0176": {
+        "id": "1b74b030-904b-42a5-b7cb-d8d7b61e0176",
+        "name": "Deliver pizza",
+        "type": "BPMNTask",
+        "owner": null,
+        "bounds": {
+          "x": 290,
+          "y": 0,
+          "width": 150,
+          "height": 60
+        },
+        "taskType": "default",
+        "marker": "none"
+      },
+      "a763191f-bf0f-40c2-a704-ea088b71f8c4": {
+        "id": "a763191f-bf0f-40c2-a704-ea088b71f8c4",
+        "name": "Take the money",
+        "type": "BPMNTask",
+        "owner": null,
+        "bounds": {
+          "x": 490,
+          "y": 0,
+          "width": 150,
+          "height": 60
+        },
+        "taskType": "default",
+        "marker": "none"
+      },
+      "5a0ab0d8-fe52-494f-b907-050f7ad3044d": {
+        "id": "5a0ab0d8-fe52-494f-b907-050f7ad3044d",
         "name": "",
+        "type": "BPMNEndEvent",
+        "owner": null,
+        "bounds": {
+          "x": 690,
+          "y": 10,
+          "width": 40,
+          "height": 40
+        },
+        "eventType": "default"
+      },
+      "b8579c23-343f-414f-bbb5-66a9b1f90e6f": {
+        "id": "b8579c23-343f-414f-bbb5-66a9b1f90e6f",
+        "name": "Order received",
         "type": "BPMNStartEvent",
         "owner": null,
         "bounds": {
@@ -493,59 +549,18 @@ if __name__ == "__main__":
           "height": 40
         },
         "eventType": "message"
-      },
-      "8fd5fbe0-f81d-457a-b7f6-c009e8fc394c": {
-        "id": "8fd5fbe0-f81d-457a-b7f6-c009e8fc394c",
-        "name": "Bake Pizza",
-        "type": "BPMNTask",
-        "owner": null,
-        "bounds": {
-          "x": 100,
-          "y": 0,
-          "width": 160,
-          "height": 60
-        },
-        "taskType": "default",
-        "marker": "none"
-      },
-      "001ff705-6703-49f4-ab68-e79a066596b8": {
-        "id": "001ff705-6703-49f4-ab68-e79a066596b8",
-        "name": "Deliver Pizza",
-        "type": "BPMNTask",
-        "owner": null,
-        "bounds": {
-          "x": 330,
-          "y": 0,
-          "width": 160,
-          "height": 60
-        },
-        "taskType": "default",
-        "marker": "none"
-      },
-      "561c077d-b2e0-4788-8436-278ee6b50adb": {
-        "id": "561c077d-b2e0-4788-8436-278ee6b50adb",
-        "name": "",
-        "type": "BPMNEndEvent",
-        "owner": null,
-        "bounds": {
-          "x": 550,
-          "y": 10,
-          "width": 40,
-          "height": 40
-        },
-        "eventType": "default"
       }
     },
     "relationships": {
-      "22cbf288-11a6-462f-9540-c3d38b6dcfa8": {
-        "id": "22cbf288-11a6-462f-9540-c3d38b6dcfa8",
+      "3e46b350-0c33-44d2-bf00-e894706f27dc": {
+        "id": "3e46b350-0c33-44d2-bf00-e894706f27dc",
         "name": "",
         "type": "BPMNFlow",
         "owner": null,
         "bounds": {
           "x": 40,
           "y": 30,
-          "width": 60,
+          "width": 50,
           "height": 1
         },
         "path": [
@@ -554,30 +569,30 @@ if __name__ == "__main__":
             "y": 0
           },
           {
-            "x": 60,
+            "x": 50,
             "y": 0
           }
         ],
         "source": {
           "direction": "Right",
-          "element": "b83370ae-4c60-48de-b2e7-b472c100e500"
+          "element": "b8579c23-343f-414f-bbb5-66a9b1f90e6f"
         },
         "target": {
           "direction": "Left",
-          "element": "8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"
+          "element": "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa"
         },
         "isManuallyLayouted": false,
         "flowType": "sequence"
       },
-      "c0fcff31-a656-4d2a-8bd9-5ef6bec80646": {
-        "id": "c0fcff31-a656-4d2a-8bd9-5ef6bec80646",
+      "000ab57f-61d4-4244-a664-9df6ff526c19": {
+        "id": "000ab57f-61d4-4244-a664-9df6ff526c19",
         "name": "",
         "type": "BPMNFlow",
         "owner": null,
         "bounds": {
-          "x": 260,
+          "x": 240,
           "y": 30,
-          "width": 70,
+          "width": 50,
           "height": 1
         },
         "path": [
@@ -586,30 +601,30 @@ if __name__ == "__main__":
             "y": 0
           },
           {
-            "x": 70,
+            "x": 50,
             "y": 0
           }
         ],
         "source": {
           "direction": "Right",
-          "element": "8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"
+          "element": "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa"
         },
         "target": {
           "direction": "Left",
-          "element": "001ff705-6703-49f4-ab68-e79a066596b8"
+          "element": "1b74b030-904b-42a5-b7cb-d8d7b61e0176"
         },
         "isManuallyLayouted": false,
         "flowType": "sequence"
       },
-      "335069fe-4456-40df-bfc5-f1e1379e4010": {
-        "id": "335069fe-4456-40df-bfc5-f1e1379e4010",
+      "1098aea3-1c45-4ccf-858a-ca348bfedc62": {
+        "id": "1098aea3-1c45-4ccf-858a-ca348bfedc62",
         "name": "",
         "type": "BPMNFlow",
         "owner": null,
         "bounds": {
-          "x": 490,
+          "x": 440,
           "y": 30,
-          "width": 60,
+          "width": 50,
           "height": 1
         },
         "path": [
@@ -618,17 +633,49 @@ if __name__ == "__main__":
             "y": 0
           },
           {
-            "x": 60,
+            "x": 50,
             "y": 0
           }
         ],
         "source": {
           "direction": "Right",
-          "element": "001ff705-6703-49f4-ab68-e79a066596b8"
+          "element": "1b74b030-904b-42a5-b7cb-d8d7b61e0176"
         },
         "target": {
           "direction": "Left",
-          "element": "561c077d-b2e0-4788-8436-278ee6b50adb"
+          "element": "a763191f-bf0f-40c2-a704-ea088b71f8c4"
+        },
+        "isManuallyLayouted": false,
+        "flowType": "sequence"
+      },
+      "591be9fe-74be-43a0-a2b9-50c7c83ba5e1": {
+        "id": "591be9fe-74be-43a0-a2b9-50c7c83ba5e1",
+        "name": "",
+        "type": "BPMNFlow",
+        "owner": null,
+        "bounds": {
+          "x": 640,
+          "y": 30,
+          "width": 50,
+          "height": 1
+        },
+        "path": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 50,
+            "y": 0
+          }
+        ],
+        "source": {
+          "direction": "Right",
+          "element": "a763191f-bf0f-40c2-a704-ea088b71f8c4"
+        },
+        "target": {
+          "direction": "Left",
+          "element": "5a0ab0d8-fe52-494f-b907-050f7ad3044d"
         },
         "isManuallyLayouted": false,
         "flowType": "sequence"
@@ -641,4 +688,4 @@ if __name__ == "__main__":
     serialized_model = BPMNSerializer.serialize(model)
     ElementTree.indent(serialized_model, space="\t", level=0)
 
-    print(ElementTree.tostring(BPMNSerializer.serialize(model), encoding='utf8', xml_declaration=True))
+    print(minidom.parseString(ElementTree.tostring(BPMNSerializer.serialize(model), encoding='utf8', xml_declaration=True)).toprettyxml(indent="\t"))

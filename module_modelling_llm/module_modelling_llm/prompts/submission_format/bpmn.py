@@ -1,0 +1,1 @@
+submission_format_remarks = """The submissions are provided as BPMN XML and need to match the following problem description. The submissions should contain every task listed in the problem statement. Do not accept task that are modelled implicitly."""

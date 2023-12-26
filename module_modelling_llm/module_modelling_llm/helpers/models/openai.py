@@ -216,7 +216,7 @@ _model_aliases = {
 # Hardcoded because openai can't provide a trustworthly api to get the list of models and capabilities...
 openai_models = {
     "chat_completion": [
-        "gpt-4",
+        # "gpt-4",
         # "gpt-4-32k", # Not publicly available
         "gpt-3.5-turbo",
         "gpt-3.5-turbo-16k"

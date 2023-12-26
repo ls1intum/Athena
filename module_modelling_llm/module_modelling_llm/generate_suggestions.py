@@ -1,3 +1,4 @@
+import json
 from typing import List, Optional, Sequence
 
 from pydantic import BaseModel, Field
@@ -18,6 +19,7 @@ from module_modelling_llm.helpers.serializers.diagram_model_serializer import Di
 from module_modelling_llm.helpers.utils import format_grading_instructions
 
 from module_modelling_llm.helpers.serializers.bpmn_serializer import BPMNSerializer
+from module_modelling_llm.prompts.submission_format.submission_format_remarks import get_submission_format_remarks
 
 
 class FeedbackModel(BaseModel):
@@ -44,14 +46,25 @@ class AssessmentModel(BaseModel):
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
+    serialized_example_solution = None
+
+    if exercise.example_solution:
+        example_solution_diagram = json.loads(exercise.example_solution)
+        serialized_example_solution = DiagramModelSerializer.serialize_model(example_solution_diagram)
+
+    submission_diagram = json.loads(submission.model)
+    submission_format_remarks = get_submission_format_remarks(DiagramType[submission_diagram.get("type")])
+
+    serialized_submission = DiagramModelSerializer.serialize_model(submission_diagram)
+
     prompt_input = {
         "max_points": exercise.max_points,
         "bonus_points": exercise.bonus_points,
         "grading_instructions": format_grading_instructions(exercise.grading_instructions, exercise.grading_criteria),
-
+        "submission_format_remarks": submission_format_remarks,
         "problem_statement": exercise.problem_statement or "No problem statement.",
-        "example_solution": exercise.example_solution,
-        "submission": DiagramModelSerializer.serialize_model_for_submission(submission)
+        "example_solution": serialized_example_solution or "No example solution.",
+        "submission": serialized_submission
     }
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
@@ -65,7 +78,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     omittable_features = ["example_solution", "problem_statement", "grading_instructions"]
     prompt_input, should_run = check_prompt_length_and_omit_features_if_necessary(
         prompt=chat_prompt,
-        prompt_input= prompt_input,
+        prompt_input=prompt_input,
         max_input_tokens=config.max_input_tokens,
         omittable_features=omittable_features,
         debug=debug
@@ -78,6 +91,10 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
             emit_meta("prompt", chat_prompt.format(**prompt_input))
             emit_meta("error", f"Input too long {num_tokens_from_prompt(chat_prompt, prompt_input)} > {config.max_input_tokens}")
         return []
+
+    print(chat_prompt.format(**prompt_input))
+
+    return
 
     result = await predict_and_parse(
         model=model, 

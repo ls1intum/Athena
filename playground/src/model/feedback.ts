@@ -32,7 +32,11 @@ export type ProgrammingFeedback = FeedbackBase & {
   line_end?: number;
 };
 
-export type Feedback = TextFeedback | ProgrammingFeedback;
+export type ModellingFeedback = FeedbackBase & {
+  type: "modelling";
+};
+
+export type Feedback = TextFeedback | ProgrammingFeedback | ModellingFeedback;
 
 export function formatReference(feedback: Feedback): string {
   if (feedback.type === "text") {

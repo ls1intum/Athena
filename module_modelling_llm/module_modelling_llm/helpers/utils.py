@@ -1,7 +1,6 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional
 
 import tiktoken
-from nltk.tokenize import sent_tokenize
 
 from athena import GradingCriterion
 

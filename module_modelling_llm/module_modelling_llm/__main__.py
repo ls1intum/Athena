@@ -1,4 +1,3 @@
-import json
 import os
 from typing import List, Any
 
@@ -6,7 +5,7 @@ import nltk
 import tiktoken
 
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider, evaluation_provider
-from athena.text import Exercise, Submission, Feedback
+from athena.modelling import Exercise, Submission, Feedback
 from athena.logger import logger
 
 from module_modelling_llm.config import Configuration
