@@ -32,8 +32,8 @@ class FastAPIWithStart(FastAPI):
 
     def start(self) -> None:
         """Start Athena. You have to ensure to have `app` in your module main scope so that it can be imported."""
-        LOGGING_CONFIG["formatters"]["default"]["fmt"] = "%(asctime)s - [%(name)s] - %(levelprefix)s %(message)s"
-        LOGGING_CONFIG["formatters"]["access"]["fmt"] = "%(asctime)s - [%(name)s] - %(levelprefix)s %(message)s"
+        LOGGING_CONFIG["formatters"]["default"]["fmt"] = "%(asctime)s %(levelname)s --- [%(name)s] : %(message)s"
+        LOGGING_CONFIG["formatters"]["access"]["fmt"] = "%(asctime)s %(levelname)s --- [%(name)s] : %(message)s"
         logger.info("Starting athena module")
 
         conf = get_module_config()

@@ -13,8 +13,8 @@ def main():
     """
     Start the assessment module manager using uvicorn.
     """
-    LOGGING_CONFIG["formatters"]["default"]["fmt"] = "%(asctime)s - [%(name)s] - %(levelprefix)s %(message)s"
-    LOGGING_CONFIG["formatters"]["access"]["fmt"] = "%(asctime)s - [%(name)s] - %(levelprefix)s %(message)s"
+    LOGGING_CONFIG["formatters"]["default"]["fmt"] = "%(asctime)s %(levelname)s --- [%(name)s] : %(message)s"
+    LOGGING_CONFIG["formatters"]["access"]["fmt"] = "%(asctime)s %(levelname)s --- [%(name)s] : %(message)s"
     logger.info("Starting assessment module manager")
 
     if env.PRODUCTION:
