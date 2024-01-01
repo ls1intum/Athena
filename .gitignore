@@ -6,6 +6,8 @@ __pycache__
 dist
 data/*
 !data/.gitkeep
-.idea
+.idea/*
 module_text_llm/.env
+!.idea/runConfigurations/
+.env
 **/.env
