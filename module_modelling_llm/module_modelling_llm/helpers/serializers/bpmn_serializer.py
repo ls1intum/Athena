@@ -2,7 +2,17 @@ import json
 import uuid
 import xml.etree.ElementTree as ElementTree
 from enum import Enum
+from itertools import chain
 from xml.dom import minidom
+
+DEFAULT_XSI_PREFIX = "xsi"
+DEFAULT_BPMN_PREFIX = "bpmn"
+DEFAULT_BPMNDI_PREFIX = "bpmndi"
+DEFAULT_DC_PREFIX = "dc"
+DEFAULT_DI_PREFIX = "di"
+
+INTERMEDIATE_CATCH_EVENT = "intermediateCatchEvent"
+INTERMEDIATE_THROW_EVENT = "intermediateThrowEvent"
 
 
 class BPMNElementType(str, Enum):
@@ -54,267 +64,358 @@ class BPMNEndEventType(str, Enum):
     TERMINATE = "terminate"
 
 
+class BPMNTaskType(str, Enum):
+    DEFAULT = "default"
+    USER = "user"
+    SEND = "send"
+    RECEIVE = "error"
+    MANUAL = "manual"
+    BUSINESS_RULE = "business-rule"
+    SCRIPT = "script"
+
+
+class BPMNGatewayType(str, Enum):
+    COMPLEX = "complex"
+    EVENT_BASED = "event-based"
+    EXCLUSIVE = "exclusive"
+    INCLUSIVE = "inclusive"
+    PARALLEL = "parallel"
+
+
 class BPMNSerializer:
-    start_event_type_map = {
-        "default": None,
-        "message": "messageEventDefinition",
-        "timer": "timerEventDefinition",
-        "signal": "signalEventDefinition",
-        "conditional": "conditionalEventDefinition"
+    start_event_definition_map = {
+        BPMNStartEventType.DEFAULT: None,
+        BPMNStartEventType.MESSAGE: "messageEventDefinition",
+        BPMNStartEventType.TIMER: "timerEventDefinition",
+        BPMNStartEventType.SIGNAL: "signalEventDefinition",
+        BPMNStartEventType.CONDITIONAL: "conditionalEventDefinition"
     }
 
     intermediate_event_type_map = {
-        "default": None,
-        "message-catch": "messageCatchEventDefinition",
-        "message-throw": "messageThrowEventDefinition",
-        "timer-catch": "timerCatchEventDefinition",
-        "escalation-catch": "escalationCatchEventDefinition",
-        "conditional-catch": "conditionalCatchEventDefinition",
-        "link-catch": "linkCatchEventDefinition",
-        "link-throw": "linkThrowEventDefinition",
-        "compensation-throw": "compensationThrowEventDefinition",
-        "signal-catch": "signalCatchEventDefinition",
-        "signal-throw": "signalThrowEventDefinition"
+        BPMNIntermediateEventType.DEFAULT: INTERMEDIATE_CATCH_EVENT,
+        BPMNIntermediateEventType.MESSAGE_CATCH: INTERMEDIATE_CATCH_EVENT,
+        BPMNIntermediateEventType.MESSAGE_THROW: INTERMEDIATE_THROW_EVENT,
+        BPMNIntermediateEventType.TIMER_CATCH: INTERMEDIATE_CATCH_EVENT,
+        BPMNIntermediateEventType.ESCALATION_CATCH: INTERMEDIATE_CATCH_EVENT,
+        BPMNIntermediateEventType.CONDITIONAL_CATCH: INTERMEDIATE_CATCH_EVENT,
+        BPMNIntermediateEventType.LINK_CATCH: INTERMEDIATE_CATCH_EVENT,
+        BPMNIntermediateEventType.LINK_THROW: INTERMEDIATE_THROW_EVENT,
+        BPMNIntermediateEventType.COMPENSATION_THROW: INTERMEDIATE_THROW_EVENT,
+        BPMNIntermediateEventType.SIGNAL_CATCH: INTERMEDIATE_CATCH_EVENT,
+        BPMNIntermediateEventType.SIGNAL_THROW: INTERMEDIATE_THROW_EVENT
     }
 
-    end_event_type_map = {
-        "default": None,
-        "message": "messageEventDefinition",
-        "escalation": "escalationEventDefinition",
-        "error": "errorEventDefinition",
-        "compensation": "compensationEventDefinition",
-        "signal": "signalEventDefinition",
-        "terminate": "terminateEventDefinition"
+    intermediate_event_definition_map = {
+        BPMNIntermediateEventType.DEFAULT: None,
+        BPMNIntermediateEventType.MESSAGE_CATCH: "messageCatchEventDefinition",
+        BPMNIntermediateEventType.MESSAGE_THROW: "messageThrowEventDefinition",
+        BPMNIntermediateEventType.TIMER_CATCH: "timerCatchEventDefinition",
+        BPMNIntermediateEventType.ESCALATION_CATCH: "escalationCatchEventDefinition",
+        BPMNIntermediateEventType.CONDITIONAL_CATCH: "conditionalCatchEventDefinition",
+        BPMNIntermediateEventType.LINK_CATCH: "linkCatchEventDefinition",
+        BPMNIntermediateEventType.LINK_THROW: "linkThrowEventDefinition",
+        BPMNIntermediateEventType.COMPENSATION_THROW: "compensationThrowEventDefinition",
+        BPMNIntermediateEventType.SIGNAL_CATCH: "signalCatchEventDefinition",
+        BPMNIntermediateEventType.SIGNAL_THROW: "signalThrowEventDefinition"
+    }
+
+    end_event_definition_map = {
+        BPMNEndEventType.DEFAULT: None,
+        BPMNEndEventType.MESSAGE: "messageEventDefinition",
+        BPMNEndEventType.ESCALATION: "escalationEventDefinition",
+        BPMNEndEventType.ERROR: "errorEventDefinition",
+        BPMNEndEventType.COMPENSATION: "compensationEventDefinition",
+        BPMNEndEventType.SIGNAL: "signalEventDefinition",
+        BPMNEndEventType.TERMINATE: "terminateEventDefinition"
     }
 
     task_type_map = {
-        "default": "task",
-        "user": "userTask",
-        "send": "sendTask",
-        "receive": "receiveTask",
-        "manual": "manualTask",
-        "business-rule": "businessRuleTask",
-        "script": "scriptTask"
+        BPMNTaskType.DEFAULT: "task",
+        BPMNTaskType.USER: "userTask",
+        BPMNTaskType.SEND: "sendTask",
+        BPMNTaskType.RECEIVE: "receive",
+        BPMNTaskType.MANUAL: "manualTask",
+        BPMNTaskType.BUSINESS_RULE: "businessRuleTask",
+        BPMNTaskType.SCRIPT: "scriptTask"
     }
 
     gateway_type_map = {
-        "complex": "exclusiveGateway",
-        "event-based": "eventBasedGateway",
-        "exclusive": "exclusiveGateway",
-        "inclusive": "inclusiveGateway",
-        "parallel": "parallelGateway"
+        BPMNGatewayType.COMPLEX: "exclusiveGateway",
+        BPMNGatewayType.EVENT_BASED: "eventBasedGateway",
+        BPMNGatewayType.EXCLUSIVE: "exclusiveGateway",
+        BPMNGatewayType.INCLUSIVE: "inclusiveGateway",
+        BPMNGatewayType.PARALLEL: "parallelGateway"
     }
 
-    @staticmethod
-    def __serialize_base_element(element: dict, tag: str) -> ElementTree.Element:
+    xsi_prefix: str = ""
+    bpmn_prefix: str = ""
+    bpmndi_prefix: str = ""
+    dc_prefix: str = ""
+    di_prefix: str = ""
+
+    def __init__(self,
+                 xsi_prefix=DEFAULT_XSI_PREFIX,
+                 bpmn_prefix=DEFAULT_BPMN_PREFIX,
+                 bpmndi_prefix=DEFAULT_BPMNDI_PREFIX,
+                 dc_prefix=DEFAULT_DC_PREFIX,
+                 di_prefix=DEFAULT_DI_PREFIX
+                 ):
+        super().__init__()
+
+        self.xsi_prefix = xsi_prefix
+        self.bpmn_prefix = bpmn_prefix
+        self.bpmndi_prefix = bpmndi_prefix
+        self.dc_prefix = dc_prefix
+        self.di_prefix = di_prefix
+
+    def __prefix_tag(self, tag: str, prefix: str) -> str:
+        """
+        Prefix a XML tag with a given prefix
+        :param tag: The prefixed tag
+        :param prefix: The prefix to prepend
+        """
+        return f"{prefix}:{tag}"
+    
+    def __prefix_id(self, element_id: str, prefix: str = None) -> str:
+        """
+        Prefix an element id with a given prefix.
+        If no prefix is provided, 'bpmn' is used as default.
+        :param element_id: The element id that should be prefixed
+        :param prefix: The prefix to prepend
+        """
+        if prefix is None:
+            prefix = "bpmn"
+        return f"{prefix}_{element_id}"
+
+    def __get_flows_connected_to_element(self, flows: list[dict], element_id: str) -> list[dict]:
+        return list(filter(lambda flow: flow.get("source").get("element") == element_id or
+                                        flow.get("target").get("element") == element_id,
+                           flows))
+
+    def __serialize_base_element(self, element: dict, tag: str, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN flow to XML
         :param element: A dictionary representing a BPMN flow element
         :param tag: The name of the tag the element should be serialized as
         :return: An Elementtree Element representing the serialized BPMN flow element
         """
-        serialized_element = ElementTree.Element(tag)
-        serialized_element.set("id", element.get("id"))
+
+        if connected_flows is None:
+            connected_flows = []
+
+        serialized_element: ElementTree.Element = ElementTree.Element(tag)
+        serialized_element.set("id", self.__prefix_id(element.get("id")))
         serialized_element.set("name", element.get("name"))
+
+        for connected_flow in connected_flows:
+            if connected_flow.get("source").get("element") == element.get("id"):
+                outgoing = ElementTree.Element(self.__prefix_tag("outgoing", self.bpmn_prefix))
+                outgoing.text = self.__prefix_id(connected_flow.get("id"))
+                serialized_element.append(outgoing)
+
+            # This is deliberately not an "else" case as otherwise connections connecting an element with itself
+            # would not be correctly serialized.
+            if connected_flow.get("target").get("element") == element.get("id"):
+                incoming = ElementTree.Element(self.__prefix_tag("incoming", self.bpmn_prefix))
+                incoming.text = self.__prefix_id(connected_flow.get("id"))
+                serialized_element.append(incoming)
 
         return serialized_element
 
-    @staticmethod
-    def __serialize_annotation(annotation: dict) -> ElementTree.Element:
+    def __serialize_annotation(self, annotation: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN annotation object to XML
         :param annotation: A dictionary representing a BPMN annotation element
         :return: An Elementtree Element representing the serialized BPMN annotation element
         """
-        serialized_annotation = BPMNSerializer.__serialize_base_element(annotation, "annotation")
+
+        tag: str = self.__prefix_tag("annotation", self.bpmn_prefix)
+        serialized_annotation: ElementTree.Element = self.__serialize_base_element(annotation, tag, connected_flows)
 
         return serialized_annotation
 
-    @staticmethod
-    def __serialize_call_activity(call_activity: dict) -> ElementTree.Element:
+    def __serialize_call_activity(self, call_activity: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize an BPMN call activity to XML
         :param call_activity: A dictionary representing an BPMN call activity element
         :return: An Elementtree Element representing the serialized BPMN call activity element
         """
-        serialized_call_activity = BPMNSerializer.__serialize_base_element(call_activity, "callActivity")
+        tag: str = self.__prefix_tag("callActivity", self.bpmn_prefix)
+        serialized_call_activity: ElementTree.Element = self.__serialize_base_element(call_activity, tag, connected_flows)
 
         return serialized_call_activity
 
-    @staticmethod
-    def __serialize_data_object(data_object: dict) -> ElementTree.Element:
+    def __serialize_data_object(self, data_object: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN data object to XML
         :param data_object: A dictionary representing a BPMN data object element
         :return: An Elementtree Element representing the serialized BPMN data object element
         """
-        serialized_data_object = BPMNSerializer.__serialize_base_element(data_object, "dataObject")
+        tag: str = self.__prefix_tag("dataObject", self.bpmn_prefix)
+        serialized_data_object: ElementTree.Element = self.__serialize_base_element(data_object, tag, connected_flows)
 
         return serialized_data_object
 
-    @staticmethod
-    def __serialize_data_store(data_store: dict) -> ElementTree.Element:
+    def __serialize_data_store(self, data_store: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN data store object to XML
         :param data_store: A dictionary representing a BPMN data store element
         :return: An Elementtree Element representing the serialized BPMN data store element
         """
-        serialized_data_store = BPMNSerializer.__serialize_base_element(data_store, "dataStore")
+        tag: str = self.__prefix_tag("dataStore", self.bpmn_prefix)
+        serialized_data_store: ElementTree.Element = self.__serialize_base_element(data_store, tag, connected_flows)
 
         return serialized_data_store
 
-    @staticmethod
-    def __serialize_end_event(end_event: dict) -> ElementTree.Element:
+    def __serialize_end_event(self, end_event: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN end event object to XML
         :param end_event: A dictionary representing a BPMN end event element
         :return: An Elementtree Element representing the serialized BPMN end event element
         """
-        serialized_end_event = BPMNSerializer.__serialize_base_element(end_event, "endEvent")
+        tag: str = self.__prefix_tag("endEvent", self.bpmn_prefix)
+        serialized_end_event: ElementTree.Element = self.__serialize_base_element(end_event, tag, connected_flows)
 
-        event_type_tag = BPMNSerializer.start_event_type_map[end_event.get("eventType")]
+        event_type_tag: str = self.start_event_definition_map[end_event.get("eventType")]
 
         if event_type_tag:
-            event_type_element = ElementTree.Element(event_type_tag)
-            event_type_element.set("id", str(uuid.uuid4()))
+            event_type_element: ElementTree.Element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.bpmn_prefix))
+            event_type_element.set("id", self.__prefix_id(str(uuid.uuid4())))
             serialized_end_event.append(event_type_element)
 
         return serialized_end_event
 
-    @staticmethod
-    def __serialize_flow(flow: dict) -> ElementTree.Element:
+    def __serialize_flow(self, flow: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN flow to XML
         :param flow: A dictionary representing a BPMN flow element
         :return: An Elementtree Element representing the serialized BPMN flow element
         """
-        serialized_flow = BPMNSerializer.__serialize_base_element(flow, "sequenceFlow")
+        tag: str = self.__prefix_tag("sequenceFlow", self.bpmn_prefix)
+        serialized_flow: ElementTree.Element = self.__serialize_base_element(flow, tag, connected_flows)
 
-        source_element = flow.get("source").get("element")
-        target_element = flow.get("target").get("element")
+        source_element: str = self.__prefix_id(flow.get("source").get("element"))
+        target_element: str = self.__prefix_id(flow.get("target").get("element"))
 
         serialized_flow.set("sourceRef", source_element)
         serialized_flow.set("targetRef", target_element)
 
         return serialized_flow
 
-    @staticmethod
-    def __serialize_gateway(gateway: dict) -> ElementTree.Element:
+    def __serialize_gateway(self, gateway: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN gateway object to XML
         :param gateway: A dictionary representing a BPMN gateway element
         :return: An Elementtree Element representing the serialized BPMN gateway element
         """
-        gateway_type_tag = BPMNSerializer.gateway_type_map[gateway.get("gatewayType")]
-        serialized_gateway = BPMNSerializer.__serialize_base_element(gateway, gateway_type_tag)
+        gateway_type_tag: str = self.__prefix_tag(self.gateway_type_map[gateway.get("gatewayType")], self.bpmn_prefix)
+        serialized_gateway = self.__serialize_base_element(gateway, gateway_type_tag, connected_flows)
 
         return serialized_gateway
 
-    @staticmethod
-    def __serialize_group(group: dict) -> ElementTree.Element:
+    def __serialize_group(self, group: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN group to XML
         :param group: A dictionary representing a BPMN group element
         :return: An Elementtree Element representing the serialized BPMN group element
         """
-        serialized_group = BPMNSerializer.__serialize_base_element(group, "group")
+        tag: str = self.__prefix_tag("group", self.bpmn_prefix)
+        serialized_group: ElementTree.Element = self.__serialize_base_element(group, tag, connected_flows)
 
         return serialized_group
 
-    @staticmethod
-    def __serialize_intermediate_event(intermediate_event: dict) -> ElementTree.Element:
+    def __serialize_intermediate_event(self, intermediate_event: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN intermediate event to XML
         :param intermediate_event: A dictionary representing a BPMN intermediate event element
         :return: An Elementtree Element representing the serialized BPMN intermediate event element
         """
-        serialized_intermediate_event = BPMNSerializer.__serialize_base_element(intermediate_event, "intermediateEvent")
+        tag: str = self.__prefix_tag(self.intermediate_event_type_map[intermediate_event.get("eventType")], self.bpmn_prefix)
+        serialized_intermediate_event: ElementTree.Element = self.__serialize_base_element(intermediate_event, tag, connected_flows)
 
-        event_type_tag = BPMNSerializer.intermediate_event_type_map[intermediate_event.get("eventType")]
+        event_type_tag: str = self.intermediate_event_definition_map[intermediate_event.get("eventType")]
 
         if event_type_tag:
-            event_type_element = ElementTree.Element(event_type_tag)
-            event_type_element.set("id", str(uuid.uuid4()))
+            event_type_element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.bpmn_prefix))
+            event_type_element.set("id", self.__prefix_id(str(uuid.uuid4())))
             serialized_intermediate_event.append(event_type_element)
 
         return serialized_intermediate_event
 
-    @staticmethod
-    def __serialize_pool(pool: dict) -> ElementTree.Element:
+    def __serialize_pool(self, pool: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN pool to XML
         :param pool: A dictionary representing a BPMN pool element
         :return: An Elementtree Element representing the serialized BPMN pool element
         """
-        serialized_pool = BPMNSerializer.__serialize_base_element(pool, "pool")
+        tag: str = self.__prefix_tag("laneSet", self.bpmn_prefix)
+        serialized_pool: ElementTree.Element = self.__serialize_base_element(pool, tag, connected_flows)
 
         return serialized_pool
 
-    @staticmethod
-    def __serialize_start_event(start_event: dict) -> ElementTree.Element:
+    def __serialize_start_event(self, start_event: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN start event to XML
         :param start_event: A dictionary representing a BPMN start event element
         :return: An Elementtree Element representing the serialized BPMN start event element
         """
-        serialized_start_event = BPMNSerializer.__serialize_base_element(start_event, "startEvent")
+        tag: str = self.__prefix_tag("startEvent", self.bpmn_prefix)
+        serialized_start_event: ElementTree.Element = self.__serialize_base_element(start_event, tag, connected_flows)
 
-        event_type_tag = BPMNSerializer.start_event_type_map[start_event.get("eventType")]
+        event_type_tag: str = self.start_event_definition_map[start_event.get("eventType")]
 
         if event_type_tag:
-            event_type_element = ElementTree.Element(event_type_tag)
-            event_type_element.set("id", str(uuid.uuid4()))
+            event_type_element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.bpmn_prefix))
+            event_type_element.set("id", self.__prefix_id(str(uuid.uuid4())))
             serialized_start_event.append(event_type_element)
 
         return serialized_start_event
 
-    @staticmethod
-    def __serialize_subprocess(subprocess: dict) -> ElementTree.Element:
+    def __serialize_subprocess(self, subprocess: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN subprocess to XML
         :param subprocess: A dictionary representing a BPMN subprocess element
         :return: An Elementtree Element representing the serialized BPMN subprocess element
         """
-        serialized_subprocess = BPMNSerializer.__serialize_base_element(subprocess, "subprocess")
+        tag: str = self.__prefix_tag("subprocess", self.bpmn_prefix)
+        serialized_subprocess: ElementTree.Element = self.__serialize_base_element(subprocess, tag, connected_flows)
 
         return serialized_subprocess
 
-    @staticmethod
-    def __serialize_swimlane(swimlane: dict) -> ElementTree.Element:
+    def __serialize_swimlane(self, swimlane: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN swimlane to XML
         :param swimlane: A dictionary representing a BPMN swimlane element
         :return: An Elementtree Element representing the serialized BPMN swimlane element
         """
-        serialized_swimlane = BPMNSerializer.__serialize_base_element(swimlane, "swimlane")
+        tag: str = self.__prefix_tag("swimlane", self.bpmn_prefix)
+        serialized_swimlane: ElementTree.Element = self.__serialize_base_element(swimlane, tag, connected_flows)
 
         return serialized_swimlane
 
-    @staticmethod
-    def __serialize_task(task: dict) -> ElementTree.Element:
+    def __serialize_task(self, task: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN task to XML
         :param task: A dictionary representing a BPMN task element
         :return: An Elementtree Element representing the serialized BPMN task element
         """
-        task_tag = BPMNSerializer.task_type_map[task.get("taskType")]
-        serialized_task = BPMNSerializer.__serialize_base_element(task, task_tag)
+        task_tag: str = self.__prefix_tag(self.task_type_map[task.get("taskType")], self.bpmn_prefix)
+        serialized_task: ElementTree.Element = self.__serialize_base_element(task, task_tag, connected_flows)
 
         return serialized_task
 
-    @staticmethod
-    def __serialize_transaction(transaction: dict) -> ElementTree.Element:
+    def __serialize_transaction(self, transaction: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN transaction to XML
         :param transaction: A dictionary representing a BPMN transaction element
         :return: An Elementtree Element representing the serialized BPMN transaction element
         """
-        serialized_transaction = BPMNSerializer.__serialize_base_element(transaction, "transaction")
+        tag: str = self.__prefix_tag("transaction", self.bpmn_prefix)
+        serialized_transaction: ElementTree.Element = self.__serialize_base_element(transaction, tag, connected_flows)
 
         return serialized_transaction
 
-    @staticmethod
-    def __serialize_element(element: dict) -> ElementTree.Element:
+    def __serialize_element(self, element: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN element to XML
 
@@ -323,52 +424,48 @@ class BPMNSerializer:
         :return: An Elementtree Element representing the serialized BPMN element
         """
 
-        serialized_element = None
-
         match element.get("type"):
             case BPMNElementType.BPMN_ANNOTATION:
-                serialized_element = BPMNSerializer.__serialize_annotation(element)
+                return self.__serialize_annotation(element, connected_flows)
             case BPMNElementType.BPMN_CALL_ACTIVITY:
-                serialized_element = BPMNSerializer.__serialize_call_activity(element)
+                return self.__serialize_call_activity(element, connected_flows)
             case BPMNElementType.BPMN_DATA_OBJECT:
-                serialized_element = BPMNSerializer.__serialize_data_object(element)
+                return self.__serialize_data_object(element, connected_flows)
             case BPMNElementType.BPMN_DATA_STORE:
-                serialized_element = BPMNSerializer.__serialize_data_store(element)
+                return self.__serialize_data_store(element, connected_flows)
             case BPMNElementType.BPMN_END_EVENT:
-                serialized_element = BPMNSerializer.__serialize_end_event(element)
+                return self.__serialize_end_event(element, connected_flows)
             case BPMNElementType.BPMN_GATEWAY:
-                serialized_element = BPMNSerializer.__serialize_gateway(element)
+                return self.__serialize_gateway(element, connected_flows)
             case BPMNElementType.BPMN_GROUP:
-                serialized_element = BPMNSerializer.__serialize_group(element)
+                return self.__serialize_group(element, connected_flows)
             case BPMNElementType.BPMN_INTERMEDIATE_EVENT:
-                serialized_element = BPMNSerializer.__serialize_intermediate_event(element)
+                return self.__serialize_intermediate_event(element, connected_flows)
             case BPMNElementType.BPMN_POOL:
-                serialized_element = BPMNSerializer.__serialize_pool(element)
+                return self.__serialize_pool(element, connected_flows)
             case BPMNElementType.BPMN_START_EVENT:
-                serialized_element = BPMNSerializer.__serialize_start_event(element)
+                return self.__serialize_start_event(element, connected_flows)
             case BPMNElementType.BPMN_SUBPROCESS:
-                serialized_element = BPMNSerializer.__serialize_subprocess(element)
+                return self.__serialize_subprocess(element, connected_flows)
             case BPMNElementType.BPMN_SWIMLANE:
-                serialized_element = BPMNSerializer.__serialize_swimlane(element)
+                return self.__serialize_swimlane(element, connected_flows)
             case BPMNElementType.BPMN_TASK:
-                serialized_element = BPMNSerializer.__serialize_task(element)
+                return self.__serialize_task(element, connected_flows)
             case BPMNElementType.BPMN_TRANSACTION:
-                serialized_element = BPMNSerializer.__serialize_transaction(element)
+                return self.__serialize_transaction(element, connected_flows)
 
-        return serialized_element
-
-    @staticmethod
-    def __serialize_shape(element: dict) -> ElementTree.Element:
+    def __serialize_shape(self, element: dict) -> ElementTree.Element:
         """
         Serialize a BPMN element to a shape
         :param element: A dictionary representing a BPMN element
         :return: An Elementtree Element representing the serialized BPMN shape
         """
 
-        serialized_shape = ElementTree.Element("bpmndi:BPMNShape")
-        serialized_shape.set("bpmnElement", element.get("id"))
+        tag: str = self.__prefix_tag("BPMNShape", self.bpmndi_prefix)
+        serialized_shape: ElementTree.Element = ElementTree.Element(tag)
+        serialized_shape.set("bpmnElement", self.__prefix_id(element.get("id")))
 
-        bounds = element.get("bounds")
+        bounds: dict = element.get("bounds")
 
         if bounds:
             serialized_bounds = ElementTree.Element("dc:Bounds")
@@ -380,90 +477,162 @@ class BPMNSerializer:
 
         return serialized_shape
 
-    @staticmethod
-    def __serialize_edge(relationship: dict) -> ElementTree.Element:
+    def __serialize_edge(self, relationship: dict) -> ElementTree.Element:
         """
         Serialize a BPMN relationship to an edge
         :param relationship: A dictionary representing a BPMN relationship
         :return: An Elementtree Element representing the serialized BPMN edge
         """
 
-        serialized_shape = ElementTree.Element("bpmndi:BPMNEdge")
-        serialized_shape.set("bpmnElement", relationship.get("id"))
+        tag: str = self.__prefix_tag("BPMNEdge", self.bpmndi_prefix)
+        serialized_shape: ElementTree.Element = ElementTree.Element(tag)
+        serialized_shape.set("bpmnElement", self.__prefix_id(relationship.get("id")))
 
         for point in relationship.get("path"):
-            serialized_waypoint = ElementTree.Element("di:waypoint")
+            serialized_waypoint: ElementTree.Element = ElementTree.Element("di:waypoint")
             serialized_waypoint.set("x", str(point.get("x")))
             serialized_waypoint.set("y", str(point.get("y")))
-            serialized_shape.append(serialized_waypoint)
+            #serialized_shape.append(serialized_waypoint)
 
         return serialized_shape
 
-    @staticmethod
-    def __serialize_process(model: dict) -> ElementTree.Element:
+    def __serialize_process(self, model: dict) -> ElementTree.Element:
         """
         Serialize the process tree of a given BPMN model
         :param model: A dictionary representing a BPMN diagram model
         :return: An Elementtree Element representing the serialized BPMN process tree
         """
 
-        process = ElementTree.Element("process")
+        process: ElementTree.Element = ElementTree.Element(self.__prefix_tag("process", self.bpmn_prefix))
+        process.set("id", self.__prefix_id(str(uuid.uuid4())))
         process.set("isExecutable", "false")
 
+        elements_by_type: dict[str, dict] = {}
+        elements_by_owner: dict[str, dict] = {}
+
+        relationships: list[ElementTree.Element] = []
+
+        # We first gather all diagram elements and store them in index structures indexed
+        # by the element type and by their owner
         for element in model.get("elements").values():
-            serialized_element = BPMNSerializer.__serialize_element(element)
+            connected_flows = self.__get_flows_connected_to_element(
+                model.get("relationships").values(),
+                element.get("id")
+            )
+
+            serialized_element = self.__serialize_element(element, connected_flows)
+
+            element_type = element.get("type", "")
+
+            if element_type:
+                elements_by_type[element_type] = {
+                    **elements_by_type.get(element_type, {}),
+                    self.__prefix_id(element.get("id")): serialized_element
+                }
+
+            element_owner = self.__prefix_id(element.get("owner", ""))
+
+            if element_owner:
+                elements_by_owner[element_owner] = {
+                    **elements_by_owner.get(element_owner, {}),
+                    self.__prefix_id(element.get("id")): serialized_element
+                }
+
+        # We then gather all relationships
+        for relationship in model.get("relationships").values():
+            serialized_relationship = self.__serialize_flow(relationship)
+            relationships.append(serialized_relationship)
+
+        # Iterate over all pool elements and insert the owned swimlanes
+        for serialized_pool in elements_by_type.get(BPMNElementType.BPMN_POOL, {}).values():
+            owned_serialized_elements = elements_by_owner[serialized_pool.get("id")].values()
+
+            for element in owned_serialized_elements:
+                if elements_by_type.get(BPMNElementType.BPMN_SWIMLANE).get(element.get("id")):
+                    # We know that the serialized element is a swimlane and therefore directly
+                    # serialize it
+                    serialized_pool.append(element)
+                else:
+                    # We know that the serialized element is noz swimlane and therefore insert
+                    # a flow node ref for it
+                    tag: str = self.__prefix_tag("flowNodeRef", self.bpmn_prefix)
+                    flow_node_ref = ElementTree.Element(tag)
+                    flow_node_ref.text = element.get("id")
+                    serialized_pool.append(flow_node_ref)
+
+            process.append(serialized_pool)
+
+        # Iterate over all swimlanes and add flowNodeRefs for all elements within the current lane
+        for serialized_swimlane in elements_by_type.get(BPMNElementType.BPMN_SWIMLANE, {}).values():
+            owned_serialized_elements = elements_by_owner[serialized_swimlane.get("id")]
+            for serialized_element in owned_serialized_elements.values():
+                tag: str = self.__prefix_tag("flowNodeRef", self.bpmn_prefix)
+                flow_node_ref = ElementTree.Element(tag)
+                flow_node_ref.text = serialized_element.get("id")
+                serialized_swimlane.append(flow_node_ref)
+
+        # We get the dictionary of elements without pools and swimlanes
+        non_bounding_elements = {
+            key: elements_by_type[key] for key in elements_by_type.keys() if key not in [
+                BPMNElementType.BPMN_POOL,
+                BPMNElementType.BPMN_SWIMLANE
+            ]
+        }
+
+        for serialized_element in chain.from_iterable([entry.values() for entry in non_bounding_elements.values()]):
             process.append(serialized_element)
 
-        for relationship in model.get("relationships").values():
-            serialized_relationship = BPMNSerializer.__serialize_flow(relationship)
-            process.append(serialized_relationship)
+        for relationship in relationships:
+            process.append(relationship)
 
         return process
 
-    @staticmethod
-    def __serialize_diagram(model: dict) -> ElementTree.Element:
+    def __serialize_plane(self, model: dict) -> ElementTree.Element:
         """
         Serialize the diagram tree of a given BPMN model
         :param model: A dictionary representing a BPMN diagram model
         :return: An Elementtree Element representing the serialized BPMN diagram tree
         """
 
-        diagram = ElementTree.Element("bpmndi:BPMNDiagram")
-        plane = ElementTree.Element("bpmndi:BPMNPlane")
+        plane: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNPlane", self.bpmndi_prefix))
+        plane.set("id", self.__prefix_id(str(uuid.uuid4())))
         plane.set("bpmnElement", "Minimal")
-        diagram.append(plane)
 
         for element in model.get("elements").values():
-            serialized_shape = BPMNSerializer.__serialize_shape(element)
+            serialized_shape: ElementTree.Element = self.__serialize_shape(element)
             plane.append(serialized_shape)
 
         for relationship in model.get("relationships").values():
-            serialized_edge = BPMNSerializer.__serialize_edge(relationship)
+            serialized_edge: ElementTree.Element = self.__serialize_edge(relationship)
             plane.append(serialized_edge)
 
-        return diagram
+        return plane
 
-    @staticmethod
-    def serialize(model: dict) -> ElementTree.Element:
+    def serialize(self, model: dict) -> ElementTree.Element:
         """
         Serialize a BPMN diagram in Apollon's native JSON format to XML according to the BPMN 2.0 standard
         :param model: A dictionary representing a BPMN diagram model
         :return: An Elementtree Element representing the serialized BPMN diagram
         """
 
-        definitions = ElementTree.Element("definitions")
+        definitions: ElementTree.Element = ElementTree.Element(self.__prefix_tag("definitions", self.bpmn_prefix))
 
         definitions.set("id", "Definition")
+        definitions.set(f"xmlns:{self.xsi_prefix}", "http://www.w3.org/2001/XMLSchema-instance")
+        definitions.set(f"xmlns:{self.bpmn_prefix}", "http://www.omg.org/spec/BPMN/20100524/MODEL")
+        definitions.set(f"xmlns:{self.bpmndi_prefix}", "http://www.omg.org/spec/BPMN/20100524/DI")
+        definitions.set(f"xmlns:{self.dc_prefix}", "http://www.omg.org/spec/DD/20100524/DC")
+        definitions.set(f"xmlns:{self.di_prefix}", "http://www.omg.org/spec/DD/20100524/DI")
+        definitions.set("targetNamespace", "http://bpmn.io/schema/bpmn")
 
-        definitions.set("xmlns", "http://www.omg.org/spec/BPMN/20100524/MODEL")
-        definitions.set("xmlns:xs", "http://www.w3.org/2001/XMLSchema-instance")
-        definitions.set("xs:schemaLocation", "http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd")
-        definitions.set("xmlns:bpmndi", "http://www.omg.org/spec/BPMN/20100524/DI")
-        definitions.set("xmlns:dc", "http://www.omg.org/spec/DD/20100524/DC")
-        definitions.set("xmlns:di", "http://www.omg.org/spec/DD/20100524/DI")
+        serialized_process = self.__serialize_process(model)
+        definitions.append(serialized_process)
 
-        definitions.append(BPMNSerializer.__serialize_process(model))
-        definitions.append(BPMNSerializer.__serialize_diagram(model))
+        diagram: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNDiagram", self.bpmndi_prefix))
+        serialized_plane = self.__serialize_plane(model)
+        serialized_plane.set("bpmnElement", serialized_process.get("id"))
+        diagram.append(serialized_plane)
+        definitions.append(diagram)
 
         return definitions
 
@@ -471,221 +640,938 @@ class BPMNSerializer:
 if __name__ == "__main__":
     model = json.loads("""
         {
-    "version": "3.0.0",
-    "type": "BPMN",
-    "size": {
-      "width": 780,
-      "height": 100
-    },
-    "interactive": {
-      "elements": {},
-      "relationships": {}
-    },
-    "elements": {
-      "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa": {
-        "id": "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa",
-        "name": "Bake pizza",
-        "type": "BPMNTask",
-        "owner": null,
-        "bounds": {
-          "x": 90,
-          "y": 0,
-          "width": 150,
-          "height": 60
-        },
-        "taskType": "default",
-        "marker": "none"
-      },
-      "1b74b030-904b-42a5-b7cb-d8d7b61e0176": {
-        "id": "1b74b030-904b-42a5-b7cb-d8d7b61e0176",
-        "name": "Deliver pizza",
-        "type": "BPMNTask",
-        "owner": null,
-        "bounds": {
-          "x": 290,
-          "y": 0,
-          "width": 150,
-          "height": 60
-        },
-        "taskType": "default",
-        "marker": "none"
-      },
-      "a763191f-bf0f-40c2-a704-ea088b71f8c4": {
-        "id": "a763191f-bf0f-40c2-a704-ea088b71f8c4",
-        "name": "Take the money",
-        "type": "BPMNTask",
-        "owner": null,
-        "bounds": {
-          "x": 490,
-          "y": 0,
-          "width": 150,
-          "height": 60
-        },
-        "taskType": "default",
-        "marker": "none"
-      },
-      "5a0ab0d8-fe52-494f-b907-050f7ad3044d": {
-        "id": "5a0ab0d8-fe52-494f-b907-050f7ad3044d",
-        "name": "",
-        "type": "BPMNEndEvent",
-        "owner": null,
-        "bounds": {
-          "x": 690,
-          "y": 10,
-          "width": 40,
-          "height": 40
-        },
-        "eventType": "default"
-      },
-      "b8579c23-343f-414f-bbb5-66a9b1f90e6f": {
-        "id": "b8579c23-343f-414f-bbb5-66a9b1f90e6f",
-        "name": "Order received",
-        "type": "BPMNStartEvent",
-        "owner": null,
-        "bounds": {
-          "x": 0,
-          "y": 10,
-          "width": 40,
-          "height": 40
-        },
-        "eventType": "message"
-      }
-    },
-    "relationships": {
-      "3e46b350-0c33-44d2-bf00-e894706f27dc": {
-        "id": "3e46b350-0c33-44d2-bf00-e894706f27dc",
-        "name": "",
-        "type": "BPMNFlow",
-        "owner": null,
-        "bounds": {
-          "x": 40,
-          "y": 30,
-          "width": 50,
-          "height": 1
-        },
-        "path": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 50,
-            "y": 0
-          }
-        ],
-        "source": {
-          "direction": "Right",
-          "element": "b8579c23-343f-414f-bbb5-66a9b1f90e6f"
-        },
-        "target": {
-          "direction": "Left",
-          "element": "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa"
-        },
-        "isManuallyLayouted": false,
-        "flowType": "sequence"
-      },
-      "000ab57f-61d4-4244-a664-9df6ff526c19": {
-        "id": "000ab57f-61d4-4244-a664-9df6ff526c19",
-        "name": "",
-        "type": "BPMNFlow",
-        "owner": null,
-        "bounds": {
-          "x": 240,
-          "y": 30,
-          "width": 50,
-          "height": 1
-        },
-        "path": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 50,
-            "y": 0
-          }
-        ],
-        "source": {
-          "direction": "Right",
-          "element": "358dd2fe-9c1d-4bb6-bd27-87f25ac7aafa"
-        },
-        "target": {
-          "direction": "Left",
-          "element": "1b74b030-904b-42a5-b7cb-d8d7b61e0176"
-        },
-        "isManuallyLayouted": false,
-        "flowType": "sequence"
-      },
-      "1098aea3-1c45-4ccf-858a-ca348bfedc62": {
-        "id": "1098aea3-1c45-4ccf-858a-ca348bfedc62",
-        "name": "",
-        "type": "BPMNFlow",
-        "owner": null,
-        "bounds": {
-          "x": 440,
-          "y": 30,
-          "width": 50,
-          "height": 1
-        },
-        "path": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 50,
-            "y": 0
-          }
-        ],
-        "source": {
-          "direction": "Right",
-          "element": "1b74b030-904b-42a5-b7cb-d8d7b61e0176"
-        },
-        "target": {
-          "direction": "Left",
-          "element": "a763191f-bf0f-40c2-a704-ea088b71f8c4"
-        },
-        "isManuallyLayouted": false,
-        "flowType": "sequence"
-      },
-      "591be9fe-74be-43a0-a2b9-50c7c83ba5e1": {
-        "id": "591be9fe-74be-43a0-a2b9-50c7c83ba5e1",
-        "name": "",
-        "type": "BPMNFlow",
-        "owner": null,
-        "bounds": {
-          "x": 640,
-          "y": 30,
-          "width": 50,
-          "height": 1
-        },
-        "path": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 50,
-            "y": 0
-          }
-        ],
-        "source": {
-          "direction": "Right",
-          "element": "a763191f-bf0f-40c2-a704-ea088b71f8c4"
-        },
-        "target": {
-          "direction": "Left",
-          "element": "5a0ab0d8-fe52-494f-b907-050f7ad3044d"
-        },
-        "isManuallyLayouted": false,
-        "flowType": "sequence"
-      }
-    },
-    "assessments": {}
-  }
+            "version": "3.0.0",
+            "type": "BPMN",
+            "size": {
+                "width": 1540,
+                "height": 940
+            },
+            "interactive": {
+                "elements": {},
+                "relationships": {}
+            },
+            "elements": {
+                "57be7ebb-099e-47ec-bf5f-2d728437d987": {
+                    "id": "57be7ebb-099e-47ec-bf5f-2d728437d987",
+                    "name": "Loan Applicant",
+                    "type": "BPMNPool",
+                    "owner": null,
+                    "bounds": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 1370,
+                        "height": 160
+                    }
+                },
+                "6f8dba39-5d62-47d0-870b-37294b903ae7": {
+                    "id": "6f8dba39-5d62-47d0-870b-37294b903ae7",
+                    "name": "",
+                    "type": "BPMNStartEvent",
+                    "owner": "57be7ebb-099e-47ec-bf5f-2d728437d987",
+                    "bounds": {
+                        "x": 60,
+                        "y": 50,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "eventType": "default"
+                },
+                "a3b67a31-a53e-4e20-9859-d1ee473e9e9f": {
+                    "id": "a3b67a31-a53e-4e20-9859-d1ee473e9e9f",
+                    "name": "Send credit request",
+                    "type": "BPMNTask",
+                    "owner": "57be7ebb-099e-47ec-bf5f-2d728437d987",
+                    "bounds": {
+                        "x": 140,
+                        "y": 40,
+                        "width": 140,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                },
+                "909c768f-284b-42d3-9ec8-fbe7675b0f28": {
+                    "id": "909c768f-284b-42d3-9ec8-fbe7675b0f28",
+                    "name": "Quote received",
+                    "type": "BPMNIntermediateEvent",
+                    "owner": "57be7ebb-099e-47ec-bf5f-2d728437d987",
+                    "bounds": {
+                        "x": 980,
+                        "y": 50,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "eventType": "message-catch"
+                },
+                "a5506560-9631-448f-85ee-aa42581ac048": {
+                    "id": "a5506560-9631-448f-85ee-aa42581ac048",
+                    "name": "Review quote",
+                    "type": "BPMNTask",
+                    "owner": "57be7ebb-099e-47ec-bf5f-2d728437d987",
+                    "bounds": {
+                        "x": 1080,
+                        "y": 40,
+                        "width": 160,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                },
+                "2dcc3930-cc74-41a9-bd7c-8218a2a14686": {
+                    "id": "2dcc3930-cc74-41a9-bd7c-8218a2a14686",
+                    "name": "",
+                    "type": "BPMNEndEvent",
+                    "owner": "57be7ebb-099e-47ec-bf5f-2d728437d987",
+                    "bounds": {
+                        "x": 1310,
+                        "y": 50,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "eventType": "default"
+                },
+                "e975fb67-ccc1-4373-b214-d3e8742930aa": {
+                    "id": "e975fb67-ccc1-4373-b214-d3e8742930aa",
+                    "name": "Credit Institute",
+                    "type": "BPMNPool",
+                    "owner": null,
+                    "bounds": {
+                        "x": 0,
+                        "y": 200,
+                        "width": 1370,
+                        "height": 430
+                    }
+                },
+                "607b811b-ab82-4aad-91c2-6bed096b5cc8": {
+                    "id": "607b811b-ab82-4aad-91c2-6bed096b5cc8",
+                    "name": "Loan Assessor",
+                    "type": "BPMNSwimlane",
+                    "owner": "e975fb67-ccc1-4373-b214-d3e8742930aa",
+                    "bounds": {
+                        "x": 40,
+                        "y": 470,
+                        "width": 1330,
+                        "height": 160
+                    }
+                },
+                "a78c7661-7823-4d40-9753-a87a92f3bc93": {
+                    "id": "a78c7661-7823-4d40-9753-a87a92f3bc93",
+                    "name": "Assess risk",
+                    "type": "BPMNTask",
+                    "owner": "607b811b-ab82-4aad-91c2-6bed096b5cc8",
+                    "bounds": {
+                        "x": 530,
+                        "y": 520,
+                        "width": 160,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                },
+                "bde0718c-a52d-4141-a6d5-d697398a1ab2": {
+                    "id": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "name": "Loan Provider",
+                    "type": "BPMNSwimlane",
+                    "owner": "e975fb67-ccc1-4373-b214-d3e8742930aa",
+                    "bounds": {
+                        "x": 40,
+                        "y": 200,
+                        "width": 1330,
+                        "height": 270
+                    }
+                },
+                "f108cf07-c22c-4284-b9ba-0b4af908c7ad": {
+                    "id": "f108cf07-c22c-4284-b9ba-0b4af908c7ad",
+                    "name": "Review request",
+                    "type": "BPMNTask",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 270,
+                        "y": 230,
+                        "width": 140,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                },
+                "6ebb416a-1a47-49cf-9ba1-7ffdcb5dea56": {
+                    "id": "6ebb416a-1a47-49cf-9ba1-7ffdcb5dea56",
+                    "name": "Credit request received",
+                    "type": "BPMNIntermediateEvent",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 190,
+                        "y": 240,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "eventType": "default"
+                },
+                "ab792872-1b3f-4d7a-afb6-aa01b1d7f785": {
+                    "id": "ab792872-1b3f-4d7a-afb6-aa01b1d7f785",
+                    "name": "",
+                    "type": "BPMNGateway",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 450,
+                        "y": 240,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "gatewayType": "parallel"
+                },
+                "e206ad60-29b0-4bfc-8e5d-08eb28c31942": {
+                    "id": "e206ad60-29b0-4bfc-8e5d-08eb28c31942",
+                    "name": "Standard terms applicable?",
+                    "type": "BPMNGateway",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 530,
+                        "y": 240,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "gatewayType": "exclusive"
+                },
+                "531d5776-832d-4ab0-b76c-dba85ec2d8a0": {
+                    "id": "531d5776-832d-4ab0-b76c-dba85ec2d8a0",
+                    "name": "Calculate terms",
+                    "type": "BPMNTask",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 610,
+                        "y": 230,
+                        "width": 140,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                },
+                "b31e8aaa-54f2-4a36-8fd0-c374045c836c": {
+                    "id": "b31e8aaa-54f2-4a36-8fd0-c374045c836c",
+                    "name": "",
+                    "type": "BPMNGateway",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 790,
+                        "y": 240,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "gatewayType": "exclusive"
+                },
+                "e409e5b5-ab11-45e7-ba78-4266473ecc17": {
+                    "id": "e409e5b5-ab11-45e7-ba78-4266473ecc17",
+                    "name": "Send quote",
+                    "type": "BPMNTask",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 1130,
+                        "y": 230,
+                        "width": 140,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                },
+                "acf010ad-0c8c-4a9a-8949-52e17f13e55c": {
+                    "id": "acf010ad-0c8c-4a9a-8949-52e17f13e55c",
+                    "name": "Quote sent",
+                    "type": "BPMNEndEvent",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 1310,
+                        "y": 240,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "eventType": "default"
+                },
+                "bdfce06b-db3e-45c8-9976-4ef57108218b": {
+                    "id": "bdfce06b-db3e-45c8-9976-4ef57108218b",
+                    "name": "",
+                    "type": "BPMNGateway",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 1050,
+                        "y": 240,
+                        "width": 40,
+                        "height": 40
+                    },
+                    "gatewayType": "parallel"
+                },
+                "be966228-7ed4-42c4-ad79-432f459f9feb": {
+                    "id": "be966228-7ed4-42c4-ad79-432f459f9feb",
+                    "name": "Prepare special terms",
+                    "type": "BPMNTask",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 610,
+                        "y": 380,
+                        "width": 140,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                },
+                "1acbea80-c430-46f2-b7d2-a44a1bc1639c": {
+                    "id": "1acbea80-c430-46f2-b7d2-a44a1bc1639c",
+                    "name": "Prepare contract",
+                    "type": "BPMNTask",
+                    "owner": "bde0718c-a52d-4141-a6d5-d697398a1ab2",
+                    "bounds": {
+                        "x": 870,
+                        "y": 230,
+                        "width": 140,
+                        "height": 60
+                    },
+                    "taskType": "default",
+                    "marker": "none"
+                }
+            },
+            "relationships": {
+                "a6626dca-b9c5-45b5-9309-e5f0a3fb9a4f": {
+                    "id": "a6626dca-b9c5-45b5-9309-e5f0a3fb9a4f",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 100,
+                        "y": 70,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "6f8dba39-5d62-47d0-870b-37294b903ae7"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "a3b67a31-a53e-4e20-9859-d1ee473e9e9f"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "e81e5161-51c8-41b8-89f0-66e36da614c1": {
+                    "id": "e81e5161-51c8-41b8-89f0-66e36da614c1",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 280,
+                        "y": 70,
+                        "width": 700,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 700,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "a3b67a31-a53e-4e20-9859-d1ee473e9e9f"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "909c768f-284b-42d3-9ec8-fbe7675b0f28"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "ca2e5065-6ee1-4548-8bcd-502077fa3e73": {
+                    "id": "ca2e5065-6ee1-4548-8bcd-502077fa3e73",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 230,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "6ebb416a-1a47-49cf-9ba1-7ffdcb5dea56"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "f108cf07-c22c-4284-b9ba-0b4af908c7ad"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "73825150-a5bb-41ab-b557-cf36fdccb0a4": {
+                    "id": "73825150-a5bb-41ab-b557-cf36fdccb0a4",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 210,
+                        "y": 100,
+                        "width": 1,
+                        "height": 140
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 0,
+                            "y": 140
+                        }
+                    ],
+                    "source": {
+                        "direction": "Down",
+                        "element": "a3b67a31-a53e-4e20-9859-d1ee473e9e9f"
+                    },
+                    "target": {
+                        "direction": "Up",
+                        "element": "6ebb416a-1a47-49cf-9ba1-7ffdcb5dea56"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "message"
+                },
+                "266c4919-88ad-4c2c-a1e4-c14947f44cde": {
+                    "id": "266c4919-88ad-4c2c-a1e4-c14947f44cde",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 470,
+                        "y": 280,
+                        "width": 60,
+                        "height": 270
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 0,
+                            "y": 270
+                        },
+                        {
+                            "x": 60,
+                            "y": 270
+                        }
+                    ],
+                    "source": {
+                        "direction": "Down",
+                        "element": "ab792872-1b3f-4d7a-afb6-aa01b1d7f785"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "a78c7661-7823-4d40-9753-a87a92f3bc93"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "b605327e-6a48-4f12-a4d4-97665fb7f230": {
+                    "id": "b605327e-6a48-4f12-a4d4-97665fb7f230",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 410,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "f108cf07-c22c-4284-b9ba-0b4af908c7ad"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "ab792872-1b3f-4d7a-afb6-aa01b1d7f785"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "33a69e1c-102b-498b-bb3b-c733c17c77bc": {
+                    "id": "33a69e1c-102b-498b-bb3b-c733c17c77bc",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 490,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "ab792872-1b3f-4d7a-afb6-aa01b1d7f785"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "e206ad60-29b0-4bfc-8e5d-08eb28c31942"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "66fe2424-b0cc-4e50-988c-f0910dd92aa6": {
+                    "id": "66fe2424-b0cc-4e50-988c-f0910dd92aa6",
+                    "name": "yes",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 570,
+                        "y": 220,
+                        "width": 40,
+                        "height": 41
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 40
+                        },
+                        {
+                            "x": 40,
+                            "y": 40
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "e206ad60-29b0-4bfc-8e5d-08eb28c31942"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "531d5776-832d-4ab0-b76c-dba85ec2d8a0"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "8263561f-d70e-4264-8e6e-6d545c9d4d57": {
+                    "id": "8263561f-d70e-4264-8e6e-6d545c9d4d57",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 750,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "531d5776-832d-4ab0-b76c-dba85ec2d8a0"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "b31e8aaa-54f2-4a36-8fd0-c374045c836c"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "2c669dc1-ec78-4ce9-af27-6fd58b5f4e17": {
+                    "id": "2c669dc1-ec78-4ce9-af27-6fd58b5f4e17",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 1090,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "bdfce06b-db3e-45c8-9976-4ef57108218b"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "e409e5b5-ab11-45e7-ba78-4266473ecc17"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "3eae3c61-5acf-4687-95d0-c5e16bb689b2": {
+                    "id": "3eae3c61-5acf-4687-95d0-c5e16bb689b2",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 830,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "b31e8aaa-54f2-4a36-8fd0-c374045c836c"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "1acbea80-c430-46f2-b7d2-a44a1bc1639c"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "c09d469a-0377-47f1-a2b5-6662f2afc0b1": {
+                    "id": "c09d469a-0377-47f1-a2b5-6662f2afc0b1",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 1010,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "1acbea80-c430-46f2-b7d2-a44a1bc1639c"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "bdfce06b-db3e-45c8-9976-4ef57108218b"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "a72d62b3-e113-4b90-bfd9-2480861d1186": {
+                    "id": "a72d62b3-e113-4b90-bfd9-2480861d1186",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 1270,
+                        "y": 260,
+                        "width": 40,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 40,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "e409e5b5-ab11-45e7-ba78-4266473ecc17"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "acf010ad-0c8c-4a9a-8949-52e17f13e55c"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "70b979b6-32e9-45c7-be45-518507652a30": {
+                    "id": "70b979b6-32e9-45c7-be45-518507652a30",
+                    "name": "no",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 550,
+                        "y": 280,
+                        "width": 60,
+                        "height": 130
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 0,
+                            "y": 130
+                        },
+                        {
+                            "x": 60,
+                            "y": 130
+                        }
+                    ],
+                    "source": {
+                        "direction": "Down",
+                        "element": "e206ad60-29b0-4bfc-8e5d-08eb28c31942"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "be966228-7ed4-42c4-ad79-432f459f9feb"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "c6ac591f-51fd-4c6e-bdfa-ae74a029d73d": {
+                    "id": "c6ac591f-51fd-4c6e-bdfa-ae74a029d73d",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 750,
+                        "y": 280,
+                        "width": 60,
+                        "height": 130
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 130
+                        },
+                        {
+                            "x": 60,
+                            "y": 130
+                        },
+                        {
+                            "x": 60,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "be966228-7ed4-42c4-ad79-432f459f9feb"
+                    },
+                    "target": {
+                        "direction": "Down",
+                        "element": "b31e8aaa-54f2-4a36-8fd0-c374045c836c"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "60e891d4-0604-45e4-b2c7-b6d6b9f72ba2": {
+                    "id": "60e891d4-0604-45e4-b2c7-b6d6b9f72ba2",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 690,
+                        "y": 280,
+                        "width": 380,
+                        "height": 270
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 270
+                        },
+                        {
+                            "x": 380,
+                            "y": 270
+                        },
+                        {
+                            "x": 380,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "a78c7661-7823-4d40-9753-a87a92f3bc93"
+                    },
+                    "target": {
+                        "direction": "Down",
+                        "element": "bdfce06b-db3e-45c8-9976-4ef57108218b"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "2bcae199-700f-44b9-93e1-2dacb6061bd8": {
+                    "id": "2bcae199-700f-44b9-93e1-2dacb6061bd8",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 1240,
+                        "y": 70,
+                        "width": 70,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 70,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "a5506560-9631-448f-85ee-aa42581ac048"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "2dcc3930-cc74-41a9-bd7c-8218a2a14686"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "b409934a-f4ad-4bcb-a157-4457c97e17fb": {
+                    "id": "b409934a-f4ad-4bcb-a157-4457c97e17fb",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 1020,
+                        "y": 70,
+                        "width": 60,
+                        "height": 1
+                    },
+                    "path": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 60,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Right",
+                        "element": "909c768f-284b-42d3-9ec8-fbe7675b0f28"
+                    },
+                    "target": {
+                        "direction": "Left",
+                        "element": "a5506560-9631-448f-85ee-aa42581ac048"
+                    },
+                    "isManuallyLayouted": false,
+                    "flowType": "sequence"
+                },
+                "aec45998-06bb-4213-a615-8e512c05a855": {
+                    "id": "aec45998-06bb-4213-a615-8e512c05a855",
+                    "name": "",
+                    "type": "BPMNFlow",
+                    "owner": null,
+                    "bounds": {
+                        "x": 1000,
+                        "y": 90,
+                        "width": 200,
+                        "height": 140
+                    },
+                    "path": [
+                        {
+                            "x": 200,
+                            "y": 140
+                        },
+                        {
+                            "x": 200,
+                            "y": 88.39453125
+                        },
+                        {
+                            "x": 0,
+                            "y": 88.39453125
+                        },
+                        {
+                            "x": 0,
+                            "y": 0
+                        }
+                    ],
+                    "source": {
+                        "direction": "Up",
+                        "element": "e409e5b5-ab11-45e7-ba78-4266473ecc17"
+                    },
+                    "target": {
+                        "direction": "Down",
+                        "element": "909c768f-284b-42d3-9ec8-fbe7675b0f28"
+                    },
+                    "isManuallyLayouted": true,
+                    "flowType": "message"
+                }
+            },
+            "assessments": {}
+        }
     """)
 
-    serialized_model = BPMNSerializer.serialize(model)
+    model2 = json.loads("""{"version":"3.0.0","type":"BPMN","size":{"width":920,"height":440},"interactive":{"elements":{},"relationships":{}},"elements":{"b83370ae-4c60-48de-b2e7-b472c100e500":{"id":"b83370ae-4c60-48de-b2e7-b472c100e500","name":"Order Received","type":"BPMNStartEvent","owner":null,"bounds":{"x":0,"y":0,"width":40,"height":40},"eventType":"message"},"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c":{"id":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c","name":"Bake Pizza","type":"BPMNTask","owner":null,"bounds":{"x":90,"y":0,"width":130,"height":40},"taskType":"default","marker":"none"},"001ff705-6703-49f4-ab68-e79a066596b8":{"id":"001ff705-6703-49f4-ab68-e79a066596b8","name":"Deliver Pizza","type":"BPMNTask","owner":null,"bounds":{"x":270,"y":0,"width":160,"height":40},"taskType":"default","marker":"none"},"561c077d-b2e0-4788-8436-278ee6b50adb":{"id":"561c077d-b2e0-4788-8436-278ee6b50adb","name":"","type":"BPMNEndEvent","owner":null,"bounds":{"x":480,"y":0,"width":40,"height":40},"eventType":"default"}},"relationships":{"22cbf288-11a6-462f-9540-c3d38b6dcfa8":{"id":"22cbf288-11a6-462f-9540-c3d38b6dcfa8","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":40,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"b83370ae-4c60-48de-b2e7-b472c100e500"},"target":{"direction":"Left","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"isManuallyLayouted":false,"flowType":"sequence"},"c0fcff31-a656-4d2a-8bd9-5ef6bec80646":{"id":"c0fcff31-a656-4d2a-8bd9-5ef6bec80646","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":220,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"target":{"direction":"Left","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"isManuallyLayouted":false,"flowType":"sequence"},"335069fe-4456-40df-bfc5-f1e1379e4010":{"id":"335069fe-4456-40df-bfc5-f1e1379e4010","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":430,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"target":{"direction":"Left","element":"561c077d-b2e0-4788-8436-278ee6b50adb"},"isManuallyLayouted":false,"flowType":"sequence"}},"assessments":{}}""")
+
+    bpmn_serializer = BPMNSerializer()
+
+    serialized_model = bpmn_serializer.serialize(model2)
     ElementTree.indent(serialized_model, space="\t", level=0)
 
-    print(minidom.parseString(ElementTree.tostring(BPMNSerializer.serialize(model), encoding='utf8', xml_declaration=True)).toprettyxml(indent="\t"))
+    print(minidom.parseString(ElementTree.tostring(bpmn_serializer.serialize(model), encoding='utf8', xml_declaration=True)).toprettyxml(indent="\t"))

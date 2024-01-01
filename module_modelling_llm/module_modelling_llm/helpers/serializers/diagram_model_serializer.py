@@ -13,32 +13,42 @@ class DiagramModelSerializer:
     def serialize_model(model: dict) -> str:
         match model.get("type"):
             case DiagramType.CLASS_DIAGRAM:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.OBJECT_DIAGRAM:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.ACTIVITY_DIAGRAM:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.USE_CASE_DIAGRAM:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.COMMUNICATION_DIAGRAM:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.COMPONENT_DIAGRAM:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.DEPLOYMENT_DIAGRAM:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.PETRI_NET:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.REACHABILITY_GRAPH:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.SYNTAX_TREE:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.FLOWCHART:
-                raise NotImplementedError("not implemented")
+                # TODO: Evaluate if there is a more sensible serialization format for this diagram type
+                return json.dumps(model)
             case DiagramType.BPMN:
-                serialized_model: ElementTree.Element = BPMNSerializer.serialize(model)
-                return minidom.parseString(
-                    ElementTree.tostring(serialized_model, encoding='utf8')
-                ).toprettyxml(indent="\t")
+                serialized_model: str = ElementTree.tostring(BPMNSerializer.serialize(model), encoding='utf8')
+                # The next line is only required to "pretty-print" the XML output for easier debugging
+                return minidom.parseString(serialized_model).toprettyxml(indent="\t")
 
     @staticmethod
     def serialize_model_from_submission(submission: Submission) -> str:

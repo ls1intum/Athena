@@ -20,11 +20,12 @@ Meaning, the feedback you provide should be applicable to the submission with li
 # Grading instructions
 {grading_instructions}
 Max points: {max_points}, bonus points: {bonus_points}\
-"""
 
-human_message = """\
 Student\'s submission to grade:
 \"\"\"
 {submission}
-\"\"\"\
+\"\"\"
+"""
+
+human_message = """
 """

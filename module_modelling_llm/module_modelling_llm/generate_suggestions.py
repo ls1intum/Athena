@@ -94,8 +94,6 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
 
     print(chat_prompt.format(**prompt_input))
 
-    return
-
     result = await predict_and_parse(
         model=model, 
         chat_prompt=chat_prompt, 
