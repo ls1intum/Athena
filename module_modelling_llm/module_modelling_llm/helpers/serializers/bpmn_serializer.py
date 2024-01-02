@@ -2,6 +2,7 @@ import json
 import uuid
 import xml.etree.ElementTree as ElementTree
 from enum import Enum
+from functools import reduce
 from itertools import chain
 from xml.dom import minidom
 
@@ -107,16 +108,16 @@ class BPMNSerializer:
 
     intermediate_event_definition_map = {
         BPMNIntermediateEventType.DEFAULT: None,
-        BPMNIntermediateEventType.MESSAGE_CATCH: "messageCatchEventDefinition",
-        BPMNIntermediateEventType.MESSAGE_THROW: "messageThrowEventDefinition",
-        BPMNIntermediateEventType.TIMER_CATCH: "timerCatchEventDefinition",
-        BPMNIntermediateEventType.ESCALATION_CATCH: "escalationCatchEventDefinition",
-        BPMNIntermediateEventType.CONDITIONAL_CATCH: "conditionalCatchEventDefinition",
-        BPMNIntermediateEventType.LINK_CATCH: "linkCatchEventDefinition",
-        BPMNIntermediateEventType.LINK_THROW: "linkThrowEventDefinition",
-        BPMNIntermediateEventType.COMPENSATION_THROW: "compensationThrowEventDefinition",
-        BPMNIntermediateEventType.SIGNAL_CATCH: "signalCatchEventDefinition",
-        BPMNIntermediateEventType.SIGNAL_THROW: "signalThrowEventDefinition"
+        BPMNIntermediateEventType.MESSAGE_CATCH: "messageEventDefinition",
+        BPMNIntermediateEventType.MESSAGE_THROW: "messageEventDefinition",
+        BPMNIntermediateEventType.TIMER_CATCH: "timerEventDefinition",
+        BPMNIntermediateEventType.ESCALATION_CATCH: "escalationEventDefinition",
+        BPMNIntermediateEventType.CONDITIONAL_CATCH: "conditionalEventDefinition",
+        BPMNIntermediateEventType.LINK_CATCH: "linkEventDefinition",
+        BPMNIntermediateEventType.LINK_THROW: "linkEventDefinition",
+        BPMNIntermediateEventType.COMPENSATION_THROW: "compensationEventDefinition",
+        BPMNIntermediateEventType.SIGNAL_CATCH: "signalEventDefinition",
+        BPMNIntermediateEventType.SIGNAL_THROW: "signalEventDefinition"
     }
 
     end_event_definition_map = {
@@ -168,15 +169,17 @@ class BPMNSerializer:
         self.dc_prefix = dc_prefix
         self.di_prefix = di_prefix
 
-    def __prefix_tag(self, tag: str, prefix: str) -> str:
+    @staticmethod
+    def __prefix_tag(tag: str, prefix: str) -> str:
         """
         Prefix a XML tag with a given prefix
         :param tag: The prefixed tag
         :param prefix: The prefix to prepend
         """
         return f"{prefix}:{tag}"
-    
-    def __prefix_id(self, element_id: str, prefix: str = None) -> str:
+
+    @staticmethod
+    def __prefix_id(element_id: str, prefix: str = None) -> str:
         """
         Prefix an element id with a given prefix.
         If no prefix is provided, 'bpmn' is used as default.
@@ -187,12 +190,27 @@ class BPMNSerializer:
             prefix = "bpmn"
         return f"{prefix}_{element_id}"
 
-    def __get_flows_connected_to_element(self, flows: list[dict], element_id: str) -> list[dict]:
-        return list(filter(lambda flow: flow.get("source").get("element") == element_id or
-                                        flow.get("target").get("element") == element_id,
-                           flows))
+    @staticmethod
+    def __omit_keys(dictionary: dict, omitted_keys: list) -> dict:
+        """
+        Copy a dictionary while omitting keys
+        :param dictionary: The dictionary that is omitted from
+        :param omitted_keys: A list of keys that should be omitted
+        """
+        return {key: dictionary[key] for key in dictionary.keys() if key not in omitted_keys}
 
-    def __serialize_base_element(self, element: dict, tag: str, connected_flows: list[dict] = None) -> ElementTree.Element:
+    @staticmethod
+    def __get_flows_connected_to_element(flows: list[dict], element_id: str) -> list[dict]:
+        """
+        Get all flows connected to an element
+        :param flows: All flows in the diagram model
+        :param element_id: The id of the element to which the retrieved flows should be connected to
+        """
+        return list(filter(lambda flow: flow.get("source").get("element") == element_id or flow.get("target").get(
+            "element") == element_id, flows))
+
+    def __serialize_base_element(self, element: dict, tag: str,
+                                 connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN flow to XML
         :param element: A dictionary representing a BPMN flow element
@@ -241,7 +259,8 @@ class BPMNSerializer:
         :return: An Elementtree Element representing the serialized BPMN call activity element
         """
         tag: str = self.__prefix_tag("callActivity", self.bpmn_prefix)
-        serialized_call_activity: ElementTree.Element = self.__serialize_base_element(call_activity, tag, connected_flows)
+        serialized_call_activity: ElementTree.Element = self.__serialize_base_element(call_activity, tag,
+                                                                                      connected_flows)
 
         return serialized_call_activity
 
@@ -279,7 +298,8 @@ class BPMNSerializer:
         event_type_tag: str = self.start_event_definition_map[end_event.get("eventType")]
 
         if event_type_tag:
-            event_type_element: ElementTree.Element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.bpmn_prefix))
+            event_type_element: ElementTree.Element = ElementTree.Element(
+                self.__prefix_tag(event_type_tag, self.bpmn_prefix))
             event_type_element.set("id", self.__prefix_id(str(uuid.uuid4())))
             serialized_end_event.append(event_type_element)
 
@@ -324,14 +344,17 @@ class BPMNSerializer:
 
         return serialized_group
 
-    def __serialize_intermediate_event(self, intermediate_event: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_intermediate_event(self, intermediate_event: dict,
+                                       connected_flows: list[dict] = None) -> ElementTree.Element:
         """
         Serialize a BPMN intermediate event to XML
         :param intermediate_event: A dictionary representing a BPMN intermediate event element
         :return: An Elementtree Element representing the serialized BPMN intermediate event element
         """
-        tag: str = self.__prefix_tag(self.intermediate_event_type_map[intermediate_event.get("eventType")], self.bpmn_prefix)
-        serialized_intermediate_event: ElementTree.Element = self.__serialize_base_element(intermediate_event, tag, connected_flows)
+        tag: str = self.__prefix_tag(self.intermediate_event_type_map[intermediate_event.get("eventType")],
+                                     self.bpmn_prefix)
+        serialized_intermediate_event: ElementTree.Element = self.__serialize_base_element(intermediate_event, tag,
+                                                                                           connected_flows)
 
         event_type_tag: str = self.intermediate_event_definition_map[intermediate_event.get("eventType")]
 
@@ -492,14 +515,15 @@ class BPMNSerializer:
             serialized_waypoint: ElementTree.Element = ElementTree.Element("di:waypoint")
             serialized_waypoint.set("x", str(point.get("x")))
             serialized_waypoint.set("y", str(point.get("y")))
-            #serialized_shape.append(serialized_waypoint)
+            # serialized_shape.append(serialized_waypoint)
 
         return serialized_shape
 
-    def __serialize_process(self, model: dict) -> ElementTree.Element:
+    def __serialize_process(self, owned_elements: list[dict], relationships: list[dict]) -> ElementTree.Element:
         """
         Serialize the process tree of a given BPMN model
-        :param model: A dictionary representing a BPMN diagram model
+        :param owned_elements: A dictionary containing the elements owned by serialized process
+        :param relationships: A dictionary the relationships contained in the diagram
         :return: An Elementtree Element representing the serialized BPMN process tree
         """
 
@@ -510,15 +534,12 @@ class BPMNSerializer:
         elements_by_type: dict[str, dict] = {}
         elements_by_owner: dict[str, dict] = {}
 
-        relationships: list[ElementTree.Element] = []
+        serialized_relationships: list[ElementTree.Element] = []
 
         # We first gather all diagram elements and store them in index structures indexed
         # by the element type and by their owner
-        for element in model.get("elements").values():
-            connected_flows = self.__get_flows_connected_to_element(
-                model.get("relationships").values(),
-                element.get("id")
-            )
+        for element in owned_elements:
+            connected_flows = self.__get_flows_connected_to_element(relationships, element.get("id"))
 
             serialized_element = self.__serialize_element(element, connected_flows)
 
@@ -539,9 +560,9 @@ class BPMNSerializer:
                 }
 
         # We then gather all relationships
-        for relationship in model.get("relationships").values():
+        for relationship in relationships:
             serialized_relationship = self.__serialize_flow(relationship)
-            relationships.append(serialized_relationship)
+            serialized_relationships.append(serialized_relationship)
 
         # Iterate over all pool elements and insert the owned swimlanes
         for serialized_pool in elements_by_type.get(BPMNElementType.BPMN_POOL, {}).values():
@@ -572,17 +593,15 @@ class BPMNSerializer:
                 serialized_swimlane.append(flow_node_ref)
 
         # We get the dictionary of elements without pools and swimlanes
-        non_bounding_elements = {
-            key: elements_by_type[key] for key in elements_by_type.keys() if key not in [
-                BPMNElementType.BPMN_POOL,
-                BPMNElementType.BPMN_SWIMLANE
-            ]
-        }
+        non_bounding_elements = self.__omit_keys(elements_by_type, [
+            BPMNElementType.BPMN_POOL,
+            BPMNElementType.BPMN_SWIMLANE
+        ])
 
         for serialized_element in chain.from_iterable([entry.values() for entry in non_bounding_elements.values()]):
             process.append(serialized_element)
 
-        for relationship in relationships:
+        for relationship in serialized_relationships:
             process.append(relationship)
 
         return process
@@ -608,6 +627,46 @@ class BPMNSerializer:
 
         return plane
 
+    def __split_elements_by_owning_pool(self, elements: dict) -> tuple[dict, list]:
+        """
+        Splits a given list of elements into a dictionary with the IDs of the root
+        pool elements as keys and lists of elements contained within the respective pools
+        as values. Elements that are not contained in a pool are returned as a list.
+        :param elements: The list of elements that should be split
+        :return: A tuple containing the dictionary of elements by owning pools and a list
+        containing the elements without an owner.
+        """
+        elements_by_owning_pool = reduce(lambda acc, element: {
+            **acc,
+            element.get("id"): []
+        } if element.get("type") == BPMNElementType.BPMN_POOL else acc, elements.values(), {})
+
+        unowned_elements = []
+
+        for element in elements:
+            if not element.get("type") == BPMNElementType.BPMN_POOL:
+                owner = self.__find_root_owner_id(elements, element.get("id"))
+
+                # If the owner of an element is returned as the element's own ID,
+                # the element is not contained in a pool. If the owner is not a key in the
+                # elementy_by_owning_pool dictionary, we assume that the element is owned by
+                # another container like a group that is not located within a pool.
+                if owner == element.get("id") or not elements_by_owning_pool.get(owner, None):
+                    unowned_elements.append(element)
+                else:
+                    elements_by_owning_pool[owner].append(element)
+
+        return elements_by_owning_pool, unowned_elements
+
+    def __find_root_owner_id(self, elements: dict, current_id: str) -> str:
+
+        owner_id = elements.get(current_id).get("owner")
+
+        if not owner_id:
+            return current_id
+
+        return self.__find_root_owner_id(elements, owner_id)
+
     def serialize(self, model: dict) -> ElementTree.Element:
         """
         Serialize a BPMN diagram in Apollon's native JSON format to XML according to the BPMN 2.0 standard
@@ -625,8 +684,13 @@ class BPMNSerializer:
         definitions.set(f"xmlns:{self.di_prefix}", "http://www.omg.org/spec/DD/20100524/DI")
         definitions.set("targetNamespace", "http://bpmn.io/schema/bpmn")
 
-        serialized_process = self.__serialize_process(model)
-        definitions.append(serialized_process)
+        elements_by_owning_pool, unowned_elements = self.__split_elements_by_owning_pool(model.get("elements", {}))
+
+        relationships: list[dict] = list(model.get("relationships", {}).values())
+
+        for owner in elements_by_owning_pool:
+            serialized_process = self.__serialize_process(elements_by_owning_pool.get(owner), relationships)
+            definitions.append(serialized_process)
 
         diagram: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNDiagram", self.bpmndi_prefix))
         serialized_plane = self.__serialize_plane(model)
@@ -1567,11 +1631,14 @@ if __name__ == "__main__":
         }
     """)
 
-    model2 = json.loads("""{"version":"3.0.0","type":"BPMN","size":{"width":920,"height":440},"interactive":{"elements":{},"relationships":{}},"elements":{"b83370ae-4c60-48de-b2e7-b472c100e500":{"id":"b83370ae-4c60-48de-b2e7-b472c100e500","name":"Order Received","type":"BPMNStartEvent","owner":null,"bounds":{"x":0,"y":0,"width":40,"height":40},"eventType":"message"},"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c":{"id":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c","name":"Bake Pizza","type":"BPMNTask","owner":null,"bounds":{"x":90,"y":0,"width":130,"height":40},"taskType":"default","marker":"none"},"001ff705-6703-49f4-ab68-e79a066596b8":{"id":"001ff705-6703-49f4-ab68-e79a066596b8","name":"Deliver Pizza","type":"BPMNTask","owner":null,"bounds":{"x":270,"y":0,"width":160,"height":40},"taskType":"default","marker":"none"},"561c077d-b2e0-4788-8436-278ee6b50adb":{"id":"561c077d-b2e0-4788-8436-278ee6b50adb","name":"","type":"BPMNEndEvent","owner":null,"bounds":{"x":480,"y":0,"width":40,"height":40},"eventType":"default"}},"relationships":{"22cbf288-11a6-462f-9540-c3d38b6dcfa8":{"id":"22cbf288-11a6-462f-9540-c3d38b6dcfa8","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":40,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"b83370ae-4c60-48de-b2e7-b472c100e500"},"target":{"direction":"Left","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"isManuallyLayouted":false,"flowType":"sequence"},"c0fcff31-a656-4d2a-8bd9-5ef6bec80646":{"id":"c0fcff31-a656-4d2a-8bd9-5ef6bec80646","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":220,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"target":{"direction":"Left","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"isManuallyLayouted":false,"flowType":"sequence"},"335069fe-4456-40df-bfc5-f1e1379e4010":{"id":"335069fe-4456-40df-bfc5-f1e1379e4010","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":430,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"target":{"direction":"Left","element":"561c077d-b2e0-4788-8436-278ee6b50adb"},"isManuallyLayouted":false,"flowType":"sequence"}},"assessments":{}}""")
+    model2 = json.loads(
+        """{"version":"3.0.0","type":"BPMN","size":{"width":920,"height":440},"interactive":{"elements":{},"relationships":{}},"elements":{"b83370ae-4c60-48de-b2e7-b472c100e500":{"id":"b83370ae-4c60-48de-b2e7-b472c100e500","name":"Order Received","type":"BPMNStartEvent","owner":null,"bounds":{"x":0,"y":0,"width":40,"height":40},"eventType":"message"},"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c":{"id":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c","name":"Bake Pizza","type":"BPMNTask","owner":null,"bounds":{"x":90,"y":0,"width":130,"height":40},"taskType":"default","marker":"none"},"001ff705-6703-49f4-ab68-e79a066596b8":{"id":"001ff705-6703-49f4-ab68-e79a066596b8","name":"Deliver Pizza","type":"BPMNTask","owner":null,"bounds":{"x":270,"y":0,"width":160,"height":40},"taskType":"default","marker":"none"},"561c077d-b2e0-4788-8436-278ee6b50adb":{"id":"561c077d-b2e0-4788-8436-278ee6b50adb","name":"","type":"BPMNEndEvent","owner":null,"bounds":{"x":480,"y":0,"width":40,"height":40},"eventType":"default"}},"relationships":{"22cbf288-11a6-462f-9540-c3d38b6dcfa8":{"id":"22cbf288-11a6-462f-9540-c3d38b6dcfa8","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":40,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"b83370ae-4c60-48de-b2e7-b472c100e500"},"target":{"direction":"Left","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"isManuallyLayouted":false,"flowType":"sequence"},"c0fcff31-a656-4d2a-8bd9-5ef6bec80646":{"id":"c0fcff31-a656-4d2a-8bd9-5ef6bec80646","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":220,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"target":{"direction":"Left","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"isManuallyLayouted":false,"flowType":"sequence"},"335069fe-4456-40df-bfc5-f1e1379e4010":{"id":"335069fe-4456-40df-bfc5-f1e1379e4010","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":430,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"target":{"direction":"Left","element":"561c077d-b2e0-4788-8436-278ee6b50adb"},"isManuallyLayouted":false,"flowType":"sequence"}},"assessments":{}}""")
 
     bpmn_serializer = BPMNSerializer()
 
     serialized_model = bpmn_serializer.serialize(model2)
     ElementTree.indent(serialized_model, space="\t", level=0)
 
-    print(minidom.parseString(ElementTree.tostring(bpmn_serializer.serialize(model), encoding='utf8', xml_declaration=True)).toprettyxml(indent="\t"))
+    print(minidom.parseString(
+        ElementTree.tostring(bpmn_serializer.serialize(model), encoding='utf8', xml_declaration=True)).toprettyxml(
+        indent="\t"))
