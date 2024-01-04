@@ -54,3 +54,11 @@ services:
       - athena
     ports:
       - "5005:5005"
+
+  module_programming_code_embedding:
+    hostname: module-programming-code-embedding
+    build: ./module_programming_code_embedding
+    depends_on:
+      - athena
+    ports:
+      - "5007:5007"

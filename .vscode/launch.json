@@ -50,5 +50,12 @@
             "cwd": "${workspaceFolder}/module_programming_themisml",
             "module": "module_programming_themisml",
         },
+        {
+            "name": "Module Programming Code Embedding",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/module_programming_code_embedding",
+            "module": "module_programming_code_embedding"
+        }
     ]
 }
