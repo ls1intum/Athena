@@ -18,7 +18,6 @@ from module_modelling_llm.helpers.models.diagram_types import DiagramType
 from module_modelling_llm.helpers.serializers.diagram_model_serializer import DiagramModelSerializer
 from module_modelling_llm.helpers.utils import format_grading_instructions
 
-from module_modelling_llm.helpers.serializers.bpmn_serializer import BPMNSerializer
 from module_modelling_llm.prompts.submission_format.submission_format_remarks import get_submission_format_remarks
 
 
@@ -79,7 +78,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     prompt_input, should_run = check_prompt_length_and_omit_features_if_necessary(
         prompt=chat_prompt,
         prompt_input=prompt_input,
-        max_input_tokens=config.max_input_tokens,
+        max_input_tokens=10000, # config.max_input_tokens,
         omittable_features=omittable_features,
         debug=debug
     )
@@ -91,8 +90,6 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
             emit_meta("prompt", chat_prompt.format(**prompt_input))
             emit_meta("error", f"Input too long {num_tokens_from_prompt(chat_prompt, prompt_input)} > {config.max_input_tokens}")
         return []
-
-    print(chat_prompt.format(**prompt_input))
 
     result = await predict_and_parse(
         model=model, 

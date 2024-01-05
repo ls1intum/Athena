@@ -46,7 +46,8 @@ class DiagramModelSerializer:
                 # TODO: Evaluate if there is a more sensible serialization format for this diagram type
                 return json.dumps(model)
             case DiagramType.BPMN:
-                serialized_model: str = ElementTree.tostring(BPMNSerializer.serialize(model), encoding='utf8')
+                serializer = BPMNSerializer()
+                serialized_model: str = ElementTree.tostring(serializer.serialize(model, omit_layout_info=True), encoding='utf8')
                 # The next line is only required to "pretty-print" the XML output for easier debugging
                 return minidom.parseString(serialized_model).toprettyxml(indent="\t")
 

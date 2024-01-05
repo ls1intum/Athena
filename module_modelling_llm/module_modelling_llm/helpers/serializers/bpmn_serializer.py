@@ -33,6 +33,11 @@ class BPMNElementType(str, Enum):
     BPMN_TRANSACTION = "BPMNTransaction"
 
 
+class BPMNFlowType(str, Enum):
+    SEQUENCE = "sequence",
+    MESSAGE = "message"
+
+
 class BPMNStartEventType(str, Enum):
     DEFAULT = "default"
     MESSAGE = "message"
@@ -83,6 +88,31 @@ class BPMNGatewayType(str, Enum):
     PARALLEL = "parallel"
 
 
+class IDMapper:
+
+    id_map: dict[str, int] = None
+    id_counter: int = None
+
+    def __init__(self):
+        self.id_map = {}
+        self.id_counter = 0
+
+    def map_id(self, id: str) -> int:
+        """
+        Map an ID to a minimum length numeric ID. This function mainly serves the purpose to shorten IDs to decrease
+        the token count for LLM queries.
+        :param id: The ID that should be shortened
+        """
+        if id not in self.id_map:
+            self.id_map[id] = self.id_counter
+            self.id_counter += 1
+
+        return self.id_map[id]
+
+    def remove_id(self, id: str):
+        del self.id_map[id]
+
+
 class BPMNSerializer:
     start_event_definition_map = {
         BPMNStartEventType.DEFAULT: None,
@@ -130,6 +160,11 @@ class BPMNSerializer:
         BPMNEndEventType.TERMINATE: "terminateEventDefinition"
     }
 
+    flow_type_map = {
+        BPMNFlowType.SEQUENCE: "sequenceFlow",
+        BPMNFlowType.MESSAGE: "messageFlow"
+    }
+
     task_type_map = {
         BPMNTaskType.DEFAULT: "task",
         BPMNTaskType.USER: "userTask",
@@ -154,6 +189,8 @@ class BPMNSerializer:
     dc_prefix: str = ""
     di_prefix: str = ""
 
+    __id_mapper: IDMapper = None
+
     def __init__(self,
                  xsi_prefix=DEFAULT_XSI_PREFIX,
                  bpmn_prefix=DEFAULT_BPMN_PREFIX,
@@ -168,6 +205,7 @@ class BPMNSerializer:
         self.bpmndi_prefix = bpmndi_prefix
         self.dc_prefix = dc_prefix
         self.di_prefix = di_prefix
+        self.__id_mapper = IDMapper()
 
     @staticmethod
     def __prefix_tag(tag: str, prefix: str) -> str:
@@ -178,8 +216,7 @@ class BPMNSerializer:
         """
         return f"{prefix}:{tag}"
 
-    @staticmethod
-    def __prefix_id(element_id: str, prefix: str = None) -> str:
+    def __shorten_id(self, element_id: str, prefix: str = None) -> str:
         """
         Prefix an element id with a given prefix.
         If no prefix is provided, 'bpmn' is used as default.
@@ -187,8 +224,9 @@ class BPMNSerializer:
         :param prefix: The prefix to prepend
         """
         if prefix is None:
-            prefix = "bpmn"
-        return f"{prefix}_{element_id}"
+            prefix = "id"
+
+        return f"{prefix}_{self.__id_mapper.map_id(element_id)}"
 
     @staticmethod
     def __omit_keys(dictionary: dict, omitted_keys: list) -> dict:
@@ -222,20 +260,20 @@ class BPMNSerializer:
             connected_flows = []
 
         serialized_element: ElementTree.Element = ElementTree.Element(tag)
-        serialized_element.set("id", self.__prefix_id(element.get("id")))
+        serialized_element.set("id", self.__shorten_id(element.get("id")))
         serialized_element.set("name", element.get("name"))
 
         for connected_flow in connected_flows:
             if connected_flow.get("source").get("element") == element.get("id"):
                 outgoing = ElementTree.Element(self.__prefix_tag("outgoing", self.bpmn_prefix))
-                outgoing.text = self.__prefix_id(connected_flow.get("id"))
+                outgoing.text = self.__shorten_id(connected_flow.get("id"))
                 serialized_element.append(outgoing)
 
             # This is deliberately not an "else" case as otherwise connections connecting an element with itself
             # would not be correctly serialized.
             if connected_flow.get("target").get("element") == element.get("id"):
                 incoming = ElementTree.Element(self.__prefix_tag("incoming", self.bpmn_prefix))
-                incoming.text = self.__prefix_id(connected_flow.get("id"))
+                incoming.text = self.__shorten_id(connected_flow.get("id"))
                 serialized_element.append(incoming)
 
         return serialized_element
@@ -300,7 +338,7 @@ class BPMNSerializer:
         if event_type_tag:
             event_type_element: ElementTree.Element = ElementTree.Element(
                 self.__prefix_tag(event_type_tag, self.bpmn_prefix))
-            event_type_element.set("id", self.__prefix_id(str(uuid.uuid4())))
+            event_type_element.set("id", self.__shorten_id(str(uuid.uuid4())))
             serialized_end_event.append(event_type_element)
 
         return serialized_end_event
@@ -311,11 +349,11 @@ class BPMNSerializer:
         :param flow: A dictionary representing a BPMN flow element
         :return: An Elementtree Element representing the serialized BPMN flow element
         """
-        tag: str = self.__prefix_tag("sequenceFlow", self.bpmn_prefix)
+        tag: str = self.__prefix_tag(self.flow_type_map.get(flow.get("flowType")), self.bpmn_prefix)
         serialized_flow: ElementTree.Element = self.__serialize_base_element(flow, tag, connected_flows)
 
-        source_element: str = self.__prefix_id(flow.get("source").get("element"))
-        target_element: str = self.__prefix_id(flow.get("target").get("element"))
+        source_element: str = self.__shorten_id(flow.get("source").get("element"))
+        target_element: str = self.__shorten_id(flow.get("target").get("element"))
 
         serialized_flow.set("sourceRef", source_element)
         serialized_flow.set("targetRef", target_element)
@@ -360,7 +398,7 @@ class BPMNSerializer:
 
         if event_type_tag:
             event_type_element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.bpmn_prefix))
-            event_type_element.set("id", self.__prefix_id(str(uuid.uuid4())))
+            event_type_element.set("id", self.__shorten_id(str(uuid.uuid4())))
             serialized_intermediate_event.append(event_type_element)
 
         return serialized_intermediate_event
@@ -389,7 +427,7 @@ class BPMNSerializer:
 
         if event_type_tag:
             event_type_element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.bpmn_prefix))
-            event_type_element.set("id", self.__prefix_id(str(uuid.uuid4())))
+            event_type_element.set("id", self.__shorten_id(str(uuid.uuid4())))
             serialized_start_event.append(event_type_element)
 
         return serialized_start_event
@@ -411,7 +449,7 @@ class BPMNSerializer:
         :param swimlane: A dictionary representing a BPMN swimlane element
         :return: An Elementtree Element representing the serialized BPMN swimlane element
         """
-        tag: str = self.__prefix_tag("swimlane", self.bpmn_prefix)
+        tag: str = self.__prefix_tag("lane", self.bpmn_prefix)
         serialized_swimlane: ElementTree.Element = self.__serialize_base_element(swimlane, tag, connected_flows)
 
         return serialized_swimlane
@@ -486,7 +524,8 @@ class BPMNSerializer:
 
         tag: str = self.__prefix_tag("BPMNShape", self.bpmndi_prefix)
         serialized_shape: ElementTree.Element = ElementTree.Element(tag)
-        serialized_shape.set("bpmnElement", self.__prefix_id(element.get("id")))
+        serialized_shape.set("id", self.__shorten_id(str(uuid.uuid4())))
+        serialized_shape.set("bpmnElement", self.__shorten_id(element.get("id")))
 
         bounds: dict = element.get("bounds")
 
@@ -508,18 +547,20 @@ class BPMNSerializer:
         """
 
         tag: str = self.__prefix_tag("BPMNEdge", self.bpmndi_prefix)
-        serialized_shape: ElementTree.Element = ElementTree.Element(tag)
-        serialized_shape.set("bpmnElement", self.__prefix_id(relationship.get("id")))
+        serialized_edge: ElementTree.Element = ElementTree.Element(tag)
+        serialized_edge.set("id", self.__shorten_id(str(uuid.uuid4())))
+        serialized_edge.set("bpmnElement", self.__shorten_id(relationship.get("id")))
 
         for point in relationship.get("path"):
             serialized_waypoint: ElementTree.Element = ElementTree.Element("di:waypoint")
             serialized_waypoint.set("x", str(point.get("x")))
             serialized_waypoint.set("y", str(point.get("y")))
-            # serialized_shape.append(serialized_waypoint)
+            # serialized_edge.append(serialized_waypoint)
 
-        return serialized_shape
+        return serialized_edge
 
-    def __serialize_process(self, owned_elements: list[dict], relationships: list[dict]) -> ElementTree.Element:
+    def __serialize_process(self, pool: dict, owned_elements: list[dict],
+                            relationships: list[dict]) -> ElementTree.Element:
         """
         Serialize the process tree of a given BPMN model
         :param owned_elements: A dictionary containing the elements owned by serialized process
@@ -528,13 +569,11 @@ class BPMNSerializer:
         """
 
         process: ElementTree.Element = ElementTree.Element(self.__prefix_tag("process", self.bpmn_prefix))
-        process.set("id", self.__prefix_id(str(uuid.uuid4())))
+        process.set("id", self.__shorten_id(pool.get("id")))
         process.set("isExecutable", "false")
 
         elements_by_type: dict[str, dict] = {}
         elements_by_owner: dict[str, dict] = {}
-
-        serialized_relationships: list[ElementTree.Element] = []
 
         # We first gather all diagram elements and store them in index structures indexed
         # by the element type and by their owner
@@ -548,40 +587,33 @@ class BPMNSerializer:
             if element_type:
                 elements_by_type[element_type] = {
                     **elements_by_type.get(element_type, {}),
-                    self.__prefix_id(element.get("id")): serialized_element
+                    self.__shorten_id(element.get("id")): serialized_element
                 }
 
-            element_owner = self.__prefix_id(element.get("owner", ""))
+            element_owner = self.__shorten_id(element.get("owner", ""))
 
             if element_owner:
                 elements_by_owner[element_owner] = {
                     **elements_by_owner.get(element_owner, {}),
-                    self.__prefix_id(element.get("id")): serialized_element
+                    self.__shorten_id(element.get("id")): serialized_element
                 }
 
-        # We then gather all relationships
-        for relationship in relationships:
-            serialized_relationship = self.__serialize_flow(relationship)
-            serialized_relationships.append(serialized_relationship)
+        serialized_pool: ElementTree.Element = ElementTree.Element(self.__prefix_tag("laneSet", self.bpmn_prefix))
+        serialized_pool.set("id", self.__shorten_id(str(uuid.uuid4())))
+        serialized_pool.set("name", pool.get("name"))
 
-        # Iterate over all pool elements and insert the owned swimlanes
-        for serialized_pool in elements_by_type.get(BPMNElementType.BPMN_POOL, {}).values():
-            owned_serialized_elements = elements_by_owner[serialized_pool.get("id")].values()
+        owned_serialized_elements = chain.from_iterable([entry.values() for entry in elements_by_owner.values()])
 
-            for element in owned_serialized_elements:
-                if elements_by_type.get(BPMNElementType.BPMN_SWIMLANE).get(element.get("id")):
-                    # We know that the serialized element is a swimlane and therefore directly
-                    # serialize it
-                    serialized_pool.append(element)
-                else:
-                    # We know that the serialized element is noz swimlane and therefore insert
-                    # a flow node ref for it
-                    tag: str = self.__prefix_tag("flowNodeRef", self.bpmn_prefix)
-                    flow_node_ref = ElementTree.Element(tag)
-                    flow_node_ref.text = element.get("id")
-                    serialized_pool.append(flow_node_ref)
+        for element in owned_serialized_elements:
 
-            process.append(serialized_pool)
+            swimlanes = elements_by_type.get(BPMNElementType.BPMN_SWIMLANE)
+
+            if swimlanes and swimlanes.get(element.get("id")):
+                # We know that the serialized element is a swimlane and therefore directly
+                # serialize it
+                serialized_pool.append(element)
+
+        process.append(serialized_pool)
 
         # Iterate over all swimlanes and add flowNodeRefs for all elements within the current lane
         for serialized_swimlane in elements_by_type.get(BPMNElementType.BPMN_SWIMLANE, {}).values():
@@ -592,17 +624,13 @@ class BPMNSerializer:
                 flow_node_ref.text = serialized_element.get("id")
                 serialized_swimlane.append(flow_node_ref)
 
+            serialized_pool.append(serialized_swimlane)
+
         # We get the dictionary of elements without pools and swimlanes
-        non_bounding_elements = self.__omit_keys(elements_by_type, [
-            BPMNElementType.BPMN_POOL,
-            BPMNElementType.BPMN_SWIMLANE
-        ])
+        non_bounding_elements = self.__omit_keys(elements_by_type, [BPMNElementType.BPMN_SWIMLANE])
 
         for serialized_element in chain.from_iterable([entry.values() for entry in non_bounding_elements.values()]):
             process.append(serialized_element)
-
-        for relationship in serialized_relationships:
-            process.append(relationship)
 
         return process
 
@@ -614,12 +642,14 @@ class BPMNSerializer:
         """
 
         plane: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNPlane", self.bpmndi_prefix))
-        plane.set("id", self.__prefix_id(str(uuid.uuid4())))
-        plane.set("bpmnElement", "Minimal")
+        plane.set("id", self.__shorten_id(str(uuid.uuid4())))
 
         for element in model.get("elements").values():
-            serialized_shape: ElementTree.Element = self.__serialize_shape(element)
-            plane.append(serialized_shape)
+            # We do not serialize BPMN pools directly as they are serialized based on participants
+            # later in the process
+            if element.get("type") != BPMNElementType.BPMN_POOL:
+                serialized_shape: ElementTree.Element = self.__serialize_shape(element)
+                plane.append(serialized_shape)
 
         for relationship in model.get("relationships").values():
             serialized_edge: ElementTree.Element = self.__serialize_edge(relationship)
@@ -643,7 +673,7 @@ class BPMNSerializer:
 
         unowned_elements = []
 
-        for element in elements:
+        for element in elements.values():
             if not element.get("type") == BPMNElementType.BPMN_POOL:
                 owner = self.__find_root_owner_id(elements, element.get("id"))
 
@@ -651,7 +681,7 @@ class BPMNSerializer:
                 # the element is not contained in a pool. If the owner is not a key in the
                 # elementy_by_owning_pool dictionary, we assume that the element is owned by
                 # another container like a group that is not located within a pool.
-                if owner == element.get("id") or not elements_by_owning_pool.get(owner, None):
+                if owner == element.get("id") or elements_by_owning_pool.get(owner, None) is None:
                     unowned_elements.append(element)
                 else:
                     elements_by_owning_pool[owner].append(element)
@@ -667,10 +697,11 @@ class BPMNSerializer:
 
         return self.__find_root_owner_id(elements, owner_id)
 
-    def serialize(self, model: dict) -> ElementTree.Element:
+    def serialize(self, model: dict, omit_layout_info: bool = False) -> ElementTree.Element:
         """
         Serialize a BPMN diagram in Apollon's native JSON format to XML according to the BPMN 2.0 standard
         :param model: A dictionary representing a BPMN diagram model
+        :param omit_layout_info: Indicates whether layouting information should be included in the diagram
         :return: An Elementtree Element representing the serialized BPMN diagram
         """
 
@@ -684,19 +715,57 @@ class BPMNSerializer:
         definitions.set(f"xmlns:{self.di_prefix}", "http://www.omg.org/spec/DD/20100524/DI")
         definitions.set("targetNamespace", "http://bpmn.io/schema/bpmn")
 
+        diagram: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNDiagram", self.bpmndi_prefix))
+        serialized_plane = self.__serialize_plane(model)
+        diagram.append(serialized_plane)
+
         elements_by_owning_pool, unowned_elements = self.__split_elements_by_owning_pool(model.get("elements", {}))
 
         relationships: list[dict] = list(model.get("relationships", {}).values())
 
-        for owner in elements_by_owning_pool:
-            serialized_process = self.__serialize_process(elements_by_owning_pool.get(owner), relationships)
-            definitions.append(serialized_process)
+        # At the moment, this only supports diagrams that contain pools which should be fine for the time being
+        if len(elements_by_owning_pool.keys()) > 0:
 
-        diagram: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNDiagram", self.bpmndi_prefix))
-        serialized_plane = self.__serialize_plane(model)
-        serialized_plane.set("bpmnElement", serialized_process.get("id"))
-        diagram.append(serialized_plane)
-        definitions.append(diagram)
+            collaboration: ElementTree.Element = ElementTree.Element(
+                self.__prefix_tag("collaboration", self.bpmn_prefix))
+            collaboration.set("id", self.__shorten_id(str(uuid.uuid4())))
+            definitions.append(collaboration)
+
+            for index, pool_id in enumerate(elements_by_owning_pool):
+
+                pool: dict = model.get("elements").get(pool_id)
+                serialized_process = self.__serialize_process(pool, elements_by_owning_pool.get(pool_id), relationships)
+                definitions.append(serialized_process)
+
+                # We append all flows to the first process as the flows coming from the Apollon
+                # diagrams do not have owners assigned.
+                if index == 0:
+                    for relationship in relationships:
+                        serialized_relationship = self.__serialize_flow(relationship)
+
+                        match relationship.get("flowType"):
+                            case BPMNFlowType.SEQUENCE:
+                                serialized_process.append(serialized_relationship)
+                            case BPMNFlowType.MESSAGE:
+                                collaboration.append(serialized_relationship)
+
+                participant: ElementTree.Element = ElementTree.Element(
+                    self.__prefix_tag("participant", self.bpmn_prefix))
+                participant_id: str = self.__shorten_id(str(uuid.uuid4()))
+                participant.set("id", participant_id)
+                participant.set("processRef", self.__shorten_id(pool_id))
+                participant.set("name", pool.get("name"))
+                collaboration.append(participant)
+
+                pool_shape = self.__serialize_shape(pool)
+                pool_shape.set("bpmnElement", participant_id)
+                pool_shape.set("isHorizontal", "true")
+                serialized_plane.append(pool_shape)
+
+            serialized_plane.set("bpmnElement", collaboration.get("id"))
+
+        if not omit_layout_info:
+            definitions.append(diagram)
 
         return definitions
 
@@ -1631,13 +1700,7 @@ if __name__ == "__main__":
         }
     """)
 
-    model2 = json.loads(
-        """{"version":"3.0.0","type":"BPMN","size":{"width":920,"height":440},"interactive":{"elements":{},"relationships":{}},"elements":{"b83370ae-4c60-48de-b2e7-b472c100e500":{"id":"b83370ae-4c60-48de-b2e7-b472c100e500","name":"Order Received","type":"BPMNStartEvent","owner":null,"bounds":{"x":0,"y":0,"width":40,"height":40},"eventType":"message"},"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c":{"id":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c","name":"Bake Pizza","type":"BPMNTask","owner":null,"bounds":{"x":90,"y":0,"width":130,"height":40},"taskType":"default","marker":"none"},"001ff705-6703-49f4-ab68-e79a066596b8":{"id":"001ff705-6703-49f4-ab68-e79a066596b8","name":"Deliver Pizza","type":"BPMNTask","owner":null,"bounds":{"x":270,"y":0,"width":160,"height":40},"taskType":"default","marker":"none"},"561c077d-b2e0-4788-8436-278ee6b50adb":{"id":"561c077d-b2e0-4788-8436-278ee6b50adb","name":"","type":"BPMNEndEvent","owner":null,"bounds":{"x":480,"y":0,"width":40,"height":40},"eventType":"default"}},"relationships":{"22cbf288-11a6-462f-9540-c3d38b6dcfa8":{"id":"22cbf288-11a6-462f-9540-c3d38b6dcfa8","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":40,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"b83370ae-4c60-48de-b2e7-b472c100e500"},"target":{"direction":"Left","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"isManuallyLayouted":false,"flowType":"sequence"},"c0fcff31-a656-4d2a-8bd9-5ef6bec80646":{"id":"c0fcff31-a656-4d2a-8bd9-5ef6bec80646","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":220,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"8fd5fbe0-f81d-457a-b7f6-c009e8fc394c"},"target":{"direction":"Left","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"isManuallyLayouted":false,"flowType":"sequence"},"335069fe-4456-40df-bfc5-f1e1379e4010":{"id":"335069fe-4456-40df-bfc5-f1e1379e4010","name":"","type":"BPMNFlow","owner":null,"bounds":{"x":430,"y":20,"width":50,"height":1},"path":[{"x":0,"y":0},{"x":50,"y":0}],"source":{"direction":"Right","element":"001ff705-6703-49f4-ab68-e79a066596b8"},"target":{"direction":"Left","element":"561c077d-b2e0-4788-8436-278ee6b50adb"},"isManuallyLayouted":false,"flowType":"sequence"}},"assessments":{}}""")
-
     bpmn_serializer = BPMNSerializer()
-
-    serialized_model = bpmn_serializer.serialize(model2)
-    ElementTree.indent(serialized_model, space="\t", level=0)
 
     print(minidom.parseString(
         ElementTree.tostring(bpmn_serializer.serialize(model), encoding='utf8', xml_declaration=True)).toprettyxml(
