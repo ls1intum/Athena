@@ -11,6 +11,12 @@ class DiagramModelSerializer:
 
     @staticmethod
     def serialize_model(model: dict) -> str:
+        """
+        Serialize a given Apollon diagram model to string. At the moment, this method returns a native JSON
+        serialization of the diagram for all diagram types other than BPMN diagrams. This diagram type is serialized in
+        the BPMN 2.0 XML format as this format is following an official standard and therefore well understood by most
+        LLMs.
+        """
         match model.get("type"):
             case DiagramType.CLASS_DIAGRAM:
                 # TODO: Evaluate if there is a more sensible serialization format for this diagram type
@@ -50,13 +56,3 @@ class DiagramModelSerializer:
                 serialized_model: str = ElementTree.tostring(serializer.serialize(model, omit_layout_info=True), encoding='utf8')
                 # The next line is only required to "pretty-print" the XML output for easier debugging
                 return minidom.parseString(serialized_model).toprettyxml(indent="\t")
-
-    @staticmethod
-    def serialize_model_from_submission(submission: Submission) -> str:
-        model: dict = json.loads(submission.model)
-        return DiagramModelSerializer.serialize_model(model)
-
-    @staticmethod
-    def serialize_model_from_string(model_string: str) -> str:
-        model: dict = json.loads(model_string)
-        return DiagramModelSerializer.serialize_model(model)
