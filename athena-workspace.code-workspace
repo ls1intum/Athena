@@ -27,6 +27,11 @@
 		{
 			"path": "module_programming_themisml"
 		},
+		{
+            "path": "module_programming_ast"
+		},
+			"path": "module_programming_code_embedding"
+		},
 	],
 	"settings": {
 		"python.linting.prospectorEnabled": true,
