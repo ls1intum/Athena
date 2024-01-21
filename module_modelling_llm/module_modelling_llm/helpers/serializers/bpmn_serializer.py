@@ -3,6 +3,7 @@ from xml.etree import ElementTree
 from enum import Enum
 from functools import reduce
 from itertools import chain
+from typing import Optional
 
 DEFAULT_XSI_PREFIX = "xsi"
 DEFAULT_BPMN_PREFIX = "bpmn"
@@ -32,7 +33,7 @@ class BPMNElementType(str, Enum):
 
 
 class BPMNFlowType(str, Enum):
-    SEQUENCE = "sequence",
+    SEQUENCE = "sequence"
     MESSAGE = "message"
 
 
@@ -219,7 +220,7 @@ class BPMNSerializer:
         """
         return f"{prefix}:{tag}"
 
-    def __shorten_id(self, element_id: str, prefix: str = None) -> str:
+    def __shorten_id(self, element_id: str, prefix: Optional[str] = None) -> str:
         """
         Prefix an element id with a given prefix.
         If no prefix is provided, 'bpmn' is used as default.
@@ -251,7 +252,7 @@ class BPMNSerializer:
             "element") == element_id, flows))
 
     def __serialize_base_element(self, element: dict, tag: str,
-                                 connected_flows: list[dict] = None) -> ElementTree.Element:
+                                 connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN flow to XML
         :param element: A dictionary representing a BPMN flow element
@@ -281,7 +282,7 @@ class BPMNSerializer:
 
         return serialized_element
 
-    def __serialize_annotation(self, annotation: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_annotation(self, annotation: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN annotation object to XML
         :param annotation: A dictionary representing a BPMN annotation element
@@ -293,7 +294,7 @@ class BPMNSerializer:
 
         return serialized_annotation
 
-    def __serialize_call_activity(self, call_activity: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_call_activity(self, call_activity: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize an BPMN call activity to XML
         :param call_activity: A dictionary representing an BPMN call activity element
@@ -305,7 +306,7 @@ class BPMNSerializer:
 
         return serialized_call_activity
 
-    def __serialize_data_object(self, data_object: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_data_object(self, data_object: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN data object to XML
         :param data_object: A dictionary representing a BPMN data object element
@@ -316,7 +317,7 @@ class BPMNSerializer:
 
         return serialized_data_object
 
-    def __serialize_data_store(self, data_store: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_data_store(self, data_store: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN data store object to XML
         :param data_store: A dictionary representing a BPMN data store element
@@ -327,7 +328,7 @@ class BPMNSerializer:
 
         return serialized_data_store
 
-    def __serialize_end_event(self, end_event: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_end_event(self, end_event: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN end event object to XML
         :param end_event: A dictionary representing a BPMN end event element
@@ -346,7 +347,7 @@ class BPMNSerializer:
 
         return serialized_end_event
 
-    def __serialize_flow(self, flow: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_flow(self, flow: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN flow to XML
         :param flow: A dictionary representing a BPMN flow element
@@ -363,7 +364,7 @@ class BPMNSerializer:
 
         return serialized_flow
 
-    def __serialize_gateway(self, gateway: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_gateway(self, gateway: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN gateway object to XML
         :param gateway: A dictionary representing a BPMN gateway element
@@ -375,7 +376,7 @@ class BPMNSerializer:
 
         return serialized_gateway
 
-    def __serialize_group(self, group: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_group(self, group: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN group to XML
         :param group: A dictionary representing a BPMN group element
@@ -387,7 +388,7 @@ class BPMNSerializer:
         return serialized_group
 
     def __serialize_intermediate_event(self, intermediate_event: dict,
-                                       connected_flows: list[dict] = None) -> ElementTree.Element:
+                                       connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN intermediate event to XML
         :param intermediate_event: A dictionary representing a BPMN intermediate event element
@@ -407,7 +408,7 @@ class BPMNSerializer:
 
         return serialized_intermediate_event
 
-    def __serialize_pool(self, pool: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_pool(self, pool: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN pool to XML
         :param pool: A dictionary representing a BPMN pool element
@@ -418,7 +419,7 @@ class BPMNSerializer:
 
         return serialized_pool
 
-    def __serialize_start_event(self, start_event: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_start_event(self, start_event: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN start event to XML
         :param start_event: A dictionary representing a BPMN start event element
@@ -436,7 +437,7 @@ class BPMNSerializer:
 
         return serialized_start_event
 
-    def __serialize_subprocess(self, subprocess: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_subprocess(self, subprocess: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN subprocess to XML
         :param subprocess: A dictionary representing a BPMN subprocess element
@@ -447,7 +448,7 @@ class BPMNSerializer:
 
         return serialized_subprocess
 
-    def __serialize_swimlane(self, swimlane: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_swimlane(self, swimlane: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN swimlane to XML
         :param swimlane: A dictionary representing a BPMN swimlane element
@@ -458,7 +459,7 @@ class BPMNSerializer:
 
         return serialized_swimlane
 
-    def __serialize_task(self, task: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_task(self, task: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN task to XML
         :param task: A dictionary representing a BPMN task element
@@ -469,7 +470,7 @@ class BPMNSerializer:
 
         return serialized_task
 
-    def __serialize_transaction(self, transaction: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_transaction(self, transaction: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN transaction to XML
         :param transaction: A dictionary representing a BPMN transaction element
@@ -480,7 +481,7 @@ class BPMNSerializer:
 
         return serialized_transaction
 
-    def __serialize_element(self, element: dict, connected_flows: list[dict] = None) -> ElementTree.Element:
+    def __serialize_element(self, element: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
         """
         Serialize a BPMN element to XML
 
