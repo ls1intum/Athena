@@ -7,7 +7,6 @@ dist
 data/*
 !data/.gitkeep
 .idea/*
-module_text_llm/.env
 !.idea/runConfigurations/
 .env
 **/.env

@@ -41,7 +41,7 @@ class AssessmentModel(BaseModel):
 
 
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> \
-List[Feedback]:
+        List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     serialized_example_solution = None
