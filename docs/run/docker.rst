@@ -9,7 +9,7 @@ Build and start with local images
 
         docker-compose up --build
 
-The assessment module manager API will be available at http://localhost:5100.
+The assessment module manager API will be available at http://localhost:5000.
 
 Start with remote images
 

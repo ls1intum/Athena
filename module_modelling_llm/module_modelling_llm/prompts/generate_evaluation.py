@@ -10,7 +10,6 @@ Our goal is to reduce the workload of tutors and reduce their cognitive load. \
 Reject feedback that is not useful and would burden the tutor.
 
 Put the focus on the description of the feedback, the title is optional. \
-The `line_start` and `line_end` should make sense with respect to the submission but do not need to be exact. \
 Credits should make sense with respect to the feedback and the submission but also do not need to be exact.
 
 # Submission (with sentence numbers <number>: <sentence>):
