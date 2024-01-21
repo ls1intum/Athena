@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 from xml.etree import ElementTree
 from xml.dom import minidom
 
@@ -9,7 +10,7 @@ from module_modelling_llm.helpers.serializers.bpmn_serializer import BPMNSeriali
 class DiagramModelSerializer:
 
     @staticmethod
-    def serialize_model(model: dict) -> str:
+    def serialize_model(model: dict) -> Optional[str]:
         """
         Serialize a given Apollon diagram model to string. At the moment, this method returns a native JSON
         serialization of the diagram for all diagram types other than BPMN diagrams. This diagram type is serialized in
@@ -56,3 +57,5 @@ class DiagramModelSerializer:
                                                              encoding='utf8')
                 # The next line is only required to "pretty-print" the XML output for easier debugging
                 return minidom.parseString(serialized_model).toprettyxml(indent="\t")
+
+        return None

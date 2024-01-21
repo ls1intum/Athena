@@ -602,30 +602,30 @@ class BPMNSerializer:
         process.set("id", self.__shorten_id(pool.get("id") or ""))
         process.set("isExecutable", "false")
 
-        elements_by_type: dict[str, dict] = {}
-        elements_by_owner: dict[str, dict] = {}
+        serialized_elements_by_type: dict[str, dict] = {}
+        serialized_elements_by_owner: dict[str, dict] = {}
 
         # We first gather all diagram elements and store them in index structures indexed
         # by the element type and by their owner
         for element in owned_elements:
             connected_flows = self.__get_flows_connected_to_element(relationships, element.get("id") or "")
 
-            serialized_element = self.__serialize_element(element, connected_flows)
+            serialized_element: Optional[ElementTree.Element] = self.__serialize_element(element, connected_flows)
 
             element_type = element.get("type", "")
 
             if serialized_element:
                 if element_type:
-                    elements_by_type[element_type] = {
-                        **elements_by_type.get(element_type, {}),
+                    serialized_elements_by_type[element_type] = {
+                        **serialized_elements_by_type.get(element_type, {}),
                         self.__shorten_id(element.get("id") or ""): serialized_element
                     }
 
-                element_owner = self.__shorten_id(serialized_element.get("owner"))
+                element_owner = self.__shorten_id(serialized_element.get("owner") or "")
 
                 if element_owner:
-                    elements_by_owner[element_owner] = {
-                        **elements_by_owner.get(element_owner, {}),
+                    serialized_elements_by_owner[element_owner] = {
+                        **serialized_elements_by_owner.get(element_owner, {}),
                         self.__shorten_id(serialized_element.get("id") or ""): serialized_element
                     }
 
@@ -633,11 +633,11 @@ class BPMNSerializer:
         serialized_pool.set("id", self.__shorten_id(str(uuid.uuid4())))
         serialized_pool.set("name", pool.get("name") or "")
 
-        owned_serialized_elements: list[ElementTree.Element] = chain.from_iterable([entry.values() for entry in elements_by_owner.values()])
+        owned_serialized_elements: list[ElementTree.Element] = list(chain.from_iterable([entry.values() for entry in serialized_elements_by_owner.values()]))
 
         for serialized_element in owned_serialized_elements:
 
-            swimlanes = elements_by_type.get(BPMNElementType.BPMN_SWIMLANE)
+            swimlanes = serialized_elements_by_type.get(BPMNElementType.BPMN_SWIMLANE)
 
             if swimlanes and swimlanes.get(serialized_element.get("id") or ""):
                 # We know that the serialized element is a swimlane and therefore directly
@@ -647,8 +647,8 @@ class BPMNSerializer:
         process.append(serialized_pool)
 
         # Iterate over all swimlanes and add flowNodeRefs for all elements within the current lane
-        for serialized_swimlane in elements_by_type.get(BPMNElementType.BPMN_SWIMLANE, {}).values():
-            owned_serialized_elements = list(elements_by_owner[serialized_swimlane.get("id") or ""].values())
+        for serialized_swimlane in serialized_elements_by_type.get(BPMNElementType.BPMN_SWIMLANE, {}).values():
+            owned_serialized_elements: list[ElementTree.Element] = list(serialized_elements_by_owner[serialized_swimlane.get("id") or ""].values())
             for serialized_element in owned_serialized_elements:
                 tag: str = self.__prefix_tag("flowNodeRef", self.__bpmn_prefix)
                 flow_node_ref = ElementTree.Element(tag)
@@ -658,7 +658,7 @@ class BPMNSerializer:
             serialized_pool.append(serialized_swimlane)
 
         # We get the dictionary of elements without pools and swimlanes
-        non_bounding_elements = self.__omit_keys(elements_by_type, [BPMNElementType.BPMN_SWIMLANE])
+        non_bounding_elements = self.__omit_keys(serialized_elements_by_type, [BPMNElementType.BPMN_SWIMLANE])
 
         for serialized_element in chain.from_iterable([entry.values() for entry in non_bounding_elements.values()]):
             process.append(serialized_element)
@@ -738,7 +738,7 @@ class BPMNSerializer:
 
         if current_element:
             owner_id: Optional[str] = current_element.get("owner")
-            
+
             if owner_id:
                 return self.__find_root_owner_id(elements, owner_id)
 
