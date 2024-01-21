@@ -252,7 +252,7 @@ class BPMNSerializer:
             source = flow.get("source")
             target = flow.get("target")
 
-            if not flow or not target:
+            if not source or not target:
                 return False
 
             return source.get("element") == element_id or target.get("element") == element_id
@@ -352,7 +352,7 @@ class BPMNSerializer:
         tag: str = self.__prefix_tag("endEvent", self.__bpmn_prefix)
         serialized_end_event: ElementTree.Element = self.__serialize_base_element(end_event, tag, connected_flows)
 
-        event_type_tag: str = self.__start_event_definition_map[end_event.get("eventType") or ""]
+        event_type_tag: Optional[str] = self.__start_event_definition_map[end_event.get("eventType") or BPMNEndEventType.DEFAULT]
 
         if event_type_tag:
             event_type_element: ElementTree.Element = ElementTree.Element(
@@ -368,18 +368,18 @@ class BPMNSerializer:
         :param flow: A dictionary representing a BPMN flow element
         :return: An Elementtree Element representing the serialized BPMN flow element
         """
-        tag: str = self.__prefix_tag(self.__flow_type_map.get(flow.get("flowType") or ""), self.__bpmn_prefix)
+        tag: str = self.__prefix_tag(self.__flow_type_map.get(flow.get("flowType") or BPMNFlowType.SEQUENCE) or "", self.__bpmn_prefix)
         serialized_flow: ElementTree.Element = self.__serialize_base_element(flow, tag, connected_flows)
 
-        source = flow.get("source", None)
-        target = flow.get("target", None)
+        source: Optional[dict] = flow.get("source")
+        target: Optional[dict] = flow.get("target")
 
         if source:
-            source_element: str = self.__shorten_id(flow.get("source").get("element") or "")
+            source_element: str = self.__shorten_id(source.get("element") or "")
             serialized_flow.set("sourceRef", source_element)
 
         if target:
-            target_element: str = self.__shorten_id(flow.get("target").get("element") or "")
+            target_element: str = self.__shorten_id(target.get("element") or "")
             serialized_flow.set("targetRef", target_element)
 
         return serialized_flow
@@ -390,7 +390,7 @@ class BPMNSerializer:
         :param gateway: A dictionary representing a BPMN gateway element
         :return: An Elementtree Element representing the serialized BPMN gateway element
         """
-        gateway_type_tag: str = self.__prefix_tag(self.__gateway_type_map[gateway.get("gatewayType") or ""],
+        gateway_type_tag: str = self.__prefix_tag(self.__gateway_type_map[gateway.get("gatewayType") or BPMNGatewayType.EXCLUSIVE],
                                                   self.__bpmn_prefix)
         serialized_gateway = self.__serialize_base_element(gateway, gateway_type_tag, connected_flows)
 
@@ -414,12 +414,12 @@ class BPMNSerializer:
         :param intermediate_event: A dictionary representing a BPMN intermediate event element
         :return: An Elementtree Element representing the serialized BPMN intermediate event element
         """
-        tag: str = self.__prefix_tag(self.__intermediate_event_type_map[intermediate_event.get("eventType") or ""],
+        tag: str = self.__prefix_tag(self.__intermediate_event_type_map[intermediate_event.get("eventType") or BPMNIntermediateEventType.DEFAULT],
                                      self.__bpmn_prefix)
         serialized_intermediate_event: ElementTree.Element = self.__serialize_base_element(intermediate_event, tag,
                                                                                            connected_flows)
 
-        event_type_tag: str = self.__intermediate_event_definition_map[intermediate_event.get("eventType") or ""]
+        event_type_tag: Optional[str] = self.__intermediate_event_definition_map[intermediate_event.get("eventType") or BPMNIntermediateEventType.DEFAULT]
 
         if event_type_tag:
             event_type_element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.__bpmn_prefix))
@@ -449,7 +449,7 @@ class BPMNSerializer:
         tag: str = self.__prefix_tag("startEvent", self.__bpmn_prefix)
         serialized_start_event: ElementTree.Element = self.__serialize_base_element(start_event, tag, connected_flows)
 
-        event_type_tag: str = self.__start_event_definition_map[start_event.get("eventType") or ""]
+        event_type_tag: Optional[str] = self.__start_event_definition_map[start_event.get("eventType") or BPMNStartEventType.DEFAULT]
 
         if event_type_tag:
             event_type_element = ElementTree.Element(self.__prefix_tag(event_type_tag, self.__bpmn_prefix))
@@ -487,7 +487,7 @@ class BPMNSerializer:
         :param task: A dictionary representing a BPMN task element
         :return: An Elementtree Element representing the serialized BPMN task element
         """
-        task_tag: str = self.__prefix_tag(self.__task_type_map[task.get("taskType") or ""], self.__bpmn_prefix)
+        task_tag: str = self.__prefix_tag(self.__task_type_map[task.get("taskType") or BPMNTaskType.DEFAULT], self.__bpmn_prefix)
         serialized_task: ElementTree.Element = self.__serialize_base_element(task, task_tag, connected_flows)
 
         return serialized_task
@@ -504,7 +504,7 @@ class BPMNSerializer:
 
         return serialized_transaction
 
-    def __serialize_element(self, element: dict, connected_flows: Optional[list[dict]] = None) -> ElementTree.Element:
+    def __serialize_element(self, element: dict, connected_flows: Optional[list[dict]] = None) -> Optional[ElementTree.Element]:
         """
         Serialize a BPMN element to XML
 
@@ -543,6 +543,8 @@ class BPMNSerializer:
             case BPMNElementType.BPMN_TRANSACTION:
                 return self.__serialize_transaction(element, connected_flows)
 
+        return None
+
     def __serialize_shape(self, element: dict) -> ElementTree.Element:
         """
         Serialize a BPMN element to a shape
@@ -555,7 +557,7 @@ class BPMNSerializer:
         serialized_shape.set("id", self.__shorten_id(str(uuid.uuid4())))
         serialized_shape.set("bpmnElement", self.__shorten_id(element.get("id") or ""))
 
-        bounds: dict | None = element.get("bounds")
+        bounds: Optional[dict] = element.get("bounds")
 
         if bounds:
             serialized_bounds = ElementTree.Element("dc:Bounds")
@@ -579,7 +581,7 @@ class BPMNSerializer:
         serialized_edge.set("id", self.__shorten_id(str(uuid.uuid4())))
         serialized_edge.set("bpmnElement", self.__shorten_id(relationship.get("id") or ""))
 
-        for point in relationship.get("path"):
+        for point in relationship.get("path") or []:
             serialized_waypoint: ElementTree.Element = ElementTree.Element(self.__prefix_tag("waypoint", self.__di_prefix))
             serialized_waypoint.set("x", str(point.get("x") or ""))
             serialized_waypoint.set("y", str(point.get("y") or ""))
@@ -597,7 +599,7 @@ class BPMNSerializer:
         """
 
         process: ElementTree.Element = ElementTree.Element(self.__prefix_tag("process", self.__bpmn_prefix))
-        process.set("id", self.__shorten_id(pool.get("id")))
+        process.set("id", self.__shorten_id(pool.get("id") or ""))
         process.set("isExecutable", "false")
 
         elements_by_type: dict[str, dict] = {}
@@ -605,48 +607,48 @@ class BPMNSerializer:
 
         # We first gather all diagram elements and store them in index structures indexed
         # by the element type and by their owner
-        for element in owned_elements:
-            connected_flows = self.__get_flows_connected_to_element(relationships, element.get("id"))
+        for serialized_element in owned_elements:
+            connected_flows = self.__get_flows_connected_to_element(relationships, serialized_element.get("id") or "")
 
-            serialized_element = self.__serialize_element(element, connected_flows)
+            serialized_element = self.__serialize_element(serialized_element, connected_flows)
 
-            element_type = element.get("type", "")
+            element_type = serialized_element.get("type", "")
 
-            if element_type:
+            if serialized_element and element_type:
                 elements_by_type[element_type] = {
                     **elements_by_type.get(element_type, {}),
-                    self.__shorten_id(element.get("id")): serialized_element
+                    self.__shorten_id(serialized_element.get("id") or ""): serialized_element
                 }
 
-            element_owner = self.__shorten_id(element.get("owner", ""))
+            element_owner = self.__shorten_id(serialized_element.get("owner", ""))
 
             if element_owner:
                 elements_by_owner[element_owner] = {
                     **elements_by_owner.get(element_owner, {}),
-                    self.__shorten_id(element.get("id")): serialized_element
+                    self.__shorten_id(serialized_element.get("id") or ""): serialized_element
                 }
 
         serialized_pool: ElementTree.Element = ElementTree.Element(self.__prefix_tag("laneSet", self.__bpmn_prefix))
         serialized_pool.set("id", self.__shorten_id(str(uuid.uuid4())))
         serialized_pool.set("name", pool.get("name") or "")
 
-        owned_serialized_elements = chain.from_iterable([entry.values() for entry in elements_by_owner.values()])
+        owned_serialized_elements: list[ElementTree] = chain.from_iterable([entry.values() for entry in elements_by_owner.values()])
 
-        for element in owned_serialized_elements:
+        for serialized_element in owned_serialized_elements:
 
             swimlanes = elements_by_type.get(BPMNElementType.BPMN_SWIMLANE)
 
-            if swimlanes and swimlanes.get(element.get("id")):
+            if swimlanes and swimlanes.get(serialized_element.get("id") or ""):
                 # We know that the serialized element is a swimlane and therefore directly
                 # serialize it
-                serialized_pool.append(element)
+                serialized_pool.append(serialized_element)
 
         process.append(serialized_pool)
 
         # Iterate over all swimlanes and add flowNodeRefs for all elements within the current lane
         for serialized_swimlane in elements_by_type.get(BPMNElementType.BPMN_SWIMLANE, {}).values():
-            owned_serialized_elements = elements_by_owner[serialized_swimlane.get("id")]
-            for serialized_element in owned_serialized_elements.values():
+            owned_serialized_elements = list(elements_by_owner[serialized_swimlane.get("id") or ""].values())
+            for serialized_element in owned_serialized_elements:
                 tag: str = self.__prefix_tag("flowNodeRef", self.__bpmn_prefix)
                 flow_node_ref = ElementTree.Element(tag)
                 flow_node_ref.text = serialized_element.get("id")
