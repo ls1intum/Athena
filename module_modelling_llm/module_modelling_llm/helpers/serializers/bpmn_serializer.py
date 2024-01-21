@@ -352,7 +352,7 @@ class BPMNSerializer:
         tag: str = self.__prefix_tag("endEvent", self.__bpmn_prefix)
         serialized_end_event: ElementTree.Element = self.__serialize_base_element(end_event, tag, connected_flows)
 
-        event_type_tag: Optional[str] = self.__start_event_definition_map[end_event.get("eventType") or BPMNEndEventType.DEFAULT]
+        event_type_tag: Optional[str] = self.__end_event_definition_map[end_event.get("eventType") or BPMNEndEventType.DEFAULT]
 
         if event_type_tag:
             event_type_element: ElementTree.Element = ElementTree.Element(
@@ -607,17 +607,17 @@ class BPMNSerializer:
 
         # We first gather all diagram elements and store them in index structures indexed
         # by the element type and by their owner
-        for serialized_element in owned_elements:
-            connected_flows = self.__get_flows_connected_to_element(relationships, serialized_element.get("id") or "")
+        for element in owned_elements:
+            connected_flows = self.__get_flows_connected_to_element(relationships, element.get("id") or "")
 
-            serialized_element = self.__serialize_element(serialized_element, connected_flows)
+            serialized_element = self.__serialize_element(element, connected_flows)
 
-            element_type = serialized_element.get("type", "")
+            element_type = element.get("type", "")
 
             if serialized_element and element_type:
                 elements_by_type[element_type] = {
                     **elements_by_type.get(element_type, {}),
-                    self.__shorten_id(serialized_element.get("id") or ""): serialized_element
+                    self.__shorten_id(element.get("id") or ""): serialized_element
                 }
 
             element_owner = self.__shorten_id(serialized_element.get("owner", ""))
@@ -632,7 +632,7 @@ class BPMNSerializer:
         serialized_pool.set("id", self.__shorten_id(str(uuid.uuid4())))
         serialized_pool.set("name", pool.get("name") or "")
 
-        owned_serialized_elements: list[ElementTree] = chain.from_iterable([entry.values() for entry in elements_by_owner.values()])
+        owned_serialized_elements: list[ElementTree.Element] = chain.from_iterable([entry.values() for entry in elements_by_owner.values()])
 
         for serialized_element in owned_serialized_elements:
 
@@ -674,14 +674,14 @@ class BPMNSerializer:
         plane: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNPlane", self.__bpmndi_prefix))
         plane.set("id", self.__shorten_id(str(uuid.uuid4())))
 
-        for element in model.get("elements").values():
+        for element in (model.get("elements") or {}).values():
             # We do not serialize BPMN pools directly as they are serialized based on participants
             # later in the process
             if element.get("type") != BPMNElementType.BPMN_POOL:
                 serialized_shape: ElementTree.Element = self.__serialize_shape(element)
                 plane.append(serialized_shape)
 
-        for relationship in model.get("relationships").values():
+        for relationship in (model.get("relationships") or {}).values():
             serialized_edge: ElementTree.Element = self.__serialize_edge(relationship)
             plane.append(serialized_edge)
 
@@ -696,7 +696,7 @@ class BPMNSerializer:
         :return: A tuple containing the dictionary of elements by owning pools and a list
         containing the elements without an owner.
         """
-        elements_by_owning_pool = reduce(lambda acc, element: {
+        elements_by_owning_pool: dict[str, list] = reduce(lambda acc, element: {
             **acc,
             (element.get("id") or ""): []
         } if element.get("type") == BPMNElementType.BPMN_POOL else acc, elements.values(), {})
@@ -727,7 +727,13 @@ class BPMNSerializer:
         :param current_id: The element of the element whose root owner should be determined
         :return: The id of the root owner of the given current_id
         """
-        owner_id = elements.get(current_id).get("owner")
+
+        current_element = elements.get(current_id)
+
+        if not current_element:
+            return current_id
+
+        owner_id = current_element.get("owner")
 
         if not owner_id:
             return current_id
@@ -771,7 +777,7 @@ class BPMNSerializer:
             for index, pool_id in enumerate(elements_by_owning_pool):
 
                 pool: dict = model.get("elements").get(pool_id)
-                serialized_process = self.__serialize_process(pool, elements_by_owning_pool.get(pool_id), relationships)
+                serialized_process = self.__serialize_process(pool, elements_by_owning_pool.get(pool_id) or {}, relationships)
                 definitions.append(serialized_process)
 
                 # We append all flows to the first process as the flows coming from the Apollon
