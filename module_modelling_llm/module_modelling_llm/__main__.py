@@ -4,14 +4,14 @@ from typing import List, Any
 import nltk
 import tiktoken
 
-from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider, evaluation_provider
-from athena.modelling import Exercise, Submission, Feedback
+from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider, \
+    evaluation_provider
 from athena.logger import logger
-
+from athena.modelling import Exercise, Submission, Feedback
 from module_modelling_llm.config import Configuration
 from module_modelling_llm.evaluation import get_feedback_statistics, get_llm_statistics
-from module_modelling_llm.generate_suggestions import generate_suggestions
 from module_modelling_llm.generate_evaluation import generate_evaluation
+from module_modelling_llm.generate_suggestions import generate_suggestions
 
 
 @submissions_consumer
@@ -27,19 +27,21 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 
 @feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
-    logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks), submission.id, exercise.id)
+    logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks),
+                submission.id, exercise.id)
 
 
 @feedback_provider
 async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
-    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
+    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id,
+                exercise.id)
     return await generate_suggestions(exercise, submission, module_config.approach, module_config.debug)
 
 
 @evaluation_provider
 async def evaluate_feedback(
-    exercise: Exercise, submission: Submission, 
-    true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback], 
+        exercise: Exercise, submission: Submission,
+        true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback],
 ) -> Any:
     logger.info(
         "evaluate_feedback: Evaluation for submission %d of exercise %d was requested with %d true and %d predicted feedbacks",
@@ -51,7 +53,8 @@ async def evaluate_feedback(
 
     # 1. LLM as a judge
     if len(predicted_feedbacks) > 0 and bool(os.environ.get("LLM_ENABLE_LLM_AS_A_JUDGE")):
-        evaluation["llm_as_a_judge"] = await generate_evaluation(exercise, submission, true_feedbacks, predicted_feedbacks)
+        evaluation["llm_as_a_judge"] = await generate_evaluation(exercise, submission, true_feedbacks,
+                                                                 predicted_feedbacks)
 
     # 2. LangSmith runs, token usage, and response times
     if bool(os.environ.get("LANGCHAIN_TRACING_V2")):
@@ -61,6 +64,7 @@ async def evaluate_feedback(
     evaluation["feedback_statistics"] = get_feedback_statistics(exercise, true_feedbacks, predicted_feedbacks)
 
     return evaluation
+
 
 if __name__ == "__main__":
     nltk.download("punkt")

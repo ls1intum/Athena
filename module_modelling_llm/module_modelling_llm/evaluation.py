@@ -20,7 +20,8 @@ def get_llm_statistics(submission: Submission):
 
     def get_statistics(runs: List[Run]):
         return {
-            "response_time": sum((run.end_time - run.start_time).total_seconds() for run in runs if run.end_time is not None),
+            "response_time": sum(
+                (run.end_time - run.start_time).total_seconds() for run in runs if run.end_time is not None),
             "prompt_tokens": sum(run.prompt_tokens for run in runs if run.prompt_tokens is not None),
             "completion_tokens": sum(run.completion_tokens for run in runs if run.completion_tokens is not None),
             "total_tokens": sum(run.total_tokens for run in runs if run.total_tokens is not None),
@@ -100,7 +101,7 @@ def get_feedback_statistics(exercise: Exercise, true_feedbacks: List[Feedback], 
         "actual_feedback_count": actual_feedback_count,
         "suggestions_count": suggestions_count,
         "actual_feedback_with_grading_instructions_count": len(actual_feedback_with_grading_instructions),
-        "suggestions_with_grading_instructions_count":len(suggestions_with_grading_instructions),
+        "suggestions_with_grading_instructions_count": len(suggestions_with_grading_instructions),
         "actual_sgi_usage": actual_sgi_usage,
         "suggested_sgi_usage": suggested_sgi_usage,
         "matched_feedback": matched_feedback,

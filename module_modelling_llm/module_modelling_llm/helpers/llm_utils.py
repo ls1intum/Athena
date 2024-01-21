@@ -1,18 +1,18 @@
 from typing import Optional, Type, TypeVar, List
-from pydantic import BaseModel, ValidationError
-import tiktoken
 
-from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
+import tiktoken
 from langchain.base_language import BaseLanguageModel
+from langchain.chains import LLMChain
+from langchain.chains.openai_functions import create_structured_output_chain
+from langchain.chat_models import ChatOpenAI
+from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
-from langchain.chains.openai_functions import create_structured_output_chain
-from langchain.output_parsers import PydanticOutputParser
 from langchain.schema import OutputParserException
+from pydantic import BaseModel, ValidationError
 
 from athena import emit_meta, get_experiment_environment
 
@@ -31,9 +31,9 @@ def num_tokens_from_prompt(chat_prompt: ChatPromptTemplate, prompt_input: dict) 
     return num_tokens_from_string(chat_prompt.format(**prompt_input))
 
 
-def check_prompt_length_and_omit_features_if_necessary(prompt: ChatPromptTemplate, 
-                                                       prompt_input: dict, 
-                                                       max_input_tokens: int, 
+def check_prompt_length_and_omit_features_if_necessary(prompt: ChatPromptTemplate,
+                                                       prompt_input: dict,
+                                                       max_input_tokens: int,
                                                        omittable_features: List[str],
                                                        debug: bool):
     """Check if the input is too long and omit features if necessary.
@@ -84,11 +84,11 @@ def supports_function_calling(model: BaseLanguageModel):
 
 
 def get_chat_prompt_with_formatting_instructions(
-            model: BaseLanguageModel,
-            system_message: str, 
-            human_message: str,
-            pydantic_object: Type[T]
-        ) -> ChatPromptTemplate:
+        model: BaseLanguageModel,
+        system_message: str,
+        human_message: str,
+        pydantic_object: Type[T]
+) -> ChatPromptTemplate:
     """Returns a ChatPromptTemplate with formatting instructions (if necessary)
 
     Note: Does nothing if the model supports function calling
@@ -106,22 +106,23 @@ def get_chat_prompt_with_formatting_instructions(
         system_message_prompt = SystemMessagePromptTemplate.from_template(system_message)
         human_message_prompt = HumanMessagePromptTemplate.from_template(human_message)
         return ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
-    
+
     output_parser = PydanticOutputParser(pydantic_object=pydantic_object)
     system_message_prompt = SystemMessagePromptTemplate.from_template(system_message + "\n{format_instructions}")
     system_message_prompt.prompt.partial_variables = {"format_instructions": output_parser.get_format_instructions()}
     system_message_prompt.prompt.input_variables.remove("format_instructions")
-    human_message_prompt = HumanMessagePromptTemplate.from_template(human_message + "\n\nJSON response following the provided schema:")
+    human_message_prompt = HumanMessagePromptTemplate.from_template(
+        human_message + "\n\nJSON response following the provided schema:")
     return ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
 
 async def predict_and_parse(
-        model: BaseLanguageModel, 
-        chat_prompt: ChatPromptTemplate, 
-        prompt_input: dict, 
-        pydantic_object: Type[T], 
+        model: BaseLanguageModel,
+        chat_prompt: ChatPromptTemplate,
+        prompt_input: dict,
+        pydantic_object: Type[T],
         tags: Optional[List[str]]
-    ) -> Optional[T]:
+) -> Optional[T]:
     """Predicts an LLM completion using the model and parses the output using the provided Pydantic model
 
     Args:
@@ -146,7 +147,7 @@ async def predict_and_parse(
 
     if supports_function_calling(model):
         chain = create_structured_output_chain(pydantic_object, llm=model, prompt=chat_prompt, tags=tags)
-        
+
         try:
             return await chain.arun(**prompt_input)
         except (OutputParserException, ValidationError):

@@ -1,13 +1,12 @@
 import os
-from pydantic import Field, PositiveInt
 from enum import Enum
 
-from langchain.llms import Replicate
 from langchain.base_language import BaseLanguageModel
+from langchain.llms import Replicate
+from pydantic import Field, PositiveInt
 
 from athena.logger import logger
 from .model_config import ModelConfig
-
 
 # Hardcoded list of models
 # If necessary, add more models from replicate here, the config below might need adjustments depending on the available
@@ -32,7 +31,7 @@ if os.environ.get("REPLICATE_API_TOKEN"):  # If Replicate is available
     available_models = {
         name: Replicate(
             model=model,
-            model_kwargs={ "temperature": 0.01 }
+            model_kwargs={"temperature": 0.01}
         )
         for name, model in replicate_models.items()
     }
@@ -44,7 +43,6 @@ if available_models:
                 ", ".join(available_models.keys()))
 
     ReplicateModel = Enum('ReplicateModel', {name: name for name in available_models})  # type: ignore
-
 
     default_model_name = "llama-2-13b-chat"
     if "LLM_DEFAULT_MODEL" in os.environ and os.environ["LLM_DEFAULT_MODEL"] in available_models:
@@ -110,7 +108,6 @@ Gradually decrease penalty over this many tokens (minimum: 1)\
             # Initialize a copy of the model using the config
             model = model.__class__(**kwargs)
             return model
-        
 
         class Config:
             title = 'Replicate'

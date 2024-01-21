@@ -1,8 +1,7 @@
 import json
-import xml.etree.ElementTree as ElementTree
+from xml.etree import ElementTree
 from xml.dom import minidom
 
-from athena.modelling import Submission
 from module_modelling_llm.helpers.models.diagram_types import DiagramType
 from module_modelling_llm.helpers.serializers.bpmn_serializer import BPMNSerializer
 
@@ -53,6 +52,7 @@ class DiagramModelSerializer:
                 return json.dumps(model)
             case DiagramType.BPMN:
                 serializer = BPMNSerializer()
-                serialized_model: str = ElementTree.tostring(serializer.serialize(model, omit_layout_info=True), encoding='utf8')
+                serialized_model: str = ElementTree.tostring(serializer.serialize(model, omit_layout_info=True),
+                                                             encoding='utf8')
                 # The next line is only required to "pretty-print" the XML output for easier debugging
                 return minidom.parseString(serialized_model).toprettyxml(indent="\t")

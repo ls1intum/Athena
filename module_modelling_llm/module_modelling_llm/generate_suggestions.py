@@ -4,20 +4,18 @@ from typing import List, Optional, Sequence
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
-from athena.modelling import Exercise, Submission, Feedback
 from athena.logger import logger
-
+from athena.modelling import Exercise, Submission, Feedback
 from module_modelling_llm.config import BasicApproachConfig
 from module_modelling_llm.helpers.llm_utils import (
-    get_chat_prompt_with_formatting_instructions, 
-    check_prompt_length_and_omit_features_if_necessary, 
+    get_chat_prompt_with_formatting_instructions,
+    check_prompt_length_and_omit_features_if_necessary,
     num_tokens_from_prompt,
     predict_and_parse
 )
 from module_modelling_llm.helpers.models.diagram_types import DiagramType
 from module_modelling_llm.helpers.serializers.diagram_model_serializer import DiagramModelSerializer
 from module_modelling_llm.helpers.utils import format_grading_instructions
-
 from module_modelling_llm.prompts.submission_format.submission_format_remarks import get_submission_format_remarks
 
 
@@ -35,14 +33,15 @@ class FeedbackModel(BaseModel):
 
 class AssessmentModel(BaseModel):
     """Collection of feedbacks making up an assessment"""
-    
+
     feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks")
 
     class Config:
         title = "Assessment"
 
 
-async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
+async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> \
+List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     serialized_example_solution = None
@@ -67,9 +66,9 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     }
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
-        model=model, 
-        system_message=config.generate_suggestions_prompt.system_message, 
-        human_message=config.generate_suggestions_prompt.human_message, 
+        model=model,
+        system_message=config.generate_suggestions_prompt.system_message,
+        human_message=config.generate_suggestions_prompt.human_message,
         pydantic_object=AssessmentModel
     )
 
@@ -78,7 +77,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     prompt_input, should_run = check_prompt_length_and_omit_features_if_necessary(
         prompt=chat_prompt,
         prompt_input=prompt_input,
-        max_input_tokens=10000, # config.max_input_tokens,
+        max_input_tokens=10000,  # config.max_input_tokens,
         omittable_features=omittable_features,
         debug=debug
     )
@@ -88,13 +87,14 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
         logger.warning("Input too long. Skipping.")
         if debug:
             emit_meta("prompt", chat_prompt.format(**prompt_input))
-            emit_meta("error", f"Input too long {num_tokens_from_prompt(chat_prompt, prompt_input)} > {config.max_input_tokens}")
+            emit_meta("error",
+                      f"Input too long {num_tokens_from_prompt(chat_prompt, prompt_input)} > {config.max_input_tokens}")
         return []
 
     result = await predict_and_parse(
-        model=model, 
-        chat_prompt=chat_prompt, 
-        prompt_input=prompt_input, 
+        model=model,
+        chat_prompt=chat_prompt,
+        prompt_input=prompt_input,
         pydantic_object=AssessmentModel,
         tags=[
             f"exercise-{exercise.id}",
@@ -112,8 +112,8 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
         return []
 
     grading_instruction_ids = set(
-        grading_instruction.id 
-        for criterion in exercise.grading_criteria or [] 
+        grading_instruction.id
+        for criterion in exercise.grading_criteria or []
         for grading_instruction in criterion.structured_grading_instructions
     )
 

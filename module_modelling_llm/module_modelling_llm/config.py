@@ -3,8 +3,8 @@ from pydantic import BaseModel, Field
 from athena import config_schema_provider
 from module_modelling_llm.helpers.models import ModelConfigType, DefaultModelConfig
 from module_modelling_llm.prompts.generate_suggestions import (
-  system_message as generate_suggestions_system_message, 
-  human_message as generate_suggestions_human_message
+    system_message as generate_suggestions_system_message,
+    human_message as generate_suggestions_human_message
 )
 
 
@@ -23,7 +23,7 @@ _Note: **{problem_statement}**, **{example_solution}**, or **{grading_instructio
 class BasicApproachConfig(BaseModel):
     """This approach uses a LLM with a single prompt to generate feedback in a single step."""
     max_input_tokens: int = Field(default=3000, description="Maximum number of tokens in the input prompt.")
-    model: ModelConfigType = Field(default=DefaultModelConfig()) # type: ignore
+    model: ModelConfigType = Field(default=DefaultModelConfig())  # type: ignore
     generate_suggestions_prompt: GenerateSuggestionsPrompt = Field(default=GenerateSuggestionsPrompt())
 
 

@@ -13,7 +13,8 @@ def num_tokens_from_string(string: str) -> int:
     return num_tokens
 
 
-def format_grading_instructions(grading_instructions: Optional[str], grading_criteria: Optional[List[GradingCriterion]]) -> Optional[str]:
+def format_grading_instructions(grading_instructions: Optional[str],
+                                grading_criteria: Optional[List[GradingCriterion]]) -> Optional[str]:
     """Formats grading instructions and the grading criteria with nested structured grading instructions into a single string.
 
     Args:
@@ -45,4 +46,3 @@ def format_grading_instructions(grading_instructions: Optional[str], grading_cri
             result += "\n"
 
     return result.strip()
-

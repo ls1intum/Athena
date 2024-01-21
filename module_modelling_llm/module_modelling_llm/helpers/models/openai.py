@@ -1,22 +1,20 @@
 import os
 from contextlib import contextmanager
-from typing import Any, Callable, Dict, List
-from pydantic import Field, validator, PositiveInt
 from enum import Enum
+from typing import Any, Callable, Dict, List
 
 import openai
+from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.llms import AzureOpenAI, OpenAI
 from langchain.llms.openai import BaseOpenAI
-from langchain.base_language import BaseLanguageModel
+from pydantic import Field, validator, PositiveInt
 
 from athena.logger import logger
 from .model_config import ModelConfig
 
-
 OPENAI_PREFIX = "openai_"
 AZURE_OPENAI_PREFIX = "azure_openai_"
-
 
 #########################################################################
 # Monkey patching openai/langchain api                                  #
@@ -31,10 +29,12 @@ AZURE_OPENAI_PREFIX = "azure_openai_"
 # Prevent LangChain error, we will set the key later
 os.environ["OPENAI_API_KEY"] = ""
 
+
 def _wrap(old: Any, new: Any) -> Callable:
     def repl(*args: Any, **kwargs: Any) -> Any:
         new(args[0])  # args[0] is self
         return old(*args, **kwargs)
+
     return repl
 
 
@@ -42,6 +42,7 @@ def _async_wrap(old: Any, new: Any):
     async def repl(*args, **kwargs):
         new(args[0])  # args[0] is self
         return await old(*args, **kwargs)
+
     return repl
 
 
@@ -71,6 +72,8 @@ ChatOpenAI._generate = _wrap(ChatOpenAI._generate, _set_credentials)  # type: ig
 ChatOpenAI._agenerate = _async_wrap(ChatOpenAI._agenerate, _set_credentials)  # type: ignore
 BaseOpenAI._generate = _wrap(BaseOpenAI._generate, _set_credentials)  # type: ignore
 BaseOpenAI._agenerate = _async_wrap(BaseOpenAI._agenerate, _set_credentials)  # type: ignore
+
+
 # pylint: enable=protected-access
 
 #########################################################################
@@ -168,7 +171,7 @@ def _get_available_deployments(openai_models: Dict[str, List[str]], model_aliase
     return available_deployments
 
 
-def _get_available_models(openai_models: Dict[str, List[str]], 
+def _get_available_models(openai_models: Dict[str, List[str]],
                           available_deployments: Dict[str, Dict[str, Any]]):
     available_models: Dict[str, BaseLanguageModel] = {}
 
@@ -243,7 +246,6 @@ if available_models:
     logger.info("Available openai models: %s", ", ".join(available_models.keys()))
 
     OpenAIModel = Enum('OpenAIModel', {name: name for name in available_models})  # type: ignore
-
 
     default_model_name = "gpt-3.5-turbo"
     if "LLM_DEFAULT_MODEL" in os.environ and os.environ["LLM_DEFAULT_MODEL"] in available_models:
@@ -331,7 +333,6 @@ decreasing the model's likelihood to repeat the same line verbatim.
             # Initialize a copy of the model using the config
             model = model.__class__(**kwargs)
             return model
-
 
         class Config:
             title = 'OpenAI'

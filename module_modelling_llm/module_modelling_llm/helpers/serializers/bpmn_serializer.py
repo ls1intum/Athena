@@ -1,5 +1,5 @@
 import uuid
-import xml.etree.ElementTree as ElementTree
+from xml.etree import ElementTree
 from enum import Enum
 from functools import reduce
 from itertools import chain
@@ -87,7 +87,6 @@ class BPMNGatewayType(str, Enum):
 
 
 class IDShortener:
-
     id_map: dict[str, int] = None
     id_counter: int = None
 
@@ -370,7 +369,8 @@ class BPMNSerializer:
         :param gateway: A dictionary representing a BPMN gateway element
         :return: An Elementtree Element representing the serialized BPMN gateway element
         """
-        gateway_type_tag: str = self.__prefix_tag(self.__gateway_type_map[gateway.get("gatewayType")], self.__bpmn_prefix)
+        gateway_type_tag: str = self.__prefix_tag(self.__gateway_type_map[gateway.get("gatewayType")],
+                                                  self.__bpmn_prefix)
         serialized_gateway = self.__serialize_base_element(gateway, gateway_type_tag, connected_flows)
 
         return serialized_gateway

@@ -1,16 +1,16 @@
-from typing import List, Sequence, Dict, Literal
-from pydantic import BaseModel, Field
 import json
+from typing import List, Sequence, Dict, Literal
 
-from athena.modelling import Exercise, Submission, Feedback
+from pydantic import BaseModel, Field
+
 from athena.logger import logger
-
-from module_modelling_llm.helpers.models import evaluation_model
+from athena.modelling import Exercise, Submission, Feedback
 from module_modelling_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
     check_prompt_length_and_omit_features_if_necessary,
     predict_and_parse
 )
+from module_modelling_llm.helpers.models import evaluation_model
 from module_modelling_llm.helpers.serializers.diagram_model_serializer import DiagramModelSerializer
 from module_modelling_llm.prompts.generate_evaluation import system_message, human_message
 
@@ -19,7 +19,8 @@ class AccuracyMetric(BaseModel):
     id: int = Field(..., description="Feedback ID")
     reasoning: str = Field(..., description="Step-by-step critical reasoning of the labels")
     acceptance_label: Literal["accepted", "rejected"] = Field(..., description="Estimated acceptance label")
-    level_of_needed_modification_label: Literal["no", "minor", "major"] = Field(..., description="Estimated level of needed modification")
+    level_of_needed_modification_label: Literal["no", "minor", "major"] = Field(...,
+                                                                                description="Estimated level of needed modification")
 
 
 class Evaluation(BaseModel):
@@ -27,12 +28,11 @@ class Evaluation(BaseModel):
 
 
 async def generate_evaluation(
-    exercise: Exercise,
-    submission: Submission,
-    true_feedbacks: List[Feedback],
-    predicted_feedbacks: List[Feedback]
+        exercise: Exercise,
+        submission: Submission,
+        true_feedbacks: List[Feedback],
+        predicted_feedbacks: List[Feedback]
 ) -> Dict[int, dict]:
-
     if evaluation_model is None:
         raise EnvironmentError("No evaluation model available, please set up LLM_EVALUATION_MODEL correctly"
                                "by setting it to one of the available models logged during startup.")
@@ -46,8 +46,11 @@ async def generate_evaluation(
             "credits": feedback.credits
         }
 
+    submission_diagram = json.loads(submission.model)
+    serialized_submission = DiagramModelSerializer.serialize_model(submission_diagram)
+
     prompt_input = {
-        "submission": DiagramModelSerializer.serialize_model_for_submission(submission),
+        "submission": serialized_submission,
         "true_feedbacks": json.dumps([feedback_to_dict(feedback) for feedback in true_feedbacks]),
         "predicted_feedbacks": json.dumps([feedback_to_dict(feedback) for feedback in predicted_feedbacks]),
     }
@@ -89,4 +92,4 @@ async def generate_evaluation(
         logger.warning("Evaluation failed. Skipping.")
         return {}
 
-    return { item.id: item.dict() for item in result.metrics }
+    return {item.id: item.dict() for item in result.metrics}
