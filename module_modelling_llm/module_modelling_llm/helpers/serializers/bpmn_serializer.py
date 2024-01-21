@@ -648,7 +648,7 @@ class BPMNSerializer:
 
         # Iterate over all swimlanes and add flowNodeRefs for all elements within the current lane
         for serialized_swimlane in serialized_elements_by_type.get(BPMNElementType.BPMN_SWIMLANE, {}).values():
-            owned_serialized_elements: list[ElementTree.Element] = list(serialized_elements_by_owner[serialized_swimlane.get("id") or ""].values())
+            owned_serialized_elements = list(serialized_elements_by_owner[serialized_swimlane.get("id") or ""].values())
             for serialized_element in owned_serialized_elements:
                 tag: str = self.__prefix_tag("flowNodeRef", self.__bpmn_prefix)
                 flow_node_ref = ElementTree.Element(tag)
@@ -661,7 +661,8 @@ class BPMNSerializer:
         non_bounding_elements = self.__omit_keys(serialized_elements_by_type, [BPMNElementType.BPMN_SWIMLANE])
 
         for serialized_element in chain.from_iterable([entry.values() for entry in non_bounding_elements.values()]):
-            process.append(serialized_element)
+            if serialized_element:
+                process.append(serialized_element)
 
         return process
 
@@ -780,8 +781,8 @@ class BPMNSerializer:
 
             for index, pool_id in enumerate(elements_by_owning_pool):
 
-                pool: dict = model.get("elements").get(pool_id)
-                serialized_process = self.__serialize_process(pool, elements_by_owning_pool.get(pool_id) or {}, relationships)
+                pool: dict = model.get("elements", {}).get(pool_id, {})
+                serialized_process = self.__serialize_process(pool, elements_by_owning_pool.get(pool_id, {}), relationships)
                 definitions.append(serialized_process)
 
                 # We append all flows to the first process as the flows coming from the Apollon
@@ -814,7 +815,7 @@ class BPMNSerializer:
                 pool_shape.set("isHorizontal", "true")
                 serialized_plane.append(pool_shape)
 
-            serialized_plane.set("bpmnElement", collaboration.get("id") or "")
+            serialized_plane.set("bpmnElement", collaboration.get("id", ""))
 
         if not omit_layout_info:
             definitions.append(diagram)
