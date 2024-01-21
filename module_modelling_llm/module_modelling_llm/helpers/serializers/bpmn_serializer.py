@@ -614,19 +614,20 @@ class BPMNSerializer:
 
             element_type = element.get("type", "")
 
-            if serialized_element and element_type:
-                elements_by_type[element_type] = {
-                    **elements_by_type.get(element_type, {}),
-                    self.__shorten_id(element.get("id") or ""): serialized_element
-                }
+            if serialized_element:
+                if element_type:
+                    elements_by_type[element_type] = {
+                        **elements_by_type.get(element_type, {}),
+                        self.__shorten_id(element.get("id") or ""): serialized_element
+                    }
 
-            element_owner = self.__shorten_id(serialized_element.get("owner", ""))
+                element_owner = self.__shorten_id(serialized_element.get("owner"))
 
-            if element_owner:
-                elements_by_owner[element_owner] = {
-                    **elements_by_owner.get(element_owner, {}),
-                    self.__shorten_id(serialized_element.get("id") or ""): serialized_element
-                }
+                if element_owner:
+                    elements_by_owner[element_owner] = {
+                        **elements_by_owner.get(element_owner, {}),
+                        self.__shorten_id(serialized_element.get("id") or ""): serialized_element
+                    }
 
         serialized_pool: ElementTree.Element = ElementTree.Element(self.__prefix_tag("laneSet", self.__bpmn_prefix))
         serialized_pool.set("id", self.__shorten_id(str(uuid.uuid4())))
@@ -674,16 +675,21 @@ class BPMNSerializer:
         plane: ElementTree.Element = ElementTree.Element(self.__prefix_tag("BPMNPlane", self.__bpmndi_prefix))
         plane.set("id", self.__shorten_id(str(uuid.uuid4())))
 
-        for element in (model.get("elements") or {}).values():
-            # We do not serialize BPMN pools directly as they are serialized based on participants
-            # later in the process
-            if element.get("type") != BPMNElementType.BPMN_POOL:
-                serialized_shape: ElementTree.Element = self.__serialize_shape(element)
-                plane.append(serialized_shape)
+        elements: Optional[dict] = model.get("elements")
+        relationships: Optional[dict] = model.get("relationships")
 
-        for relationship in (model.get("relationships") or {}).values():
-            serialized_edge: ElementTree.Element = self.__serialize_edge(relationship)
-            plane.append(serialized_edge)
+        if elements:
+            for element in elements.values():
+                # We do not serialize BPMN pools directly as they are serialized based on participants
+                # later in the process
+                if element.get("type") != BPMNElementType.BPMN_POOL:
+                    serialized_shape: ElementTree.Element = self.__serialize_shape(element)
+                    plane.append(serialized_shape)
+
+        if relationships:
+            for relationship in relationships.values():
+                serialized_edge: ElementTree.Element = self.__serialize_edge(relationship)
+                plane.append(serialized_edge)
 
         return plane
 
@@ -728,17 +734,15 @@ class BPMNSerializer:
         :return: The id of the root owner of the given current_id
         """
 
-        current_element = elements.get(current_id)
+        current_element: Optional[dict] = elements.get(current_id)
 
-        if not current_element:
-            return current_id
+        if current_element:
+            owner_id: Optional[str] = current_element.get("owner")
+            
+            if owner_id:
+                return self.__find_root_owner_id(elements, owner_id)
 
-        owner_id = current_element.get("owner")
-
-        if not owner_id:
-            return current_id
-
-        return self.__find_root_owner_id(elements, owner_id)
+        return current_id
 
     def serialize(self, model: dict, omit_layout_info: bool = False) -> ElementTree.Element:
         """
