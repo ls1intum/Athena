@@ -96,8 +96,6 @@ def _use_openai_credentials():
 openai_available = bool(os.environ.get("LLM_OPENAI_API_KEY"))
 azure_openai_available = bool(os.environ.get("LLM_AZURE_OPENAI_API_KEY"))
 
-print("azure_openai_available", azure_openai_available)
-
 
 # This is a hack to make sure that the openai api is set correctly
 # Right now it is overkill, but it will be useful when the api gets fixed and we no longer
@@ -216,7 +214,7 @@ _model_aliases = {
 # Hardcoded because openai can't provide a trustworthly api to get the list of models and capabilities...
 openai_models = {
     "chat_completion": [
-        # "gpt-4",
+        "gpt-4",
         # "gpt-4-32k", # Not publicly available
         "gpt-3.5-turbo",
         "gpt-3.5-turbo-16k"
