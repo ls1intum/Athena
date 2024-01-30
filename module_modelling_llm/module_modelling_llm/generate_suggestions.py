@@ -22,6 +22,7 @@ from module_modelling_llm.prompts.submission_format.submission_format_remarks im
 class FeedbackModel(BaseModel):
     title: str = Field(description="Very short title, i.e. feedback category or similar", example="Logic Error")
     description: str = Field(description="Feedback description")
+    element_ids: Optional[str] = Field(description="Referenced diagram element IDs, or empty if unreferenced")
     credits: float = Field(0.0, description="Number of points received/deducted")
     grading_instruction_id: Optional[int] = Field(
         description="ID of the grading instruction that was used to generate this feedback, or empty if no grading instruction was used"
@@ -125,6 +126,9 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
             submission_id=submission.id,
             title=feedback.title,
             description=feedback.description,
+            element_ids=list(
+                map(lambda element_id: element_id.strip(), feedback.element_ids.split(","))
+            ) if feedback.element_ids else [],
             credits=feedback.credits,
             structured_grading_instruction_id=grading_instruction_id,
             meta={}

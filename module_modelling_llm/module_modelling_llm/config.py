@@ -9,11 +9,13 @@ from module_modelling_llm.prompts.generate_suggestions import (
 
 
 class GenerateSuggestionsPrompt(BaseModel):
-    """\
-Features available: **{problem_statement}**, **{example_solution}**, **{grading_instructions}**, **{max_points}**, **{bonus_points}**, **{submission}**
+    """
+    Features available: **{problem_statement}**, **{example_solution}**, **{grading_instructions}**, **{max_points}**,
+    **{bonus_points}**, **{submission}**
 
-_Note: **{problem_statement}**, **{example_solution}**, or **{grading_instructions}** might be omitted if the input is too long._\
-"""
+    _Note: **{problem_statement}**, **{example_solution}**, or **{grading_instructions}** might be omitted if the input
+    is too long._
+    """
     system_message: str = Field(default=generate_suggestions_system_message,
                                 description="Message for priming AI behavior and instructing it what to do.")
     human_message: str = Field(default=generate_suggestions_human_message,
