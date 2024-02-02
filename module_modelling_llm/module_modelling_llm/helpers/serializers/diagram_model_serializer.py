@@ -52,7 +52,13 @@ class DiagramModelSerializer:
                 # TODO: Evaluate if there is a more sensible serialization format for this diagram type
                 return json.dumps(model)
             case DiagramType.BPMN:
-                serializer = BPMNSerializer()
+                serializer = BPMNSerializer(
+                    xsi_prefix=None,
+                    bpmn_prefix=None,
+                    bpmndi_prefix=None,
+                    dc_prefix=None,
+                    di_prefix=None
+                )
                 serialized_model: str = ElementTree.tostring(serializer.serialize(model, omit_layout_info=True),
                                                              encoding='utf8')
                 # The next line is only required to "pretty-print" the XML output for easier debugging

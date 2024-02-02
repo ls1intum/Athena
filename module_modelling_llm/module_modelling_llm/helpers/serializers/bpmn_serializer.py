@@ -174,20 +174,20 @@ class BPMNSerializer:
         BPMNGatewayType.PARALLEL: "parallelGateway"
     }
 
-    __xsi_prefix: str = ""
-    __bpmn_prefix: str = ""
-    __bpmndi_prefix: str = ""
-    __dc_prefix: str = ""
-    __di_prefix: str = ""
+    __xsi_prefix: Optional[str] = ""
+    __bpmn_prefix: Optional[str] = ""
+    __bpmndi_prefix: Optional[str] = ""
+    __dc_prefix: Optional[str] = ""
+    __di_prefix: Optional[str] = ""
 
     __id_shortener: Optional[IDShortener] = None
 
     def __init__(self,
-                 xsi_prefix=DEFAULT_XSI_PREFIX,
-                 bpmn_prefix=DEFAULT_BPMN_PREFIX,
-                 bpmndi_prefix=DEFAULT_BPMNDI_PREFIX,
-                 dc_prefix=DEFAULT_DC_PREFIX,
-                 di_prefix=DEFAULT_DI_PREFIX
+                 xsi_prefix: str | None = DEFAULT_XSI_PREFIX,
+                 bpmn_prefix: str | None = DEFAULT_BPMN_PREFIX,
+                 bpmndi_prefix: str | None = DEFAULT_BPMNDI_PREFIX,
+                 dc_prefix: str | None = DEFAULT_DC_PREFIX,
+                 di_prefix: str | None = DEFAULT_DI_PREFIX
                  ):
         """
         Create a new instance of the BPMNSerializer class. This class is used to serialize BPMN diagrams in Apollon's
@@ -208,13 +208,13 @@ class BPMNSerializer:
         self.__id_shortener = IDShortener()
 
     @staticmethod
-    def __prefix_tag(tag: str, prefix: str) -> str:
+    def __prefix_tag(tag: str, prefix: str | None) -> str:
         """
         Prefix a XML tag with a given prefix
         :param tag: The prefixed tag
         :param prefix: The prefix to prepend
         """
-        return f"{prefix}:{tag}"
+        return f"{prefix}{':' if prefix else ''}{tag}"
 
     def __shorten_id(self, element_id: str, prefix: Optional[str] = None) -> str:
         """
