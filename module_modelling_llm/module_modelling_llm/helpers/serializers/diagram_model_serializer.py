@@ -66,7 +66,7 @@ class DiagramModelSerializer:
                 serialized_model: str = ElementTree.tostring(serializer.serialize(model, omit_layout_info=True),
                                                              encoding='utf8')
 
-                reverse_id_map = serializer.id_shortener.get_reverse_id_map()
+                reverse_id_map = serializer.id_shortener.get_reverse_id_map() if serializer.id_shortener else None
 
                 # The use of minidom is only required here "pretty-print" the XML output for easier debugging
                 return minidom.parseString(serialized_model).toprettyxml(indent="\t"), reverse_id_map
