@@ -54,6 +54,10 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     submission_diagram = json.loads(submission.model)
     submission_format_remarks = get_submission_format_remarks(DiagramType[submission_diagram.get("type")])
 
+    # Having the LLM reference IDs that a specific feedback item applies to seems to work a lot more reliable with
+    # shorter IDs, especially if they are prefixed with "id_". We therefore map the UUIDs used in Apollon diagrams to
+    # shortened IDs and have the diagram model serializer return a reverse mapping dictionary which allows us to map
+    # the shortened IDs back to the original ones.
     serialized_submission, reverse_id_map = DiagramModelSerializer.serialize_model(submission_diagram)
 
     prompt_input = {
