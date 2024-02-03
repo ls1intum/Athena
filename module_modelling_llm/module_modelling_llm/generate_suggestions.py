@@ -49,12 +49,12 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
 
     if exercise.example_solution:
         example_solution_diagram = json.loads(exercise.example_solution)
-        serialized_example_solution = DiagramModelSerializer.serialize_model(example_solution_diagram)
+        serialized_example_solution, _ = DiagramModelSerializer.serialize_model(example_solution_diagram)
 
     submission_diagram = json.loads(submission.model)
     submission_format_remarks = get_submission_format_remarks(DiagramType[submission_diagram.get("type")])
 
-    serialized_submission = DiagramModelSerializer.serialize_model(submission_diagram)
+    serialized_submission, reverse_id_map = DiagramModelSerializer.serialize_model(submission_diagram)
 
     prompt_input = {
         "max_points": exercise.max_points,
@@ -127,7 +127,9 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
             title=feedback.title,
             description=feedback.description,
             element_ids=list(
-                map(lambda element_id: element_id.strip(), feedback.element_ids.split(","))
+                map(lambda element_id: reverse_id_map[
+                    element_id.strip()
+                ] if reverse_id_map else element_id.strip(), feedback.element_ids.split(","))
             ) if feedback.element_ids else [],
             credits=feedback.credits,
             structured_grading_instruction_id=grading_instruction_id,

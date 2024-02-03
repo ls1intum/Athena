@@ -88,20 +88,37 @@ class BPMNGatewayType(str, Enum):
 
 
 class IDShortener:
-    id_map: dict[str, int] = {}
+    id_map: dict[str, str] = {}
     id_counter: int = 0
 
-    def shorten_id(self, id: str) -> int:
+    def shorten_id(self, id: str, prefix: Optional[str] = None) -> str:
         """
         Shorten an ID to a minimum length numeric ID. This function mainly serves the purpose to shorten IDs to decrease
         the token count for LLM queries.
         :param id: The ID that should be shortened
+        :param prefix: An optional prefix for the shortened IDs
         """
+
+        if prefix is None:
+            prefix = "id"
+
         if id not in self.id_map:
-            self.id_map[id] = self.id_counter
+            self.id_map[id] = f"{prefix}{'-' if prefix else ''}{self.id_counter}"
             self.id_counter += 1
 
         return self.id_map[id]
+
+    def get_id_map(self) -> dict[str, str]:
+        """
+        Retrieve the dictionary used to map a given ID to a shortened ID
+        """
+        return self.id_map
+
+    def get_reverse_id_map(self) -> dict[str, str]:
+        """
+        Retrieve a dictionary allowing to map a shortened ID back to a full ID
+        """
+        return {value: key for key, value in self.id_map.items()}
 
 
 class BPMNSerializer:
@@ -180,7 +197,7 @@ class BPMNSerializer:
     __dc_prefix: Optional[str] = ""
     __di_prefix: Optional[str] = ""
 
-    __id_shortener: Optional[IDShortener] = None
+    id_shortener: Optional[IDShortener] = None
 
     def __init__(self,
                  xsi_prefix: str | None = DEFAULT_XSI_PREFIX,
@@ -205,7 +222,8 @@ class BPMNSerializer:
         self.__bpmndi_prefix = bpmndi_prefix
         self.__dc_prefix = dc_prefix
         self.__di_prefix = di_prefix
-        self.__id_shortener = IDShortener()
+
+        self.id_shortener = IDShortener()
 
     @staticmethod
     def __prefix_tag(tag: str, prefix: str | None) -> str:
@@ -223,13 +241,11 @@ class BPMNSerializer:
         :param element_id: The element id that should be prefixed
         :param prefix: The prefix to prepend
         """
-        if prefix is None:
-            prefix = "id"
 
-        if self.__id_shortener is None:
+        if self.id_shortener is None:
             return element_id
 
-        return f"{prefix}_{self.__id_shortener.shorten_id(element_id)}"
+        return self.id_shortener.shorten_id(element_id, prefix=prefix)
 
     @staticmethod
     def __omit_keys(dictionary: dict, omitted_keys: list) -> dict:
