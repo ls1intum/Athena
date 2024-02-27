@@ -18,6 +18,7 @@ from athena.storage import get_stored_submission_meta, get_stored_exercise_meta,
 E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
 F = TypeVar('F', bound=Feedback)
+G = TypeVar('G', bound=bool)
 
 # Config type
 C = TypeVar("C", bound=BaseModel)
@@ -270,6 +271,7 @@ def feedback_provider(func: Union[
     Callable[[E, S], List[F]],
     Callable[[E, S], Coroutine[Any, Any, List[F]]],
     Callable[[E, S, C], List[F]],
+    Callable[[E, S, G, C], List[F]],
     Callable[[E, S, C], Coroutine[Any, Any, List[F]]]
 ]):
     """
@@ -302,6 +304,7 @@ def feedback_provider(func: Union[
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
     module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    is_graded_type = inspect.signature(func).parameters["is_graded"].annotation
 
     @app.post("/feedback_suggestions", responses=module_responses)
     @authenticated
@@ -309,6 +312,7 @@ def feedback_provider(func: Union[
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
+            is_graded: is_graded_type,
             module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
         
         # Retrieve existing metadata for the exercise, submission and feedback
@@ -321,6 +325,9 @@ def feedback_provider(func: Union[
         kwargs = {}
         if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
+
+        if "is_graded" in inspect.signature(func).parameters:
+            kwargs["is_graded"] = is_graded
 
         # Call the actual provider
         if inspect.iscoroutinefunction(func):
