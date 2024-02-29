@@ -7,7 +7,7 @@ from langchain.prompts import ChatPromptTemplate
 from athena import emit_meta
 from athena.programming import Exercise, Submission
 
-from module_programming_llm.config import BasicApproachConfig
+from module_programming_llm.config import GradedBasicApproachConfig
 from module_programming_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions, 
     num_tokens_from_string, 
@@ -32,7 +32,7 @@ async def split_grading_instructions_by_file(
         exercise: Exercise, 
         submission: Submission,
         prompt: ChatPromptTemplate,
-        config: BasicApproachConfig, 
+        config: GradedBasicApproachConfig,
         debug: bool
     ) -> Optional[SplitGradingInstructions]:
     """Split the general grading instructions by file
@@ -41,7 +41,7 @@ async def split_grading_instructions_by_file(
         exercise (Exercise): Exercise to split the grading instructions for (respecting the changed files)
         submission (Submission): Submission to split the grading instructions for (respecting the changed files)
         prompt (ChatPromptTemplate): Prompt template to check for grading_instructions
-        config (BasicApproachConfig): Configuration
+        config (GradedBasicApproachConfig): Configuration
 
     Returns:
         Optional[SplitGradingInstructions]: Split grading instructions, None if it is too short or too long

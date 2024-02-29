@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 import tiktoken
@@ -7,7 +8,10 @@ from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 from module_programming_llm.config import Configuration
 
-from module_programming_llm.generate_suggestions_by_file import generate_suggestions_by_file
+from module_programming_llm.generate_suggestions_by_file import \
+    generate_suggestions_by_file as generate_graded_suggestions_by_file
+from module_programming_llm.generate_non_graded_suggestions_by_file import \
+    generate_suggestions_by_file as generate_non_graded_suggestions_by_file
 
 
 @submissions_consumer
@@ -23,13 +27,21 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 
 @feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
-    logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks), submission.id, exercise.id)
+    logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks),
+                submission.id, exercise.id)
 
 
 @feedback_provider
-async def suggest_feedback(exercise: Exercise, submission: Submission, is_graded: bool, module_config: Configuration) -> List[Feedback]:
-    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
-    return await generate_suggestions_by_file(exercise, submission, module_config.approach, module_config.debug)
+async def suggest_feedback(exercise: Exercise, submission: Submission, is_graded: bool, module_config: Configuration) -> \
+List[Feedback]:
+    logger.info("suggest_feedback: %s suggestions for submission %d of exercise %d were requested",
+                "Graded" if is_graded else "Non-graded", submission.id, exercise.id)
+    if is_graded:
+        return await generate_graded_suggestions_by_file(exercise, submission, module_config.graded_approach,
+                                                         module_config.debug)
+    else:
+        return await generate_non_graded_suggestions_by_file(exercise, submission, module_config.non_graded_approach,
+                                                             module_config.debug)
 
 
 if __name__ == "__main__":

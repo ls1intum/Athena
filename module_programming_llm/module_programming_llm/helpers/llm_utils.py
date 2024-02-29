@@ -15,6 +15,7 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain.schema import OutputParserException
 
 from athena import emit_meta, get_experiment_environment
+from athena.logger import logger
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -149,8 +150,17 @@ async def predict_and_parse(
         
         try:
             return await chain.arun(**prompt_input)
-        except (OutputParserException, ValidationError):
-            # In the future, we should probably have some recovery mechanism here (i.e. fix the output with another prompt)
+        except (OutputParserException, ValidationError) as e:
+            # Log the exception type and message
+            logger.error(f"Exception type: {type(e).__name__}, Message: {e}")
+            # Optionally, you can do additional logging or handling based on the type
+            # For example, if you want to handle specific types differently:
+            if isinstance(e, OutputParserException):
+                # Handle OutputParserException specifically
+                pass
+            elif isinstance(e, ValidationError):
+                # Handle ValidationError specifically
+                pass
             return None
 
     output_parser = PydanticOutputParser(pydantic_object=pydantic_object)

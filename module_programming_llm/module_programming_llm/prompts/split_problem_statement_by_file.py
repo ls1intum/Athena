@@ -7,12 +7,22 @@ Make it as easy as possible for the tutor to grade the assignment when looking a
 Some parts of the problem statement may be relevant for multiple files.
 """
 
-human_message = """\
+human_message_with_solution = """\
 Problem statement:
 {problem_statement}
 
 Changed files from template to sample solution:
 {changed_files_from_template_to_solution}
+
+Changed files from template to student submission (Pick from this list, very important!):
+{changed_files_from_template_to_submission}
+
+Problem statement by file:
+"""
+
+human_message_without_solution = """\
+Problem statement:
+{problem_statement}
 
 Changed files from template to student submission (Pick from this list, very important!):
 {changed_files_from_template_to_submission}

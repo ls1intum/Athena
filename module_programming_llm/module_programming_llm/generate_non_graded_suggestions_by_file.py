@@ -6,8 +6,7 @@ from pydantic import BaseModel, Field
 from athena import emit_meta
 from athena.programming import Exercise, Submission, Feedback
 
-from module_programming_llm.config import GradedBasicApproachConfig
-from module_programming_llm.split_grading_instructions_by_file import split_grading_instructions_by_file
+from module_programming_llm.config import GradedBasicApproachConfig, NonGradedBasicApproachConfig
 from module_programming_llm.split_problem_statement_by_file import split_problem_statement_by_file
 from module_programming_llm.helpers.llm_utils import (
     check_prompt_length_and_omit_features_if_necessary, 
@@ -28,61 +27,34 @@ class FeedbackModel(BaseModel):
     description: str = Field(description="Feedback description")
     line_start: Optional[int] = Field(description="Referenced line number start, or empty if unreferenced")
     line_end: Optional[int] = Field(description="Referenced line number end, or empty if unreferenced")
-    credits: float = Field(0.0, description="Number of points received/deducted")
-    grading_instruction_id: Optional[int] = Field(
-        description="ID of the grading instruction that was used to generate this feedback, or empty if no grading instruction was used"
-    )
 
     class Config:
         title = "Feedback"
 
 
-class AssessmentModel(BaseModel):
-    """Collection of feedbacks making up an assessment"""
+class ImprovementModel(BaseModel):
+    """Collection of feedbacks making up an improvement"""
     
-    feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks")
+    feedbacks: Sequence[FeedbackModel] = Field(description="Improvement feedbacks")
 
     class Config:
-        title = "Assessment"
+        title = "Improvement"
 
 
 # pylint: disable=too-many-locals
-async def generate_suggestions_by_file(exercise: Exercise, submission: Submission, config: GradedBasicApproachConfig, debug: bool) -> List[Feedback]:
+async def generate_suggestions_by_file(exercise: Exercise, submission: Submission, config: NonGradedBasicApproachConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
         model=model, 
         system_message=config.generate_suggestions_by_file_prompt.system_message, 
         human_message=config.generate_suggestions_by_file_prompt.human_message, 
-        pydantic_object=AssessmentModel
+        pydantic_object=ImprovementModel
     )
-
-    # Get split problem statement and grading instructions by file (if necessary)
-    split_problem_statement, split_grading_instructions = await asyncio.gather(
-        split_problem_statement_by_file(exercise=exercise, submission=submission, prompt=chat_prompt, config=config, debug=debug),
-        split_grading_instructions_by_file(exercise=exercise, submission=submission, prompt=chat_prompt, config=config, debug=debug)
-    )
-
-    problem_statement_tokens = num_tokens_from_string(exercise.problem_statement or "")
-    is_short_problem_statement = problem_statement_tokens <= config.split_problem_statement_by_file_prompt.tokens_before_split
-    file_problem_statements = { 
-        item.file_name: item.problem_statement 
-        for item in split_problem_statement.items 
-    } if split_problem_statement is not None else {}
-
-    is_short_grading_instructions = (
-        num_tokens_from_string(exercise.grading_instructions) <= config.split_grading_instructions_by_file_prompt.tokens_before_split 
-        if exercise.grading_instructions is not None else True
-    )
-    file_grading_instructions = { 
-        item.file_name: item.grading_instructions 
-        for item in split_grading_instructions.items 
-    } if split_grading_instructions is not None else {}
 
     prompt_inputs: List[dict] = []
     
     # Feature extraction
-    solution_repo = exercise.get_solution_repository()
     template_repo = exercise.get_template_repository()
     submission_repo = submission.get_repository()
     
@@ -111,20 +83,7 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         )
         problem_statement = problem_statement if problem_statement.strip() else "No problem statement found."
 
-        grading_instructions = (
-            exercise.grading_instructions or "" if is_short_grading_instructions
-            else file_grading_instructions.get(file_path, "No relevant grading instructions found.")
-        )
-        grading_instructions = grading_instructions if grading_instructions.strip() else "No grading instructions found."
-
         file_content = add_line_numbers(file_content)
-        solution_to_submission_diff = get_diff(
-            src_repo=solution_repo, 
-            dst_repo=submission_repo, 
-            src_prefix="solution", 
-            dst_prefix="submission", 
-            file_path=file_path
-        )
         template_to_submission_diff = get_diff(
             src_repo=template_repo, 
             dst_repo=submission_repo, 
@@ -132,24 +91,13 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
             dst_prefix="submission", 
             file_path=file_path
         )
-        template_to_solution_diff = get_diff(
-            src_repo=template_repo, 
-            dst_repo=solution_repo, 
-            src_prefix="template", 
-            dst_prefix="solution", 
-            file_path=file_path
-        )
 
         prompt_inputs.append({
             "file_path": file_path, # Not really relevant for the prompt
-            "priority": len(template_to_solution_diff), # Not really relevant for the prompt
             "submission_file": file_content,
             "max_points": exercise.max_points,
             "bonus_points": exercise.bonus_points,
-            "solution_to_submission_diff": solution_to_submission_diff,
             "template_to_submission_diff": template_to_submission_diff,
-            "template_to_solution_diff": template_to_solution_diff,
-            "grading_instructions": grading_instructions,
             "problem_statement": problem_statement,
         })
     
@@ -158,10 +106,7 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
     # "submission_file" is not omittable, because it is the main input containing the line numbers
     # In the future we might be able to include the line numbers in the diff, but for now we need to keep it
     omittable_features = [
-        "template_to_solution_diff", # If it is even included in the prompt (has the lowest priority since it is indirectly included in other diffs)
-        "problem_statement", 
-        "grading_instructions",
-        "solution_to_submission_diff",
+        "problem_statement",
         "template_to_submission_diff", # In the future we might indicate the changed lines in the submission_file additionally
     ]
 
@@ -200,12 +145,12 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
             filtered_prompt_inputs.append(prompt_inputs.pop(0))
         prompt_inputs = filtered_prompt_inputs
    
-    results: List[Optional[AssessmentModel]] = await asyncio.gather(*[
+    results: List[Optional[ImprovementModel]] = await asyncio.gather(*[
         predict_and_parse(
             model=model, 
             chat_prompt=chat_prompt, 
             prompt_input=prompt_input, 
-            pydantic_object=AssessmentModel,
+            pydantic_object=ImprovementModel,
             tags=[
                 f"exercise-{exercise.id}",
                 f"submission-{submission.id}",
@@ -227,12 +172,6 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
             ]
         )
 
-    grading_instruction_ids = set(
-        grading_instruction.id 
-        for criterion in exercise.grading_criteria or [] 
-        for grading_instruction in criterion.structured_grading_instructions
-    )
-
     feedbacks: List[Feedback] = []
     for prompt_input, result in zip(prompt_inputs, results):
         file_path = prompt_input["file_path"]
@@ -248,9 +187,8 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
                 file_path=file_path,
                 line_start=feedback.line_start,
                 line_end=feedback.line_end,
-                credits=feedback.credits,
-                structured_grading_instruction_id=grading_instruction_id,
                 meta={}
+                # todo introduce non graded feedback object and extend the communication flow
             ))
 
     return feedbacks

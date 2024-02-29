@@ -3,6 +3,8 @@ The main app instance for your module. Try not to use the FastAPI functionality 
 Instead, use the decorators in the `athena` package.
 The only exception is the `start` method, which is used to start the module.
 """
+import os
+
 import uvicorn
 from uvicorn.config import LOGGING_CONFIG
 from fastapi import FastAPI, Request
