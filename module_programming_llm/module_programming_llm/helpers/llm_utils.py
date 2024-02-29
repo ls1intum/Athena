@@ -1,4 +1,5 @@
-from typing import Optional, Type, TypeVar, List
+from typing import Optional, Type, TypeVar, List, Any, Dict
+
 from pydantic import BaseModel, ValidationError
 import tiktoken
 
@@ -12,7 +13,7 @@ from langchain.prompts import (
 )
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.output_parsers import PydanticOutputParser
-from langchain.schema import OutputParserException
+from langchain.schema import OutputParserException, BaseLLMOutputParser, Generation, LLMResult
 
 from athena import emit_meta, get_experiment_environment
 from athena.logger import logger
@@ -81,7 +82,7 @@ def supports_function_calling(model: BaseLanguageModel):
     Returns:
         boolean: True if the model supports function calling, False otherwise
     """
-    return isinstance(model, ChatOpenAI)
+    return False #isinstance(model, ChatOpenAI)
 
 
 def get_chat_prompt_with_formatting_instructions(
@@ -114,6 +115,7 @@ def get_chat_prompt_with_formatting_instructions(
     system_message_prompt.prompt.input_variables.remove("format_instructions")
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_message + "\n\nJSON response following the provided schema:")
     return ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+
 
 
 async def predict_and_parse(
@@ -151,16 +153,7 @@ async def predict_and_parse(
         try:
             return await chain.arun(**prompt_input)
         except (OutputParserException, ValidationError) as e:
-            # Log the exception type and message
             logger.error(f"Exception type: {type(e).__name__}, Message: {e}")
-            # Optionally, you can do additional logging or handling based on the type
-            # For example, if you want to handle specific types differently:
-            if isinstance(e, OutputParserException):
-                # Handle OutputParserException specifically
-                pass
-            elif isinstance(e, ValidationError):
-                # Handle ValidationError specifically
-                pass
             return None
 
     output_parser = PydanticOutputParser(pydantic_object=pydantic_object)
@@ -170,3 +163,5 @@ async def predict_and_parse(
     except (OutputParserException, ValidationError):
         # In the future, we should probably have some recovery mechanism here (i.e. fix the output with another prompt)
         return None
+
+    # todo debug settings

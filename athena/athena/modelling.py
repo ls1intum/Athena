@@ -4,7 +4,7 @@ import functools
 
 import athena.storage
 from .module_config import get_module_config
-from .schemas import ModellingExercise, ModellingFeedback, ModellingSubmission
+from .schemas import ModellingExercise, ModellingGradedFeedback, ModellingSubmission
 
 module_type = get_module_config().type
 if module_type.name != "modelling":
@@ -14,7 +14,7 @@ if module_type.name != "modelling":
 # re-export with shorter names, because the module will only use these
 Exercise = ModellingExercise
 Submission = ModellingSubmission
-Feedback = ModellingFeedback
+Feedback = ModellingGradedFeedback
 
 # re-export without the need to give the type of the requested schema
 get_stored_exercises = functools.partial(athena.storage.get_stored_exercises, Exercise)

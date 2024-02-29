@@ -52,6 +52,17 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         pydantic_object=ImprovementModel
     )
 
+    # Get split problem statement by file (if necessary)
+    split_problem_statement = await split_problem_statement_by_file(exercise=exercise, submission=submission, prompt=chat_prompt, config=config,
+                                        debug=debug)
+
+    problem_statement_tokens = num_tokens_from_string(exercise.problem_statement or "")
+    is_short_problem_statement = problem_statement_tokens <= config.split_problem_statement_by_file_prompt.tokens_before_split
+    file_problem_statements = {
+        item.file_name: item.problem_statement
+        for item in split_problem_statement.items
+    } if split_problem_statement is not None else {}
+
     prompt_inputs: List[dict] = []
     
     # Feature extraction
@@ -93,18 +104,12 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         )
 
         prompt_inputs.append({
-            "file_path": file_path, # Not really relevant for the prompt
             "submission_file": file_content,
-            "max_points": exercise.max_points,
-            "bonus_points": exercise.bonus_points,
             "template_to_submission_diff": template_to_submission_diff,
             "problem_statement": problem_statement,
+            "file_name": file_path,
         })
-    
-    # Filter long prompts (omitting features if necessary)
-    # Lowest priority features are at the top of the list (i.e. they are omitted first if necessary)
-    # "submission_file" is not omittable, because it is the main input containing the line numbers
-    # In the future we might be able to include the line numbers in the diff, but for now we need to keep it
+
     omittable_features = [
         "problem_statement",
         "template_to_submission_diff", # In the future we might indicate the changed lines in the submission_file additionally
@@ -154,7 +159,7 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
             tags=[
                 f"exercise-{exercise.id}",
                 f"submission-{submission.id}",
-                f"file-{prompt_input['file_path']}",
+                #f"file-{prompt_input['file_path']}", todo
                 "generate-suggestions-by-file"
             ]
         ) for prompt_input in prompt_inputs
@@ -164,7 +169,7 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         emit_meta(
             "generate_suggestions", [
                 {
-                    "file_path": prompt_input["file_path"],
+                    #"file_path": prompt_input["file_path"],
                     "prompt": chat_prompt.format(**prompt_input),
                     "result": result.dict() if result is not None else None
                 }
@@ -178,7 +183,6 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         if result is None:
             continue
         for feedback in result.feedbacks:
-            grading_instruction_id = feedback.grading_instruction_id if feedback.grading_instruction_id in grading_instruction_ids else None
             feedbacks.append(Feedback(
                 exercise_id=exercise.id,
                 submission_id=submission.id,

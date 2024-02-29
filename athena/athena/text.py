@@ -3,7 +3,7 @@ import functools
 
 import athena.storage
 from .module_config import get_module_config
-from .schemas import TextExercise, TextFeedback, TextSubmission, TextLanguageEnum
+from .schemas import TextExercise, TextGradedFeedback, TextSubmission, TextLanguageEnum
 
 module_type = get_module_config().type
 if module_type.name != "text":
@@ -13,7 +13,7 @@ if module_type.name != "text":
 # re-export with shorter names, because the module will only use these
 Exercise = TextExercise
 Submission = TextSubmission
-Feedback = TextFeedback
+Feedback = TextGradedFeedback
 
 # re-export without the need to give the type of the requested schema
 get_stored_exercises = functools.partial(athena.storage.get_stored_exercises, Exercise)

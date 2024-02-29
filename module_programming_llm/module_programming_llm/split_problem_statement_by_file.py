@@ -7,7 +7,7 @@ from langchain.prompts import ChatPromptTemplate
 from athena import emit_meta
 from athena.programming import Exercise, Submission
 
-from module_programming_llm.config import GradedBasicApproachConfig
+from module_programming_llm.config import GradedBasicApproachConfig, BasicApproachConfig
 from module_programming_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions, 
     num_tokens_from_string, 
@@ -32,7 +32,7 @@ async def split_problem_statement_by_file(
         exercise: Exercise, 
         submission: Submission, 
         prompt: ChatPromptTemplate,
-        config: GradedBasicApproachConfig,
+        config: BasicApproachConfig,
         debug: bool
     ) -> Optional[SplitProblemStatement]:
     """Split the general problem statement by file
@@ -58,15 +58,7 @@ async def split_problem_statement_by_file(
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     template_repo = exercise.get_template_repository()
-    solution_repo = exercise.get_solution_repository()
     submission_repo = submission.get_repository()
-
-    changed_files_from_template_to_solution = get_diff(
-        src_repo=template_repo, 
-        dst_repo=solution_repo, 
-        file_path=None, 
-        name_only=True
-    ).split("\n")
 
     changed_files_from_template_to_submission = get_diff(
         src_repo=template_repo, 
@@ -84,9 +76,18 @@ async def split_problem_statement_by_file(
     
     prompt_input = {
         "problem_statement": exercise.problem_statement or "No problem statement.",
-        "changed_files_from_template_to_solution": ", ".join(changed_files_from_template_to_solution),
         "changed_files_from_template_to_submission": ", ".join(changed_files_from_template_to_submission)
     }
+
+    if "changed_files_from_template_to_solution" in prompt.input_variables:
+        solution_repo = exercise.get_solution_repository()
+        changed_files_from_template_to_solution = get_diff(
+            src_repo=template_repo,
+            dst_repo=solution_repo,
+            file_path=None,
+            name_only=True
+        ).split("\n")
+        prompt_input["changed_files_from_template_to_solution"] = ", ".join(changed_files_from_template_to_solution)
 
     # Return None if the prompt is too long
     if num_tokens_from_prompt(chat_prompt, prompt_input) > config.max_input_tokens:

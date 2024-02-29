@@ -9,7 +9,7 @@ from athena.authenticate import authenticated
 from athena.metadata import with_meta
 from athena.module_config import get_dynamic_module_config_factory
 from athena.logger import logger
-from athena.schemas import Exercise, Submission, Feedback
+from athena.schemas import Exercise, Submission, GradedFeedback
 from athena.schemas.schema import to_camel
 from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
     store_exercise, store_feedback, store_feedback_suggestions, store_submissions, get_stored_submissions
@@ -17,7 +17,7 @@ from athena.storage import get_stored_submission_meta, get_stored_exercise_meta,
 
 E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
-F = TypeVar('F', bound=Feedback)
+F = TypeVar('F', bound=GradedFeedback)
 G = TypeVar('G', bound=bool)
 
 # Config type
@@ -215,20 +215,20 @@ def feedback_consumer(func: Union[
 
         Without using module config (both synchronous and asynchronous forms):
         >>> @feedback_consumer
-        ... def sync_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
+        ... def sync_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
         ...     # process feedback here
 
         >>> @feedback_consumer
-        ... async def async_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
+        ... async def async_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
         ...     # process feedback here
 
         With using module config (both synchronous and asynchronous forms):
         >>> @feedback_consumer
-        ... def sync_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[Feedback], module_config: Optional[dict]):
+        ... def sync_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback], module_config: Optional[dict]):
         ...     # process feedback here using module_config
 
         >>> @feedback_consumer
-        ... async def async_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[Feedback], module_config: Optional[dict]):
+        ... async def async_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback], module_config: Optional[dict]):
         ...     # process feedback here using module_config
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
@@ -387,14 +387,14 @@ def evaluation_provider(func: Union[
         >>> @evaluation_provider
         ... def sync_evaluate_feedback(
         ...     exercise: Exercise, submission: Submission, 
-        ...     true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback]
+        ...     true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]
         ... ) -> Any:
         ...     # evaluate predicted feedback here and return evaluation results
 
         >>> @feedback_provider
         ... async def async_evaluate_feedback(
         ...     exercise: Exercise, submission: Submission, 
-        ...     true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback]
+        ...     true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]
         ... ) -> Any:
         ...     # evaluate predicted feedback here and return evaluation results
     """

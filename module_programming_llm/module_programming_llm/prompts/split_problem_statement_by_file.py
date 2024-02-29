@@ -5,6 +5,8 @@ You are an AI tutor for programming assessment at a prestigious university.
 Restructure the problem statement by student changed file to show relevant information for each file to the tutor. \
 Make it as easy as possible for the tutor to grade the assignment when looking at the changed file. \
 Some parts of the problem statement may be relevant for multiple files.
+Stick to the given schema and enclose each key and value into quotes, json format.
+For the file keys, include the full path.
 """
 
 human_message_with_solution = """\

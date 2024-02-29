@@ -1,10 +1,10 @@
 from typing import Optional
 from pydantic import Field, validator
 
-from .feedback import Feedback
+from .graded_feedback import GradedFeedback
 
 
-class TextFeedback(Feedback):
+class TextGradedFeedback(GradedFeedback):
     """Feedback on a text exercise."""
     index_start: Optional[int] = Field(None, description="The start index of the feedback in the submission text.", example=0)
     index_end: Optional[int] = Field(None, description="The end index of the feedback in the submission text.", example=10)

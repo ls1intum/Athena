@@ -6,7 +6,7 @@ from pydantic import Field
 from .schema import Schema
 
 
-class Feedback(Schema, ABC):
+class GradedFeedback(Schema, ABC):
     id: Optional[int] = Field(None, example=1)
     title: Optional[str] = Field(None,
                                  description="The title of the feedback that is shown to the student.",

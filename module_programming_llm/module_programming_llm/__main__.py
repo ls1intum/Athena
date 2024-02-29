@@ -8,7 +8,7 @@ from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 from module_programming_llm.config import Configuration
 
-from module_programming_llm.generate_suggestions_by_file import \
+from module_programming_llm.generate_graded_suggestions_by_file import \
     generate_suggestions_by_file as generate_graded_suggestions_by_file
 from module_programming_llm.generate_non_graded_suggestions_by_file import \
     generate_suggestions_by_file as generate_non_graded_suggestions_by_file

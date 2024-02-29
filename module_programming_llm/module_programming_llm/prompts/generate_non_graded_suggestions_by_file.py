@@ -11,15 +11,21 @@ Rather concentrate on incorrectly applied principles or inconsistencies
 # Style
 1. Constructive, 2. Specific, 3. Balanced, 4. Clear and Concise, 5. Actionable, 6. Educational, 7. Contextual
 
+Focus on the content, and not the format of submissions. No need to mention namespaces, comments, java docs or file names unless absolutely relevant. 
+Remember, this is a university course, and not an industrial setting.
+
 # Problem statement
 {problem_statement}
 
 # Diff between template (deletions) and student\'s submission (additions):
+\"\"\"
 {template_to_submission_diff}
+\"\"\"
 """
 
 human_message = """\
 Student\'s submission file for which you have to generate feedback (with line numbers <number>: <line>):
+{file_name}
 \"\"\"
 {submission_file}
 \"\"\"\
