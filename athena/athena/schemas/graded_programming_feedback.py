@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, validator
 from .graded_feedback import GradedFeedback
 
 
-class ProgrammingGradedFeedback(GradedFeedback, BaseModel):
+class GradedProgrammingFeedback(GradedFeedback, BaseModel):
     """Feedback on a programming exercise."""
     file_path: Optional[str] = Field(None, example="src/pe1/MergeSort.java")
 

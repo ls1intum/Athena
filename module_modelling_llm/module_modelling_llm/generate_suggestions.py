@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from athena import emit_meta
 from athena.logger import logger
-from athena.modelling import Exercise, Submission, Feedback
+from athena.modelling import Exercise, Submission, GradedFeedback
 from module_modelling_llm.config import BasicApproachConfig
 from module_modelling_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
@@ -42,7 +42,7 @@ class AssessmentModel(BaseModel):
 
 
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> \
-        List[Feedback]:
+        List[GradedFeedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     serialized_example_solution = None
@@ -125,7 +125,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     feedbacks = []
     for feedback in result.feedbacks:
         grading_instruction_id = feedback.grading_instruction_id if feedback.grading_instruction_id in grading_instruction_ids else None
-        feedbacks.append(Feedback(
+        feedbacks.append(GradedFeedback(
             exercise_id=exercise.id,
             submission_id=submission.id,
             title=feedback.title,

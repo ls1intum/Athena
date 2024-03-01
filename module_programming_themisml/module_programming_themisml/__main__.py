@@ -3,11 +3,11 @@ Entry point for the module_programming_themisml module.
 """
 from typing import List, cast
 
-from athena import app, submissions_consumer, submission_selector, feedback_consumer, feedback_provider
-from athena.programming import Exercise, Submission, Feedback, get_stored_feedback_suggestions, get_stored_submissions, count_stored_submissions
+from athena import app, submissions_consumer, submission_selector, graded_feedback_consumer, graded_feedback_provider
+from athena.programming import Exercise, Submission, GradedFeedback, get_stored_feedback_suggestions, get_stored_submissions, count_stored_submissions
 from athena.logger import logger
 from athena.storage import store_feedback
-from athena.storage.feedback_storage import store_feedback_suggestions
+from athena.storage.feedback_storage import store_graded_feedback_suggestions
 
 from module_programming_themisml.extract_methods import get_feedback_method
 from module_programming_themisml.feedback_suggestions import create_feedback_suggestions, filter_overlapping_suggestions, filter_suspicious
@@ -28,8 +28,8 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@feedback_consumer
-def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
+@graded_feedback_consumer
+def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
     logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d", len(feedbacks), submission.id, exercise.id)
     logger.info("process_feedback: Feedbacks: %s", feedbacks)
 
@@ -73,15 +73,15 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
                 suggestion.meta["n_feedback_suggestions"] = feedback.meta["n_feedback_suggestions"]
 
     # save to database
-    store_feedback_suggestions(feedback_suggestions)  # type: ignore
+    store_graded_feedback_suggestions(feedback_suggestions)  # type: ignore
     for feedback in feedbacks:
         store_feedback(feedback)
 
     logger.debug("Feedbacks processed")
 
 
-@feedback_provider
-async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[Feedback]:
+@graded_feedback_provider
+async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[GradedFeedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
 
     # ThemisML currently only works with Java
@@ -89,7 +89,7 @@ async def suggest_feedback(exercise: Exercise, submission: Submission) -> List[F
         logger.info("ThemisML only works with Java. Returning no suggestions.")
         return []
 
-    suggested_feedbacks = cast(List[Feedback], list(get_stored_feedback_suggestions(exercise.id, submission.id)))
+    suggested_feedbacks = cast(List[GradedFeedback], list(get_stored_feedback_suggestions(exercise.id, submission.id)))
     logger.debug("Found %d feedback suggestions (unfiltered)", len(suggested_feedbacks))
     suggested_feedbacks = filter_suspicious(suggested_feedbacks, count_stored_submissions(exercise.id))
     logger.debug("Found %d feedback suggestions (removed suspicious suggestions)", len(suggested_feedbacks))

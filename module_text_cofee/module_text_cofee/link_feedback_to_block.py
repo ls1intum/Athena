@@ -8,11 +8,11 @@ more easily later on, when creating feedback suggestions.
 from typing import Optional
 
 from athena.database import get_db
-from athena.text import Feedback
+from athena.text import GradedFeedback
 from module_text_cofee.models.db_text_block import DBTextBlock
 
 
-def feedback_to_text_block(feedback: Feedback) -> Optional[DBTextBlock]:
+def feedback_to_text_block(feedback: GradedFeedback) -> Optional[DBTextBlock]:
     """
     Returns the text block that the given feedback is given on, if any.
     """
@@ -26,7 +26,7 @@ def feedback_to_text_block(feedback: Feedback) -> Optional[DBTextBlock]:
         return None
 
 
-def link_feedback_to_block(feedback: Feedback):
+def link_feedback_to_block(feedback: GradedFeedback):
     """
     Links the given feedback to the text block that it is given on, if any.
     Modifies the feedback in place.

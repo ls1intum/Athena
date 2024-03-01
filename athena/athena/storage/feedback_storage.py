@@ -61,7 +61,7 @@ def get_stored_feedback_suggestions(
         return (f.to_schema() for f in query.all())
 
 
-def store_feedback_suggestions(feedbacks: List[GradedFeedback]) -> List[GradedFeedback]:
+def store_graded_feedback_suggestions(feedbacks: List[GradedFeedback]) -> List[GradedFeedback]:
     """Stores the given feedbacks as a suggestions.
 
     Returns:
@@ -79,4 +79,4 @@ def store_feedback_suggestions(feedbacks: List[GradedFeedback]) -> List[GradedFe
 
 def store_feedback_suggestion(feedback: GradedFeedback):
     """Stores the given feedback as a suggestion."""
-    store_feedback_suggestions([feedback])
+    store_graded_feedback_suggestions([feedback])

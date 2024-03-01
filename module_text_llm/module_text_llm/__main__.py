@@ -5,8 +5,8 @@ from typing import List, Any
 import nltk
 import tiktoken
 
-from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider, evaluation_provider
-from athena.text import Exercise, Submission, Feedback
+from athena import app, submission_selector, submissions_consumer, graded_feedback_consumer, graded_feedback_provider, evaluation_provider
+from athena.text import Exercise, Submission, GradedFeedback
 from athena.logger import logger
 
 from module_text_llm.config import Configuration
@@ -26,13 +26,13 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@feedback_consumer
-def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
+@graded_feedback_consumer
+def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
     logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks), submission.id, exercise.id)
 
 
-@feedback_provider
-async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
+@graded_feedback_provider
+async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[GradedFeedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
     return await generate_suggestions(exercise, submission, module_config.approach, module_config.debug)
 
@@ -40,7 +40,7 @@ async def suggest_feedback(exercise: Exercise, submission: Submission, module_co
 @evaluation_provider
 async def evaluate_feedback(
     exercise: Exercise, submission: Submission, 
-    true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback], 
+    true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback],
 ) -> Any:
     logger.info(
         "evaluate_feedback: Evaluation for submission %d of exercise %d was requested with %d true and %d predicted feedbacks",

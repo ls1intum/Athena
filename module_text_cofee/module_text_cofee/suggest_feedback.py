@@ -2,7 +2,7 @@ from typing import List, Iterable
 
 from athena.database import get_db
 from athena.logger import logger
-from athena.text import Submission, Feedback
+from athena.text import Submission, GradedFeedback
 from athena.helpers.text import get_exercise_feedbacks
 from module_text_cofee.models.db_text_block import DBTextBlock
 from module_text_cofee.models.db_text_cluster import DBTextCluster
@@ -11,7 +11,7 @@ from module_text_cofee.models.db_text_cluster import DBTextCluster
 DISTANCE_THRESHOLD = 1.0
 
 
-def filter_feedbacks_by_block(feedbacks: List[Feedback], block: DBTextBlock) -> Iterable[Feedback]:
+def filter_feedbacks_by_block(feedbacks: List[GradedFeedback], block: DBTextBlock) -> Iterable[GradedFeedback]:
     """
     Filter a list of feedback to only contain feedback that is linked to a given block.
     """
@@ -21,7 +21,7 @@ def filter_feedbacks_by_block(feedbacks: List[Feedback], block: DBTextBlock) -> 
     )
 
 
-def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> List[Feedback]:
+def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> List[GradedFeedback]:
     """
     Suggest feedback for a text block (part of submission) based on existing feedback & processed clusters.
     """
@@ -56,7 +56,7 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
     # Get all feedbacks on the closest block
     closest_block_feedback = filter_feedbacks_by_block(exercise_feedbacks, closest_block)
     # add new submission ID, link the feedback to the block and add meta information for debugging
-    suggested_feedback: List[Feedback] = []
+    suggested_feedback: List[GradedFeedback] = []
     for f in closest_block_feedback:
         copy = f.copy(deep=True)
         copy.submission_id = submission.id
@@ -73,7 +73,7 @@ def suggest_feedback_for_block(submission: Submission, block: DBTextBlock) -> Li
     return suggested_feedback
 
 
-def suggest_feedback_for_submission(submission: Submission) -> List[Feedback]:
+def suggest_feedback_for_submission(submission: Submission) -> List[GradedFeedback]:
     """
     Suggest feedback for a submission based on existing feedback & processed clusters.
     """

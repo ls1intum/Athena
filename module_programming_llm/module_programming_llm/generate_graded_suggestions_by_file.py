@@ -4,7 +4,7 @@ import asyncio
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
-from athena.programming import Exercise, Submission, Feedback
+from athena.programming import Exercise, Submission, GradedFeedback
 
 from module_programming_llm.config import GradedBasicApproachConfig
 from module_programming_llm.split_grading_instructions_by_file import split_grading_instructions_by_file
@@ -47,7 +47,7 @@ class AssessmentModel(BaseModel):
 
 
 # pylint: disable=too-many-locals
-async def generate_suggestions_by_file(exercise: Exercise, submission: Submission, config: GradedBasicApproachConfig, debug: bool) -> List[Feedback]:
+async def generate_suggestions_by_file(exercise: Exercise, submission: Submission, config: GradedBasicApproachConfig, debug: bool) -> List[GradedFeedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
@@ -199,7 +199,8 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         while len(filtered_prompt_inputs) < config.max_number_of_files and prompt_inputs:
             filtered_prompt_inputs.append(prompt_inputs.pop(0))
         prompt_inputs = filtered_prompt_inputs
-   
+
+    # noinspection PyTypeChecker
     results: List[Optional[AssessmentModel]] = await asyncio.gather(*[
         predict_and_parse(
             model=model, 
@@ -233,14 +234,14 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         for grading_instruction in criterion.structured_grading_instructions
     )
 
-    feedbacks: List[Feedback] = []
+    feedbacks: List[GradedFeedback] = []
     for prompt_input, result in zip(prompt_inputs, results):
         file_path = prompt_input["file_path"]
         if result is None:
             continue
         for feedback in result.feedbacks:
             grading_instruction_id = feedback.grading_instruction_id if feedback.grading_instruction_id in grading_instruction_ids else None
-            feedbacks.append(Feedback(
+            feedbacks.append(GradedFeedback(
                 exercise_id=exercise.id,
                 submission_id=submission.id,
                 title=feedback.title,

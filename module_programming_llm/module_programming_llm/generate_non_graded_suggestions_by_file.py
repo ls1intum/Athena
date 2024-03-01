@@ -4,9 +4,9 @@ import asyncio
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
-from athena.programming import Exercise, Submission, Feedback
+from athena.programming import Exercise, Submission, NonGradedFeedback
 
-from module_programming_llm.config import GradedBasicApproachConfig, NonGradedBasicApproachConfig
+from module_programming_llm.config import NonGradedBasicApproachConfig
 from module_programming_llm.split_problem_statement_by_file import split_problem_statement_by_file
 from module_programming_llm.helpers.llm_utils import (
     check_prompt_length_and_omit_features_if_necessary, 
@@ -28,6 +28,7 @@ class FeedbackModel(BaseModel):
     line_start: Optional[int] = Field(description="Referenced line number start, or empty if unreferenced")
     line_end: Optional[int] = Field(description="Referenced line number end, or empty if unreferenced")
 
+
     class Config:
         title = "Feedback"
 
@@ -42,7 +43,7 @@ class ImprovementModel(BaseModel):
 
 
 # pylint: disable=too-many-locals
-async def generate_suggestions_by_file(exercise: Exercise, submission: Submission, config: NonGradedBasicApproachConfig, debug: bool) -> List[Feedback]:
+async def generate_suggestions_by_file(exercise: Exercise, submission: Submission, config: NonGradedBasicApproachConfig, debug: bool) -> List[NonGradedFeedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
@@ -51,17 +52,6 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         human_message=config.generate_suggestions_by_file_prompt.human_message, 
         pydantic_object=ImprovementModel
     )
-
-    # Get split problem statement by file (if necessary)
-    split_problem_statement = await split_problem_statement_by_file(exercise=exercise, submission=submission, prompt=chat_prompt, config=config,
-                                        debug=debug)
-
-    problem_statement_tokens = num_tokens_from_string(exercise.problem_statement or "")
-    is_short_problem_statement = problem_statement_tokens <= config.split_problem_statement_by_file_prompt.tokens_before_split
-    file_problem_statements = {
-        item.file_name: item.problem_statement
-        for item in split_problem_statement.items
-    } if split_problem_statement is not None else {}
 
     prompt_inputs: List[dict] = []
     
@@ -86,6 +76,18 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         file_filter=lambda file_path: file_path in changed_files_from_template_to_submission
     )
 
+    # Get split problem statement by file (if necessary)
+    split_problem_statement = await split_problem_statement_by_file(exercise=exercise, submission=submission,
+                                                                    prompt=chat_prompt, config=config,
+                                                                    debug=debug)
+
+    problem_statement_tokens = num_tokens_from_string(exercise.problem_statement or "")
+    is_short_problem_statement = problem_statement_tokens <= config.split_problem_statement_by_file_prompt.tokens_before_split
+    file_problem_statements = {
+        item.file_name: item.problem_statement
+        for item in split_problem_statement.items
+    } if split_problem_statement is not None else {}
+
     # Gather prompt inputs for each changed file (independently)
     for file_path, file_content in changed_files.items():
         problem_statement = (
@@ -107,7 +109,7 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
             "submission_file": file_content,
             "template_to_submission_diff": template_to_submission_diff,
             "problem_statement": problem_statement,
-            "file_name": file_path,
+            "file_path": file_path,
         })
 
     omittable_features = [
@@ -149,7 +151,8 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         while len(filtered_prompt_inputs) < config.max_number_of_files and prompt_inputs:
             filtered_prompt_inputs.append(prompt_inputs.pop(0))
         prompt_inputs = filtered_prompt_inputs
-   
+
+    # noinspection PyTypeChecker
     results: List[Optional[ImprovementModel]] = await asyncio.gather(*[
         predict_and_parse(
             model=model, 
@@ -159,7 +162,7 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
             tags=[
                 f"exercise-{exercise.id}",
                 f"submission-{submission.id}",
-                #f"file-{prompt_input['file_path']}", todo
+                f"file-{prompt_input['file_path']}",
                 "generate-suggestions-by-file"
             ]
         ) for prompt_input in prompt_inputs
@@ -169,7 +172,7 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
         emit_meta(
             "generate_suggestions", [
                 {
-                    #"file_path": prompt_input["file_path"],
+                    "file_path": prompt_input["file_path"],
                     "prompt": chat_prompt.format(**prompt_input),
                     "result": result.dict() if result is not None else None
                 }
@@ -177,13 +180,13 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
             ]
         )
 
-    feedbacks: List[Feedback] = []
+    feedbacks: List[NonGradedFeedback] = []
     for prompt_input, result in zip(prompt_inputs, results):
         file_path = prompt_input["file_path"]
         if result is None:
             continue
         for feedback in result.feedbacks:
-            feedbacks.append(Feedback(
+            feedbacks.append(NonGradedFeedback(
                 exercise_id=exercise.id,
                 submission_id=submission.id,
                 title=feedback.title,
@@ -192,7 +195,6 @@ async def generate_suggestions_by_file(exercise: Exercise, submission: Submissio
                 line_start=feedback.line_start,
                 line_end=feedback.line_end,
                 meta={}
-                # todo introduce non graded feedback object and extend the communication flow
             ))
 
     return feedbacks

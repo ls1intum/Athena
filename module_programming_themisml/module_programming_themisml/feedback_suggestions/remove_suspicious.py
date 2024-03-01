@@ -12,10 +12,10 @@ When evaluating ThemisML, we found the following problems with the suggestions:
 
 from typing import Dict, List, cast
 
-from athena.programming import Feedback
+from athena.programming import GradedFeedback
 
 
-def filter_suspicious(suggestions: List[Feedback], n_submissions: int) -> List[Feedback]:
+def filter_suspicious(suggestions: List[GradedFeedback], n_submissions: int) -> List[GradedFeedback]:
     """
     Filters out suspicious suggestions we don't want to suggest to tutors.
     suggestions: List of suggestions to filter
@@ -28,7 +28,7 @@ def filter_suspicious(suggestions: List[Feedback], n_submissions: int) -> List[F
         if n_feedback_suggestions > 2 and n_feedback_suggestions > 0.1 * n_submissions:
             suspicious[cast(int, suggestion.id)] = True
         # find all other suggestions for the same method
-        other_suggestions: List[Feedback] = []
+        other_suggestions: List[GradedFeedback] = []
         for other_suggestion in suggestions:
             if other_suggestion.id == suggestion.id:
                 continue
