@@ -1,5 +1,5 @@
 import asyncio
-from typing import Optional, Sequence, List
+from typing import Optional, Sequence, List, Dict
 from collections import defaultdict
 
 from pydantic import BaseModel, Field
@@ -17,14 +17,27 @@ from module_programming_llm.helpers.llm_utils import (
 from module_programming_llm.helpers.utils import load_files_from_repo, add_line_numbers
 
 
-class FileSummary(BaseModel):
+class FileDescription(BaseModel):
     file_name: str = Field(description="File name")
-    summary: str = Field(description="Summary relevant for this file")
+    description: str = Field(description="Summary relevant for this file")
+
+    class Config:
+        title = "FileDescription"
 
 
 class SolutionSummary(BaseModel):
-    """Collection of summaries split by file"""
-    items: Sequence[FileSummary] = Field(description="File summary")
+    """Collection of summaries, accessible by file path"""
+    items: Dict[str, str] = Field(description="File summaries indexed by file path")
+
+    class Config:
+        title = "SolutionSummary"
+
+    def describe_solution_summary(self) -> str:
+        descriptions = []
+        for file_path, file_summary in self.items.items():
+            description = f"File {file_path}: {file_summary}"
+            descriptions.append(description)
+        return "\n".join(descriptions)
 
 
 # pylint: disable=too-many-locals
@@ -48,7 +61,7 @@ async def generate_summary_by_file(
     """
 
     # Return None if submission_file not in the prompt
-    if "submission_file" not in prompt.input_variables:
+    if "summary" not in prompt.input_variables:
         return None
 
     model = config.model.get_model()  # type: ignore[attr-defined]
@@ -59,9 +72,9 @@ async def generate_summary_by_file(
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
         model=model,
-        system_message=config.generate_suggestions_by_file_prompt.system_message,
-        human_message=config.generate_suggestions_by_file_prompt.human_message,
-        pydantic_object=SolutionSummary
+        system_message=config.generate_file_summary_prompt.system_message,
+        human_message=config.generate_file_summary_prompt.human_message,
+        pydantic_object=FileDescription
     )
 
     prompt_inputs = []
@@ -81,12 +94,12 @@ async def generate_summary_by_file(
     ]
 
     # noinspection PyTypeChecker
-    results: List[Optional[FileSummary]] = await asyncio.gather(*[
+    results: List[Optional[FileDescription]] = await asyncio.gather(*[
         predict_and_parse(
             model=model,
             chat_prompt=chat_prompt,
             prompt_input=prompt_input,
-            pydantic_object=FileSummary,
+            pydantic_object=FileDescription,
             tags=[
                 f"exercise-{exercise.id}",
                 f"submission-{submission.id}",
@@ -107,4 +120,10 @@ async def generate_summary_by_file(
     if not any(result is not None for result in results):
         return None
 
-    return SolutionSummary(items=[result for result in results if result is not None])
+    items_dict = {}
+
+    for _, file_summary in enumerate(results):
+        if file_summary is not None:
+            items_dict[file_summary.file_name] = file_summary.description
+
+    return SolutionSummary(items=items_dict)

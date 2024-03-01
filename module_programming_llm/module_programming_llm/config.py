@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC
 
 from pydantic import BaseModel, Field
 
@@ -16,10 +16,13 @@ from module_programming_llm.prompts.split_grading_instructions_by_file import (
     system_message as split_grading_instructions_by_file_message,
     human_message as split_grading_instructions_by_file_human_message
 )
-from module_programming_llm.prompts.split_problem_statement_by_file import (
-    system_message as split_problem_statements_by_file_system_message,
-    human_message_without_solution as split_problem_statements_by_file_human_message_without_solution,
-    human_message_with_solution as split_problem_statements_by_file_human_message_with_solution,
+from module_programming_llm.prompts.split_problem_non_grading_statement_by_file import (
+    system_message as split_problem_statements_by_file_system_message_without_solution,
+    human_message as split_problem_statements_by_file_human_message_without_solution,
+)
+from module_programming_llm.prompts.split_problem_grading_statement_by_file import (
+    system_message as split_problem_statements_by_file_system_message_with_solution,
+    human_message as split_problem_statements_by_file_human_message_with_solution,
 )
 from module_programming_llm.prompts.summarize_submission_by_file import (
     system_message as summarize_submission_by_file_system_message,
@@ -29,7 +32,7 @@ from module_programming_llm.prompts.summarize_submission_by_file import (
 
 class SplitProblemStatementsBasePrompt(BaseModel):
     """Base class for splitting problem statements, contains common definitions."""
-    system_message: str = Field(split_problem_statements_by_file_system_message, description="Message for priming AI "
+    system_message: str = Field(..., description="Message for priming AI "
                                                                                              "behavior and "
                                                                                              "instructing it what to "
                                                                                              "do.")
@@ -40,10 +43,12 @@ class SplitProblemStatementsBasePrompt(BaseModel):
 
 
 class SplitProblemStatementsWithSolutionByFilePrompt(SplitProblemStatementsBasePrompt):
+    system_message: str = split_problem_statements_by_file_system_message_with_solution
     human_message: str = split_problem_statements_by_file_human_message_with_solution
 
 
 class SplitProblemStatementsWithoutSolutionByFilePrompt(SplitProblemStatementsBasePrompt):
+    system_message: str = split_problem_statements_by_file_system_message_without_solution
     human_message: str = split_problem_statements_by_file_human_message_without_solution
 
 
@@ -104,6 +109,11 @@ class BasicApproachConfig(BaseModel):
                                                                                                  "subclasses.")
     generate_suggestions_by_file_prompt: SplitProblemStatementsBasePrompt = Field(description="To be defined in "
                                                                                               "subclasses.")
+    generate_file_summary_prompt: FileSummaryPrompt = Field(default=FileSummaryPrompt(), description="Generates short "
+                                                                                                     "summaries to be "
+                                                                                                     "fed into the LLM "
+                                                                                                     "with separate "
+                                                                                                     "files.")
 
 
 class GradedBasicApproachConfig(BasicApproachConfig, ABC):
@@ -128,7 +138,6 @@ Then, it generates suggestions for each file independently.\
         default=SplitProblemStatementsWithoutSolutionByFilePrompt())
     generate_suggestions_by_file_prompt: FeedbackGenerationBasePrompt = Field(
         default=NonGradedFeedbackGenerationPrompt())
-    generate_file_aummary_prompt: FileSummaryPrompt = Field(default=FileSummaryPrompt)
 
 
 @config_schema_provider

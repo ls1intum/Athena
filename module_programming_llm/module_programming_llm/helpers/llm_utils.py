@@ -1,5 +1,6 @@
 from typing import Optional, Type, TypeVar, List, Any, Dict
 
+from langchain.callbacks.tracers import langchain
 from pydantic import BaseModel, ValidationError
 import tiktoken
 
@@ -82,7 +83,7 @@ def supports_function_calling(model: BaseLanguageModel):
     Returns:
         boolean: True if the model supports function calling, False otherwise
     """
-    return False #isinstance(model, ChatOpenAI)
+    return False#isinstance(model, ChatOpenAI)
 
 
 def get_chat_prompt_with_formatting_instructions(
@@ -137,6 +138,8 @@ async def predict_and_parse(
     Returns:
         Optional[T]: Parsed output, or None if it could not be parsed
     """
+    langchain.debug = True
+
     experiment = get_experiment_environment()
 
     tags = tags or []
@@ -149,7 +152,7 @@ async def predict_and_parse(
 
     if supports_function_calling(model):
         chain = create_structured_output_chain(pydantic_object, llm=model, prompt=chat_prompt, tags=tags)
-        
+        chain.verbose = True
         try:
             return await chain.arun(**prompt_input)
         except (OutputParserException, ValidationError) as e:
@@ -160,7 +163,8 @@ async def predict_and_parse(
     chain = LLMChain(llm=model, prompt=chat_prompt, output_parser=output_parser, tags=tags)
     try:
         return await chain.arun(**prompt_input)
-    except (OutputParserException, ValidationError):
+    except (OutputParserException, ValidationError) as e:
+        logger.error(f"Exception type: {type(e).__name__}, Message: {e}")
         # In the future, we should probably have some recovery mechanism here (i.e. fix the output with another prompt)
         return None
 

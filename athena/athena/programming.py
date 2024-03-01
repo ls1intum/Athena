@@ -24,6 +24,6 @@ get_stored_feedback = functools.partial(athena.storage.get_stored_feedback, Grad
 get_stored_feedback_suggestions = functools.partial(athena.storage.get_stored_feedback_suggestions, GradedFeedback)
 
 __all__ = [
-    "Exercise", "Submission", "GradedFeedback",
+    "Exercise", "Submission", "GradedFeedback", "NonGradedFeedback",
     "get_stored_exercises", "get_stored_submissions", "get_stored_feedback", "get_stored_feedback_suggestions"
 ]
