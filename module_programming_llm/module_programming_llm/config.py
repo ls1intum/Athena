@@ -21,6 +21,10 @@ from module_programming_llm.prompts.split_problem_statement_by_file import (
     human_message_without_solution as split_problem_statements_by_file_human_message_without_solution,
     human_message_with_solution as split_problem_statements_by_file_human_message_with_solution,
 )
+from module_programming_llm.prompts.summarize_submission_by_file import (
+    system_message as summarize_submission_by_file_system_message,
+    human_message as summarize_submission_by_file_human_message
+)
 
 
 class SplitProblemStatementsBasePrompt(BaseModel):
@@ -80,6 +84,16 @@ e.g. template_to_submission_diff. todo revisit*\
     human_message: str = generate_non_graded_suggestions_by_file_human_message
 
 
+class FileSummaryPrompt(BaseModel):
+    """todo"""
+    system_message: str = Field(summarize_submission_by_file_system_message, description="Message for priming AI "
+                                                                                         "behavior and instructing it"
+                                                                                         " what to do.")
+    human_message: str = Field(summarize_submission_by_file_human_message, description="Message from a human. The "
+                                                                                       "input on which the AI is "
+                                                                                       "supposed to act.")
+
+
 class BasicApproachConfig(BaseModel):
     max_input_tokens: int = Field(default=3000, description="Maximum number of tokens in the input prompt.")
     model: ModelConfigType = Field(default=DefaultModelConfig())
@@ -90,11 +104,6 @@ class BasicApproachConfig(BaseModel):
                                                                                                  "subclasses.")
     generate_suggestions_by_file_prompt: SplitProblemStatementsBasePrompt = Field(description="To be defined in "
                                                                                               "subclasses.")
-
-    @abstractmethod
-    def includes_solution(self) -> bool:
-        """Method to check if the prompt includes a solution. To be implemented in subclasses."""
-        pass
 
 
 class GradedBasicApproachConfig(BasicApproachConfig, ABC):
@@ -109,9 +118,6 @@ Then, it generates suggestions for each file independently.\
     generate_suggestions_by_file_prompt: FeedbackGenerationBasePrompt = Field(
         default=GradedFeedbackGenerationPrompt())
 
-    def includes_solution(self) -> bool:
-        return True
-
 
 class NonGradedBasicApproachConfig(BasicApproachConfig, ABC):
     """\
@@ -122,9 +128,7 @@ Then, it generates suggestions for each file independently.\
         default=SplitProblemStatementsWithoutSolutionByFilePrompt())
     generate_suggestions_by_file_prompt: FeedbackGenerationBasePrompt = Field(
         default=NonGradedFeedbackGenerationPrompt())
-
-    def includes_solution(self) -> bool:
-        return False
+    generate_file_aummary_prompt: FileSummaryPrompt = Field(default=FileSummaryPrompt)
 
 
 @config_schema_provider

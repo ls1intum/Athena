@@ -20,6 +20,9 @@ Remember, this is a university course, and not an industrial setting.
 \"\"\"
 {template_to_submission_diff}
 \"\"\"
+
+# Short summary of the other project files:
+{summary}
 """
 
 human_message = """\
