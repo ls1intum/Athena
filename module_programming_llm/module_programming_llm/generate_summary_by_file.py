@@ -12,7 +12,7 @@ from module_programming_llm.config import GradedBasicApproachConfig, BasicApproa
 from module_programming_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
     num_tokens_from_prompt,
-    predict_and_parse
+    predict_and_parse,
 )
 from module_programming_llm.helpers.utils import load_files_from_repo, add_line_numbers
 
@@ -27,6 +27,7 @@ class FileDescription(BaseModel):
 
 class SolutionSummary(BaseModel):
     """Collection of summaries, accessible by file path"""
+
     items: Dict[str, str] = Field(description="File summaries indexed by file path")
 
     class Config:
@@ -42,11 +43,11 @@ class SolutionSummary(BaseModel):
 
 # pylint: disable=too-many-locals
 async def generate_summary_by_file(
-        exercise: Exercise,
-        submission: Submission,
-        prompt: ChatPromptTemplate,
-        config: BasicApproachConfig,
-        debug: bool
+    exercise: Exercise,
+    submission: Submission,
+    prompt: ChatPromptTemplate,
+    config: BasicApproachConfig,
+    debug: bool,
 ) -> Optional[SolutionSummary]:
     """Generaty summary for the submission file by file
 
@@ -74,7 +75,7 @@ async def generate_summary_by_file(
         model=model,
         system_message=config.generate_file_summary_prompt.system_message,
         human_message=config.generate_file_summary_prompt.human_message,
-        pydantic_object=FileDescription
+        pydantic_object=FileDescription,
     )
 
     prompt_inputs = []
@@ -83,39 +84,50 @@ async def generate_summary_by_file(
     for file_path, file_content in files.items():
         file_content = add_line_numbers(file_content)
 
-        prompt_inputs.append({
-            "submission_file": file_content,
-            "file_path": file_path,
-        })
+        prompt_inputs.append(
+            {
+                "submission_file": file_content,
+                "file_path": file_path,
+            }
+        )
 
     valid_prompt_inputs = [
-        prompt_input for prompt_input in prompt_inputs
+        prompt_input
+        for prompt_input in prompt_inputs
         if num_tokens_from_prompt(chat_prompt, prompt_input) <= config.max_input_tokens
     ]
 
     # noinspection PyTypeChecker
-    results: List[Optional[FileDescription]] = await asyncio.gather(*[
-        predict_and_parse(
-            model=model,
-            chat_prompt=chat_prompt,
-            prompt_input=prompt_input,
-            pydantic_object=FileDescription,
-            tags=[
-                f"exercise-{exercise.id}",
-                f"submission-{submission.id}",
-                f"file-{prompt_input['file_path']}",
-                "generate-summary-by-file"
-            ]
-        ) for prompt_input in valid_prompt_inputs
-    ])
+    results: List[Optional[FileDescription]] = await asyncio.gather(
+        *[
+            predict_and_parse(
+                model=model,
+                chat_prompt=chat_prompt,
+                prompt_input=prompt_input,
+                pydantic_object=FileDescription,
+                tags=[
+                    f"exercise-{exercise.id}",
+                    f"submission-{submission.id}",
+                    f"file-{prompt_input['file_path']}",
+                    "generate-summary-by-file",
+                ],
+            )
+            for prompt_input in valid_prompt_inputs
+        ]
+    )
 
     if debug:
         for prompt_input, result in zip(valid_prompt_inputs, results):
-            emit_meta("file_summary", {
-                "prompt": chat_prompt.format(**prompt_input),
-                "result": result.dict() if result is not None else None,
-                "file_path": prompt_input['file_path']  # Include the file path for reference
-            })
+            emit_meta(
+                "file_summary",
+                {
+                    "prompt": chat_prompt.format(**prompt_input),
+                    "result": result.dict() if result is not None else None,
+                    "file_path": prompt_input[
+                        "file_path"
+                    ],  # Include the file path for reference
+                },
+            )
 
     if not any(result is not None for result in results):
         return None

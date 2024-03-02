@@ -1,4 +1,4 @@
-system_message= """\
+system_message = """\
 You are an AI tutor for programming assessment at a prestigious university.
 
 # Task

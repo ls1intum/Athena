@@ -14,7 +14,12 @@ from langchain.prompts import (
 )
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.output_parsers import PydanticOutputParser
-from langchain.schema import OutputParserException, BaseLLMOutputParser, Generation, LLMResult
+from langchain.schema import (
+    OutputParserException,
+    BaseLLMOutputParser,
+    Generation,
+    LLMResult,
+)
 
 from athena import emit_meta, get_experiment_environment
 from athena.logger import logger
@@ -34,11 +39,13 @@ def num_tokens_from_prompt(chat_prompt: ChatPromptTemplate, prompt_input: dict) 
     return num_tokens_from_string(chat_prompt.format(**prompt_input))
 
 
-def check_prompt_length_and_omit_features_if_necessary(prompt: ChatPromptTemplate, 
-                                                       prompt_input: dict, 
-                                                       max_input_tokens: int, 
-                                                       omittable_features: List[str],
-                                                       debug: bool):
+def check_prompt_length_and_omit_features_if_necessary(
+    prompt: ChatPromptTemplate,
+    prompt_input: dict,
+    max_input_tokens: int,
+    omittable_features: List[str],
+    debug: bool,
+):
     """Check if the input is too long and omit features if necessary.
 
     Note: Omitted features will be replaced with "omitted" in the prompt
@@ -51,7 +58,7 @@ def check_prompt_length_and_omit_features_if_necessary(prompt: ChatPromptTemplat
         debug (bool): Debug flag
 
     Returns:
-        (dict, bool): Tuple of (prompt_input, should_run) where prompt_input is the input with omitted features and 
+        (dict, bool): Tuple of (prompt_input, should_run) where prompt_input is the input with omitted features and
                       should_run is True if the model should run, False otherwise
     """
     if num_tokens_from_prompt(prompt, prompt_input) <= max_input_tokens:
@@ -83,15 +90,15 @@ def supports_function_calling(model: BaseLanguageModel):
     Returns:
         boolean: True if the model supports function calling, False otherwise
     """
-    return False#isinstance(model, ChatOpenAI)
+    return False  # isinstance(model, ChatOpenAI)
 
 
 def get_chat_prompt_with_formatting_instructions(
-            model: BaseLanguageModel,
-            system_message: str, 
-            human_message: str,
-            pydantic_object: Type[T]
-        ) -> ChatPromptTemplate:
+    model: BaseLanguageModel,
+    system_message: str,
+    human_message: str,
+    pydantic_object: Type[T],
+) -> ChatPromptTemplate:
     """Returns a ChatPromptTemplate with formatting instructions (if necessary)
 
     Note: Does nothing if the model supports function calling
@@ -106,26 +113,37 @@ def get_chat_prompt_with_formatting_instructions(
         ChatPromptTemplate: ChatPromptTemplate with formatting instructions (if necessary)
     """
     if supports_function_calling(model):
-        system_message_prompt = SystemMessagePromptTemplate.from_template(system_message)
+        system_message_prompt = SystemMessagePromptTemplate.from_template(
+            system_message
+        )
         human_message_prompt = HumanMessagePromptTemplate.from_template(human_message)
-        return ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
-    
-    output_parser = PydanticOutputParser(pydantic_object=pydantic_object)
-    system_message_prompt = SystemMessagePromptTemplate.from_template(system_message + "\n{format_instructions}")
-    system_message_prompt.prompt.partial_variables = {"format_instructions": output_parser.get_format_instructions()}
-    system_message_prompt.prompt.input_variables.remove("format_instructions")
-    human_message_prompt = HumanMessagePromptTemplate.from_template(human_message + "\n\nJSON response following the provided schema:")
-    return ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+        return ChatPromptTemplate.from_messages(
+            [system_message_prompt, human_message_prompt]
+        )
 
+    output_parser = PydanticOutputParser(pydantic_object=pydantic_object)
+    system_message_prompt = SystemMessagePromptTemplate.from_template(
+        system_message + "\n{format_instructions}"
+    )
+    system_message_prompt.prompt.partial_variables = {
+        "format_instructions": output_parser.get_format_instructions()
+    }
+    system_message_prompt.prompt.input_variables.remove("format_instructions")
+    human_message_prompt = HumanMessagePromptTemplate.from_template(
+        human_message + "\n\nJSON response following the provided schema:"
+    )
+    return ChatPromptTemplate.from_messages(
+        [system_message_prompt, human_message_prompt]
+    )
 
 
 async def predict_and_parse(
-        model: BaseLanguageModel, 
-        chat_prompt: ChatPromptTemplate, 
-        prompt_input: dict, 
-        pydantic_object: Type[T], 
-        tags: Optional[List[str]]
-    ) -> Optional[T]:
+    model: BaseLanguageModel,
+    chat_prompt: ChatPromptTemplate,
+    prompt_input: dict,
+    pydantic_object: Type[T],
+    tags: Optional[List[str]],
+) -> Optional[T]:
     """Predicts an LLM completion using the model and parses the output using the provided Pydantic model
 
     Args:
@@ -151,7 +169,9 @@ async def predict_and_parse(
         tags.append(f"run-{experiment.run_id}")
 
     if supports_function_calling(model):
-        chain = create_structured_output_chain(pydantic_object, llm=model, prompt=chat_prompt, tags=tags)
+        chain = create_structured_output_chain(
+            pydantic_object, llm=model, prompt=chat_prompt, tags=tags
+        )
         chain.verbose = True
         try:
             return await chain.arun(**prompt_input)
@@ -160,7 +180,9 @@ async def predict_and_parse(
             return None
 
     output_parser = PydanticOutputParser(pydantic_object=pydantic_object)
-    chain = LLMChain(llm=model, prompt=chat_prompt, output_parser=output_parser, tags=tags)
+    chain = LLMChain(
+        llm=model, prompt=chat_prompt, output_parser=output_parser, tags=tags
+    )
     try:
         return await chain.arun(**prompt_input)
     except (OutputParserException, ValidationError) as e:
