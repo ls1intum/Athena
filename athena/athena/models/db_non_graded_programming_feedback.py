@@ -3,12 +3,12 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
-from .db_graded_feedback import DBGradedFeedback
+from .db_non_graded_feedback import DBNonGradedFeedback
 from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
-class DBGradedProgrammingGradedFeedback(DBGradedFeedback, Base):
-    __tablename__ = "graded_programming_feedbacks"
+class DBNonGradedProgrammingGradedFeedback(DBNonGradedFeedback, Base):
+    __tablename__ = "non_graded_programming_feedbacks"
 
     file_path: Optional[str] = Column(String)  # type: ignore
     line_start: Optional[int] = Column(Integer)  # type: ignore

@@ -12,3 +12,6 @@ class GradedFeedback(Feedback):
     structured_grading_instruction_id: Optional[int] = Field(None,
                                                              description="The id of the structured grading instruction that this feedback belongs to.",
                                                              example=1)
+
+    def to_model(self, is_suggestion: bool = False, lms_id: Optional[int] = None):
+        return type(self).get_model_class()(**self.dict(), is_suggestion=is_suggestion, lms_id=lms_id)
