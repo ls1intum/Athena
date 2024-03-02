@@ -417,7 +417,7 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
     return cls
 
 
-def evaluation_graded_provider(func: Union[
+def evaluation_provider(func: Union[
     Callable[[E, S, List[GF], List[GF]], Any],
     Callable[[E, S, List[GF], List[GF]], Coroutine[Any, Any, Any]]
 ]):
@@ -433,7 +433,7 @@ def evaluation_graded_provider(func: Union[
         Below are some examples of possible functions that you can decorate with this decorator:
 
         Without using module config (both synchronous and asynchronous forms):
-        >>> @evaluation_graded_provider
+        >>> @evaluation_provider
         ... def sync_evaluate_feedback(
         ...     exercise: Exercise, submission: Submission, 
         ...     true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]

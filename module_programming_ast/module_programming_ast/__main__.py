@@ -5,7 +5,7 @@ import random
 from typing import List, Any
 from pydantic import BaseModel, Field
 
-from athena import app, config_schema_provider, submissions_consumer, submission_selector, graded_feedback_consumer, graded_feedback_provider, evaluation_graded_provider, emit_meta
+from athena import app, config_schema_provider, submissions_consumer, submission_selector, graded_feedback_consumer, graded_feedback_provider, evaluation_provider, emit_meta
 from athena.programming import Exercise, Submission, GradedFeedback
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
@@ -141,7 +141,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
 
 
 # Only if it makes sense for a module (Optional)
-@evaluation_graded_provider
+@evaluation_provider
 def evaluate_feedback(exercise: Exercise, submission: Submission, true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]) -> Any:
     logger.info(
         "evaluate_feedback: Evaluation for submission %d of exercise %d was requested with %d true and %d predicted feedbacks", 
