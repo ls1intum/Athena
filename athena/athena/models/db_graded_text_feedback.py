@@ -4,12 +4,12 @@ from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
-from .db_feedback import DBFeedback
+from .db_graded_feedback import DBGradedFeedback
 from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
-class DBTextFeedback(DBFeedback, Base):
-    __tablename__ = "text_feedbacks"
+class DBGradedTextGradedFeedback(DBGradedFeedback, Base):
+    __tablename__ = "graded_text_feedbacks"
 
     index_start: Optional[int] = Column(Integer)  # type: ignore
     index_end: Optional[int] = Column(Integer)  # type: ignore

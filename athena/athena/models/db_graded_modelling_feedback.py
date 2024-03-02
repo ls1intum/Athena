@@ -4,12 +4,12 @@ from sqlalchemy import Column, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
-from .db_feedback import DBFeedback
+from .db_graded_feedback import DBGradedFeedback
 from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
-class DBModellingFeedback(DBFeedback, Base):
-    __tablename__ = "modelling_feedbacks"
+class DBGradedModellingGradedFeedback(DBGradedFeedback, Base):
+    __tablename__ = "graded_modelling_feedbacks"
 
     element_ids: Optional[list[str]] = Column(JSON)  # type: ignore
 
