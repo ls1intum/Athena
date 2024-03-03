@@ -8,7 +8,7 @@ from .db_graded_feedback import DBGradedFeedback
 from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
-class DBGradedTextGradedFeedback(DBGradedFeedback, Base):
+class DBGradedTextFeedback(DBGradedFeedback, Base):
     __tablename__ = "graded_text_feedbacks"
 
     index_start: Optional[int] = Column(Integer)  # type: ignore

@@ -16,7 +16,8 @@ class DBProgrammingSubmission(DBSubmission, Base):
                          index=True)
 
     exercise = relationship("DBProgrammingExercise", back_populates="submissions")
-    feedbacks = relationship("DBGradedProgrammingFeedback", back_populates="submission")
+    graded_feedbacks = relationship("DBGradedProgrammingFeedback", back_populates="submission")
+    non_graded_feedbacks = relationship("DBNonGradedProgrammingFeedback", back_populates="submission")
 
     def get_referenced_code(self, file_path, line_start, line_end) -> str:
         """

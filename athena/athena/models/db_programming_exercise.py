@@ -14,4 +14,5 @@ class DBProgrammingExercise(DBExercise, Base):
     tests_repository_url: str = Column(String, nullable=False)  # type: ignore
 
     submissions = relationship("DBProgrammingSubmission", back_populates="exercise")
-    feedbacks = relationship("DBGradedProgrammingFeedback", back_populates="exercise")
+    graded_feedbacks = relationship("DBGradedProgrammingFeedback", back_populates="exercise")
+    non_graded_feedbacks = relationship("DBNonGradedProgrammingFeedback", back_populates="exercise")

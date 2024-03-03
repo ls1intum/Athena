@@ -7,7 +7,7 @@ from .db_graded_feedback import DBGradedFeedback
 from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
-class DBGradedProgrammingGradedFeedback(DBGradedFeedback, Base):
+class DBGradedProgrammingFeedback(DBGradedFeedback, Base):
     __tablename__ = "graded_programming_feedbacks"
 
     file_path: Optional[str] = Column(String)  # type: ignore
@@ -17,5 +17,5 @@ class DBGradedProgrammingGradedFeedback(DBGradedFeedback, Base):
     exercise_id = Column(BigIntegerWithAutoincrement, ForeignKey("programming_exercises.id", ondelete="CASCADE"), index=True)
     submission_id = Column(BigIntegerWithAutoincrement, ForeignKey("programming_submissions.id", ondelete="CASCADE"), index=True)
 
-    exercise = relationship("DBProgrammingExercise", back_populates="feedbacks")
-    submission = relationship("DBProgrammingSubmission", back_populates="feedbacks")
+    exercise = relationship("DBProgrammingExercise", back_populates="graded_feedbacks")
+    submission = relationship("DBProgrammingSubmission", back_populates="graded_feedbacks")
