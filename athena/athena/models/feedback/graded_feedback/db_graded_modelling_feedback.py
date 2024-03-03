@@ -4,8 +4,8 @@ from sqlalchemy import Column, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
-from .db_graded_feedback import DBGradedFeedback
-from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
+from athena.models.feedback.graded_feedback.db_graded_feedback import DBGradedFeedback
+from athena.models.big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
 class DBGradedModellingFeedback(DBGradedFeedback, Base):

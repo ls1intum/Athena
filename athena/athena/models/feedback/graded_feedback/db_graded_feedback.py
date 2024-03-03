@@ -1,6 +1,6 @@
-from sqlalchemy import Column, BigInteger, Boolean, String, Float, JSON, UniqueConstraint
+from sqlalchemy import Column, BigInteger, Boolean, Float
 
-from .db_feedback import DBFeedback
+from athena.models.feedback.db_feedback import DBFeedback
 
 
 class DBGradedFeedback(DBFeedback):
