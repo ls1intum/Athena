@@ -1,7 +1,7 @@
 from sqlalchemy import Column, BigInteger, Boolean, String, Float, JSON, UniqueConstraint
 
-from athena.models.model import Model
-from athena.models.big_integer_with_autoincrement import BigIntegerWithAutoincrement
+from .model import Model
+from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
 class DBFeedback(Model):
