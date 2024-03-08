@@ -5,12 +5,12 @@ from sqlalchemy.orm import relationship
 
 from athena.database import Base, get_db
 from .db_programming_submission import DBProgrammingSubmission
-from .db_graded_feedback import DBGradedFeedback
+from .db_feedback import DBFeedback
 from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
-class DBGradedProgrammingGradedFeedback(DBGradedFeedback, Base):
-    __tablename__ = "graded_programming_feedbacks"
+class DBProgrammingFeedback(DBFeedback, Base):
+    __tablename__ = "programming_feedbacks"
 
     file_path: Optional[str] = Column(String)  # type: ignore
     line_start: Optional[int] = Column(Integer)  # type: ignore

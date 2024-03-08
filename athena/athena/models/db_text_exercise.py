@@ -11,4 +11,4 @@ class DBTextExercise(DBExercise, Base):
     example_solution: str = Column(String)  # type: ignore
 
     submissions = relationship("DBTextSubmission", back_populates="exercise")
-    feedbacks = relationship("DBGradedTextFeedback", back_populates="exercise")
+    feedbacks = relationship("DBTextFeedback", back_populates="exercise")

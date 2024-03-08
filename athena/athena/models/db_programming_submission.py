@@ -13,4 +13,4 @@ class DBProgrammingSubmission(DBSubmission, Base):
     exercise_id = Column(BigIntegerWithAutoincrement, ForeignKey("programming_exercises.id", ondelete="CASCADE"), index=True)
 
     exercise = relationship("DBProgrammingExercise", back_populates="submissions")
-    feedbacks = relationship("DBGradedProgrammingFeedback", back_populates="submission")
+    feedbacks = relationship("DBProgrammingFeedback", back_populates="submission")

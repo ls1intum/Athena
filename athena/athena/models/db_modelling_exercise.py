@@ -11,4 +11,4 @@ class DBModellingExercise(DBExercise, Base):
     example_solution: str = Column(String)  # type: ignore
 
     submissions = relationship("DBModellingSubmission", back_populates="exercise")
-    feedbacks = relationship("DBGradedModellingFeedback", back_populates="exercise")
+    feedbacks = relationship("DBModellingFeedback", back_populates="exercise")
