@@ -5,7 +5,7 @@ from typing import List, Any
 import nltk
 import tiktoken
 
-from athena import app, submission_selector, submissions_consumer, graded_feedback_consumer, graded_feedback_provider, evaluation_graded_provider
+from athena import app, submission_selector, submissions_consumer, graded_feedback_consumer, graded_feedback_provider, evaluation_provider
 from athena.text import Exercise, Submission, GradedFeedback
 from athena.logger import logger
 
@@ -37,7 +37,7 @@ async def suggest_feedback(exercise: Exercise, submission: Submission, module_co
     return await generate_suggestions(exercise, submission, module_config.approach, module_config.debug)
 
 
-@evaluation_graded_provider
+@evaluation_provider
 async def evaluate_feedback(
     exercise: Exercise, submission: Submission, 
     true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback],

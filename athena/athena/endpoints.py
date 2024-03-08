@@ -12,7 +12,7 @@ from athena.logger import logger
 from athena.schemas import Exercise, Submission, GradedFeedback, NonGradedFeedback
 from athena.schemas.schema import to_camel
 from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
-    store_exercise, store_feedback, store_graded_feedback_suggestions, store_submissions, get_stored_submissions, store_non_graded_feedback_suggestions
+    store_exercise, store_feedback, store_graded_feedback_suggestions, store_submissions, get_stored_submissions
 
 
 E = TypeVar('E', bound=Exercise)
@@ -236,7 +236,7 @@ def graded_feedback_consumer(func: Union[
     feedback_type = inspect.signature(func).parameters["feedbacks"].annotation.__args__[0]
     module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
-    @app.post("/graded_feedbacks", responses=module_responses)
+    @app.post("/feedbacks", responses=module_responses)
     @authenticated
     @with_meta
     async def wrapper(
@@ -384,7 +384,7 @@ def non_graded_feedback_provider(func: Union[
             feedbacks = func(exercise, submission, **kwargs)
 
         # Store feedback suggestions and assign internal IDs
-        feedbacks = store_non_graded_feedback_suggestions(feedbacks)
+        #feedbacks = store_graded_feedback_suggestions(feedbacks) todo
         return feedbacks
 
     return wrapper
@@ -417,7 +417,7 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
     return cls
 
 
-def evaluation_graded_provider(func: Union[
+def evaluation_provider(func: Union[
     Callable[[E, S, List[GF], List[GF]], Any],
     Callable[[E, S, List[GF], List[GF]], Coroutine[Any, Any, Any]]
 ]):
@@ -433,7 +433,7 @@ def evaluation_graded_provider(func: Union[
         Below are some examples of possible functions that you can decorate with this decorator:
 
         Without using module config (both synchronous and asynchronous forms):
-        >>> @evaluation_graded_provider
+        >>> @evaluation_provider
         ... def sync_evaluate_feedback(
         ...     exercise: Exercise, submission: Submission, 
         ...     true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]

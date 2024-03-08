@@ -42,7 +42,6 @@ def store_submissions(submissions: List[Submission]):
             db.merge(s.to_model())
         db.commit()
 
-
 def store_submission(submission: Submission):
     """Stores the given submission."""
     store_submissions([submission])

@@ -20,11 +20,10 @@ NonGradedFeedback = NonGradedProgrammingFeedback
 get_stored_exercises = functools.partial(athena.storage.get_stored_exercises, Exercise)
 count_stored_submissions = functools.partial(athena.storage.count_stored_submissions, Submission)
 get_stored_submissions = functools.partial(athena.storage.get_stored_submissions, Submission)
-get_stored_graded_feedback = functools.partial(athena.storage.get_stored_feedback, GradedFeedback)
-get_stored_graded_feedback_suggestions = functools.partial(athena.storage.get_stored_graded_feedback_suggestions, GradedFeedback)
+get_stored_feedback = functools.partial(athena.storage.get_stored_feedback, GradedFeedback)
+get_stored_feedback_suggestions = functools.partial(athena.storage.get_stored_feedback_suggestions, GradedFeedback)
 
 __all__ = [
     "Exercise", "Submission", "GradedFeedback", "NonGradedFeedback",
-    "get_stored_exercises", "get_stored_submissions", "get_stored_graded_feedback",
-    "get_stored_graded_feedback_suggestions"
+    "get_stored_exercises", "get_stored_submissions", "get_stored_feedback", "get_stored_feedback_suggestions"
 ]
