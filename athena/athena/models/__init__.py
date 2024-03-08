@@ -12,7 +12,6 @@ from .db_modelling_exercise import DBModellingExercise
 from .db_programming_submission import DBProgrammingSubmission
 from .db_text_submission import DBTextSubmission
 from .db_modelling_submission import DBModellingSubmission
-from .db_graded_programming_feedback import DBGradedProgrammingFeedback
-from .db_non_graded_programming_feedback import DBNonGradedProgrammingFeedback
-from .db_graded_text_feedback import DBGradedTextFeedback
-from .db_graded_modelling_feedback import DBGradedModellingFeedback
+from .db_graded_programming_feedback import DBGradedProgrammingGradedFeedback
+from .db_graded_text_feedback import DBGradedTextGradedFeedback
+from .db_graded_modelling_feedback import DBGradedModellingGradedFeedback

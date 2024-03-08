@@ -8,7 +8,7 @@ from .db_graded_feedback import DBGradedFeedback
 from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
-class DBGradedModellingFeedback(DBGradedFeedback, Base):
+class DBGradedModellingGradedFeedback(DBGradedFeedback, Base):
     __tablename__ = "graded_modelling_feedbacks"
 
     element_ids: Optional[list[str]] = Column(JSON)  # type: ignore
