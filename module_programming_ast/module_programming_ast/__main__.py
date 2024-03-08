@@ -5,8 +5,8 @@ import random
 from typing import List, Any
 from pydantic import BaseModel, Field
 
-from athena import app, config_schema_provider, submissions_consumer, submission_selector, graded_feedback_consumer, graded_feedback_provider, evaluation_provider, emit_meta
-from athena.programming import Exercise, Submission, GradedFeedback
+from athena import app, config_schema_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider, evaluation_provider, emit_meta
+from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
 
@@ -58,8 +58,8 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@graded_feedback_consumer
-def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
+@feedback_consumer
+def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
     logger.info("process_feedback: Received feedbacks for submission %d of exercise %d", submission.id, exercise.id)
     logger.info("process_feedback: Feedbacks: %s", feedbacks)
     # Do something with the feedback
@@ -69,8 +69,8 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
         store_feedback(feedback)
 
 
-@graded_feedback_provider
-def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[GradedFeedback]:
+@feedback_provider
+def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
     # Do something with the submission and return a list of feedback
 
@@ -82,7 +82,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
     
     return [
         # Referenced feedback, line 8-9 in BinarySearch.java
-        GradedFeedback(
+        Feedback(
             id=None,
             exercise_id=exercise.id,
             submission_id=submission.id,
@@ -96,7 +96,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
             meta={}
         ),
         # Referenced feedback, line 13-18 in BinarySearch.java
-        GradedFeedback(
+        Feedback(
             id=None,
             exercise_id=exercise.id,
             submission_id=submission.id,
@@ -110,7 +110,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
             meta={}
         ),
         # Unreferenced feedback without file
-        GradedFeedback(
+        Feedback(
             id=None,
             exercise_id=exercise.id,
             submission_id=submission.id,
@@ -124,7 +124,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
             meta={}
         ),
         # Unreferenced feedback in BinarySearch.java
-        GradedFeedback(
+        Feedback(
             id=None,
             exercise_id=exercise.id,
             submission_id=submission.id,
@@ -142,7 +142,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
 
 # Only if it makes sense for a module (Optional)
 @evaluation_provider
-def evaluate_feedback(exercise: Exercise, submission: Submission, true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]) -> Any:
+def evaluate_feedback(exercise: Exercise, submission: Submission, true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback]) -> Any:
     logger.info(
         "evaluate_feedback: Evaluation for submission %d of exercise %d was requested with %d true and %d predicted feedbacks", 
         submission.id, exercise.id, len(true_feedbacks), len(predicted_feedbacks)

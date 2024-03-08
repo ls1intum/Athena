@@ -3,9 +3,9 @@ from typing import List
 import nltk
 import tiktoken
 
-from athena import app, submission_selector, submissions_consumer, graded_feedback_consumer, graded_feedback_provider
+from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider
 from athena.logger import logger
-from athena.modelling import Exercise, Submission, GradedFeedback
+from athena.modelling import Exercise, Submission, Feedback
 from module_modelling_llm.config import Configuration
 from module_modelling_llm.generate_suggestions import generate_suggestions
 
@@ -21,14 +21,14 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
     return submissions[0]
 
 
-@graded_feedback_consumer
-def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
+@feedback_consumer
+def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
     logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks),
                 submission.id, exercise.id)
 
 
-@graded_feedback_provider
-async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[GradedFeedback]:
+@feedback_provider
+async def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id,
                 exercise.id)
     return await generate_suggestions(exercise, submission, module_config.approach, module_config.debug)

@@ -2,7 +2,7 @@ from typing import List, Optional, Sequence
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
-from athena.text import Exercise, Submission, GradedFeedback
+from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
 from module_text_llm.config import BasicApproachConfig
@@ -37,7 +37,7 @@ class AssessmentModel(BaseModel):
         title = "Assessment"
 
 
-async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[GradedFeedback]:
+async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     prompt_input = {
@@ -104,7 +104,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     for feedback in result.feedbacks:
         index_start, index_end = get_index_range_from_line_range(feedback.line_start, feedback.line_end, submission.text)
         grading_instruction_id = feedback.grading_instruction_id if feedback.grading_instruction_id in grading_instruction_ids else None
-        feedbacks.append(GradedFeedback(
+        feedbacks.append(Feedback(
             exercise_id=exercise.id,
             submission_id=submission.id,
             title=feedback.title,

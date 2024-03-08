@@ -2,10 +2,10 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 
-from .non_graded_feedback import NonGradedFeedback
+from .feedback import Feedback
 
 
-class NonGradedProgrammingFeedback(NonGradedFeedback, BaseModel):
+class ProgrammingFeedback(Feedback, BaseModel):
     """Feedback on a programming exercise."""
     file_path: Optional[str] = Field(None, example="src/pe1/MergeSort.java")
 

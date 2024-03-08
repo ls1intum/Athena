@@ -1,12 +1,12 @@
 from typing import Iterable, Union, Type, Optional, List
 
 from athena.database import get_db
-from athena.schemas import GradedFeedback
+from athena.schemas import Feedback
 
 
 def get_stored_feedback(
-        feedback_cls: Type[GradedFeedback], exercise_id: int, submission_id: Union[int, None]
-) -> Iterable[GradedFeedback]:
+        feedback_cls: Type[Feedback], exercise_id: int, submission_id: Union[int, None]
+) -> Iterable[Feedback]:
     """
     Returns a list of feedbacks for the given exercise in the given submission.
     If submission_id is None, returns all feedbacks for the given exercise.
@@ -19,22 +19,22 @@ def get_stored_feedback(
         return (f.to_schema() for f in query.all())
 
 
-def get_stored_feedback_meta(feedback: GradedFeedback) -> Optional[dict]:
+def get_stored_feedback_meta(feedback: Feedback) -> Optional[dict]:
     """Returns the stored metadata associated with the feedback."""
     db_feedback_cls = feedback.__class__.get_model_class()
     with get_db() as db:
         return db.query(db_feedback_cls.meta).filter_by(id=feedback.id).scalar()  # type: ignore
 
 
-def store_feedback(feedback: GradedFeedback, is_lms_id=False) -> GradedFeedback:
+def store_feedback(feedback: Feedback, is_lms_id=False) -> Feedback:
     """Stores the given LMS feedback.
 
     Args:
-        feedback (GradedFeedback): The feedback to store.
+        feedback (Feedback): The feedback to store.
         is_lms_id (bool, optional): Whether the feedback's ID is an LMS ID. Defaults to False.
     
     Returns:
-        GradedFeedback: The stored feedback with its internal ID assigned.
+        Feedback: The stored feedback with its internal ID assigned.
     """
     db_feedback_cls = feedback.__class__.get_model_class()
     with get_db() as db:
@@ -50,8 +50,8 @@ def store_feedback(feedback: GradedFeedback, is_lms_id=False) -> GradedFeedback:
 
 
 def get_stored_feedback_suggestions(
-        feedback_cls: Type[GradedFeedback], exercise_id: int, submission_id: int
-) -> Iterable[GradedFeedback]:
+        feedback_cls: Type[Feedback], exercise_id: int, submission_id: int
+) -> Iterable[Feedback]:
     """Returns a list of feedback suggestions for the given exercise in the given submission."""
     db_feedback_cls = feedback_cls.get_model_class()
     with get_db() as db:
@@ -61,13 +61,13 @@ def get_stored_feedback_suggestions(
         return (f.to_schema() for f in query.all())
 
 
-def store_graded_feedback_suggestions(feedbacks: List[GradedFeedback]) -> List[GradedFeedback]:
+def store_feedback_suggestions(feedbacks: List[Feedback]) -> List[Feedback]:
     """Stores the given feedbacks as a suggestions.
 
     Returns:
-        List[GradedFeedback]: The stored feedback suggestions with their internal IDs assigned.
+        List[Feedback]: The stored feedback suggestions with their internal IDs assigned.
     """
-    stored_feedbacks: List[GradedFeedback] = []
+    stored_feedbacks: List[Feedback] = []
     with get_db() as db:
         for feedback in feedbacks:
             stored_feedback_model = db.merge(feedback.to_model(is_suggestion=True))
@@ -77,6 +77,6 @@ def store_graded_feedback_suggestions(feedbacks: List[GradedFeedback]) -> List[G
     return stored_feedbacks
 
 
-def store_feedback_suggestion(feedback: GradedFeedback):
+def store_feedback_suggestion(feedback: Feedback):
     """Stores the given feedback as a suggestion."""
-    store_graded_feedback_suggestions([feedback])
+    store_feedback_suggestions([feedback])

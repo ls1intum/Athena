@@ -3,7 +3,7 @@ import gc
 
 from athena.helpers.programming.feedback import format_feedback_title
 from athena.logger import logger
-from athena.programming import GradedFeedback, Submission
+from athena.programming import Feedback, Submission
 
 from module_programming_themisml.extract_methods import MethodNode, extract_methods
 from module_programming_themisml.feedback_suggestions.batch import batched
@@ -12,7 +12,7 @@ from .code_similarity_computer import CodeSimilarityComputer
 SIMILARITY_SCORE_THRESHOLD = 0.95  # has to be really high - otherwise, there would just be too many feedback suggestions
 
 
-def make_feedback_suggestion_from(feedback: GradedFeedback, submission: Submission, submission_method: MethodNode) -> GradedFeedback:
+def make_feedback_suggestion_from(feedback: Feedback, submission: Submission, submission_method: MethodNode) -> Feedback:
     suggestion = feedback.copy(deep=True)
     # add meta information for debugging
     suggestion.meta["original_feedback_id"] = feedback.id
@@ -31,7 +31,7 @@ def make_feedback_suggestion_from(feedback: GradedFeedback, submission: Submissi
 
 class CodeComparisonWithCorrespondingSuggestions:
     """A pair of code snippets with a corresponding suggestions if their similarity is high enough."""
-    def __init__(self, code1: str, code2: str, suggestion: GradedFeedback) -> None:
+    def __init__(self, code1: str, code2: str, suggestion: Feedback) -> None:
         self.code1 = code1
         self.code2 = code2
         self.suggestion = suggestion
@@ -40,9 +40,9 @@ class CodeComparisonWithCorrespondingSuggestions:
         return self.code1 == other.code1 and self.code2 == other.code2
 
 
-def group_feedbacks_by_file_path(feedbacks: List[GradedFeedback]) -> Dict[str, List[GradedFeedback]]:
+def group_feedbacks_by_file_path(feedbacks: List[Feedback]) -> Dict[str, List[Feedback]]:
     """Groups feedbacks by file path for faster access."""
-    feedbacks_by_file_path: Dict[str, List[GradedFeedback]] = {}
+    feedbacks_by_file_path: Dict[str, List[Feedback]] = {}
     for feedback in feedbacks:
         if feedback.file_path not in feedbacks_by_file_path:
             feedbacks_by_file_path[str(feedback.file_path)] = []
@@ -52,7 +52,7 @@ def group_feedbacks_by_file_path(feedbacks: List[GradedFeedback]) -> Dict[str, L
 
 def create_comparisons_with_suggestions(
     submissions: List[Submission],
-    feedbacks: List[GradedFeedback],
+    feedbacks: List[Feedback],
 ) -> Iterable[CodeComparisonWithCorrespondingSuggestions]:
     """Creates code comparisons and corresponding feedback suggestions as a generator."""
     if len(feedbacks) == 0:
@@ -87,8 +87,8 @@ def create_comparisons_with_suggestions(
 
 def create_feedback_suggestions(
     submissions: List[Submission],
-    feedbacks: List[GradedFeedback],
-) -> List[GradedFeedback]:
+    feedbacks: List[Feedback],
+) -> List[Feedback]:
     """
     Get a list of all submissions that the given feedback could also apply to (similar code in same method).
     Then generate feedback suggestions for those submissions.
@@ -96,7 +96,7 @@ def create_feedback_suggestions(
     if len(feedbacks) == 0:
         return []  # nothing to do
 
-    suggestions: List[GradedFeedback] = []
+    suggestions: List[Feedback] = []
 
     # create code comparisons and corresponding feedback suggestions in batches for less memory usage
     for idx, comparisons_with_suggestions in enumerate(batched(create_comparisons_with_suggestions(submissions, feedbacks), 128)):

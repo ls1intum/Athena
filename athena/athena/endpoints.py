@@ -9,16 +9,15 @@ from athena.authenticate import authenticated
 from athena.metadata import with_meta
 from athena.module_config import get_dynamic_module_config_factory
 from athena.logger import logger
-from athena.schemas import Exercise, Submission, GradedFeedback, NonGradedFeedback
+from athena.schemas import Exercise, Submission, Feedback, Feedback
 from athena.schemas.schema import to_camel
 from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
-    store_exercise, store_feedback, store_graded_feedback_suggestions, store_submissions, get_stored_submissions
-
+    store_exercise, store_feedback, store_feedback_suggestions, store_submissions, get_stored_submissions
 
 E = TypeVar('E', bound=Exercise)
 S = TypeVar('S', bound=Submission)
-GF = TypeVar('GF', bound=GradedFeedback)
-NGF = TypeVar('NGF', bound=NonGradedFeedback)
+F = TypeVar('F', bound=Feedback)
+G = TypeVar('G', bound=bool)
 
 # Config type
 C = TypeVar("C", bound=BaseModel)
@@ -66,7 +65,8 @@ def submissions_consumer(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
-    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    module_config_type = inspect.signature(func).parameters[
+        "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/submissions", responses=module_responses)
     @authenticated
@@ -76,7 +76,7 @@ def submissions_consumer(func: Union[
             exercise: exercise_type,
             submissions: List[submission_type],
             module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
-        
+
         # Retrieve existing metadata for the exercise and submissions
         exercise_meta = get_stored_exercise_meta(exercise) or {}
         exercise_meta.update(exercise.meta)
@@ -107,6 +107,7 @@ def submissions_consumer(func: Union[
         background_tasks.add_task(func, exercise, submissions, **kwargs)
 
         return None
+
     return wrapper
 
 
@@ -146,14 +147,15 @@ def submission_selector(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
-    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    module_config_type = inspect.signature(func).parameters[
+        "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     # own request model to allow for `submissionIds` instead of `submission_ids` (camelCase vs snake_case)
     class SubmissionSelectorRequest(BaseModel):
         exercise: exercise_type
         submission_ids: List[int]
         module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))
-    
+
         class Config:
             # Allow camelCase field names in the API (converted to snake_case)
             alias_generator = to_camel
@@ -198,11 +200,11 @@ def submission_selector(func: Union[
     return wrapper
 
 
-def graded_feedback_consumer(func: Union[
-    Callable[[E, S, List[GF]], None],
-    Callable[[E, S, List[GF]], Coroutine[Any, Any, None]],
-    Callable[[E, S, List[GF], C], None],
-    Callable[[E, S, List[GF], C], Coroutine[Any, Any, None]]
+def feedback_consumer(func: Union[
+    Callable[[E, S, List[F]], None],
+    Callable[[E, S, List[F]], Coroutine[Any, Any, None]],
+    Callable[[E, S, List[F], C], None],
+    Callable[[E, S, List[F], C], Coroutine[Any, Any, None]]
 ]):
     """
     Receive feedback from the Assessment Module Manager.
@@ -214,27 +216,28 @@ def graded_feedback_consumer(func: Union[
         Below are some examples of possible functions that you can decorate with this decorator:
 
         Without using module config (both synchronous and asynchronous forms):
-        >>> @graded_feedback_consumer
-        ... def sync_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
+        >>> @feedback_consumer
+        ... def sync_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
         ...     # process feedback here
 
-        >>> @graded_feedback_consumer
-        ... async def async_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback]):
+        >>> @feedback_consumer
+        ... async def async_process_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
         ...     # process feedback here
 
         With using module config (both synchronous and asynchronous forms):
-        >>> @graded_feedback_consumer
-        ... def sync_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback], module_config: Optional[dict]):
+        >>> @feedback_consumer
+        ... def sync_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[Feedback], module_config: Optional[dict]):
         ...     # process feedback here using module_config
 
-        >>> @graded_feedback_consumer
-        ... async def async_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[GradedFeedback], module_config: Optional[dict]):
+        >>> @feedback_consumer
+        ... async def async_process_feedback_with_config(exercise: Exercise, submission: Submission, feedbacks: List[Feedback], module_config: Optional[dict]):
         ...     # process feedback here using module_config
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
     feedback_type = inspect.signature(func).parameters["feedbacks"].annotation.__args__[0]
-    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    module_config_type = inspect.signature(func).parameters[
+        "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/feedbacks", responses=module_responses)
     @authenticated
@@ -264,15 +267,17 @@ def graded_feedback_consumer(func: Union[
         background_tasks.add_task(func, exercise, submission, feedbacks, **kwargs)
 
         return None
+
     return wrapper
 
 
-def graded_feedback_provider(func: Union[
-    Callable[[E, S], List[GF]],
-    Callable[[E, S], Coroutine[Any, Any, List[GF]]],
-    Callable[[E, S, C], List[GF]],
-    Callable[[E, S, C], List[GF]],
-    Callable[[E, S, C], Coroutine[Any, Any, List[GF]]]
+def feedback_provider(func: Union[
+    Callable[[E, S], List[F]],
+    Callable[[E, S], Coroutine[Any, Any, List[F]]],
+    Callable[[E, S, C], List[F]],
+    Callable[[E, S, C], List[F]],
+    Callable[[E, S, C], Coroutine[Any, Any, List[F]]],
+    Callable[[E, S, G, C], List[F]],
 ]):
     """
     Provide feedback to the Assessment Module Manager.
@@ -284,72 +289,20 @@ def graded_feedback_provider(func: Union[
         Below are some examples of possible functions that you can decorate with this decorator:
 
         Without using module config (both synchronous and asynchronous forms):
-        >>> @graded_feedback_provider
+        >>> @feedback_provider
         ... def sync_suggest_feedback(exercise: Exercise, submission: Submission):
         ...     # suggest feedback here and return it as a list
 
-        >>> @graded_feedback_provider
+        >>> @feedback_provider
         ... async def async_suggest_feedback(exercise: Exercise, submission: Submission):
         ...     # suggest feedback here and return it as a list
 
         With using module config (both synchronous and asynchronous forms):
-        >>> @graded_feedback_provider
+        >>> @feedback_provider
         ... def sync_suggest_feedback_with_config(exercise: Exercise, submission: Submission, module_config: Optional[dict]):
         ...     # suggest feedback here using module_config and return it as a list
 
-        >>> @graded_feedback_provider
-        ... async def async_suggest_feedback_with_config(exercise: Exercise, submission: Submission, module_config: Optional[dict]):
-        ...     # suggest feedback here using module_config and return it as a list
-    """
-    exercise_type = inspect.signature(func).parameters["exercise"].annotation
-    submission_type = inspect.signature(func).parameters["submission"].annotation
-    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
-
-    @app.post("/graded_feedback_suggestions", responses=module_responses)
-    @authenticated
-    @with_meta
-    async def wrapper(
-            exercise: exercise_type,
-            submission: submission_type,
-            module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
-        
-        # Retrieve existing metadata for the exercise, submission and feedback
-        exercise.meta.update(get_stored_exercise_meta(exercise) or {})
-        submission.meta.update(get_stored_submission_meta(submission) or {})
-
-        store_exercise(exercise)
-        store_submissions([submission])
-
-        kwargs = {}
-        if "module_config" in inspect.signature(func).parameters:
-            kwargs["module_config"] = module_config
-
-        # Call the actual provider
-        if inspect.iscoroutinefunction(func):
-            feedbacks = await func(exercise, submission, **kwargs)
-        else:
-            feedbacks = func(exercise, submission, **kwargs)
-
-        # Store feedback suggestions and assign internal IDs
-        feedbacks = store_graded_feedback_suggestions(feedbacks)
-        return feedbacks
-    return wrapper
-
-
-def non_graded_feedback_provider(func: Union[
-    Callable[[E, S, C], List[NGF]]
-]):
-    """
-    Provide non graded feedback to the Submission Module Manager.
-    The non feedback provider is usually called whenever a student requests feedback for a submission with passed auto-tests in the LMS.
-
-    This decorator can be used with several types of functions: synchronous or asynchronous, with or without a module config.
-
-    Examples:
-        Below are some examples of possible functions that you can decorate with this decorator:
-
-        Without using module config (both synchronous and asynchronous forms):
-        >>> @non_graded_feedback_provider
+        >>> @feedback_provider
         ... async def async_suggest_feedback_with_config(exercise: Exercise, submission: Submission, module_config: Optional[dict]):
         ...     # suggest feedback here using module_config and return it as a list
     """
@@ -357,13 +310,15 @@ def non_graded_feedback_provider(func: Union[
     submission_type = inspect.signature(func).parameters["submission"].annotation
     module_config_type = inspect.signature(func).parameters[
         "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    is_graded_type = inspect.signature(func).parameters["is_graded"].annotation
 
-    @app.post("/non_graded_feedback_suggestions", responses=module_responses)
+    @app.post("/feedback_suggestions", responses=module_responses)
     @authenticated
     @with_meta
     async def wrapper(
             exercise: exercise_type,
             submission: submission_type,
+            is_graded: is_graded_type = Body(False),
             module_config: module_config_type = Depends(get_dynamic_module_config_factory(module_config_type))):
 
         # Retrieve existing metadata for the exercise, submission and feedback
@@ -377,6 +332,9 @@ def non_graded_feedback_provider(func: Union[
         if "module_config" in inspect.signature(func).parameters:
             kwargs["module_config"] = module_config
 
+        if "is_graded" in inspect.signature(func).parameters:
+            kwargs["is_graded"] = is_graded
+
         # Call the actual provider
         if inspect.iscoroutinefunction(func):
             feedbacks = await func(exercise, submission, **kwargs)
@@ -384,7 +342,7 @@ def non_graded_feedback_provider(func: Union[
             feedbacks = func(exercise, submission, **kwargs)
 
         # Store feedback suggestions and assign internal IDs
-        #feedbacks = store_graded_feedback_suggestions(feedbacks) todo
+        feedbacks = store_feedback_suggestions(feedbacks)
         return feedbacks
 
     return wrapper
@@ -408,7 +366,8 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
     try:
         cls()
     except ValidationError as exc:
-        raise TypeError(f'Cannot initialize {cls.__name__} without parameters, please provide default values for all parameters') from exc
+        raise TypeError(
+            f'Cannot initialize {cls.__name__} without parameters, please provide default values for all parameters') from exc
 
     @app.get("/config_schema")
     async def wrapper():
@@ -418,8 +377,8 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
 
 
 def evaluation_provider(func: Union[
-    Callable[[E, S, List[GF], List[GF]], Any],
-    Callable[[E, S, List[GF], List[GF]], Coroutine[Any, Any, Any]]
+    Callable[[E, S, List[F], List[F]], Any],
+    Callable[[E, S, List[F], List[F]], Coroutine[Any, Any, Any]]
 ]):
     """
     Provide evaluated feedback to the Assessment Module Manager.
@@ -436,14 +395,14 @@ def evaluation_provider(func: Union[
         >>> @evaluation_provider
         ... def sync_evaluate_feedback(
         ...     exercise: Exercise, submission: Submission, 
-        ...     true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]
+        ...     true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback]
         ... ) -> Any:
         ...     # evaluate predicted feedback here and return evaluation results
 
-        >>> @graded_feedback_provider
+        >>> @feedback_provider
         ... async def async_evaluate_feedback(
         ...     exercise: Exercise, submission: Submission, 
-        ...     true_feedbacks: List[GradedFeedback], predicted_feedbacks: List[GradedFeedback]
+        ...     true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback]
         ... ) -> Any:
         ...     # evaluate predicted feedback here and return evaluation results
     """
@@ -455,11 +414,11 @@ def evaluation_provider(func: Union[
     @authenticated
     @with_meta
     async def wrapper(
-            exercise: exercise_type, 
-            submission: submission_type, 
-            true_feedbacks: List[feedback_type], 
+            exercise: exercise_type,
+            submission: submission_type,
+            true_feedbacks: List[feedback_type],
             predicted_feedbacks: List[feedback_type],
-        ):
+    ):
         # Retrieve existing metadata for the exercise, submission and feedback
         exercise.meta.update(get_stored_exercise_meta(exercise) or {})
         submission.meta.update(get_stored_submission_meta(submission) or {})
@@ -473,4 +432,5 @@ def evaluation_provider(func: Union[
             evaluation = func(exercise, submission, true_feedbacks, predicted_feedbacks)
 
         return evaluation
+
     return wrapper

@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
 from athena.database import Base
-from athena.text import GradedFeedback
+from athena.text import Feedback
 from athena.logger import logger
 
 
@@ -23,7 +23,7 @@ class DBTextBlock(Base):
     submission = relationship("DBTextSubmission")
     cluster = relationship("DBTextCluster", back_populates="blocks")
 
-    def includes_feedback(self, feedback: GradedFeedback) -> bool:
+    def includes_feedback(self, feedback: Feedback) -> bool:
         """
         Whether the given feedback is included in this block.
         Example:
@@ -39,7 +39,7 @@ class DBTextBlock(Base):
             return False
         return self.index_start <= feedback.index_start and feedback.index_end <= self.index_end  # type: ignore
 
-    def feedback_is_linked_to_block(self, feedback: GradedFeedback) -> bool:
+    def feedback_is_linked_to_block(self, feedback: Feedback) -> bool:
         """The info whether the feedback is linked to the block is stored in the metadata of the feedback."""
         return feedback.meta.get("block_id") == self.id
 

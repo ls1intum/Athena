@@ -1,13 +1,13 @@
 from typing import Optional
 
-from athena.programming import GradedFeedback, Submission
+from athena.programming import Feedback, Submission
 from athena.logger import logger
 
 from .extract_methods import extract_methods
 from .method_node import MethodNode
 
 
-def get_feedback_method(submission: Submission, feedback: GradedFeedback) -> Optional[MethodNode]:
+def get_feedback_method(submission: Submission, feedback: Feedback) -> Optional[MethodNode]:
     """Find method that the feedback is on"""
     if feedback.file_path is None or feedback.line_start is None:
         return None

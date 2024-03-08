@@ -2,7 +2,7 @@ from typing import List, Sequence, Dict, Literal
 from pydantic import BaseModel, Field
 import json
 
-from athena.text import Exercise, Submission, GradedFeedback
+from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
 from module_text_llm.helpers.models import evaluation_model
@@ -28,8 +28,8 @@ class Evaluation(BaseModel):
 async def generate_evaluation(
     exercise: Exercise,
     submission: Submission,
-    true_feedbacks: List[GradedFeedback],
-    predicted_feedbacks: List[GradedFeedback]
+    true_feedbacks: List[Feedback],
+    predicted_feedbacks: List[Feedback]
 ) -> Dict[int, dict]:
 
     if evaluation_model is None:
@@ -37,7 +37,7 @@ async def generate_evaluation(
                                "by setting it to one of the available models logged during startup.")
     max_input_tokens = 3000
 
-    def feedback_to_dict(feedback: GradedFeedback):
+    def feedback_to_dict(feedback: Feedback):
         line_start, line_end = get_line_range_from_index_range(
             feedback.index_start, feedback.index_end, submission.text)
         return {

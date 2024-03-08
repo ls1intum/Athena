@@ -4,7 +4,7 @@ import asyncio
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
-from athena.programming import Exercise, Submission, GradedFeedback
+from athena.programming import Exercise, Submission, Feedback
 
 from module_programming_llm.config import GradedBasicApproachConfig
 from module_programming_llm.split_grading_instructions_by_file import (
@@ -62,7 +62,7 @@ async def generate_suggestions_by_file(
     submission: Submission,
     config: GradedBasicApproachConfig,
     debug: bool,
-) -> List[GradedFeedback]:
+) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     chat_prompt = get_chat_prompt_with_formatting_instructions(
@@ -297,7 +297,7 @@ async def generate_suggestions_by_file(
         for grading_instruction in criterion.structured_grading_instructions
     )
 
-    feedbacks: List[GradedFeedback] = []
+    feedbacks: List[Feedback] = []
     for prompt_input, result in zip(prompt_inputs, results):
         file_path = prompt_input["file_path"]
         if result is None:
@@ -309,7 +309,7 @@ async def generate_suggestions_by_file(
                 else None
             )
             feedbacks.append(
-                GradedFeedback(
+                Feedback(
                     exercise_id=exercise.id,
                     submission_id=submission.id,
                     title=feedback.title,
@@ -319,6 +319,7 @@ async def generate_suggestions_by_file(
                     line_end=feedback.line_end,
                     credits=feedback.credits,
                     structured_grading_instruction_id=grading_instruction_id,
+                    is_graded=True,
                     meta={},
                 )
             )

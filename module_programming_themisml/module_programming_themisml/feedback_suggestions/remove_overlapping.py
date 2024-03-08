@@ -5,10 +5,10 @@ This module removes overlapping suggestions.
 
 from typing import List
 
-from athena.programming import GradedFeedback
+from athena.programming import Feedback
 
 
-def is_overlapping(feedback1: GradedFeedback, feedback2: GradedFeedback) -> bool:
+def is_overlapping(feedback1: Feedback, feedback2: Feedback) -> bool:
     """Returns whether the two given feedbacks overlap."""
     if feedback1.file_path != feedback2.file_path:
         # feedback in different files
@@ -23,7 +23,7 @@ def is_overlapping(feedback1: GradedFeedback, feedback2: GradedFeedback) -> bool
     return True
 
 
-def filter_overlapping_suggestions(suggestions: List[GradedFeedback]) -> List[GradedFeedback]:
+def filter_overlapping_suggestions(suggestions: List[Feedback]) -> List[Feedback]:
     """Filters out overlapping suggestions we don't want to suggest to tutors.
 
     Arguments:
@@ -32,7 +32,7 @@ def filter_overlapping_suggestions(suggestions: List[GradedFeedback]) -> List[Gr
     # sort suggestions by similarity_score to keep the most accurate ones
     suggestions.sort(key=lambda s: s.meta.get("similarity_score", 0), reverse=True)
     # skip suggestions if they overlap with a suggestion that was already added
-    added_suggestions: List[GradedFeedback] = []
+    added_suggestions: List[Feedback] = []
     for suggestion in suggestions:
         if any(is_overlapping(suggestion, added_suggestion) for added_suggestion in added_suggestions):
             continue
