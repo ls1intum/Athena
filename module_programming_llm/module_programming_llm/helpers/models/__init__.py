@@ -1,5 +1,5 @@
 import os
-from typing import Type, Union, List, NewType
+from typing import Type, Union, List
 from module_programming_llm.helpers.models.model_config import ModelConfig
 
 
@@ -32,7 +32,7 @@ if 'DefaultModelConfig' not in globals():
 
 type0 = types[0]
 if len(types) == 1:
-    ModelConfigType = NewType('ModelConfigType', type0)
+    ModelConfigType = type0 # type: ignore
 else:
     type1 = types[1]
-    ModelConfigType = NewType('ModelConfigType', Union[type0, type1])
+    ModelConfigType = Union[type0, type1] # type: ignore
