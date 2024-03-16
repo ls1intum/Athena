@@ -31,14 +31,11 @@ from module_programming_llm.prompts.summarize_submission_by_file import (
 
 
 class SplitProblemStatementsBasePrompt(BaseModel):
-    """Base class for splitting problem statements, contains common definitions."""
+    """Base class for splitting problem statements into file-based ones, providing a structured approach for processing statements."""
 
     system_message: str = Field(
         ...,
-        description="Message for priming AI "
-        "behavior and "
-        "instructing it what to "
-        "do.",
+        description="Message for priming AI behavior and instructing it what to do.",
     )
     human_message: str = Field(
         ...,
@@ -46,12 +43,12 @@ class SplitProblemStatementsBasePrompt(BaseModel):
     )
     tokens_before_split: int = Field(
         default=250,
-        description="Split the problem statement into file-based ones after this number "
-        "of tokens.",
+        description="Split the problem statement into file-based ones after this number of tokens."
     )
 
 
 class SplitProblemStatementsWithSolutionByFilePrompt(SplitProblemStatementsBasePrompt):
+    """Specialized class for splitting problem statements with solutions, for cases where detailed solution information is available."""
     system_message: str = split_problem_statements_by_file_system_message_with_solution
     human_message: str = split_problem_statements_by_file_human_message_with_solution
 
@@ -59,6 +56,7 @@ class SplitProblemStatementsWithSolutionByFilePrompt(SplitProblemStatementsBaseP
 class SplitProblemStatementsWithoutSolutionByFilePrompt(
     SplitProblemStatementsBasePrompt
 ):
+    """Specialized class for splitting problem statements without solutions, applicable when solution details are not provided."""
     system_message: str = (
         split_problem_statements_by_file_system_message_without_solution
     )
@@ -67,7 +65,7 @@ class SplitProblemStatementsWithoutSolutionByFilePrompt(
 
 class SplitGradingInstructionsByFilePrompt(BaseModel):
     """
-\ Features available: **{grading_instructions}**, **{changed_files_from_template_to_solution}**,
+Features available: **{grading_instructions}**, **{changed_files_from_template_to_solution}**,
 **{changed_files_from_template_to_submission}**\
     """
 
@@ -100,7 +98,7 @@ class FeedbackGenerationBasePrompt(BaseModel):
 
 
 class GradedFeedbackGenerationPrompt(FeedbackGenerationBasePrompt):
-    """Inherits common fields from the base class and adds specific ones for the graded scenario."""
+    """Generates graded feedback based on file submissions, tailored to provide detailed, evaluative comments and scores."""
 
     system_message: str = generate_graded_suggestions_by_file_system_message
     human_message: str = generate_graded_suggestions_by_file_human_message
@@ -111,7 +109,7 @@ class NonGradedFeedbackGenerationPrompt(FeedbackGenerationBasePrompt):
 Features available: **{problem_statement}**, **{submission_file}**
 
 *Note: Prompt will be applied per file independently. Also, you don't have to include all features,
-e.g. template_to_submission_diff. todo revisit*\
+e.g. template_to_submission_diff.
     """
 
     system_message: str = generate_non_graded_suggestions_by_file_system_message
@@ -119,7 +117,7 @@ e.g. template_to_submission_diff. todo revisit*\
 
 
 class FileSummaryPrompt(BaseModel):
-    """todo"""
+    """Generates concise summaries of submission files, facilitating a quicker review and understanding of the content for AI processing."""
 
     system_message: str = Field(
         summarize_submission_by_file_system_message,
@@ -136,6 +134,8 @@ class FileSummaryPrompt(BaseModel):
 
 
 class BasicApproachConfig(BaseModel):
+    """Defines a basic configuration for processing submissions, incorporating problem statement splitting, feedback generation, and file summarization."""
+
     max_input_tokens: int = Field(
         default=3000, description="Maximum number of tokens in the input prompt."
     )
@@ -164,7 +164,7 @@ class BasicApproachConfig(BaseModel):
 class GradedBasicApproachConfig(BasicApproachConfig, ABC):
     """\
 This approach uses an LLM to split up the problem statement and grading instructions by file, if necessary. \
-Then, it generates suggestions for each file independently.\
+Then, it generates graded suggestions for each file independently.\
 """
 
     split_problem_statement_by_file_prompt: SplitProblemStatementsWithSolutionByFilePrompt = Field(
@@ -181,7 +181,7 @@ Then, it generates suggestions for each file independently.\
 class NonGradedBasicApproachConfig(BasicApproachConfig, ABC):
     """\
 This approach uses an LLM to split up the problem statement, if necessary. \
-Then, it generates suggestions for each file independently.\
+Then, it generates non graded suggestions for each file independently.\
 """
 
     split_problem_statement_by_file_prompt: SplitProblemStatementsWithoutSolutionByFilePrompt = Field(
@@ -194,6 +194,8 @@ Then, it generates suggestions for each file independently.\
 
 @config_schema_provider
 class Configuration(BaseModel):
+    """Configuration settings for the entire module, including debug mode and approach-specific configurations."""
+
     debug: bool = Field(default=False, description="Enable debug mode.")
     graded_approach: GradedBasicApproachConfig = Field(
         default=GradedBasicApproachConfig()
@@ -201,6 +203,3 @@ class Configuration(BaseModel):
     non_graded_approach: NonGradedBasicApproachConfig = Field(
         default=NonGradedBasicApproachConfig()
     )
-
-
-# todo fix comments

@@ -61,8 +61,7 @@ List[Feedback]:
     if is_graded:
         return await generate_graded_suggestions_by_file(exercise, submission, module_config.graded_approach,
                                                          module_config.debug)
-    else:
-        return await generate_non_graded_suggestions_by_file(exercise, submission, module_config.non_graded_approach,
+    return await generate_non_graded_suggestions_by_file(exercise, submission, module_config.non_graded_approach,
                                                              module_config.debug)
 
 
