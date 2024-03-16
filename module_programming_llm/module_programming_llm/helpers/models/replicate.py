@@ -8,11 +8,12 @@ from langchain.base_language import BaseLanguageModel
 from athena.logger import logger
 from .model_config import ModelConfig
 
+
 # Hardcoded list of models
 # If necessary, add more models from replicate here, the config below might need adjustments depending on the available
 # parameters of the model
 #
-# To update the version of the models, go to the respective page on replicate.com and copy the (latest) version id
+# To update the version of the models, go to the respective page on replicate.com and copy the (latest) version id 
 # from and paste it after the colon in the value of the dictionary. Ever so often a new version is released.
 replicate_models = {
     # LLAMA 2 70B Chat
@@ -24,7 +25,7 @@ replicate_models = {
     # LLaMA 2 7B Chat
     # https://replicate.com/a16z-infra/llama-2-7b-chat
     "llama-2-7b-chat": "a16z-infra/llama-2-7b-chat:7b0bfc9aff140d5b75bacbed23e91fd3c34b01a1e958d32132de6e0a19796e2c",
-    # CodeLLAMA 2 13B
+    # CodeLLAMA 2 13B 
     # https://replicate.com/replicate/codellama-13b
     "codellama-13b": "replicate/codellama-13b:1c914d844307b0588599b8393480a3ba917b660c7e9dfae681542b5325f228db",
     # CodeLLAMA 2 34B
@@ -37,7 +38,7 @@ if os.environ.get("REPLICATE_API_TOKEN"):  # If Replicate is available
     available_models = {
         name: Replicate(
             model=model,
-            model_kwargs={"temperature": 0.01}
+            model_kwargs={ "temperature": 0.01 }
         )
         for name, model in replicate_models.items()
     }
@@ -49,6 +50,7 @@ if available_models:
                 ", ".join(available_models.keys()))
 
     ReplicateModel = Enum('ReplicateModel', {name: name for name in available_models})  # type: ignore
+
 
     default_model_name = "llama-2-13b-chat"
     if "LLM_DEFAULT_MODEL" in os.environ and os.environ["LLM_DEFAULT_MODEL"] in available_models:
@@ -114,6 +116,7 @@ Gradually decrease penalty over this many tokens (minimum: 1)\
             # Initialize a copy of the model using the config
             model = model.__class__(**kwargs)
             return model
+        
 
         class Config:
             title = 'Replicate'

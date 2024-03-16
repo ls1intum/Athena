@@ -184,7 +184,7 @@ def _get_available_models(openai_models: Dict[str, List[str]],
                 model=model_name,
                 openai_api_key=openai_api_key,
                 client="",
-                temperature=0,
+                temperature=0
             )
 
     if azure_openai_available:
@@ -252,13 +252,9 @@ if available_models:
 
         """OpenAI LLM configuration."""
 
-        model_name: OpenAIModel = Field(
-            default=default_openai_model,  # type: ignore
-            description="The name of the model to use.",
-        )
-        max_tokens: PositiveInt = Field(
-            1000,
-            description="""\
+        model_name: OpenAIModel = Field(default=default_openai_model,  # type: ignore
+                                        description="The name of the model to use.")
+        max_tokens: PositiveInt = Field(1000, description="""\
 The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the chat completion.
 
 The total length of input tokens and generated tokens is limited by the model's context length. \

@@ -12,34 +12,29 @@ from module_programming_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
     num_tokens_from_string,
     num_tokens_from_prompt,
-    predict_and_parse,
+    predict_and_parse
 )
 from module_programming_llm.helpers.utils import format_grading_instructions, get_diff
 
 
 class FileGradingInstruction(BaseModel):
     file_name: str = Field(description="File name")
-    grading_instructions: str = Field(
-        description="Grading instructions relevant for this file"
-    )
+    grading_instructions: str = Field(description="Grading instructions relevant for this file")
 
 
 class SplitGradingInstructions(BaseModel):
-    """Collection of grading instructions split by file"""
-
-    items: Sequence[FileGradingInstruction] = Field(
-        description="File grading instructions"
-    )
+     """Collection of grading instructions split by file"""
+     items: Sequence[FileGradingInstruction] = Field(description="File grading instructions")
 
 
 # pylint: disable=too-many-locals
 async def split_grading_instructions_by_file(
-    exercise: Exercise,
-    submission: Submission,
-    prompt: ChatPromptTemplate,
-    config: GradedBasicApproachConfig,
-    debug: bool,
-) -> Optional[SplitGradingInstructions]:
+        exercise: Exercise,
+        submission: Submission,
+        prompt: ChatPromptTemplate,
+        config: GradedBasicApproachConfig,
+        debug: bool
+    ) -> Optional[SplitGradingInstructions]:
     """Split the general grading instructions by file
 
     Args:
@@ -52,16 +47,12 @@ async def split_grading_instructions_by_file(
         Optional[SplitGradingInstructions]: Split grading instructions, None if it is too short or too long
     """
 
-    grading_instructions = format_grading_instructions(
-        exercise.grading_instructions, exercise.grading_criteria
-    )
+    grading_instructions = format_grading_instructions(exercise.grading_instructions, exercise.grading_criteria)
 
     # Return None if the grading instructions are too short
-    if (
-        grading_instructions is None
-        or num_tokens_from_string(grading_instructions)
-        <= config.split_grading_instructions_by_file_prompt.tokens_before_split
-    ):
+    if (grading_instructions is None
+            or num_tokens_from_string(
+                grading_instructions) <= config.split_grading_instructions_by_file_prompt.tokens_before_split):
         return None
 
     # Return None if the grading instructions are not in the prompt

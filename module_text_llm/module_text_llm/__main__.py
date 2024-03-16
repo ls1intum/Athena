@@ -40,7 +40,7 @@ async def suggest_feedback(exercise: Exercise, submission: Submission, module_co
 @evaluation_provider
 async def evaluate_feedback(
     exercise: Exercise, submission: Submission, 
-    true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback],
+    true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback], 
 ) -> Any:
     logger.info(
         "evaluate_feedback: Evaluation for submission %d of exercise %d was requested with %d true and %d predicted feedbacks",

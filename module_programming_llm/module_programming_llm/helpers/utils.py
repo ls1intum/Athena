@@ -63,8 +63,8 @@ def add_line_numbers(content: str) -> str:
     lines = content.splitlines()
     line_number_max_length = len(str(len(lines)))
     return "\n".join(
-        f"{str(line_number).rjust(line_number_max_length)} {line}"
-        for line_number, line
+        f"{str(line_number).rjust(line_number_max_length)} {line}" 
+        for line_number, line 
         in enumerate(lines)
     )
 
@@ -88,7 +88,7 @@ def get_programming_language_file_extension(programming_language: str) -> str | 
 @contextmanager
 def temporary_remote(remote_name: str, repo: Repo, remote_url: str) -> Iterator[Optional[Remote]]:
     """Context manager for temporarily adding a remote to a Git repository.
-
+    
     Args:
         remote_name (str): The name of the remote
         repo (Repo): The repository to add the remote to
@@ -104,13 +104,13 @@ def temporary_remote(remote_name: str, repo: Repo, remote_url: str) -> Iterator[
         repo.delete_remote(remote)
 
 
-def get_diff(src_repo: Repo,
-             dst_repo: Repo,
+def get_diff(src_repo: Repo, 
+             dst_repo: Repo, 
              src_prefix: str = "a",
              dst_prefix: str = "b",
              file_path: Optional[str] = None,
              name_only: bool = False,
-             branch: str = "main",
+             branch: str = "main", 
              remote_name: str = "diff_target") -> str:
     """Get the diff between two branches of two Git repositories.
 
