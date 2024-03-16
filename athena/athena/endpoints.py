@@ -65,8 +65,7 @@ def submissions_consumer(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
-    module_config_type = inspect.signature(func).parameters[
-        "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/submissions", responses=module_responses)
     @authenticated
@@ -107,7 +106,6 @@ def submissions_consumer(func: Union[
         background_tasks.add_task(func, exercise, submissions, **kwargs)
 
         return None
-
     return wrapper
 
 
@@ -147,8 +145,7 @@ def submission_selector(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submissions"].annotation.__args__[0]
-    module_config_type = inspect.signature(func).parameters[
-        "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     # own request model to allow for `submissionIds` instead of `submission_ids` (camelCase vs snake_case)
     class SubmissionSelectorRequest(BaseModel):
@@ -236,8 +233,7 @@ def feedback_consumer(func: Union[
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
     feedback_type = inspect.signature(func).parameters["feedbacks"].annotation.__args__[0]
-    module_config_type = inspect.signature(func).parameters[
-        "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
 
     @app.post("/feedbacks", responses=module_responses)
     @authenticated
@@ -267,7 +263,6 @@ def feedback_consumer(func: Union[
         background_tasks.add_task(func, exercise, submission, feedbacks, **kwargs)
 
         return None
-
     return wrapper
 
 
@@ -308,8 +303,7 @@ def feedback_provider(func: Union[
     """
     exercise_type = inspect.signature(func).parameters["exercise"].annotation
     submission_type = inspect.signature(func).parameters["submission"].annotation
-    module_config_type = inspect.signature(func).parameters[
-        "module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
+    module_config_type = inspect.signature(func).parameters["module_config"].annotation if "module_config" in inspect.signature(func).parameters else None
     is_graded_type = inspect.signature(func).parameters["is_graded"].annotation
 
     @app.post("/feedback_suggestions", responses=module_responses)
@@ -344,7 +338,6 @@ def feedback_provider(func: Union[
         # Store feedback suggestions and assign internal IDs
         feedbacks = store_feedback_suggestions(feedbacks)
         return feedbacks
-
     return wrapper
 
 
@@ -366,8 +359,7 @@ def config_schema_provider(cls: Type[C]) -> Type[C]:
     try:
         cls()
     except ValidationError as exc:
-        raise TypeError(
-            f'Cannot initialize {cls.__name__} without parameters, please provide default values for all parameters') from exc
+        raise TypeError(f'Cannot initialize {cls.__name__} without parameters, please provide default values for all parameters') from exc
 
     @app.get("/config_schema")
     async def wrapper():
@@ -432,5 +424,4 @@ def evaluation_provider(func: Union[
             evaluation = func(exercise, submission, true_feedbacks, predicted_feedbacks)
 
         return evaluation
-
     return wrapper
