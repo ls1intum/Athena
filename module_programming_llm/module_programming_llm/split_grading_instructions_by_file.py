@@ -23,8 +23,8 @@ class FileGradingInstruction(BaseModel):
 
 
 class SplitGradingInstructions(BaseModel):
-     """Collection of grading instructions split by file"""
-     items: Sequence[FileGradingInstruction] = Field(description="File grading instructions")
+    """Collection of grading instructions split by file"""
+    items: Sequence[FileGradingInstruction] = Field(description="File grading instructions")
 
 
 # pylint: disable=too-many-locals

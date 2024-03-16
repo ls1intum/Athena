@@ -95,7 +95,8 @@ async def generate_suggestions_by_file(
         config=config,
         debug=debug,
     )
-    summary_string = solution_summary.describe_solution_summary() or ""
+    summary_string = solution_summary.describe_solution_summary() if solution_summary is not None else ""
+
 
     # Get split problem statement by file (if necessary)
     split_problem_statement = await split_problem_statement_by_file(
@@ -144,11 +145,11 @@ async def generate_suggestions_by_file(
             file_path=file_path,
         )
 
-        diff_lines = diff_lines.split("\n")
+        diff_lines_list = diff_lines.split("\n")
 
         diff_without_deletions = []
 
-        for line in diff_lines:
+        for line in diff_lines_list:
             if not line.startswith("-"):
                 diff_without_deletions.append(line)
 

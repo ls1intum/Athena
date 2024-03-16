@@ -159,7 +159,7 @@ async def predict_and_parse(
         try:
             return await chain.arun(**prompt_input)
         except (OutputParserException, ValidationError) as e:
-            logger.error(f"Exception type: {type(e).__name__}, Message: {e}")
+            logger.error("Exception type: %s, Message: %s", type(e).__name__, e)
             return None
 
     output_parser = PydanticOutputParser(pydantic_object=pydantic_object)
@@ -167,7 +167,7 @@ async def predict_and_parse(
     try:
         return await chain.arun(**prompt_input)
     except (OutputParserException, ValidationError) as e:
-        logger.error(f"Exception type: {type(e).__name__}, Message: {e}")
+        logger.error("Exception type: %s, Message: %s", type(e).__name__, e)
         # In the future, we should probably have some recovery mechanism here (i.e. fix the output with another prompt)
         return None
 

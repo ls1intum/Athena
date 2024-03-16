@@ -9,7 +9,7 @@ from athena.authenticate import authenticated
 from athena.metadata import with_meta
 from athena.module_config import get_dynamic_module_config_factory
 from athena.logger import logger
-from athena.schemas import Exercise, Submission, Feedback, Feedback
+from athena.schemas import Exercise, Submission, Feedback
 from athena.schemas.schema import to_camel
 from athena.storage import get_stored_submission_meta, get_stored_exercise_meta, get_stored_feedback_meta, \
     store_exercise, store_feedback, store_feedback_suggestions, store_submissions, get_stored_submissions
