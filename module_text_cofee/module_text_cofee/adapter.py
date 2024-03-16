@@ -37,11 +37,22 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
     """Send submissions to old Athena-CoFee server."""
     logger.info("Sending %d submissions to CoFee", len(submissions))
     module_url = os.environ.get("MODULE_URL", f"http://localhost:{get_module_config().port}")
+    logger.info("json:")
+    logger.info({
+        "callbackUrl": f"{module_url}/cofee_callback/{exercise.id}",
+        "submissions": [
+            {
+                "id": submission.id,
+                "text": submission.text,
+            }
+            for submission in submissions
+        ],
+    })
     resp = requests.post(
         f"{get_cofee_url()}/submit",
         json={
             # TODO: maybe make this more flexible?
-            # "callbackUrl": f"http://host.docker.internal:5004/cofee_callback/{exercise.id}", # for local debugging
+            #"callbackUrl": f"http://host.docker.internal:5004/cofee_callback/{exercise.id}", # for local debugging
             "callbackUrl": f"{module_url}/cofee_callback/{exercise.id}",
             "submissions": [
                 {
@@ -55,10 +66,9 @@ def send_submissions(exercise: Exercise, submissions: List[Submission]):
             "Content-Type": "application/json",
             "Authorization": COFEE_AUTH_TOKEN,
         },
-        timeout=60,
-        # TODO: remove this again:
-        verify=False,  # Ignore SSL errors for now, because athenetest1-01 has an invalid certificate
+        # timeout=60,
     )
+    logger.info("sent! raising for status...")
     resp.raise_for_status()
     logger.info("Submissions sent to CoFee")
 
