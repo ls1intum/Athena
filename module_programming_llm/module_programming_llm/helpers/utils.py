@@ -10,7 +10,6 @@ from langchain.document_loaders import GitLoader
 
 from athena import GradingCriterion
 
-
 def load_files_from_repo(repo: Repo, file_filter: Optional[Callable[[str], bool]] = None) -> Dict[str, str]:
     return {
         doc.metadata['file_path']: doc.page_content
@@ -18,8 +17,7 @@ def load_files_from_repo(repo: Repo, file_filter: Optional[Callable[[str], bool]
     }
 
 
-def merge_repos_by_filepath(*repos: Repo, file_filter: Optional[Callable[[str], bool]] = None) -> Iterator[
-    Tuple[str, List[Optional[str]]]]:
+def merge_repos_by_filepath(*repos: Repo, file_filter: Optional[Callable[[str], bool]] = None) -> Iterator[Tuple[str, List[Optional[str]]]]:
     docs = [load_files_from_repo(repo, file_filter) for repo in repos]
     files = {file for doc in docs for file in doc}
 
@@ -27,8 +25,7 @@ def merge_repos_by_filepath(*repos: Repo, file_filter: Optional[Callable[[str], 
         yield (file, [doc.get(file) for doc in docs])
 
 
-def format_grading_instructions(grading_instructions: Optional[str],
-                                grading_criteria: Optional[List[GradingCriterion]]) -> Optional[str]:
+def format_grading_instructions(grading_instructions: Optional[str], grading_criteria: Optional[List[GradingCriterion]]) -> Optional[str]:
     """Formats grading instructions and the grading criteria with nested structured grading instructions into a single string.
 
     Args:
@@ -139,6 +136,5 @@ def get_diff(src_repo: Repo,
             return f"- {src_prefix}/{file_path} does not exist.\n+ {dst_prefix}/{file_path} has been added."
 
     with temporary_remote(remote_name, src_repo, str(dst_repo.working_tree_dir)):
-        diff = src_repo.git.diff(branch, f"{remote_name}/{branch}", f"--src-prefix={src_prefix}/",
-                                 f"--dst-prefix={dst_prefix}/", file_path, name_only=name_only)
+        diff = src_repo.git.diff(branch, f"{remote_name}/{branch}", f"--src-prefix={src_prefix}/", f"--dst-prefix={dst_prefix}/", file_path, name_only=name_only)
     return diff
