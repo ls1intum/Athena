@@ -16,7 +16,7 @@ export type TextSubmission = SubmissionBase & {
 
 export type ProgrammingSubmission = SubmissionBase & {
   type: "programming";
-  repository_uri: string;
+  repository_url: string;
 };
 
 export type ModellingSubmission = SubmissionBase & {
