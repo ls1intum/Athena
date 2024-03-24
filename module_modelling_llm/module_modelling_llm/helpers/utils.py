@@ -57,5 +57,5 @@ def get_elements(model: dict) -> list[dict]:
 
     if isinstance(elements, list):
         return elements
-    else:
-        return list(elements.values())
+
+    return list(elements.values())
