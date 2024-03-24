@@ -43,11 +43,10 @@ class AssessmentModel(BaseModel):
 
 def filter_ids_for_model(ids: List[str], model: dict) -> List[str]:
     """
-    Filter a list of element ids based on whether a corresponding element is present in a given model.
-    This function is helpful to filter out element references that might not be applicable
+    Filter a list of element ids based on whether a corresponding element is present in a given diagram model.
     :param ids: List of ids that should be filtered
-    :param model: Diagram model in which the filtered ids should be contained
-    :return Filtered list of ids
+    :param model: Diagram model in which elements with the given ids should be contained
+    :return The filtered list of IDs
     """
     elements: list[dict] = get_elements(model)
     model_ids: set[str] = {str(element.get("id")) for element in elements}
