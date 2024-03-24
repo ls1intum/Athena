@@ -50,7 +50,7 @@ def filter_ids_for_model(ids: List[str], model: dict) -> List[str]:
     :return Filtered list of ids
     """
     elements: list[dict] = get_elements(model)
-    model_ids: set[str] = {element.get("id") for element in elements}
+    model_ids: set[str] = {str(element.get("id")) for element in elements}
     return list(filter(lambda id: id in model_ids, ids))
 
 
