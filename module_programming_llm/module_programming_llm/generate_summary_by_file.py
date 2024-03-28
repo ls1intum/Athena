@@ -14,7 +14,11 @@ from module_programming_llm.helpers.llm_utils import (
     num_tokens_from_prompt,
     predict_and_parse,
 )
-from module_programming_llm.helpers.utils import load_files_from_repo, add_line_numbers
+from module_programming_llm.helpers.utils import (
+    get_diff,
+    load_files_from_repo,
+    add_line_numbers
+)
 
 
 class FileDescription(BaseModel):
@@ -67,10 +71,23 @@ async def generate_summary_by_file(
 
     model = config.model.get_model()  # type: ignore[attr-defined]
 
+    template_repo = exercise.get_template_repository()
     submission_repo = submission.get_repository()
 
-    files = load_files_from_repo(submission_repo)
+    changed_files_from_template_to_submission = get_diff(
+        src_repo=template_repo, dst_repo=submission_repo, file_path=None, name_only=True
+    ).split("\n")
+    changed_files_from_template_to_submission = [
+        os.path.join(str(submission_repo.working_tree_dir or ""), file_path)
+        for file_path in changed_files_from_template_to_submission
+    ]
 
+    # Changed text files
+    changed_files = load_files_from_repo(
+        submission_repo,
+        file_filter=lambda file_path: file_path
+                                      in changed_files_from_template_to_submission,
+    )
     chat_prompt = get_chat_prompt_with_formatting_instructions(
         model=model,
         system_message=config.generate_file_summary_prompt.system_message,
@@ -81,7 +98,7 @@ async def generate_summary_by_file(
     prompt_inputs = []
 
     # Gather prompt inputs for each file (independently)
-    for file_path, file_content in files.items():
+    for file_path, file_content in changed_files.items():
         file_content = add_line_numbers(file_content)
 
         prompt_inputs.append(
