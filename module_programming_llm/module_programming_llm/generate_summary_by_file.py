@@ -1,6 +1,6 @@
 import asyncio
-from typing import Optional, Sequence, List, Dict
-from collections import defaultdict
+import os
+from typing import Optional, List, Dict
 
 from pydantic import BaseModel, Field
 from langchain.prompts import ChatPromptTemplate
