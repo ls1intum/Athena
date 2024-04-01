@@ -9,7 +9,7 @@ types: List[Type[ModelConfig]] = []
 try:
     import module_programming_llm.helpers.models.openai as openai_config
 
-    types.append(openai_config.OpenAIModelConfig)
+    types.append(Type[openai_config.OpenAIModelConfig])
     if default_model_name in openai_config.available_models:
         DefaultModelConfig = openai_config.OpenAIModelConfig
 except AttributeError:
@@ -18,7 +18,7 @@ except AttributeError:
 try:
     import module_programming_llm.helpers.models.replicate as replicate_config
 
-    types.append(replicate_config.ReplicateModelConfig)
+    types.append(Type[replicate_config.ReplicateModelConfig])
     if default_model_name in replicate_config.available_models:
         DefaultModelConfig = replicate_config.ReplicateModelConfig
 except AttributeError:
@@ -31,13 +31,15 @@ if not types:
 if 'DefaultModelConfig' not in globals():
     DefaultModelConfig = types[0]
 
-type0 = types[0]
+
+def to_union_type(models: List[Type[ModelConfig]]) -> Type[ModelConfig]:
+    if len(models) == 1:
+        return models[0]
+    else:
+        return Union[models[0], *models[1:]]
+
 
 if TYPE_CHECKING:
-    ModelConfigType = type0
+    ModelConfigType = Type[openai_config.OpenAIModelConfig]
 else:
-    if len(types) == 1:
-        ModelConfigType = type0
-    else:
-        type1 = types[1]
-        ModelConfigType = Union[type0, type1]
+    ModelConfigType = to_union_type(types)
