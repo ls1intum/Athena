@@ -34,7 +34,7 @@ if 'DefaultModelConfig' not in globals():
 
 type0 = types[0]
 if len(types) == 1:
-    ModelConfigType: type = type0
+    ModelConfigType = openai_config.OpenAIModelConfig
 else:
     type1 = types[1]
-    ModelConfigType: type = Union[type0, type1]
+    ModelConfigType = Union[openai_config.OpenAIModelConfig, replicate_config.ReplicateModelConfig]
