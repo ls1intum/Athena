@@ -1,5 +1,5 @@
 import os
-from typing import Type, Union, List
+from typing import Type, Union, List, TYPE_CHECKING
 from module_programming_llm.helpers.models.model_config import ModelConfig
 
 
@@ -31,9 +31,14 @@ if 'DefaultModelConfig' not in globals():
     DefaultModelConfig = types[0]
 
 
+
 type0 = types[0]
-if len(types) == 1:
-    ModelConfigType: Type = openai_config.OpenAIModelConfig
+
+if TYPE_CHECKING:
+    ModelConfigType = type0
 else:
-    type1 = types[1]
-    ModelConfigType: Type[Union[openai_config.OpenAIModelConfig, replicate_config.ReplicateModelConfig]] = Union[openai_config.OpenAIModelConfig, replicate_config.ReplicateModelConfig]
+    if len(types) == 1:
+        ModelConfigType= type0
+    else:
+        type1 = types[1]
+        ModelConfigType = Union[type0, type1]
