@@ -2,13 +2,13 @@ import os
 from typing import Type, Union, List, TYPE_CHECKING
 from module_programming_llm.helpers.models.model_config import ModelConfig
 
-
 DefaultModelConfig: Type[ModelConfig]
 default_model_name = os.environ.get("LLM_DEFAULT_MODEL")
 
 types: List[Type[ModelConfig]] = []
 try:
     import module_programming_llm.helpers.models.openai as openai_config
+
     types.append(openai_config.OpenAIModelConfig)
     if default_model_name in openai_config.available_models:
         DefaultModelConfig = openai_config.OpenAIModelConfig
@@ -17,6 +17,7 @@ except AttributeError:
 
 try:
     import module_programming_llm.helpers.models.replicate as replicate_config
+
     types.append(replicate_config.ReplicateModelConfig)
     if default_model_name in replicate_config.available_models:
         DefaultModelConfig = replicate_config.ReplicateModelConfig
@@ -30,15 +31,13 @@ if not types:
 if 'DefaultModelConfig' not in globals():
     DefaultModelConfig = types[0]
 
-
-
 type0 = types[0]
 
 if TYPE_CHECKING:
     ModelConfigType = type0
 else:
     if len(types) == 1:
-        ModelConfigType= type0
+        ModelConfigType = type0
     else:
         type1 = types[1]
         ModelConfigType = Union[type0, type1]
