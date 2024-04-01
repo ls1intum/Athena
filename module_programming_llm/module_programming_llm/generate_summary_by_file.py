@@ -47,11 +47,11 @@ class SolutionSummary(BaseModel):
 
 # pylint: disable=too-many-locals
 async def generate_summary_by_file(
-    exercise: Exercise,
-    submission: Submission,
-    prompt: ChatPromptTemplate,
-    config: BasicApproachConfig,
-    debug: bool,
+        exercise: Exercise,
+        submission: Submission,
+        prompt: ChatPromptTemplate,
+        config: BasicApproachConfig,
+        debug: bool,
 ) -> Optional[SolutionSummary]:
     """Generaty summary for the submission file by file
 
@@ -85,8 +85,7 @@ async def generate_summary_by_file(
     # Changed text files
     changed_files = load_files_from_repo(
         submission_repo,
-        file_filter=lambda file_path: file_path
-                                      in changed_files_from_template_to_submission,
+        file_filter=lambda file_path: file_path in changed_files_from_template_to_submission,
     )
     chat_prompt = get_chat_prompt_with_formatting_instructions(
         model=model,
