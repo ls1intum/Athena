@@ -32,7 +32,7 @@ if 'DefaultModelConfig' not in globals():
 
 type0 = types[0]
 if len(types) == 1:
-    ModelConfigType = type0 # type: ignore
+    ModelConfigType = type0
 else:
     type1 = types[1]
-    ModelConfigType = Union[type0, type1] # type: ignore
+    ModelConfigType = Union[type0, type1]
