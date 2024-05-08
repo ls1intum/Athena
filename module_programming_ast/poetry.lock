@@ -21,6 +21,17 @@ test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypo
 trio = ["trio (>=0.23)"]
 
 [[package]]
+name = "apted"
+version = "1.0.3"
+description = "APTED algorithm for the Tree Edit Distance"
+optional = false
+python-versions = "*"
+files = [
+    {file = "apted-1.0.3-py3-none-any.whl", hash = "sha256:74193369d023649d335269e67c4df07f922959e5ac2597de1b79af4e694150e8"},
+    {file = "apted-1.0.3.tar.gz", hash = "sha256:befa5181e2d4457fa88e54995a82604ee048bb2fbc781ea97d8e1856b4715ce9"},
+]
+
+[[package]]
 name = "athena"
 version = "1.0.0"
 description = "This is a helper module for easier development of Athena modules. It provides communication functionality with the Assessment Module manager, as well as helper functions for storage."
@@ -554,4 +565,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "f024e7d202dff0e82c241659ea183b74cab1a472b72b64e1b24f948246b7f457"
+content-hash = "a355f50afb738e5a03d2ef63d9522975efa4524fab35a4c295842bd895b771e7"

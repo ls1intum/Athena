@@ -8,6 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "3.11.*"
 athena = {path = "../athena", develop = true}
+apted = "^1.0.3"
 
 [tool.poetry.scripts]
 module = "athena:run_module"
