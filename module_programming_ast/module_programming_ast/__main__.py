@@ -9,8 +9,8 @@ from athena import app, config_schema_provider, submissions_consumer, submission
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
 from athena.programming import Exercise, Submission, Feedback, get_stored_feedback_suggestions, count_stored_submissions
-from module_programming_ast.module_programming_ast.remove_overlapping import filter_overlapping_suggestions
-from module_programming_ast.module_programming_ast.remove_suspicious import filter_suspicious
+from module_programming_ast.remove_overlapping import filter_overlapping_suggestions
+from module_programming_ast.remove_suspicious import filter_suspicious
 
 
 @config_schema_provider
