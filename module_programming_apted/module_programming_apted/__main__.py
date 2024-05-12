@@ -1,5 +1,5 @@
 """
-Entry point for the module_programming_ast module.
+Entry point for the module_programming_apted module.
 """
 import random
 from typing import List, Any
@@ -13,7 +13,7 @@ from athena.storage import store_exercise, store_submissions, store_feedback
 
 @config_schema_provider
 class Configuration(BaseModel):
-    """Example configuration for the module_programming_ast module."""
+    """Example configuration for the module_programming_apted module."""
     debug: bool = Field(False, description="Whether the module is in **debug mode**. This is an example config option.")
 
 
