@@ -1,8 +1,30 @@
-import javalang
-from apted import APTED
+from apted import APTED, Config
 from apted.helpers import Tree
-
 from module_programming_ast.convert_code_to_ast.java_to_ast_distance import java_file_to_ast
+
+
+class FeedbackFocusedConfig(Config):
+    def rename(self, node1, node2):
+        # Adjusting the renaming costs depending on the node type
+        if 'Var' in node1.name and 'Var' in node2.name:
+            return 0  # Ignore variable renaming
+        elif 'Literal' in node1.name and 'Literal' in node2.name:
+            return 0.1  # Low costs for changes in literals
+        elif 'Comment' in node1.name and 'Comment' in node2.name:
+            return 0  # Ignore commmets
+        return 1 if node1.name != node2.name else 0  # Standardkosten für andere Typen
+
+    def insert(self, node):
+        # Higher costs for inserting new control structures
+        if 'Control' in node.name:
+            return 2
+        return 1
+
+    def delete(self, node):
+        # Higher costs for deleting new control structures
+        if 'Control' in node.name:
+            return 2
+        return 1
 
 
 def serialized_to_apted_string(node):
@@ -20,8 +42,9 @@ def serialized_to_apted_string(node):
     # returns following apted format {a{b}{c}}
     return result
 
+
 def compute_ap_ted(tree1, tree2):
-    apted = APTED(tree1, tree2)
+    apted = APTED(tree1, tree2, FeedbackFocusedConfig())
     ted = apted.compute_edit_distance()
     # To display mapping between those two predicates
     mapping = apted.compute_edit_mapping()
