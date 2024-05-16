@@ -4,7 +4,7 @@
             int test = 9;
             for(int i = 0; i < 10; i++) {
                 String foo = "Testeeeeeeed";
-                int marlon = "7";
+                int marlon = 7;
                 System.out.println(i);
             }
         }
