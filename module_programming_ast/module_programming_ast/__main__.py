@@ -11,6 +11,7 @@ from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
 
 
+
 @config_schema_provider
 class Configuration(BaseModel):
     """Example configuration for the module_programming_ast module."""
@@ -60,13 +61,56 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 
 @feedback_consumer
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
-    logger.info("process_feedback: Received feedbacks for submission %d of exercise %d", submission.id, exercise.id)
+    logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d", len(feedbacks),
+                submission.id, exercise.id)
     logger.info("process_feedback: Feedbacks: %s", feedbacks)
-    # Do something with the feedback
-    # Add data to feedback
+
+    #Currently only works with Java and Python - can be extended with more languages if the grammar is available
+    if exercise.programming_language.lower() not in ["java", "python"]:
+        logger.info("AP-TED currently only works with Java and Python. Not consuming feedback.")
+        return
+
+    # Remove unreferenced feedbacks
+    feedbacks = list(filter(lambda f: f.file_path is not None and f.line_start is not None, feedbacks))
+
+    # Add method metadata to feedbacks
+    feedbacks_with_method = []
     for feedback in feedbacks:
-        feedback.meta["some_data"] = "some_value"
+        feedback_method = get_feedback_method(submission, feedback)
+        if feedback_method is None:
+            # don't consider feedback without a method
+            continue
+        logger.debug("Feedback #%d: Found method %s", feedback.id, feedback_method.name)
+        feedback.meta["method_name"] = feedback_method.name
+        feedback.meta["method_code"] = feedback_method.source_code
+        feedback.meta["method_line_start"] = feedback_method.line_start
+        feedback.meta["method_line_end"] = feedback_method.line_end
+        feedbacks_with_method.append(feedback)
+    feedbacks = feedbacks_with_method
+
+    # find all submissions for this exercise
+    exercise_submissions = cast(List[Submission], list(get_stored_submissions(exercise.id)))
+
+    # create feedback suggestions
+    logger.info("Creating feedback suggestions for %d feedbacks", len(feedbacks))
+    feedback_suggestions = create_feedback_suggestions(exercise_submissions, feedbacks)
+
+    # additionally, store metadata about how impactful each feedback was, i.e. how many suggestions were given based on it
+    for feedback in feedbacks:
+        # count how many suggestions were given based on this feedback
+        feedback.meta["n_feedback_suggestions"] = len(
+            [f for f in feedback_suggestions if f.meta["original_feedback_id"] == feedback.id])
+        # store the information on the suggestions as well for quicker access later
+        for suggestion in feedback_suggestions:
+            if suggestion.meta["original_feedback_id"] == feedback.id:
+                suggestion.meta["n_feedback_suggestions"] = feedback.meta["n_feedback_suggestions"]
+
+    # save to database
+    store_feedback_suggestions(feedback_suggestions)  # type: ignore
+    for feedback in feedbacks:
         store_feedback(feedback)
+
+    logger.debug("Feedbacks processed")
 
 
 @feedback_provider

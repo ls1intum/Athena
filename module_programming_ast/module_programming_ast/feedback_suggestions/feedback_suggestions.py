@@ -9,7 +9,10 @@ from athena.programming import Feedback, Submission
 from module_programming_themisml.extract_methods import MethodNode, extract_methods
 from module_programming_themisml.feedback_suggestions.batch import batched
 
-#TODO This is a placeholder for computing the similarity score and give the right feedback. This is why themisCode is pasted in here.
+
+# TODO This is a placeholder for computing the similarity score and give the right feedback. This is why themisCode is pasted in here.
+
+APTED_THRESHOLD = 10  # TODO Needs to be adapted
 
 def make_feedback_suggestion_from(feedback: Feedback, submission: Submission,
                                   submission_method: MethodNode) -> Feedback:
@@ -27,6 +30,7 @@ def make_feedback_suggestion_from(feedback: Feedback, submission: Submission,
     # remove ID
     suggestion.id = None
     return suggestion
+# TODO: Stays the same
 
 
 class CodeComparisonWithCorrespondingSuggestions:
@@ -36,6 +40,7 @@ class CodeComparisonWithCorrespondingSuggestions:
         self.code1 = code1
         self.code2 = code2
         self.suggestion = suggestion
+        # TODO: Maybe create here also the tree for the code?
 
     def has_same_code(self, other) -> bool:
         return self.code1 == other.code1 and self.code2 == other.code2
@@ -49,6 +54,7 @@ def group_feedbacks_by_file_path(feedbacks: List[Feedback]) -> Dict[str, List[Fe
             feedbacks_by_file_path[str(feedback.file_path)] = []
         feedbacks_by_file_path[str(feedback.file_path)].append(feedback)
     return feedbacks_by_file_path
+# TODO stays the same
 
 
 def create_comparisons_with_suggestions(
@@ -74,6 +80,7 @@ def create_comparisons_with_suggestions(
                 continue
             # get all methods in the file of the submission
             submission_methods = extract_methods(code)
+            # TODO Here eigentlch nur noch den Tree mitnehmen.
             # get all feedbacks that match methods in the submission
             for s_method in submission_methods:
                 for feedback in file_feedbacks:
@@ -105,6 +112,7 @@ def create_feedback_suggestions(
             batched(create_comparisons_with_suggestions(submissions, feedbacks), 128)):
         # compute similarity scores for all comparisons at once
         sim_computer = CodeSimilarityComputer()
+        #TODO Anstatt dem Computer meinen eignen SimilarityCOmputer? - AP-TED usen brauche ich bestimmte Datenstrukturen?
         for s_comp in comparisons_with_suggestions:
             sim_computer.add_comparison(s_comp.code1, s_comp.code2)
         logger.debug("Computing similarity scores for %d code comparisons (batch #%d)",
@@ -114,7 +122,8 @@ def create_feedback_suggestions(
         # create suggestions
         for s_comp in comparisons_with_suggestions:
             similarity = sim_computer.get_similarity_score(s_comp.code1, s_comp.code2)
-            if similarity.f1 >= SIMILARITY_SCORE_THRESHOLD:
+            if similarity.f1 >= APTED_THRESHOLD:
+                #TODO Here meinen eigenen Threshold einfügen und die eigene Config überpürfen
                 # found similar code -> create feedback suggestion
                 logger.info("Found similar code with similarity score %s", similarity.f1)
                 # add meta information for debugging

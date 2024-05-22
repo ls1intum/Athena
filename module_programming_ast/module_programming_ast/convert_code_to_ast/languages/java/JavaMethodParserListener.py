@@ -47,7 +47,7 @@ class ExtendedMethodParserListener(MethodParserListener):
                 line_start=ctx.start.line,
                 line_end=ctx.stop.line,
                 source_code=ctx.start.source[1].getText(ctx.start.start, ctx.stop.stop),
-                name=name,  #Set the name of the method
+                name=name,  # Set the name of the method
                 ast=ctx  # Save the tree
             )
             self.methods.append(me)
