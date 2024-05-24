@@ -1,6 +1,6 @@
 from apted import APTED, Config
 from apted.helpers import Tree
-from module_programming_ast.convert_code_to_ast.antlr_to_apted_tree import parse_java_file
+from module_programming_ast.convert_code_to_ast.antlr_to_apted_tree import parse_java_file, parse_python_file
 
 
 class FeedbackFocusedConfig(Config):
@@ -46,5 +46,22 @@ if __name__ == "__main__":
     java_ast1 = parse_java_file("../test_files/test2.java")
     java_ast2 = parse_java_file("../test_files/test3.java")
 
+    code = """def process_numbers(numbers):
+    total = 0
+    for number in numbers:
+        if number % 2 == 1:
+            total += number
+        else:
+            total -= number
+    if total > 0:
+        print("Positive total:", total)
+    else:
+        print("Non-positive total:", total)"""
+
+    code_java = ""
+
+    code1 = parse_java_file(code_java)[0]
+    code2 = parse_java_file(code_java)[0]
+
     # Call APTED-algorithm
-    compute_ap_ted(java_ast1, java_ast2)
+    compute_ap_ted(code1, code2)

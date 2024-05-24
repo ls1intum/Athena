@@ -2,8 +2,10 @@ from antlr4 import ParseTreeListener
 
 from module_programming_ast.convert_code_to_ast.languages.python.Python3Parser import Python3Parser
 from module_programming_ast.convert_code_to_ast.languages.python.Python3ParserListener import Python3ParserListener
+from dataclasses import dataclass
 
 
+@dataclass
 class MethodNode:
     def __init__(self, line_start, line_end, source_code, name, ast_string):
         self.line_start = line_start

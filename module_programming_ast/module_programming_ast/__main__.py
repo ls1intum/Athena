@@ -2,14 +2,16 @@
 Entry point for the module_programming_ast module.
 """
 import random
-from typing import List, Any
+from typing import List, Any, cast
 from pydantic import BaseModel, Field
 
-from athena import app, config_schema_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider, evaluation_provider, emit_meta
-from athena.programming import Exercise, Submission, Feedback
+from athena import app, config_schema_provider, submissions_consumer, submission_selector, feedback_consumer, \
+    feedback_provider, evaluation_provider, emit_meta
+from athena.programming import Exercise, Submission, Feedback, get_stored_submissions
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
-
+from module_programming_ast.convert_code_to_ast.get_feedback_methods import get_feedback_method
+from module_programming_ast.feedback_suggestions.feedback_suggestions import create_feedback_suggestions
 
 
 @config_schema_provider
@@ -65,8 +67,9 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
                 submission.id, exercise.id)
     logger.info("process_feedback: Feedbacks: %s", feedbacks)
 
-    #Currently only works with Java and Python - can be extended with more languages if the grammar is available
-    if exercise.programming_language.lower() not in ["java", "python"]:
+    programming_language = exercise.programming_language.lower()
+    # Currently only works with Java and Python - can be extended with more languages if the grammar is available
+    if programming_language not in ["java", "python"]:
         logger.info("AP-TED currently only works with Java and Python. Not consuming feedback.")
         return
 
@@ -76,7 +79,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     # Add method metadata to feedbacks
     feedbacks_with_method = []
     for feedback in feedbacks:
-        feedback_method = get_feedback_method(submission, feedback)
+        feedback_method = get_feedback_method(submission, feedback, programming_language)
         if feedback_method is None:
             # don't consider feedback without a method
             continue
@@ -115,7 +118,8 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
 @feedback_provider
 def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
-    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
+    logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id,
+                exercise.id)
     # Do something with the submission and return a list of feedback
 
     # Example use of module config
@@ -123,7 +127,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
     logger.info("Config: %s", module_config)
     if module_config.debug:
         emit_meta("costs", "100.00€")
-    
+
     return [
         # Referenced feedback, line 8-9 in BinarySearch.java
         Feedback(
@@ -186,16 +190,17 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
 
 # Only if it makes sense for a module (Optional)
 @evaluation_provider
-def evaluate_feedback(exercise: Exercise, submission: Submission, true_feedbacks: List[Feedback], predicted_feedbacks: List[Feedback]) -> Any:
+def evaluate_feedback(exercise: Exercise, submission: Submission, true_feedbacks: List[Feedback],
+                      predicted_feedbacks: List[Feedback]) -> Any:
     logger.info(
-        "evaluate_feedback: Evaluation for submission %d of exercise %d was requested with %d true and %d predicted feedbacks", 
+        "evaluate_feedback: Evaluation for submission %d of exercise %d was requested with %d true and %d predicted feedbacks",
         submission.id, exercise.id, len(true_feedbacks), len(predicted_feedbacks)
     )
 
     # Do something with the true and predicted feedback and return the evaluation result
     # Generate some example evaluation result
     evaluation_results = []
-    true_feedback_embeddings = [random.random() for _ in true_feedbacks] 
+    true_feedback_embeddings = [random.random() for _ in true_feedbacks]
     predicted_feedback_embeddings = [random.random() for _ in predicted_feedbacks]
     for feedback, embedding in zip(predicted_feedbacks, predicted_feedback_embeddings):
         feedback_evaluation = {

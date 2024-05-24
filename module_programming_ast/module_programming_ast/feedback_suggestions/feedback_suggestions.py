@@ -123,7 +123,7 @@ def create_feedback_suggestions(
         for s_comp in comparisons_with_suggestions:
             similarity = sim_computer.get_similarity_score(s_comp.code1, s_comp.code2)
             if similarity.f1 >= APTED_THRESHOLD:
-                #TODO Here meinen eigenen Threshold einfügen und die eigene Config überpürfen
+                #TODO Here meinen eigenen Threshold einfügen und die eigene Config überprüfen
                 # found similar code -> create feedback suggestion
                 logger.info("Found similar code with similarity score %s", similarity.f1)
                 # add meta information for debugging
