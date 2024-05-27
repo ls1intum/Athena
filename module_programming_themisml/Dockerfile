@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# This is the Dockerfile for the module_example.
+# This is the Dockerfile for the module_programming_themisml.
 
 # Pytorch CPU version is not yet available for Python 3.12
 FROM python:3.11

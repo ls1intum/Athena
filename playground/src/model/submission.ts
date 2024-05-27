@@ -19,4 +19,9 @@ export type ProgrammingSubmission = SubmissionBase & {
   repository_url: string;
 };
 
-export type Submission = ProgrammingSubmission | TextSubmission;
+export type ModelingSubmission = SubmissionBase & {
+  type: "modeling";
+  model: string;
+};
+
+export type Submission = ProgrammingSubmission | TextSubmission | ModelingSubmission;

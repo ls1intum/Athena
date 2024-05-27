@@ -1,4 +1,4 @@
-export type ExerciseType = "text" | "programming";
+export type ExerciseType = "text" | "programming" | "modeling";
 
 export type StructuredGradingInstruction = {
   id: number;
@@ -43,4 +43,9 @@ export type ProgrammingExercise = ExerciseBase & {
   tests_repository_url: string;
 };
 
-export type Exercise = TextExercise | ProgrammingExercise;
+export type ModelingExercise = ExerciseBase & {
+  type: "modeling";
+  example_solution?: string;
+};
+
+export type Exercise = TextExercise | ProgrammingExercise | ModelingExercise;
