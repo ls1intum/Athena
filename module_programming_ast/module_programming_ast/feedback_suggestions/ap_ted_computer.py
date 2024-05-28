@@ -1,7 +1,8 @@
 from apted import APTED, Config
-from apted.helpers import Tree
 from module_programming_ast.convert_code_to_ast.antlr_to_apted_tree import parse_java_file, parse_python_file
 
+
+#TODO Whitespace removing and caching
 
 class FeedbackFocusedConfig(Config):
     def rename(self, node1, node2):

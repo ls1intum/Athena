@@ -11,6 +11,7 @@ from module_programming_ast.convert_code_to_ast.languages.java.JavaMethodParserL
 
 # TODO: DO I need the to_ast method?
 
+# Grammars for programming languages have different parse rules
 JAVA_PARSE_RULE = "compilationUnit"
 PYTHON_PARSE_RULE = "file_input"
 

@@ -9,10 +9,10 @@ from athena.programming import Feedback, Submission
 from module_programming_themisml.extract_methods import MethodNode, extract_methods
 from module_programming_themisml.feedback_suggestions.batch import batched
 
-
 # TODO This is a placeholder for computing the similarity score and give the right feedback. This is why themisCode is pasted in here.
 
 APTED_THRESHOLD = 10  # TODO Needs to be adapted
+
 
 def make_feedback_suggestion_from(feedback: Feedback, submission: Submission,
                                   submission_method: MethodNode) -> Feedback:
@@ -30,15 +30,19 @@ def make_feedback_suggestion_from(feedback: Feedback, submission: Submission,
     # remove ID
     suggestion.id = None
     return suggestion
+
+
 # TODO: Stays the same
 
 
 class CodeComparisonWithCorrespondingSuggestions:
     """A pair of code snippets with a corresponding suggestions if their similarity is high enough."""
 
-    def __init__(self, code1: str, code2: str, suggestion: Feedback) -> None:
+    def __init__(self, code1: str, code2: str, tree1: str, tree2: str, suggestion: Feedback) -> None:
         self.code1 = code1
         self.code2 = code2
+        self.tree1 = tree1
+        self.tree2 = tree2
         self.suggestion = suggestion
         # TODO: Maybe create here also the tree for the code?
 
@@ -54,6 +58,8 @@ def group_feedbacks_by_file_path(feedbacks: List[Feedback]) -> Dict[str, List[Fe
             feedbacks_by_file_path[str(feedback.file_path)] = []
         feedbacks_by_file_path[str(feedback.file_path)].append(feedback)
     return feedbacks_by_file_path
+
+
 # TODO stays the same
 
 
@@ -80,7 +86,9 @@ def create_comparisons_with_suggestions(
                 continue
             # get all methods in the file of the submission
             submission_methods = extract_methods(code)
-            # TODO Here eigentlch nur noch den Tree mitnehmen.
+            # TODO Hier die AST für die Methoden von der Submission generieren.
+            # Erinnerung: nur die feedbacks haben bisher die ASTs
+
             # get all feedbacks that match methods in the submission
             for s_method in submission_methods:
                 for feedback in file_feedbacks:
@@ -90,6 +98,8 @@ def create_comparisons_with_suggestions(
                     if feedback.meta["method_name"] == s_method.name:
                         # compare code (later) and add feedback as a possible suggestion (also later)
                         suggestion = make_feedback_suggestion_from(feedback, submission, s_method)
+                        # TODO Stays the same I only add also the ASTs hier von feedback and suggestion here to the method;
+                        # suggestion doestn need to be changed
                         yield CodeComparisonWithCorrespondingSuggestions(s_method.source_code,
                                                                          feedback.meta["method_code"], suggestion)
 
@@ -112,8 +122,9 @@ def create_feedback_suggestions(
             batched(create_comparisons_with_suggestions(submissions, feedbacks), 128)):
         # compute similarity scores for all comparisons at once
         sim_computer = CodeSimilarityComputer()
-        #TODO Anstatt dem Computer meinen eignen SimilarityCOmputer? - AP-TED usen brauche ich bestimmte Datenstrukturen?
+        # TODO Anstatt dem Computer meinen eigenen SimilarityCOmputer? - AP-TED usen brauche ich bestimmte Datenstrukturen?
         for s_comp in comparisons_with_suggestions:
+            # TODO hier nicht den Code sondern den AST eingeben (oder beides Nullcheck?)
             sim_computer.add_comparison(s_comp.code1, s_comp.code2)
         logger.debug("Computing similarity scores for %d code comparisons (batch #%d)",
                      len(comparisons_with_suggestions), idx)
@@ -123,7 +134,7 @@ def create_feedback_suggestions(
         for s_comp in comparisons_with_suggestions:
             similarity = sim_computer.get_similarity_score(s_comp.code1, s_comp.code2)
             if similarity.f1 >= APTED_THRESHOLD:
-                #TODO Here meinen eigenen Threshold einfügen und die eigene Config überprüfen
+                # TODO Here meinen eigenen Threshold einfügen und die eigene Config überprüfen
                 # found similar code -> create feedback suggestion
                 logger.info("Found similar code with similarity score %s", similarity.f1)
                 # add meta information for debugging
