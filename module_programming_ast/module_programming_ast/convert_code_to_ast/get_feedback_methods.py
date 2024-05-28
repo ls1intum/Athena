@@ -1,7 +1,7 @@
 from typing import Optional
 
 from athena.programming import Submission, Feedback
-from module_programming_ast.convert_code_to_ast.antlr_to_apted_tree import parse
+from module_programming_ast.convert_code_to_ast.extract_method_and_ast import parse
 from module_programming_ast.convert_code_to_ast.method_node import MethodNode
 from athena.logger import logger
 

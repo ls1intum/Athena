@@ -1,4 +1,3 @@
-from apted import APTED, Config
 from typing import Dict, Iterable, List
 import gc
 
@@ -6,8 +5,10 @@ from athena.helpers.programming.feedback import format_feedback_title
 from athena.logger import logger
 from athena.programming import Feedback, Submission
 
-from module_programming_themisml.extract_methods import MethodNode, extract_methods
-from module_programming_themisml.feedback_suggestions.batch import batched
+from module_programming_ast.convert_code_to_ast.extract_method_and_ast import parse
+from module_programming_ast.convert_code_to_ast.method_node import MethodNode
+from module_programming_ast.feedback_suggestions.ap_ted_computer import CodeSimilarityComputer
+from module_programming_ast.feedback_suggestions.batch import batched
 
 # TODO This is a placeholder for computing the similarity score and give the right feedback. This is why themisCode is pasted in here.
 
@@ -64,6 +65,7 @@ def group_feedbacks_by_file_path(feedbacks: List[Feedback]) -> Dict[str, List[Fe
 def create_comparisons_with_suggestions(
         submissions: List[Submission],
         feedbacks: List[Feedback],
+        programming_language: str,
 ) -> Iterable[CodeComparisonWithCorrespondingSuggestions]:
     """Creates code comparisons and corresponding feedback suggestions as a generator."""
     if len(feedbacks) == 0:
@@ -83,7 +85,7 @@ def create_comparisons_with_suggestions(
                 logger.warning("File %s in submission %d is not UTF-8 encoded.", file_path, submission.id)
                 continue
             # get all methods in the file of the submission
-            submission_methods = extract_methods(code)
+            submission_methods = parse(code, programming_language)
             # get all feedbacks that match methods in the submission
             for s_method in submission_methods:
                 for feedback in file_feedbacks:
@@ -93,15 +95,15 @@ def create_comparisons_with_suggestions(
                     if feedback.meta["method_name"] == s_method.name:
                         # compare code (later) and add feedback as a possible suggestion (also later)
                         suggestion = make_feedback_suggestion_from(feedback, submission, s_method)
-                        # TODO Stays the same I only add also the ASTs hier von feedback and suggestion here to the method;
-                        # suggestion doestn need to be changed
                         yield CodeComparisonWithCorrespondingSuggestions(s_method.source_code,
-                                                                         feedback.meta["method_code"], suggestion)
+                                                                         feedback.meta["method_code"], s_method.ast,
+                                                                         feedback.meta["method_ast"], suggestion)
 
 
 def create_feedback_suggestions(
         submissions: List[Submission],
         feedbacks: List[Feedback],
+        programming_language: str,
 ) -> List[Feedback]:
     """
     Get a list of all submissions that the given feedback could also apply to (similar code in same method).
@@ -114,13 +116,11 @@ def create_feedback_suggestions(
 
     # create code comparisons and corresponding feedback suggestions in batches for less memory usage
     for idx, comparisons_with_suggestions in enumerate(
-            batched(create_comparisons_with_suggestions(submissions, feedbacks), 128)):
+            batched(create_comparisons_with_suggestions(submissions, feedbacks, programming_language), 128)):
         # compute similarity scores for all comparisons at once
         sim_computer = CodeSimilarityComputer()
-        # TODO Anstatt dem Computer meinen eigenen SimilarityCOmputer? - AP-TED usen brauche ich bestimmte Datenstrukturen?
         for s_comp in comparisons_with_suggestions:
-            # TODO hier nicht den Code sondern den AST eingeben (oder beides Nullcheck?)
-            sim_computer.add_comparison(s_comp.code1, s_comp.code2)
+            sim_computer.add_comparison(s_comp.code1, s_comp.code2, s_comp.tree1, s_comp.tree2)
         logger.debug("Computing similarity scores for %d code comparisons (batch #%d)",
                      len(comparisons_with_suggestions), idx)
         sim_computer.compute_similarity_scores()  # compute all at once, enables vectorization
@@ -128,15 +128,11 @@ def create_feedback_suggestions(
         # create suggestions
         for s_comp in comparisons_with_suggestions:
             similarity = sim_computer.get_similarity_score(s_comp.code1, s_comp.code2)
-            if similarity.f1 >= APTED_THRESHOLD:
-                # TODO Here meinen eigenen Threshold einfügen und die eigene Config überprüfen
+            if similarity.distance <= APTED_THRESHOLD:
                 # found similar code -> create feedback suggestion
-                logger.info("Found similar code with similarity score %s", similarity.f1)
+                logger.info("Found similar code with AP-TE distance of %d", similarity.distance)
                 # add meta information for debugging
-                s_comp.suggestion.meta["precision_score"] = similarity.precision
-                s_comp.suggestion.meta["recall_score"] = similarity.recall
-                s_comp.suggestion.meta["similarity_score"] = similarity.f1
-                s_comp.suggestion.meta["similarity_score_f3"] = similarity.f3
+                s_comp.suggestion.meta["distance"] = similarity.distance
                 # add to suggestions
                 suggestions.append(s_comp.suggestion)
         # clear memory to prevent being killed by OOM killer

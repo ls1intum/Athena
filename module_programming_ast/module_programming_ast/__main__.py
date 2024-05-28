@@ -97,7 +97,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
     # create feedback suggestions
     logger.info("Creating feedback suggestions for %d feedbacks", len(feedbacks))
-    feedback_suggestions = create_feedback_suggestions(exercise_submissions, feedbacks)
+    feedback_suggestions = create_feedback_suggestions(exercise_submissions, feedbacks, programming_language)
 
     # additionally, store metadata about how impactful each feedback was, i.e. how many suggestions were given based on it
     for feedback in feedbacks:
