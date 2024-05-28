@@ -106,27 +106,3 @@ class CodeSimilarityComputer:
         return cast(SimilarityScore, self.cache[key])
 
 
-if __name__ == "__main__":
-    # Java to AST (from prev. JSON)
-    java_ast1 = parse_java_file("../test_files/test2.java")
-    java_ast2 = parse_java_file("../test_files/test3.java")
-
-    code = """def process_numbers(numbers):
-    total = 0
-    for number in numbers:
-        if number % 2 == 1:
-            total += number
-        else:
-            total -= number
-    if total > 0:
-        print("Positive total:", total)
-    else:
-        print("Non-positive total:", total)"""
-
-    code_java = ""
-
-    code1 = parse_java_file(code_java)[0]
-    code2 = parse_java_file(code_java)[0]
-
-    # Call APTED-algorithm
-    compute_ap_ted(code1, code2)

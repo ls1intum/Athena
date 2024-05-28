@@ -10,7 +10,6 @@ from module_programming_ast.convert_code_to_ast.method_node import MethodNode
 from module_programming_ast.feedback_suggestions.ap_ted_computer import CodeSimilarityComputer
 from module_programming_ast.feedback_suggestions.batch import batched
 
-# TODO This is a placeholder for computing the similarity score and give the right feedback. This is why themisCode is pasted in here.
 
 APTED_THRESHOLD = 10  # TODO Needs to be adapted
 
@@ -33,9 +32,6 @@ def make_feedback_suggestion_from(feedback: Feedback, submission: Submission,
     return suggestion
 
 
-# TODO: Stays the same
-
-
 class CodeComparisonWithCorrespondingSuggestions:
     """A pair of code snippets with a corresponding suggestions if their similarity is high enough."""
 
@@ -45,7 +41,6 @@ class CodeComparisonWithCorrespondingSuggestions:
         self.tree1 = tree1
         self.tree2 = tree2
         self.suggestion = suggestion
-        # TODO: Maybe create here also the tree for the code?
 
     def has_same_code(self, other) -> bool:
         return self.code1 == other.code1 and self.code2 == other.code2
