@@ -89,7 +89,6 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
         feedback.meta["method_line_start"] = feedback_method.line_start
         feedback.meta["method_line_end"] = feedback_method.line_end
         feedback.meta["method_ast"] = feedback_method.ast
-        # TODO ADD also the tree here!
         feedbacks_with_method.append(feedback)
     feedbacks = feedbacks_with_method
 

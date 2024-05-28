@@ -1,7 +1,7 @@
 from typing import Optional
 
 from athena.programming import Submission, Feedback
-from module_programming_ast.convert_code_to_ast.antlr_to_apted_tree import parse_python_file, parse_java_file
+from module_programming_ast.convert_code_to_ast.antlr_to_apted_tree import parse
 from module_programming_ast.convert_code_to_ast.method_node import MethodNode
 from athena.logger import logger
 
@@ -15,13 +15,7 @@ def get_feedback_method(submission: Submission, feedback: Feedback, programming_
     except UnicodeDecodeError:
         logger.warning("File %s in submission %d is not UTF-8 encoded.", feedback.file_path, submission.id)
         return None
-    if programming_language == "java":
-        methods = parse_java_file(code)
-    elif programming_language == "python":
-        methods = parse_python_file(code)
-    else:
-        logger.warning("Unsupported programming language.")
-        return None
+    methods = parse(code, programming_language)
     for m in methods:
         if m.line_start is None or m.line_end is None:
             continue

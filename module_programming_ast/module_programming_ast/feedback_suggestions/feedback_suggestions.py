@@ -60,8 +60,6 @@ def group_feedbacks_by_file_path(feedbacks: List[Feedback]) -> Dict[str, List[Fe
     return feedbacks_by_file_path
 
 
-# TODO stays the same
-
 
 def create_comparisons_with_suggestions(
         submissions: List[Submission],
@@ -86,9 +84,6 @@ def create_comparisons_with_suggestions(
                 continue
             # get all methods in the file of the submission
             submission_methods = extract_methods(code)
-            # TODO Hier die AST für die Methoden von der Submission generieren.
-            # Erinnerung: nur die feedbacks haben bisher die ASTs
-
             # get all feedbacks that match methods in the submission
             for s_method in submission_methods:
                 for feedback in file_feedbacks:
