@@ -93,7 +93,7 @@ class CodeSimilarityComputer:
         for code1, tree1, code2, tree2 in wanted_comparisons:
             apted = APTED(tree1, tree2, FeedbackFocusedConfig())
             distance = apted.compute_edit_distance()
-            mapping = apted.compute_edit_mapping()  # TODO: Do I need it?
+            mapping = apted.compute_edit_mapping()  # TODO: Not needed now, but maybe for the config
             self.cache[cache_key(code1, code2)] = SimilarityScore(distance)
 
     def get_similarity_score(self, code1: str, code2: str) -> SimilarityScore:
