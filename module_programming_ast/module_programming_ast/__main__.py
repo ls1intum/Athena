@@ -76,8 +76,8 @@ def suggest_feedback(exercise: Exercise, submission: Submission, module_config: 
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id, exercise.id)
     # Do something with the submission and return a list of feedback
     # ThemisML currently only works with Java
-    if exercise.programming_language.lower() != "java":
-        logger.info("ThemisML only works with Java. Returning no suggestions.")
+    if exercise.programming_language.lower() != "java" or exercise.programming_language.lower() != "python":
+        logger.info("The AP-TED module currently only works with Java and Python. Returning no suggestions.")
         return []
 
     suggested_feedbacks = cast(List[Feedback], list(get_stored_feedback_suggestions(exercise.id, submission.id)))
