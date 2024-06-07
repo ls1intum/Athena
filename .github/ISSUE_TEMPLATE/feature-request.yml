@@ -1,4 +1,4 @@
-name: Feature Request
+name: 🚀 Feature Request
 description: Something's missing in Athena? Suggest a new feature!
 labels: [feature]
 body:
@@ -12,8 +12,8 @@ body:
     placeholder: "For example: I'm always frustrated when [...] or I wish I could [...]."
 - type: textarea
   attributes:
-    label: Describe the solution you want
-    description: You can also upload additional material such as mock-ups, diagrams or sketches to support your idea.
+    label: Describe the solution you'd like
+    description: Feel free to upload additional material such as mock-ups, diagrams, or sketches to support your idea.
   validations:
       required: true
 - type: textarea
