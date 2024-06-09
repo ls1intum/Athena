@@ -63,7 +63,7 @@ def parse_file(source_code, lexer_class, parser_class, parse_rule, listener_clas
 def parse(source_code: str, programming_language: str):
     if programming_language == "java":
         return parse_java_file(source_code)
-    elif programming_language == "python":
+    if programming_language == "python":
         return parse_python_file(source_code)
     else:
         raise ValueError(f"Unsupported programming language: {programming_language}")

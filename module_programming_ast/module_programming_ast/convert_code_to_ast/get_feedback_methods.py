@@ -25,4 +25,3 @@ def get_feedback_method(submission: Submission, feedback: Feedback, programming_
             if m.line_end >= feedback_line_end:
                 return m
     return None
-
