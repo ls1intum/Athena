@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Dict, Tuple, Union, cast
 
 from apted import APTED, Config
-from module_programming_ast.convert_code_to_ast.extract_method_and_ast import parse_java_file, parse_python_file
 
 
 class FeedbackFocusedConfig(Config):
@@ -10,9 +9,9 @@ class FeedbackFocusedConfig(Config):
         # Adjusting the renaming costs depending on the node type
         if 'Var' in node1.name and 'Var' in node2.name:
             return 0  # Ignore variable renaming
-        elif 'Literal' in node1.name and 'Literal' in node2.name:
+        if 'Literal' in node1.name and 'Literal' in node2.name:
             return 0.1  # Low costs for changes in literals
-        elif 'Comment' in node1.name and 'Comment' in node2.name:
+        if 'Comment' in node1.name and 'Comment' in node2.name:
             return 0  # Ignore commmets
         return 1 if node1.name != node2.name else 0  # Standardkosten für andere Typen
 
@@ -104,5 +103,3 @@ class CodeSimilarityComputer:
         if isinstance(self.cache[key], UncomputedComparison):
             raise ValueError("Similarity score not yet computed. Call compute_similarity_scores() first.")
         return cast(SimilarityScore, self.cache[key])
-
-
