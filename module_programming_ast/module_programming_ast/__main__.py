@@ -113,7 +113,6 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 
     # save to database
     # type: ignore
-    # pylint:  disable=undefined-variable
     store_feedback_suggestions(feedback_suggestions)
     for feedback in feedbacks:
         store_feedback(feedback)

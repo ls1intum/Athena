@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Tuple, Union, cast
 
-from apted import APTED, Config
+from apted import APTED, Config  # pylint: disable=import-error
 
 
 class FeedbackFocusedConfig(Config):
