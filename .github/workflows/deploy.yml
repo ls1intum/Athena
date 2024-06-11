@@ -63,7 +63,7 @@ jobs:
           ssh-add - <<< $GATEWAY_SSH_KEY
           ssh-add - <<< $DEPLOYMENT_SSH_KEY
           cat - <<< $GATEWAY_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
-          cat - <<< $(sed 's/\\n/\n/g' <<< "$DEPLOYMENT_HOST_PUBLIC_KEYS") >> ~/.ssh/known_hosts
+          # cat - <<< $(sed 's/\\n/\n/g' <<< "$DEPLOYMENT_HOST_PUBLIC_KEYS") >> ~/.ssh/known_hosts
 
       - name: Deploy Athena with Docker
         env:
