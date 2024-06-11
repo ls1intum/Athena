@@ -9,7 +9,7 @@ from module_programming_ast.feedback_suggestions.feedback_suggestions import cre
 from athena import (app, config_schema_provider, submissions_consumer, submission_selector, feedback_consumer,
                     feedback_provider, evaluation_provider, emit_meta)
 from athena.logger import logger
-from athena.storage import store_exercise, store_submissions, store_feedback
+from athena.storage import store_exercise, store_submissions, store_feedback, store_feedback_suggestions
 from athena.programming import (Exercise, Submission, Feedback, get_stored_feedback_suggestions,
                                 count_stored_submissions, get_stored_submissions)
 from module_programming_ast.remove_overlapping import filter_overlapping_suggestions
@@ -112,7 +112,9 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
                 suggestion.meta["n_feedback_suggestions"] = feedback.meta["n_feedback_suggestions"]
 
     # save to database
-    store_feedback_suggestions(feedback_suggestions)  # type: ignore
+    # type: ignore
+    # pylint:  disable=undefined-variable
+    store_feedback_suggestions(feedback_suggestions)
     for feedback in feedbacks:
         store_feedback(feedback)
 
