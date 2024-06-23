@@ -33,7 +33,7 @@ class HealthResponse(BaseModel):
     modules: dict = Field(
         example=[
             {
-                "module_programming_winnowing": {
+                "module_example": {
                     "url": "http://localhost:5001",
                     "type": "programming",
                     "healthy": True,
