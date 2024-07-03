@@ -51,17 +51,17 @@
             "module": "module_programming_themisml"
         },
         {
-            "name": "Module Programming AST",
+            "name": "Module Programming APTED",
             "type": "python",
             "request": "launch",
-            "cwd": "${workspaceFolder}/module_programming_ast",
+            "cwd": "${workspaceFolder}/module_programming_apted",
             "module": "module_programming_ast"
         },
         {
-            "name": "Module Programming Code Embedding",
+            "name": "Module Programming Winnowing",
             "type": "python",
             "request": "launch",
-            "cwd": "${workspaceFolder}/module_programming_code_embedding",
+            "cwd": "${workspaceFolder}/module_programming_winnowing",
             "module": "module_programming_code_embedding"
         }
     ]
