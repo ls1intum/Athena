@@ -40,5 +40,6 @@ jobs:
       run: |
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         poetry install
+
     - name: Run Prospector
       run: poetry run prospector
