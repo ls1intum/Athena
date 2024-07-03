@@ -38,6 +38,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
         poetry install
 
     - name: Run Prospector
