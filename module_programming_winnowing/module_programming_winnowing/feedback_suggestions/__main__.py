@@ -2,15 +2,13 @@
 Entry point for the module_programming_winnowing module.
 """
 import random
-from typing import List, Any, cast
+from typing import List, Any
 from pydantic import BaseModel, Field
 
 from athena import app, config_schema_provider, submissions_consumer, submission_selector, feedback_consumer, feedback_provider, evaluation_provider, emit_meta
-from athena.programming import Exercise, Submission, Feedback, get_stored_feedback_suggestions, count_stored_submissions
+from athena.programming import Exercise, Submission, Feedback, get_stored_feedback_suggestions
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback
-from module_programming_winnowing.feedback_suggestions.remove_overlapping import filter_overlapping_suggestions
-from module_programming_winnowing.feedback_suggestions.remove_suspicious import filter_suspicious
 
 
 @config_schema_provider
