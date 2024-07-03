@@ -1,5 +1,5 @@
 """
-When evaluating ThemisML, we found the following problems with the suggestions:
+When evaluating Winnowing, we found the following problems with the suggestions:
 (1) Sometimes, there was a feedback on something banal like a getter, which was actually meant for another method.
     This caused suggestions for almost all the other submissions, which were not helpful.
     We therefore classify a suggestion as "suspicious" if it affects too many other submissions (> 10% and > 2).
