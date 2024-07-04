@@ -154,11 +154,11 @@ def calculate_similarity(counts1, levels1, counts2, levels2):
 if __name__ == "__main__":
 
     from module_programming_winnowing.convert_code_to_ast.languages.python.PythonAstVisitor import analyze
-    file_path1 = "../../test_codes/test1a.py"
-    file_path2 = "../../test_codes/test3b.py"
+    file_path1 = "../../../test_codes/test1a.py"
+    file_path2 = "../../../test_codes/test3b.py"
 
-    counts1, levels1 = analyze(file_path1)
-    counts2, levels2 = analyze(file_path2)
+    #counts1, levels1 = analyze(file_path1)
+    #counts2, levels2 = analyze(file_path2)
 
-    similarity_score = calculate_similarity(counts1, levels1, counts2, levels2)
-    print("Similarity score:", similarity_score)
+    #similarity_score = calculate_similarity(counts1, levels1, counts2, levels2)
+    #print("Similarity score:", similarity_score)

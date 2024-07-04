@@ -1,4 +1,3 @@
-import sys
 from antlr4 import *
 from Python3Lexer import Python3Lexer
 from Python3Parser import Python3Parser
@@ -120,5 +119,5 @@ def analyze(filename, program_number="1"):
 
 
 if __name__ == "__main__":
-    file_path = "../../test_codes/test1a.py"
+    file_path = "../../../test_codes/test1a.py"
     counts, levels = analyze(file_path)
