@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
 import path from "path";
-import formidable from "formidable";
+import formidable, { IncomingForm } from "formidable";
 import unzipper from "unzipper";
 
 export const config = {
@@ -13,16 +13,30 @@ export const config = {
 const UPLOAD_DIR = path.join(process.cwd(), "data/evaluation");
 
 async function handleFileUpload(file: formidable.File, directory: string) {
-  const filePath = path.join(directory, file.originalFilename || file.newFilename);
-
   if (file.mimetype === "application/zip") {
     await new Promise((resolve, reject) => {
       fs.createReadStream(file.filepath)
-        .pipe(unzipper.Extract({ path: directory }))
+        .pipe(unzipper.Parse())
+        .on("entry", entry => {
+          if (entry.path.startsWith("__MACOSX") || entry.path.endsWith(".DS_Store")) {
+            entry.autodrain();
+            return;
+          }
+          const fullPath = path.join(directory, entry.path);
+          if (entry.type === "Directory") {
+            fs.mkdirSync(fullPath, { recursive: true });
+            entry.autodrain();
+          } else {
+            const dirName = path.dirname(fullPath);
+            fs.mkdirSync(dirName, { recursive: true });
+            entry.pipe(fs.createWriteStream(fullPath));
+          }
+        })
         .on("close", resolve)
         .on("error", reject);
     });
   } else if (file.mimetype === "application/json") {
+    const filePath = path.join(directory, file.originalFilename || file.newFilename);
     fs.copyFileSync(file.filepath, filePath);
   } else {
     throw new Error("Unsupported file type");
@@ -30,14 +44,10 @@ async function handleFileUpload(file: formidable.File, directory: string) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!req.query.dataMode?.toString().startsWith("evaluation-")) {
-    return res.status(400).json({ error: "Invalid data mode" });
-  }
-
-  const form = new formidable.IncomingForm();
+  const form = new IncomingForm();
   const dataMode = req.query.dataMode as string;
-  const customDir = dataMode.slice(dataMode.indexOf("-") + 1)
-  const directory = path.join(UPLOAD_DIR, customDir);
+
+  const directory = path.join(UPLOAD_DIR, dataMode.slice("evaluation-".length));
 
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
