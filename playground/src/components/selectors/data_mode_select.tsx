@@ -132,7 +132,7 @@ export default function DataModeSelect({
                   if (isLoadingExport || isLoadingDelete) return;
                   exportData({ dataMode });
                 }}
-                disabled={isLoadingExport || isLoadingDelete || exerciseData === undefined || exerciseData.length === 0}
+                disabled={isLoadingExport || isLoadingDelete}
               >
                 Export
               </button>
@@ -144,7 +144,7 @@ export default function DataModeSelect({
                     deleteData({ dataMode });
                   }
                 }}
-                disabled={isLoadingExport || isLoadingDelete || exerciseData === undefined || exerciseData.length === 0}
+                disabled={isLoadingExport || isLoadingDelete}
               >
                 Delete
               </button>
