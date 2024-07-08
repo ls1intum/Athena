@@ -1,9 +1,15 @@
+# This implementation has been adapted from the algorithm provided in the repository:
+# https://github.com/prateksha/Source-Code-Similarity-Measurement/blob/master/generate_ast.py
+# The original code has been modified to fit the specific requirements of this project,
+# including changes in the caching mechanism and additional functionality to handle
+# both Java and Python code (and potentially further programming languages) similarity measurements.
+
+
 import nltk
 import math
 from nltk.util import ngrams
 from collections import Counter
 from statistics import mean
-
 
 def cosine_similarity(l1, l2):
     vec1 = Counter(l1)
@@ -30,8 +36,8 @@ def get_min(get_key=lambda x: x):
         minimum_index = -1
         pos = 0
 
-        while (pos < len(l)):
-            if (get_key(l[pos]) < minimum):
+        while pos < len(l):
+            if get_key(l[pos]) < minimum:
                 minimum = get_key(l[pos])
                 minimum_index = pos
             pos += 1
@@ -115,7 +121,7 @@ def calculate_similarity(counts1, levels1, counts2, levels2):
         lev1s.append(cosine_similarity_lev1)
 
         fingerprints1_2 = generate_fingerprints(levels1[2], 13, 17)
-        fingerprints2_2 = generate_fingerprints(levels1[2], 13, 17)
+        fingerprints2_2 = generate_fingerprints(levels2[2], 13, 17)
         cosine_similarity_lev2 = cosine_similarity(fingerprints1_2, fingerprints2_2)
         lev2s.append(cosine_similarity_lev2)
 
@@ -152,13 +158,13 @@ def calculate_similarity(counts1, levels1, counts2, levels2):
 
 
 if __name__ == "__main__":
-
     from module_programming_winnowing.convert_code_to_ast.languages.python.PythonAstVisitor import analyze
-    file_path1 = "../../../test_codes/test1a.py"
-    file_path2 = "../../../test_codes/test3b.py"
 
-    #counts1, levels1 = analyze(file_path1)
-    #counts2, levels2 = analyze(file_path2)
+    file_path1 = "1.py"
+    file_path2 = "test6b.py"
 
-    #similarity_score = calculate_similarity(counts1, levels1, counts2, levels2)
-    #print("Similarity score:", similarity_score)
+    counts1, levels1 = analyze(file_path1)
+    counts2, levels2 = analyze(file_path2)
+
+    similarity_score = calculate_similarity(counts1, levels1, counts2, levels2)
+    print("Similarity score:", similarity_score)

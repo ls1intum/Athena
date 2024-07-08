@@ -1,7 +1,7 @@
 from antlr4 import *
-from Python3Lexer import Python3Lexer
-from Python3Parser import Python3Parser
-from Python3ParserVisitor import Python3ParserVisitor
+from module_programming_winnowing.convert_code_to_ast.languages.python.Python3Lexer import Python3Lexer
+from module_programming_winnowing.convert_code_to_ast.languages.python.Python3Parser import Python3Parser
+from module_programming_winnowing.convert_code_to_ast.languages.python.Python3ParserVisitor import Python3ParserVisitor
 
 
 class RemoveVariableNames(Python3ParserVisitor):
@@ -95,7 +95,7 @@ def get_parent_children_relation(root, parser, level=0):
             get_parent_children_relation(child, parser, level + 1)
 
 
-def analyze(filename, program_number="1"):
+def analyze(filename):
     input_tree = mutate(filename)
 
     parser = Python3Parser(CommonTokenStream(Python3Lexer(FileStream(filename))))
@@ -113,11 +113,14 @@ def analyze(filename, program_number="1"):
     get_parent_children_relation(input_tree, parser)
 
     counts = [count_l, count_if, count_f]
+    print(counts)
     levels = [level0, level1, level2]
+    i = 1
+    for lev in levels:
+        print("Level", i)
+        print(lev)
+        i += 1
 
     return counts, levels
 
 
-if __name__ == "__main__":
-    file_path = "../../../test_codes/test1a.py"
-    counts, levels = analyze(file_path)
