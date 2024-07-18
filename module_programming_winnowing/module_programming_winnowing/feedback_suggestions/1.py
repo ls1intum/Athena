@@ -1,11 +1,9 @@
-a=input()
-a=int(a)
+import math
 
+input_1 = input()
+input_2 = input()
+input_1 = int(input_1)
+input_2 = int(input_2)
+res = math.sqrt((input_1 * input_1) + (input_2 * input_2))
 
-if(5<=a<18):
- print ("child")
-elif(a>=18):
- print ("adult")
-elif(a<5):
- print ("infant")
-
+print(res)

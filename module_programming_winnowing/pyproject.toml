@@ -9,6 +9,7 @@ license = "MIT"
 python = "3.11.*"
 athena = {path = "../athena", develop = true}
 nltk = "^3.6.5"
+antlr4-python3-runtime = "^4.13.1"
 
 [tool.poetry.scripts]
 module = "athena:run_module"

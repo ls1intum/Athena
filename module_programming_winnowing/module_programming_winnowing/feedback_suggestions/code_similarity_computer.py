@@ -66,7 +66,7 @@ class CodeSimilarityComputer:
         else:
             counts1, level1 = create_ast_level_and_counts(code1, programming_language)
             counts2, level2 = create_ast_level_and_counts(code2, programming_language)
-            self.cache[key] = UncomputedComparison(counts1, level1, counts2, level2)
+            self.cache[key] = UncomputedComparison(counts1, level1, counts2, level2) #TODO Code noch hinzufügen
 
     def compute_similarity_scores(self):
         """Compute the similarity scores for all comparisons."""

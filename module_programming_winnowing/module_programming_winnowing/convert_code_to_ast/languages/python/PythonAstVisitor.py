@@ -94,7 +94,6 @@ def get_parent_children_relation(root, parser, level=0):
                 children2.append(c)
             get_parent_children_relation(child, parser, level + 1)
 
-
 def analyze(filename):
     input_tree = mutate(filename)
 
@@ -124,3 +123,6 @@ def analyze(filename):
     return counts, levels
 
 
+if __name__ == "__main__":
+    file_path = "test1b.py"
+    counts, levels = analyze(file_path)

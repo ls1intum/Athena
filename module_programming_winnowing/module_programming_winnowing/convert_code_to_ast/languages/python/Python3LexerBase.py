@@ -17,17 +17,17 @@ class Python3LexerBase(Lexer):
         self.tokens = []
         self.indents = []
         self.opened = 0
-    
+
     def reset(self):
         self.tokens = []
         self.indents = []
         self.opened = 0
         super().reset()
-    
+
     def emitToken(self, token):
         self._token = token
         self.tokens.append(token)
-    
+
     def nextToken(self):
         # Check if the end-of-file is ahead and there are still some DEDENTS expected.
         if self._input.LA(1) == Python3Parser.EOF and len(self.indents) != 0:
