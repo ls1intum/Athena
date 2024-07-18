@@ -37,7 +37,8 @@ class SimilarityScore:
 
 def create_ast_level_and_counts(code: str, programming_language: str):
     if programming_language == "java":
-        return analyze_java(code)
+        #  return analyze_java(code)
+        return
     if programming_language == "python":
         return analyze_python(code)
     raise ValueError(f"Unsupported programming language: {programming_language}")
@@ -66,7 +67,7 @@ class CodeSimilarityComputer:
         else:
             counts1, level1 = create_ast_level_and_counts(code1, programming_language)
             counts2, level2 = create_ast_level_and_counts(code2, programming_language)
-            self.cache[key] = UncomputedComparison(counts1, level1, counts2, level2) #TODO Code noch hinzufügen
+            self.cache[key] = UncomputedComparison(code1, counts1, level1, code2, counts2, level2)
 
     def compute_similarity_scores(self):
         """Compute the similarity scores for all comparisons."""
@@ -91,3 +92,42 @@ class CodeSimilarityComputer:
         if isinstance(self.cache[key], UncomputedComparison):
             raise ValueError("Similarity score not yet computed. Call compute_similarity_scores() first.")
         return cast(SimilarityScore, self.cache[key])
+
+
+# TODO: These are test functions; to be deleted when productive later
+def test_code_similarity_computer():
+    # Beispiel-Code-Snippets
+    code1 = """
+        public class HelloWorld {
+        public static void main(String[] args) {
+            System.out.println("Hello, wooorld!");
+            int feld = 4;
+            int test = 5;
+        
+    }"""
+    code2 = """
+    public class HelloWorld {
+        public static void main(String[] args) {
+            System.out.println("Hello, wooorld!");
+            int test = 5;
+            
+    }"""
+
+    # Initialisiere den CodeSimilarityComputer
+    sim_computer = CodeSimilarityComputer()
+
+    # Füge die Code-Vergleiche hinzu
+    sim_computer.add_comparison(code1, code2, "java")
+
+    # Berechne die Ähnlichkeitspunkte
+    sim_computer.compute_similarity_scores()
+
+    # Hole die Ähnlichkeitspunkte
+    similarity = sim_computer.get_similarity_score(code1, code2)
+
+    # Ausgabe der Ähnlichkeit
+    print(f"Similarity score between code1 and code2: {similarity.similarity_score}")
+
+
+if __name__ == "__main__":
+    test_code_similarity_computer()

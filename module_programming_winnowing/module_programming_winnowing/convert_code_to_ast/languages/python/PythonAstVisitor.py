@@ -37,8 +37,8 @@ class CustomPythonVisitor(Python3ParserVisitor):
         return self.visitChildren(ctx)
 
 
-def mutate(filename):
-    input_stream = FileStream(filename)
+def mutate(source_code: str):
+    input_stream = InputStream(source_code)
     lexer = Python3Lexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = Python3Parser(stream)
@@ -94,10 +94,11 @@ def get_parent_children_relation(root, parser, level=0):
                 children2.append(c)
             get_parent_children_relation(child, parser, level + 1)
 
-def analyze(filename):
-    input_tree = mutate(filename)
 
-    parser = Python3Parser(CommonTokenStream(Python3Lexer(FileStream(filename))))
+def analyze(source_code: str):
+    input_tree = mutate(source_code)
+
+    parser = Python3Parser(CommonTokenStream(Python3Lexer(InputStream(source_code))))
 
     visitor = CustomPythonVisitor()
     visitor.visit(input_tree)
@@ -124,5 +125,10 @@ def analyze(filename):
 
 
 if __name__ == "__main__":
-    file_path = "test1b.py"
-    counts, levels = analyze(file_path)
+    code = """
+    def sum_first_ten():
+        sum = 0
+        for i in range (11):
+            sum += i
+        return sum"""
+    counts, levels = analyze(code)

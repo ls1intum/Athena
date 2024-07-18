@@ -11,6 +11,7 @@ from athena.programming import Exercise, Submission, Feedback, get_stored_feedba
 from athena.logger import logger
 from athena.storage import store_exercise, store_submissions, store_feedback, store_feedback_suggestions
 from module_programming_winnowing.convert_code_to_ast.get_feedback_methods import get_feedback_method
+from module_programming_winnowing.feedback_suggestions.feedback_suggestions import create_feedback_suggestions
 from module_programming_winnowing.feedback_suggestions.remove_overlapping import filter_overlapping_suggestions
 from module_programming_winnowing.feedback_suggestions.remove_suspicious import filter_suspicious
 

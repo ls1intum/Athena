@@ -1,9 +1,11 @@
 # Generated from Java20Parser.g4 by ANTLR 4.13.1
 from antlr4 import *
+
 if "." in __name__:
-    from .Java20Parser import Java20Parser
+    from module_programming_winnowing.convert_code_to_ast.languages.java.JavaParser import Java20Parser
 else:
-    from Java20Parser import Java20Parser
+    from module_programming_winnowing.convert_code_to_ast.languages.java.JavaParser import Java20Parser
+
 
 # This class defines a complete generic visitor for a parse tree produced by Java20Parser.
 

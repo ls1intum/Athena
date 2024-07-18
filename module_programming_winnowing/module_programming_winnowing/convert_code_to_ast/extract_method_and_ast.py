@@ -15,28 +15,6 @@ from module_programming_apted.convert_code_to_ast.languages.java.JavaMethodParse
 JAVA_PARSE_RULE = "compilationUnit"
 PYTHON_PARSE_RULE = "file_input"
 
-
-# class ASTNode:
-#     def __init__(self, name):
-#         self.name = name
-#         self.children = []
-#
-#     def add_child(self, child):
-#         self.children.append(child)
-#
-#     def __repr__(self):
-#         return f"{self.name}{self.children}"
-#
-#
-# def to_ast(node):
-#     if isinstance(node, TerminalNodeImpl):
-#         return ASTNode(node.getText())
-#     ast_node = ASTNode(type(node).__name__.replace('Context', ''))
-#     for i in range(node.getChildCount()):
-#         ast_node.add_child(to_ast(node.getChild(i)))
-#     return ast_node
-
-
 def parse_java_file(source_code: str):
     return parse_file(source_code, JavaLexer, JavaParser, JAVA_PARSE_RULE, JavaMethodParserListener)
 

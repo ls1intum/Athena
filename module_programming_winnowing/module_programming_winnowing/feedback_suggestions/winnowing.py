@@ -160,8 +160,8 @@ def calculate_similarity(counts1, levels1, counts2, levels2):
 if __name__ == "__main__":
     from module_programming_winnowing.convert_code_to_ast.languages.python.PythonAstVisitor import analyze
 
-    file_path1 = "1.py"
-    file_path2 = "test6b.py"
+    file_path1 = "1.py" #TODO test with string
+    file_path2 = "test6b.py" #TODO Test with String
 
     counts1, levels1 = analyze(file_path1)
     counts2, levels2 = analyze(file_path2)

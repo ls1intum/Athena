@@ -1,7 +1,8 @@
 from antlr4 import *
-from Java20Lexer import Java20Lexer
-from Java20Parser import Java20Parser
-from Java20ParserVisitor import Java20ParserVisitor
+
+from module_programming_winnowing.convert_code_to_ast.languages.java.JavaLexer import Java20Lexer
+from module_programming_winnowing.convert_code_to_ast.languages.java.JavaParser import Java20Parser
+from module_programming_winnowing.convert_code_to_ast.languages.java.JavaParserVisitor import Java20ParserVisitor
 
 
 class RemoveVariableNames(Java20ParserVisitor):
@@ -35,8 +36,8 @@ class CustomJavaVisitor(Java20ParserVisitor):
         return self.visitChildren(ctx)
 
 
-def mutate(filename):
-    input_stream = FileStream(filename)
+def mutate(source_code):
+    input_stream = InputStream(source_code)
     lexer = Java20Lexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = Java20Parser(stream)
@@ -97,10 +98,10 @@ def get_parent_children_relation(root, parser, level=0):
             get_parent_children_relation(child, parser, level + 1)
 
 
-def analyze(filename, program_number="1"):
-    input_tree = mutate(filename)
+def analyze(source_code):
+    input_tree = mutate(source_code)
 
-    parser = Java20Parser(CommonTokenStream(Java20Lexer(FileStream(filename))))
+    parser = Java20Parser(CommonTokenStream(Java20Lexer(InputStream(source_code))))
 
     visitor = CustomJavaVisitor()
     visitor.visit(input_tree)
@@ -121,6 +122,12 @@ def analyze(filename, program_number="1"):
 
 
 if __name__ == "__main__":
-    file_path = "../test_codes/test1.java"
+    file_path = """
+        public class HelloWorld {
+        public static void main(String[] args) {
+            System.out.println("Hello, wooorld!");
+            int test = 5;
+    }
+    """
     counts, levels = analyze(file_path)
     print(counts, levels)
