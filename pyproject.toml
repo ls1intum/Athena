@@ -10,12 +10,13 @@ packages = []
 [tool.poetry.dependencies]
 python = "3.11.*"
 prospector = "^1.10.2"
+pydantic = "1.10.13"
 assessment_module_manager = {path = "./assessment_module_manager", develop = true}
 athena = {path = "./athena", develop = true}
 log_viewer = {path = "./log_viewer", develop = true}
 module_example = {path = "./module_example", develop = true}
-module_programming_llm = {path = "./module_programming_llm", develop = true}
-module_text_llm = {path = "./module_text_llm", develop = true}
+#module_programming_llm = {path = "./module_programming_llm", develop = true}
+#module_text_llm = {path = "./module_text_llm", develop = true}
 module_text_cofee = {path = "./module_text_cofee", develop = true}
 module_programming_themisml = {path = "./module_programming_themisml", develop = true}
 module_programming_winnowing = {path = "./module_programming_winnowing", develop = true}
