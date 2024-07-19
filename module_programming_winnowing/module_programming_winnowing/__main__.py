@@ -120,7 +120,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     logger.debug("Feedbacks processed")
 
 @feedback_provider
-def suggest_feedback(exercise: Exercise, submission: Submission, module_config: Configuration) -> List[Feedback]:
+def suggest_feedback(exercise: Exercise, submission: Submission, is_graded: bool, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: Suggestions for submission %d of exercise %d were requested", submission.id,
                 exercise.id)
     # Do something with the submission and return a list of feedback
