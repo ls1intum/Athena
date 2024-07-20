@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict, Tuple, Union, cast
-from winnowing import calculate_similarity
+from module_programming_winnowing.feedback_suggestions.winnowing import calculate_similarity
 
 from module_programming_winnowing.convert_code_to_ast.languages.python.PythonAstVisitor import analyze as analyze_python
 from module_programming_winnowing.convert_code_to_ast.languages.java.JavaAstVisitor import analyze as analyze_java
