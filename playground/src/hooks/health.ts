@@ -1,8 +1,8 @@
-import type { HealthResponse } from "@/model/health_response";
+import type { HealthResponse } from "@/model/healthResponse";
 
 import { UseQueryOptions, useQuery } from "react-query";
-import baseUrl from "@/helpers/base_url";
-import { useBaseInfo } from "@/hooks/base_info_context";
+import baseUrl from "@/helpers/baseUrl";
+import { useBaseInfo } from "@/hooks/baseInfoContext";
 
 /**
  * Fetches the health of Athena.

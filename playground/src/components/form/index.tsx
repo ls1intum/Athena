@@ -1,6 +1,6 @@
 import { ThemeProps, withTheme } from "@rjsf/core";
-import TextAreaWidget from "./textarea_widget";
-import DescriptionField from "./description_field";
+import TextAreaWidget from "./textareaWidget";
+import DescriptionField from "./descriptionField";
 
 const theme: ThemeProps = {
   widgets: { textarea: TextAreaWidget },

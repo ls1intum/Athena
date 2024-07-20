@@ -1,9 +1,9 @@
 import type { Exercise } from "@/model/exercise";
-import type { DataMode } from "@/model/data_mode";
+import type { DataMode } from "@/model/dataMode";
 
 import { UseQueryOptions, useQuery } from "react-query";
-import baseUrl from "@/helpers/base_url";
-import { useBaseInfo } from "@/hooks/base_info_context";
+import baseUrl from "@/helpers/baseUrl";
+import { useBaseInfo } from "@/hooks/baseInfoContext";
 
 export async function fetchExercises(dataMode: DataMode) {
   const response = await fetch(`${baseUrl}/api/data/${dataMode}/exercises`);

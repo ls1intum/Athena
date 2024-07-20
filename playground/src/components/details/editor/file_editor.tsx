@@ -1,10 +1,10 @@
 import type { Feedback, FeedbackReferenceType } from "@/model/feedback";
-import type { ManualRating } from "@/model/manual_rating";
+import type { ManualRating } from "@/model/manualRating";
 
 import { useEffect, useRef, useState } from "react";
 import { Editor, Monaco, useMonaco } from "@monaco-editor/react";
 import { Position, Selection, editor } from "monaco-editor";
-import { createManualRatingItemUpdater } from "@/model/manual_rating";
+import { createManualRatingItemUpdater } from "@/model/manualRating";
 
 import {
   getFeedbackRange,

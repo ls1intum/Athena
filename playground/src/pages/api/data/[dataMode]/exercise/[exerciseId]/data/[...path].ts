@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import type { DataMode } from "@/model/data_mode";
+import type { DataMode } from "@/model/dataMode";
 
 import { promises as fs } from "fs";
 import { join } from "path";
 import Archiver from "archiver";
-import { validateDataModeMiddleware } from "@/helpers/validate_data_mode_middleware";
+import { validateDataModeMiddleware } from "@/helpers/validateDataModeMiddleware";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { dataMode, exerciseId, path } = req.query as {

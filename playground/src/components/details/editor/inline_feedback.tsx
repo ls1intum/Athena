@@ -1,5 +1,5 @@
 import type { Feedback } from "@/model/feedback";
-import type { ManualRating } from "@/model/manual_rating";
+import type { ManualRating } from "@/model/manualRating";
 
 import { useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";

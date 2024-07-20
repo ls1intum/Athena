@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Exercise } from "@/model/exercise";
-import type { DataMode } from "@/model/data_mode";
+import type { DataMode } from "@/model/dataMode";
 
-import { getExercises } from "@/helpers/get_data";
-import getOriginFromRequest from "@/helpers/origin_from_req";
-import { validateDataModeMiddleware } from "@/helpers/validate_data_mode_middleware";
+import { getExercises } from "@/helpers/getData";
+import getOriginFromRequest from "@/helpers/originFromReq";
+import { validateDataModeMiddleware } from "@/helpers/validateDataModeMiddleware";
 
 function handler(req: NextApiRequest, res: NextApiResponse<Exercise[]>) {
   const { dataMode } = req.query as { dataMode: DataMode };

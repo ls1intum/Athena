@@ -10,7 +10,7 @@ import "allotment/dist/style.css";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { QueryClient, QueryClientProvider } from "react-query"
-import { BaseInfoProvider } from "@/hooks/base_info_context";
+import { BaseInfoProvider } from "@/hooks/baseInfoContext";
 
 const queryClient = new QueryClient()
 

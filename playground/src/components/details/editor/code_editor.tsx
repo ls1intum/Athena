@@ -1,10 +1,10 @@
 import type { Feedback } from "@/model/feedback";
-import type { ManualRating } from "@/model/manual_rating";
+import type { ManualRating } from "@/model/manualRating";
 
 import { useEffect, useState } from "react";
 import { Allotment } from "allotment";
 
-import { useFetchAndUnzip } from "@/helpers/fetch_and_unzip";
+import { useFetchAndUnzip } from "@/helpers/fetchAndUnzip";
 
 import FileTree from "./file_tree";
 import FileEditor from "./file_editor";
