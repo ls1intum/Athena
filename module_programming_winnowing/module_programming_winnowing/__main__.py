@@ -125,7 +125,7 @@ def suggest_feedback(exercise: Exercise, submission: Submission, is_graded: bool
                 exercise.id)
     # Do something with the submission and return a list of feedback
     # ThemisML currently only works with Java
-    if exercise.programming_language.lower() != "java" or exercise.programming_language.lower() != "python":
+    if exercise.programming_language.lower() not in ["java", "python"]:
         logger.info("The Winnowing module currently only works with Java and Python. Returning no suggestions.")
         return []
 
