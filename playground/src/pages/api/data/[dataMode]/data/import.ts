@@ -59,7 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     try {
-      const fileArray = (Array.isArray(files.file) ? files.file : [files.file]).filter((file) => file !== undefined);
+      const fileArray = (Array.isArray(files.file) ? files.file : [files.file]).filter((file): file is NonNullable<typeof file> => file !== undefined);
 
       for (const file of fileArray) {
         await handleFileUpload(file, directory);
