@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "module_programming_winnowing"
+version = "0.1.0"
+description = "Programming assessment Winnowing module."
+authors = ["Marlon Bucciarelli <marlon.bucciarelli@tum.de>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.11.*"
+athena = {path = "../athena", develop = true}
+module_programming_apted = {path = "../module_programming_apted", develop = true}
+nltk = "^3.6.5"
+antlr4-python3-runtime = "^4.13.1"
+pydantic = "1.10.13"
+
+[tool.poetry.scripts]
+module = "athena:run_module"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

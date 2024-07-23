@@ -70,3 +70,11 @@ services:
       - athena
     ports:
       - "5008:5008"
+
+  module_programming_winnowing:
+    hostname: module-programming-winnowing
+    build: ./module_programming_winnowing
+    depends_on:
+      - athena
+    ports:
+      - "5009:5009"
