@@ -72,7 +72,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
     programming_language = exercise.programming_language.lower()
     # Currently only works with Java and Python - can be extended with more languages if the grammar is available
     if programming_language not in ["java", "python"]:
-        logger.info("AP-TED currently only works with Java and Python. Not consuming feedback.")
+        logger.info("The winnowing module currently only works with Java and Python. Not consuming feedback.")
         return
 
     # Remove unreferenced feedbacks
