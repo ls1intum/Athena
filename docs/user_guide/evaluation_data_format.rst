@@ -4,7 +4,7 @@
 Evaluation Data Format
 ===========================
 
-This document describes the structure of the evaluation data format used in Athena. It covers various exercise types, their submissions, and feedback types. The following sections provide detailed explanations and examples.
+This document describes the structure of the evaluation data format used in Athena. It covers various exercise types, their submissions, and feedback types. The following sections provide detailed explanations and examples. Please refer to the example data provided in the `playground/data/example/` directory for examples, if the structure is unclear contact the Athena team.
 
 Exercise Data Structure
 =======================
