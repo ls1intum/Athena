@@ -17,7 +17,8 @@ export default function DataModeSelect({
   onChangeDataMode: (dataMode: DataMode) => void;
 }) {
   const queryClient = useQueryClient();
-  const evaluationDataKey = dataMode.startsWith("evaluation-") ? dataMode.slice("evaluation-".length) : undefined;
+  const evaluationKey = "evaluation-";
+  const evaluationDataKey = dataMode.startsWith(evaluationKey) ? dataMode.slice(evaluationKey.length) : undefined;
 
   const { data: exerciseData, error: exerciseError, isLoading: isLoadingExercises } = useExercises()
   const exerciseTypes = new Map<string, number>();
