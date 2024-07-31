@@ -31,7 +31,8 @@ if azure_openai_available:
 actually_deployed_azure= [
     "gpt-35-turbo",
     "gpt-4-turbo",
-    "gpt-4-vision"
+    "gpt-4-vision",
+    "gpt-4o"
 ]
 
 new_openai_models = []
