@@ -6,7 +6,6 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from athena import emit_meta
 from athena.programming import Exercise, Submission
 
-from module_programming_llm.config import GradedBasicApproachConfig, BasicApproachConfig
 from module_programming_llm.helpers.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
     num_tokens_from_string,
@@ -15,6 +14,7 @@ from module_programming_llm.helpers.llm_utils import (
 )
 from module_programming_llm.helpers.utils import get_diff
 
+from .config import GuidedBasicByFileConfig
 
 class FileProblemStatement(BaseModel):
     file_name: str = Field(description="File name")
@@ -28,10 +28,10 @@ class SplitProblemStatement(BaseModel):
 
 
 # pylint: disable=too-many-locals
-async def split_problem_statement_by_file(
+async def generate_split_problem_statement_by_file(
         exercise: Exercise,
         submission: Submission,
-        config: BasicApproachConfig,
+        config: GuidedBasicByFileConfig,
         debug: bool
     ) -> Optional[SplitProblemStatement]:
     """Split the general problem statement by file
@@ -49,13 +49,13 @@ async def split_problem_statement_by_file(
 
     prompt = get_chat_prompt_with_formatting_instructions(
         model=model,
-        system_message=config.split_problem_statement_by_file_prompt.system_message,
-        human_message=config.split_problem_statement_by_file_prompt.human_message,
+        system_message=config.split_problem_statement_prompt.system_message,
+        human_message=config.split_problem_statement_prompt.human_message,
         pydantic_object=SplitProblemStatement
     )
 
     # Return None if the problem statement is too short
-    if num_tokens_from_string(exercise.problem_statement or "") <= config.split_problem_statement_by_file_prompt.tokens_before_split:
+    if num_tokens_from_string(exercise.problem_statement or "") <= config.split_problem_statement_prompt.tokens_before_split:
         return None
 
     # Return None if the problem statement not in the prompt
@@ -72,12 +72,19 @@ async def split_problem_statement_by_file(
         name_only=True
     ).split("\n")
 
+    chat_prompt = get_chat_prompt_with_formatting_instructions(
+        model=model,
+        system_message=config.split_problem_statement_prompt.system_message,
+        human_message=config.split_problem_statement_prompt.human_message,
+        pydantic_object=SplitProblemStatement
+    )
+
     prompt_input = {
         "problem_statement": exercise.problem_statement or "No problem statement.",
         "changed_files_from_template_to_submission": ", ".join(changed_files_from_template_to_submission)
     }
 
-    if "changed_files_from_template_to_solution" in chat_prompt.input_variables:
+    if "changed_files_from_template_to_solution" in prompt.input_variables:
         solution_repo = exercise.get_solution_repository()
         changed_files_from_template_to_solution = get_diff(
             src_repo=template_repo,
