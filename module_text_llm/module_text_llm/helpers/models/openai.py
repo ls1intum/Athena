@@ -11,23 +11,10 @@ from .model_config import ModelConfig
 
 OPENAI_PREFIX = "openai_"
 AZURE_OPENAI_PREFIX = "azure_openai_"
-############################################################################################
-# START  Set Enviorment variables that are automatically used by ChatOpenAI/ChatAzureOpenAI#
-############################################################################################
-# Might be worth renaming them
-openai_available = bool(os.environ.get("LLM_OPENAI_API_KEY"))                                      
-if openai_available:                             
-    os.environ["OPENAI_API_KEY"] = os.environ["LLM_OPENAI_API_KEY"]
+openai_available = bool(os.environ.get("OPENAI_API_KEY"))                                      
+azure_openai_available = bool(os.environ.get("AZURE_OPENAI_API_KEY"))
 
-azure_openai_available = bool(os.environ.get("LLM_AZURE_OPENAI_API_KEY"))
-if azure_openai_available:
-    os.environ["AZURE_OPENAI_ENDPOINT"]=os.environ["LLM_AZURE_OPENAI_API_BASE"]
-    os.environ["AZURE_OPENAI_API_KEY"]=os.environ["LLM_AZURE_OPENAI_API_KEY"]
-    os.environ["OPENAI_API_VERSION"]=os.environ["LLM_AZURE_OPENAI_API_VERSION"]
-#########################################################################################
-# END Set Enviorment variables that are automatically used by ChatOpenAI/ChatAzureOpenAI#
-#########################################################################################
-
+# For sure correct chat completion models
 actually_deployed_azure= [
     "gpt-35-turbo",
     "gpt-4-turbo",
@@ -45,12 +32,17 @@ def _get_available_deployments():
         "embeddings": {},
         "inference": {}
     }
-
-    if azure_openai_available:
-        for deployment in actually_deployed_azure:
-                available_deployments["chat_completion"][deployment] = deployment
-       
     
+    deployments = openai.AzureOpenAI().models.list() or []
+    if azure_openai_available:
+        for deployment in deployments:
+                if deployment.capabilities["chat_completion"]:
+                    available_deployments["chat_completion"][deployment.id] = deployment
+    # This takes only the hardcoded models
+    # if azure_openai_available:
+    #     for deployment in actually_deployed_azure:
+    #                 available_deployments["chat_completion"][deployment] = deployment    
+                    
     if openai_available:
         # This will return only the usable models
         openai.api_type= "openai"
@@ -75,7 +67,8 @@ def _get_available_models(available_deployments: Dict[str, Dict[str, Any]]):
             for deployment_name, deployment in available_deployments[model_type].items():
                 available_models[AZURE_OPENAI_PREFIX + deployment_name] = Model(
                     deployment_name=deployment_name,
-                    temperature=0
+                    temperature=0,
+                    client=""
                 )
     return available_models
 
@@ -152,8 +145,7 @@ decreasing the model's likelihood to repeat the same line verbatim.
                 BaseLanguageModel: The model.
             """
             model = available_models[self.model_name.value]
-            kwargs = model.__dict__ #BaseLanguageModel type
-            # kw = model._lc_kwargs
+            kwargs = model.__dict__
             secrets = {secret: getattr(model, secret) for secret in model.lc_secrets.keys()}
             kwargs.update(secrets)
 
