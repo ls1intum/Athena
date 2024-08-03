@@ -7,20 +7,12 @@ from langchain.base_language import BaseLanguageModel
 from langchain_openai import AzureChatOpenAI, AzureOpenAI, ChatOpenAI
 from athena.logger import logger
 from .model_config import ModelConfig
-
+import json
 
 OPENAI_PREFIX = "openai_"
 AZURE_OPENAI_PREFIX = "azure_openai_"
 openai_available = bool(os.environ.get("OPENAI_API_KEY"))                                      
 azure_openai_available = bool(os.environ.get("AZURE_OPENAI_API_KEY"))
-
-# For sure correct chat completion models
-actually_deployed_azure= [
-    "gpt-35-turbo",
-    "gpt-4-turbo",
-    "gpt-4-vision",
-    "gpt-4o"
-]
 
 available_models: Dict[str, BaseLanguageModel] = {}
 
@@ -33,8 +25,9 @@ if openai_available:
         )
 
 if azure_openai_available:
-    for deployment in actually_deployed_azure:
-                available_models[AZURE_OPENAI_PREFIX+deployment] = AzureChatOpenAI(deployment_name=deployment, temperature=0, client="")
+    # Will be replaced in the future
+    for deployment in json.loads(os.environ['AZURE_DEPLOYMENTS']):
+                available_models[AZURE_OPENAI_PREFIX + deployment] = AzureChatOpenAI(deployment_name=deployment, temperature=0, client="")
   
 if available_models:
     logger.info("Available openai models: %s", ", ".join(available_models.keys()))
