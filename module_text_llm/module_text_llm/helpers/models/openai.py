@@ -56,7 +56,7 @@ if available_models:
     if default_model_name not in available_models:
         default_model_name = list(available_models.keys())[0]
 
-    default_openai_model = OpenAIModel[default_model_name] #type:ignore
+    default_openai_model = OpenAIModel[default_model_name] # type: ignore
 
     # Long descriptions will be displayed in the playground UI and are copied from the OpenAI docs
     class OpenAIModelConfig(ModelConfig):
