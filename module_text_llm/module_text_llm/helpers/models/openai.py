@@ -32,7 +32,7 @@ if available_models:
     logger.info("Available openai models: %s", ", ".join(available_models.keys()))
 
     OpenAIModel = Enum('OpenAIModel', {name: name for name in available_models})  # type: ignore
-    default_model_name = "gpt-35-turbo"
+    default_model_name = None
     if "LLM_DEFAULT_MODEL" in os.environ and os.environ["LLM_DEFAULT_MODEL"] in available_models:
         default_model_name = os.environ["LLM_DEFAULT_MODEL"]
     if default_model_name not in available_models:
