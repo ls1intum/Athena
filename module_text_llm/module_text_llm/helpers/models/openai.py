@@ -4,10 +4,9 @@ from pydantic import Field, validator, PositiveInt
 from enum import Enum
 import openai
 from langchain.base_language import BaseLanguageModel
-from langchain_openai import AzureChatOpenAI, AzureOpenAI, ChatOpenAI
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from athena.logger import logger
 from .model_config import ModelConfig
-import json
 
 OPENAI_PREFIX = "openai_"
 AZURE_OPENAI_PREFIX = "azure_openai_"
@@ -26,7 +25,7 @@ if openai_available:
 
 if azure_openai_available:
     # Will be replaced in the future
-    for deployment in json.loads(os.environ['AZURE_DEPLOYMENTS']):
+    for deployment in os.environ['AZURE_DEPLOYMENTS'].split(','):
                 available_models[AZURE_OPENAI_PREFIX + deployment] = AzureChatOpenAI(deployment_name=deployment, temperature=0, client="")
   
 if available_models:
