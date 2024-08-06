@@ -99,8 +99,8 @@ jobs:
             hosts: athena-test2.ase.cit.tum.de
             folder: ${{ vars.DEPLOYMENT_FOLDER }}
     outputs:
-      TS1: ${{ steps.filter.outputs.artemis-test1 || '' }}
-      TS2: ${{ steps.filter.outputs.artemis-test2 || '' }}
+      TS1: ${{ steps.filter.outputs.athena-test1 || '' }}
+      TS2: ${{ steps.filter.outputs.athena-test2 || '' }}
     steps:
       - run: |
           echo "$DEPLOY_LABEL"
