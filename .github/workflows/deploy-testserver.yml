@@ -253,6 +253,14 @@ jobs:
                   })
                 }
 
+      - name: Update badge
+        uses: RubbaBoy/BYOB@v1.3.0
+        with:
+            NAME: ${{ matrix.label-identifier }}
+            LABEL: ${{ matrix.environment }}
+            STATUS: ${{ github.event.pull_request.head.ref }}
+            COLOR: red
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Check that the build job has run successfully before deploying, otherwise add an error label
   add-error-label:
