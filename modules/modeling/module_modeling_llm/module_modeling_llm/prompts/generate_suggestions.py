@@ -89,6 +89,11 @@ FORMAT_INSTRUCTIONS = """
 {format_instructions}
 """
 
+OFFICIAL_EXAMPLE_SOLUTION = """
+<Official Example Solution>
+{example_solution}
+"""
+
 STUDENT_SUBMISSION = """
 <Student Submission>
 {submission}
@@ -103,7 +108,7 @@ GRADED_FEEDBACK_OUTPUT = """
 {original_feedback}
 """
 
-graded_feedback_system_message = f"{ROLE}\n\n{GRADED_FEEDBACK_TASK}\n\n{STYLE}\n\n{PROBLEM_STATEMENT}\n\n{EXERCISE_GRADING_INSTRUCTIONS}\n\n{GRADING_INSTRUCTIONS}\n\n{UML_DIAGRAM_FORMAT}\n\n{FORMAT_INSTRUCTIONS}"
+graded_feedback_system_message = f"{ROLE}\n\n{GRADED_FEEDBACK_TASK}\n\n{STYLE}\n\n{PROBLEM_STATEMENT}\n\n{EXERCISE_GRADING_INSTRUCTIONS}\n\n{OFFICIAL_EXAMPLE_SOLUTION}\n\n{GRADING_INSTRUCTIONS}\n\n{UML_DIAGRAM_FORMAT}\n\n{FORMAT_INSTRUCTIONS}"
 graded_feedback_human_message = f"{STUDENT_SUBMISSION}\n\n{OUTPUT_FORMAT}"
 
 filter_feedback_system_message = f"{NON_GRADED_FEEDBACK_TASK}\n\n{FORMAT_INSTRUCTIONS}"
