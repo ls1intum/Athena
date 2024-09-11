@@ -48,6 +48,6 @@ async def predict_and_parse(
         # In the future, we should probably have some recovery mechanism here (i.e. fix the output with another prompt)
         # Show the exception
 
-        print("OutputParserException or ValidationError", e)
+        logger.error("Exception type: %s, Message: %s", type(e).__name__, e)
 
         return None
