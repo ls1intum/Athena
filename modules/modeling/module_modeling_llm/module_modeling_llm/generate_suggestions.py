@@ -96,7 +96,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, is_gr
         return []
 
     # Check if is graded
-    if is_graded == False:
+    if is_graded is False:
         filter_chat_prompt = ChatPromptTemplate.from_messages([
             ("system", config.generate_suggestions_prompt.filter_feedback_system_message),
             ("human", config.generate_suggestions_prompt.filter_feedback_human_message)

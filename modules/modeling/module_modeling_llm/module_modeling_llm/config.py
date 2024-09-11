@@ -3,10 +3,10 @@ from pydantic import BaseModel, Field
 from athena import config_schema_provider
 from module_modeling_llm.helpers.models import ModelConfigType, DefaultModelConfig
 from module_modeling_llm.prompts.generate_suggestions import (
-    graded_feedback_system_message,
-    graded_feedback_human_message,
-    filter_feedback_system_message,
-    filter_feedback_human_message
+    graded_feedback_system_message as default_graded_feedback_system_message,
+    graded_feedback_human_message as default_graded_feedback_human_message,
+    filter_feedback_system_message as default_filter_feedback_system_message,
+    filter_feedback_human_message as default_filter_feedback_human_message
 )
 
 
@@ -18,14 +18,14 @@ class GenerateSuggestionsPrompt(BaseModel):
     _Note: **{problem_statement}**, **{example_solution}**, or **{grading_instructions}** might be omitted if the input
     is too long._
     """
-    graded_feedback_system_message: str = Field(default=graded_feedback_system_message,
-                                description="Message for priming AI behavior and instructing it what to do.")
-    graded_feedback_human_message: str = Field(default=graded_feedback_human_message,
-                               description="Message from a human. The input on which the AI is supposed to act.")
-    filter_feedback_system_message: str = Field(default=filter_feedback_system_message,
-                                description="Message for priming AI behavior for filtering ungraded feedback.")
-    filter_feedback_human_message: str = Field(default=filter_feedback_human_message,
-                               description="Message for instructing AI to filter ungraded feedback.")
+    graded_feedback_system_message: str = Field(default=default_graded_feedback_system_message,
+        description="Message for priming AI behavior and instructing it what to do.")
+    graded_feedback_human_message: str = Field(default=default_graded_feedback_human_message,
+        description="Message from a human. The input on which the AI is supposed to act.")
+    filter_feedback_system_message: str = Field(default=default_filter_feedback_system_message,
+        description="Message for priming AI behavior for filtering ungraded feedback.")
+    filter_feedback_human_message: str = Field(default=default_filter_feedback_human_message,
+        description="Message for instructing AI to filter ungraded feedback.")
     
 
 

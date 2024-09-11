@@ -29,10 +29,10 @@ class Element:
         if self.attributes or self.methods:
             details = []
             if self.attributes:
-                details.append(f"   attributes:")
+                details.append("   attributes:")
                 details.extend(f"       {attr}" for attr in self.attributes)
             if self.methods:
-                details.append(f"   methods:")
+                details.append("   methods:")
                 details.extend(f"       {method}" for method in self.methods)
             parts.append("{\n" + "\n".join(details) + "\n}")
 
