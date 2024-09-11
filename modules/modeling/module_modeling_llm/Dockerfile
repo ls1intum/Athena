@@ -20,7 +20,6 @@ COPY --from=athena /code /athena
 # install dependencies
 RUN poetry config virtualenvs.create true \
     && poetry config virtualenvs.in-project true \
-    && poetry lock --no-update \
     && poetry install --no-interaction --no-ansi
 
 # Project files
