@@ -5,7 +5,6 @@ from module_modeling_llm.prompts.apollon_format import apollon_format_descriptio
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
-from athena.logger import logger
 from athena.modeling import Exercise, Submission, Feedback
 from module_modeling_llm.config import BasicApproachConfig
 from langchain_core.output_parsers import PydanticOutputParser
