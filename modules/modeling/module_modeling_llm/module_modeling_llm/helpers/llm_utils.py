@@ -4,6 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, ValidationError
 from langchain_core.runnables import RunnableSequence
 from athena import get_experiment_environment
+from assessment_module_manager.logger import logger
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -45,9 +46,7 @@ async def predict_and_parse(
     try:
         return await chain.ainvoke(prompt_input, config={"tags": tags})
     except (ValidationError) as e:
-        # In the future, we should probably have some recovery mechanism here (i.e. fix the output with another prompt)
-        # Show the exception
-
+        
         logger.error("Exception type: %s, Message: %s", type(e).__name__, e)
 
         return None
