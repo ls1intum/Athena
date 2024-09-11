@@ -89,8 +89,8 @@ def get_relation_arrow(relation_type: str) -> str:
 
     relation_type = relation_type.replace(" ", "").lower()
 
-    for key in arrow_map:
+    for key, value in arrow_map.items():
         if relation_type.endswith(key):
-            return  f"({relation_type}) {arrow_map[key]}"
+            return f"({relation_type}) {value}"
 
     return f"-- {relation_type} --"
