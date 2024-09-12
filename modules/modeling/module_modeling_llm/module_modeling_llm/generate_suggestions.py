@@ -146,7 +146,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, is_gr
             structured_grading_instruction_id=grading_instruction_id,
             meta={},
             id=None,
-            is_graded=False
+            is_graded=is_graded
         ))
 
     return feedbacks
