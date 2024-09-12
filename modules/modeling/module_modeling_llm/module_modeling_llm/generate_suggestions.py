@@ -48,8 +48,6 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, is_gr
     """
     model = config.model.get_model()  # type: ignore[attr-defined]
 
-    print("Model ", model)
-
     serialized_example_solution = None
     if exercise.example_solution:
         example_solution_diagram = json.loads(exercise.example_solution)
@@ -105,8 +103,6 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, is_gr
             "original_feedback": result.dict(),
             "format_instructions": PydanticOutputParser(pydantic_object=AssessmentModel).get_format_instructions()
         }
-
-        print("Filter prompt input", filter_prompt_input)
 
         result = await predict_and_parse(
             model=model,

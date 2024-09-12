@@ -6,8 +6,14 @@ from module_modeling_llm.helpers.serializers.parser.relation import Relation
 
 
 class UMLParser:
+    """
+    A parser for UML diagrams
+
+    This class is responsible for parsing JSON data representing a Apollon UML diagram
+    and converting it into a mermaid like textual representation
+    """
+
     def __init__(self, json_data: Dict[str, Any]):
-        print("JSON data", json_data)
         self.data: Dict[str, Any] = json_data
         self.title: str = self.data['type']
         self.elements: List[Element] = []

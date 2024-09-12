@@ -1,6 +1,12 @@
 from typing import Dict, Any, List, Optional
 
 class Relation:
+    """
+    Represents a relationship between elements in a UML diagram.
+
+    This class encapsulates the properties and behavior of a UML relationship,
+    including its type, source and target elements, and associated messages.
+    """
     def __init__(self, data: Dict[str, Any], element_dict: Optional[Dict[str, Any]], index: int):
         self.id: str = data.get('id', '')
         self.type: str = data.get('type', '')
@@ -15,6 +21,9 @@ class Relation:
             self.resolve_references(element_dict)
 
     def resolve_references(self, element_dict: Dict[str, Any]):
+        """
+        Resolve the source and target element references using the provided element dictionary. The json data contains only references to other elements that represent the source and target elements. This method resolves these references to the actual names of the elements by looking up the corresponding elements via their IDs in the provided element dictionary.
+        """
         if self.source['element'] in element_dict:
             self.source['element'] = element_dict[self.source['element']].get("name", "")
         if self.target['element'] in element_dict:
