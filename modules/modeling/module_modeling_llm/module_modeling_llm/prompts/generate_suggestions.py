@@ -1,5 +1,3 @@
-from string import Template
-
 # Constants for prompt components
 ROLE = "You are an AI tutor for {submission_format} modeling exercise assessment at a prestigious university."
 
