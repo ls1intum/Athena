@@ -70,7 +70,7 @@
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceFolder}/modules/modeling/module_modeling_llm",
-            "module": "module_text_cofee"
+            "module": "module_modeling_llm"
         }
     ]
 }
