@@ -21,14 +21,6 @@
             "justMyCode": true
         },
         {
-            "name": "Module Modeling LLM",
-            "type": "python",
-            "request": "launch",
-            "cwd": "${workspaceFolder}/modules/modeling/module_modeling_llm",
-            "module": "module_modeling_llm",
-            "justMyCode": false
-        },
-        {
             "name": "Module Programming LLM",
             "type": "python",
             "request": "launch",
