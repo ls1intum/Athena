@@ -12,8 +12,8 @@ def get_exercise_model(exercise: Exercise, submission: Submission) -> ExerciseMo
     transformed_submission, element_id_mapping, diagram_type = ApollonJSONTransformer.transform_json(submission.model)
 
     return ExerciseModel(
-        submissionId=submission.id,
-        exerciseId=exercise.id,
+        submission_id=submission.id,
+        exercise_id=exercise.id,
         transformed_submission=transformed_submission,
         problem_statement=exercise.problem_statement,
         max_points=exercise.max_points,

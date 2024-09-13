@@ -42,13 +42,13 @@ async def generate_suggestions(
         ("human", config.generate_suggestions_prompt.graded_feedback_human_message)])
 
     feedback_result = await predict_and_parse(
-        model=config.model.get_model(),
+        model=config.model.get_model(), # type: ignore[attr-defined]
         chat_prompt=chat_prompt,
         prompt_input=prompt_inputs.dict(),
         pydantic_object=AssessmentModel,
         tags=[
-            f"exercise-{exercise_model.exerciseId}",
-            f"submission-{exercise_model.submissionId}",
+            f"exercise-{exercise_model.exercise_id}",
+            f"submission-{exercise_model.submission_id}",
         ]
     )
 

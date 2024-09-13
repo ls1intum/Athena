@@ -10,6 +10,7 @@ class StructuredGradingInstructionsInputs(BaseModel):
     example_solution: str
     structured_instructions_output_format: str
 
+
 structured_grading_instructions_system_message = """You are an AI tutor for {submission_uml_type} modeling exercise assessment at a prestigious university.
 
 Create a structured grading instruction based on the given grading instructions (important), the solution diagram (if present) and the problem statement. The structured grading instruction should be highly detailed to ensure consistent grading across different tutors.

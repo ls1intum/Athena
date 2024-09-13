@@ -13,6 +13,7 @@ class GradedFeedbackInputs(BaseModel):
     uml_diagram_format: str
     feedback_output_format: str
 
+
 graded_feedback_system_message = """
 You are an AI tutor for {submission_uml_type} modeling exercise assessment at a prestigious university.
 

@@ -50,7 +50,7 @@ async def suggest_feedback(exercise: Exercise, submission: Submission, is_graded
     )
 
     # If the submission is not graded (Student is requesting feedback), we reformulate the feedback to not give away the solution
-    if is_graded == False:
+    if is_graded is False:
         feedback = await filter_feedback(exercise_model, feedback, module_config.approach, module_config.debug)
 
     return convert_to_athana_feedback_model(feedback, exercise_model, is_graded)

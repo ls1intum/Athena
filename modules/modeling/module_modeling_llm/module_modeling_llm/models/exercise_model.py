@@ -2,8 +2,8 @@ from typing import Optional
 from pydantic import BaseModel
 
 class ExerciseModel(BaseModel):
-    submissionId: int
-    exerciseId: int
+    submission_id: int
+    exercise_id: int
     transformed_submission: str
     problem_statement: Optional[str] = None
     max_points: float

@@ -34,9 +34,9 @@ if azure_openai_available:
             "api-key": os.environ["AZURE_OPENAI_API_KEY"]
         }
 
-        models_response = requests.get(f"{base_url}/models?api-version=2023-03-15-preview", headers=headers)
+        models_response = requests.get(f"{base_url}/models?api-version=2023-03-15-preview", headers=headers, timeout=60)
         models_data = models_response.json()["data"]
-        deployments_response = requests.get(f"{base_url}/deployments?api-version=2023-03-15-preview", headers=headers)
+        deployments_response = requests.get(f"{base_url}/deployments?api-version=2023-03-15-preview", headers=headers, timeout=60)
         deployments_data = deployments_response.json()["data"]
 
         # Check if deployment["model"] is a substring of model["id"], i.e. "gpt-4o" is substring "gpt-4o-2024-05-13"
@@ -64,7 +64,7 @@ if available_models:
 
         model_name: OpenAIModel = Field(default=default_openai_model, # type: ignore
                                         description="The name of the model to use.")
-        max_tokens: PositiveInt = Field(4000, description="""\
+        max_tokens: PositiveInt = Field(1000, description="""\
 The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the chat completion.
 
 The total length of input tokens and generated tokens is limited by the model's context length. \

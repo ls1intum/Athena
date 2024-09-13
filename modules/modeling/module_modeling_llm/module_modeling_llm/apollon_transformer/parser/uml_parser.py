@@ -1,23 +1,30 @@
 from typing import Dict, Any, List
 from string import ascii_uppercase
 
-from module_modeling_llm.apollon_transformer.parser.element import Element
-from module_modeling_llm.apollon_transformer.parser.relation import Relation
+from module_modeling_llm.helpers.serializers.parser.element import Element
+from module_modeling_llm.helpers.serializers.parser.relation import Relation
 
 
 class UMLParser:
+    """
+    A parser for UML diagrams
+
+    This class is responsible for parsing JSON data representing a Apollon UML diagram
+    and converting it into a mermaid like textual representation
+    """
+
     def __init__(self, json_data: Dict[str, Any]):
-        self.data = json_data
-        self.title = self.data['type']
+        self.data: Dict[str, Any] = json_data
+        self.title: str = self.data['type']
         self.elements: List[Element] = []
         self.relations: List[Relation] = []
         self.owners: Dict[str, List[str]] = {}
         self._parse()
 
-    def _parse(self):
-        name_counts = {}
-        referenced_ids : List[str] = []
-        name_suffix_counters = {}
+    def _parse(self) -> None:
+        name_count: Dict[str, int] = {}
+        referenced_ids: List[str] = []
+        name_suffix_counters: Dict[str, int] = {}
 
         # Get all referenced attributes and methods
         for element_data in self.data['elements'].values():
@@ -27,7 +34,7 @@ class UMLParser:
         # Count occurrences of each name
         for element_data in self.data['elements'].values():
             name = element_data.get('name')
-            name_counts[name] = name_counts.get(name, 0) + 1
+            name_count[name] = name_count.get(name, 0) + 1
             name_suffix_counters[name] = 0
 
         # Filter elements and ensure unique names for duplicates
@@ -35,7 +42,7 @@ class UMLParser:
         for element_data in self.data['elements'].values():
             if element_data.get('id') not in referenced_ids:
                 name = element_data.get('name')
-                if name_counts[name] > 1:
+                if name_count[name] > 1:
                     suffix_index = name_suffix_counters[name]
                     element_data['name'] = f"{name}{ascii_uppercase[suffix_index]}"
                     name_suffix_counters[name] += 1
@@ -60,7 +67,7 @@ class UMLParser:
                     self.owners[ownerName].append(element.name)
 
     def to_apollon(self) -> str:
-        lines = [f"UML Diagram Type: {self.title}", ""]
+        lines: List[str] = [f"UML Diagram Type: {self.title}", ""]
 
         if self.elements:
             lines.append("@Elements:\n")

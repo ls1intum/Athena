@@ -5,6 +5,7 @@ class FilterFeedbackInputs(BaseModel):
     original_feedback: str
     feedback_output_format: str
 
+
 filter_feedback_system_message = """
 Your task is to modify given feedback. This feedback was originally created for tutors to help them grade student submissions. We want to use this same feedback for students before the due date of the assignment. However we need to make sure that the feedback does not give away the solution. Your task is to modify the feedback so that it is appropriate for students.
 

@@ -26,13 +26,13 @@ async def filter_feedback(
     )
 
     feedback_result = await predict_and_parse(
-        model=config.model.get_model(),
+        model=config.model.get_model(), # type: ignore[attr-defined]
         chat_prompt=chat_prompt,
         prompt_input=prompt_inputs.dict(),
         pydantic_object=AssessmentModel,
         tags=[
-            f"exercise-{exercise.exerciseId}-filter",
-            f"submission-{exercise.submissionId}-filter",
+            f"exercise-{exercise.exercise_id}-filter",
+            f"submission-{exercise.submission_id}-filter",
         ]
     )
 

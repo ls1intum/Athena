@@ -25,8 +25,8 @@ def convert_to_athana_feedback_model(
         element_ids = [exercise_model.element_id_mapping[element] for element in (feedback.element_names or [])]
 
         feedbacks.append(Feedback(
-            exercise_id=exercise_model.exerciseId,
-            submission_id=exercise_model.submissionId,
+            exercise_id=exercise_model.exercise_id,
+            submission_id=exercise_model.submission_id,
             title=feedback.title,
             description=feedback.description,
             element_ids=element_ids,
