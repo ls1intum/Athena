@@ -1,8 +1,8 @@
 from typing import Dict, Any, List
 from string import ascii_uppercase
 
-from module_modeling_llm.helpers.serializers.parser.element import Element
-from module_modeling_llm.helpers.serializers.parser.relation import Relation
+from module_modeling_llm.apollon_transformer.parser.element import Element
+from module_modeling_llm.apollon_transformer.parser.relation import Relation
 
 
 class UMLParser:
