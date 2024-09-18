@@ -10,6 +10,8 @@ def convert_to_athana_feedback_model(
         exercise_model: ExerciseModel, 
         manual_structured_grading_instructions: Optional[List[GradingCriterion]] = None
     ) -> List[Feedback]:
+
+    print("Converting feedback to Athena feedback model", feedback_result, manual_structured_grading_instructions, exercise_model.element_id_mapping)
     
     grading_instruction_ids = set(
         grading_instruction.id
@@ -21,7 +23,11 @@ def convert_to_athana_feedback_model(
     for feedback in feedback_result.feedbacks:
         # Each feedback has a grading_instruction_id. However we only want to have the grading_instruction_id in the final feedback that are associated with the manual structured grading instructions
         grading_instruction_id = feedback.grading_instruction_id if feedback.grading_instruction_id in grading_instruction_ids else None
-        element_ids = [exercise_model.element_id_mapping[element] for element in (feedback.element_names or [])]
+        element_ids = [
+            exercise_model.element_id_mapping[element] 
+            for element in (feedback.element_names or [])
+            if element in exercise_model.element_id_mapping
+        ]
 
         feedbacks.append(Feedback(
             exercise_id=exercise_model.exercise_id,
