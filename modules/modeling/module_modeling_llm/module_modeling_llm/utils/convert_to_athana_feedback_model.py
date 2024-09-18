@@ -8,7 +8,6 @@ from module_modeling_llm.models.exercise_model import ExerciseModel
 def convert_to_athana_feedback_model(
         feedback_result : AssessmentModel, 
         exercise_model: ExerciseModel, 
-        is_graded: bool,
         manual_structured_grading_instructions: Optional[List[GradingCriterion]] = None
     ) -> List[Feedback]:
     
