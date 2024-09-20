@@ -11,8 +11,6 @@ def convert_to_athana_feedback_model(
         manual_structured_grading_instructions: Optional[List[GradingCriterion]] = None
     ) -> List[Feedback]:
 
-    print("Converting feedback to Athena feedback model", feedback_result, manual_structured_grading_instructions, exercise_model.element_id_mapping)
-    
     grading_instruction_ids = set(
         grading_instruction.id
         for criterion in manual_structured_grading_instructions or []

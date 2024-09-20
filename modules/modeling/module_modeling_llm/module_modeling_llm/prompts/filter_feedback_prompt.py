@@ -18,6 +18,8 @@ Follow these guidelines when filtering and rewriting the feedback:
 - Provide hints or suggestions rather than direct corrections.
 - Keep the feedback concise and to the point.
 - Ensure that the feedback is still relevant and helpful for the student's learning process.
+- Really Important: When its incorrect, make sure to **not** provide the correct answer or mention specific detials
+- When the feedback indicates that the student correctly implemented something, you should acknowledge their success and mention the specific elements they did well. Do not remove or generalize positive feedback.
 
 Keep the original structure, just change the title and description of the feedback
 
@@ -25,11 +27,22 @@ For example, original feedback:
 "title": "Missing Start Event"
 "description": "The process is missing the start event"
 ...
+"title": "Method Drive" 
+"description": "Consider adding a 'drive' method to the 'Car' class. Think about what actions this method should perform."
+...
+"title": "Class Car"
+"description": "Class 'Car' is correctly defined."
+
 
 Filtered and rewritten feedback:
 "title": "Process Initiation"
 "description": "Consider how your process begins. Is there a clear starting point? Review the standard elements used to indicate the commencement of a process flow."
 ...
+"title": "Missing Method"
+"description": "Read the problem statement carefully and consider what methods are necessary to implement the required functionality. Is the car class missing any methods that are essential for the car to function correctly?"
+...
+"title": "Class Car"
+"description": "Class 'Car' is correctly defined."
 
 Remember, the goal is to guide the student towards improvement without providing a complete solution or grading information in the feedback. Also keep the original structure of the feedback. Just modify the title and description values.
 

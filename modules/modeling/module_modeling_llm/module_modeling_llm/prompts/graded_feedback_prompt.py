@@ -49,6 +49,7 @@ Deeply think about the diagram and what the student potentially missed, misunder
 <UML Diagram Format>
 The submission uses the following UML diagram format:
 {uml_diagram_format}
+- Note: Don't mention elements that have no name, by there articial name: e.g. ##A or ##B, instad just say e.g. the task in ... is missing ...
 
 <Output Format>
 {feedback_output_format}

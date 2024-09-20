@@ -14,6 +14,8 @@ async def filter_feedback(
         config: BasicApproachConfig,
         debug: bool,
 ) -> AssessmentModel:
+    
+    print(f"\n\n\n\n\n{original_feedback.json()}\n\n\n\n\n")
 
     chat_prompt = ChatPromptTemplate.from_messages([
         ("system", config.generate_suggestions_prompt.filter_feedback_system_message),
@@ -44,5 +46,7 @@ async def filter_feedback(
     
     if feedback_result is None:
         raise ValueError("No feedback was returned by the model.")
+    
+    print(f"\n\n\n\n\n{feedback_result.json()}\n\n\n\n\n")
     
     return feedback_result
