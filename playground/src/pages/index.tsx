@@ -4,6 +4,7 @@ import { useBaseInfo } from "@/hooks/base_info_context";
 import BaseInfoHeader from "@/components/base_info_header";
 import ModuleRequests from "@/components/view_mode/module_requests";
 import EvaluationMode from "@/components/view_mode/evaluation_mode";
+import ExpertEvaluation from "@/components/expert_evaluation_header";
 
 export default function Playground() {
   const { viewMode } = useBaseInfo();
@@ -11,6 +12,7 @@ export default function Playground() {
   return (
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-6xl font-bold text-white mb-8">Playground</h1>
+      <ExpertEvaluation />
       <BaseInfoHeader />
       {viewMode === "module_requests" && <ModuleRequests />}
       {viewMode === "evaluation_mode" && <EvaluationMode />}
