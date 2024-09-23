@@ -14,6 +14,7 @@ type TextSubmissionDetailProps = {
   onFeedbacksChange?: (feedback: Feedback[]) => void;
   manualRatings?: ManualRating[];
   onManualRatingsChange?: (manualRatings: ManualRating[]) => void;
+  hideFeedbackDetails?: boolean;
 };
 
 export default function TextSubmissionDetail({
@@ -23,6 +24,7 @@ export default function TextSubmissionDetail({
   onFeedbacksChange,
   manualRatings,
   onManualRatingsChange,
+  hideFeedbackDetails,
 }: TextSubmissionDetailProps) {
   const unreferencedFeedbacks = feedbacks?.filter(
     (feedback) => getFeedbackReferenceType(feedback) === "unreferenced"
@@ -64,6 +66,7 @@ export default function TextSubmissionDetail({
                     onManualRatingsChange &&
                     createManualRatingItemUpdater(feedback.id, manualRatings, onManualRatingsChange)
                   }
+                  hideDetails={hideFeedbackDetails}
                 />
               )
           )}
