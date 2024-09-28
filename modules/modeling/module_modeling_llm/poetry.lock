@@ -191,8 +191,8 @@ uvicorn = "^0.23.0"
 [package.source]
 type = "git"
 url = "https://github.com/ls1intum/Athena.git"
-reference = "2da2d33"
-resolved_reference = "2da2d33bb7045793de0fd74b245dd97166fd45f0"
+reference = "d9ff3bd"
+resolved_reference = "d9ff3bd\n"
 subdirectory = "athena"
 
 [[package]]
@@ -2332,4 +2332,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "35ad0afc2863ce84ea67d8ac57a23b4df6dc0a76845eb3a836a9965bd0ee140a"
+content-hash = "609a19d333c02663d4b755fa30044f9bd5c18c0f7c4f6ee3b74bbe8eed4eee42"
