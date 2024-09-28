@@ -178,7 +178,7 @@ description = "This is a helper module for easier development of Athena modules.
 optional = false
 python-versions = "3.11.*"
 files = []
-develop = false
+develop = true
 
 [package.dependencies]
 fastapi = "^0.109.1"
@@ -189,11 +189,8 @@ sqlalchemy = {version = "^2.0.21", extras = ["mypy"]}
 uvicorn = "^0.23.0"
 
 [package.source]
-type = "git"
-url = "https://github.com/ls1intum/Athena.git"
-reference = "2da2d33"
-resolved_reference = "2da2d33bb7045793de0fd74b245dd97166fd45f0"
-subdirectory = "athena"
+type = "directory"
+url = "../../../athena"
 
 [[package]]
 name = "attrs"
@@ -2333,4 +2330,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "945945c82ff4456679b3fa08c19011341bb418a847152fd28a9de8ef2d953032"
+content-hash = "e3d6d9da95585aa2a7cba97910d821d5cda5412c2a37578097b588e49553d19c"
