@@ -5,7 +5,7 @@ from .big_integer_with_autoincrement import BigIntegerWithAutoincrement
 
 
 class DBFeedback(Model):
-    __table_args__ = (UniqueConstraint('lms_id', 'lms_url'),)
+    __table_args__ = (UniqueConstraint('lms_id'),)
 
     id = Column(BigIntegerWithAutoincrement, primary_key=True, index=True, autoincrement=True)
     lms_url = Column(String, index=True, nullable=False)
