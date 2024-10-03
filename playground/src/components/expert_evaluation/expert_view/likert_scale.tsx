@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircleInfo} from "@fortawesome/free-solid-svg-icons/faCircleInfo";
+import Popup from "@/components/expert_evaluation/expert_view/popup";
 
 interface SingleChoiceLikertScaleProps {
   title: string;
   summary: string;
-  description: string;
+  description: MetricDescription;
 }
 
 const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
@@ -13,15 +14,20 @@ const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
   summary,
   description,
 }) => {
-  const [selectedValue, setSelectedValue] = useState<number | null>(null); // No default value
+  const [selectedValue, setSelectedValue] = useState<number | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleInfoClick = () => {
-    alert(description);
+    setIsPopupOpen(true);
   };
 
   const handleChange = (value: number) => {
     setSelectedValue(value);
   };
+
+    const closePopup = () => {
+        setIsPopupOpen(false);
+    };
 
   // Define background colors matching the slider colors
   const scaleColors = [
@@ -46,6 +52,11 @@ const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
           <FontAwesomeIcon icon={faCircleInfo} />
         </span>
       </div>
+      <Popup isOpen={isPopupOpen} onClose={closePopup} title="Information">
+          <p><b>Good: </b>{description.good}</p>
+          <p><b>Mid: </b>{description.mid}</p>
+          <p><b>Bad: </b>{description.bad}</p>
+                </Popup>
 
       {/* Question Section */}
       <p className="text-gray-800">{summary}</p>

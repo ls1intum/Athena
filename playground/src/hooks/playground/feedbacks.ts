@@ -1,56 +1,93 @@
-import type { Feedback } from "@/model/feedback";
-import type { Submission } from "@/model/submission";
-import type { Exercise } from "@/model/exercise";
-import type { DataMode } from "@/model/data_mode";
+import type {CategorizedFeedback, Feedback} from "@/model/feedback";
+import type {Submission} from "@/model/submission";
+import type {Exercise} from "@/model/exercise";
+import type {DataMode} from "@/model/data_mode";
 
-import { UseQueryOptions, useQuery } from "react-query";
+import {useQuery, UseQueryOptions} from "react-query";
 import baseUrl from "@/helpers/base_url";
-import { useBaseInfo } from "@/hooks/base_info_context";
+import {useBaseInfo} from "@/hooks/base_info_context";
 
 export async function fetchFeedbacks(
-  exercise: Exercise | undefined,
-  submission: Submission | undefined,
-  dataMode: DataMode
+    exercise: Exercise | undefined,
+    submission: Submission | undefined,
+    dataMode: DataMode
 ) {
-  const response = await fetch(
-    `${baseUrl}/api/data/${dataMode}/${exercise ? `exercise/${exercise.id}/` : ""}feedbacks`
-  );
+    const response = await fetch(
+        `${baseUrl}/api/data/${dataMode}/${exercise ? `exercise/${exercise.id}/` : ""}feedbacks`
+    );
 
-  let feedbacks = await response.json() as Feedback[];
-  for (const feedback of feedbacks) {
-    if (feedback.structured_grading_instruction_id) {
-      feedback.structured_grading_instruction = exercise?.grading_criteria?.flatMap((criteria) => criteria.structured_grading_instructions).find((instruction) => instruction.id === feedback.structured_grading_instruction_id);
+    let feedbacks = await response.json() as Feedback[];
+    for (const feedback of feedbacks) {
+        if (feedback.structured_grading_instruction_id) {
+            feedback.structured_grading_instruction = exercise?.grading_criteria?.flatMap((criteria) => criteria.structured_grading_instructions).find((instruction) => instruction.id === feedback.structured_grading_instruction_id);
+        }
     }
-  }
 
-  if (submission) {
-    return feedbacks.filter((feedback) => feedback.submission_id === submission.id);
-  }
-  return feedbacks;
+    if (submission) {
+        return feedbacks.filter((feedback) => feedback.submission_id === submission.id);
+    }
+    return feedbacks;
+}
+
+export async function fetchCategorizedFeedbacks(
+    exercise: Exercise | undefined,
+    submission: Submission | undefined,
+    dataMode: DataMode
+) {
+    const response = await fetch(
+        `${baseUrl}/api/data/${dataMode}/${exercise ? `exercise/${exercise.id}/` : ""}categorized_feedback`
+    );
+
+    let feedbacks = await response.json() as CategorizedFeedback;
+    if (submission) {
+        const filteredFeedbacks: CategorizedFeedback = {};
+
+        Object.keys(feedbacks).forEach((category) => {
+            filteredFeedbacks[category] = feedbacks[category]
+                .filter((feedback) => {
+                    // Filter based on submission_id, if submission is provided
+                    return submission ? feedback.submission_id === submission.id : true;
+                })
+                .map((feedback) => {
+                    // Process structured grading instruction
+                    if (feedback.structured_grading_instruction_id) {
+                        feedback.structured_grading_instruction = exercise?.grading_criteria
+                            ?.flatMap((criteria) => criteria.structured_grading_instructions)
+                            .find((instruction) => instruction.id === feedback.structured_grading_instruction_id);
+                    }
+                    return feedback;
+                });
+
+        });
+
+        return filteredFeedbacks;
+    }
+
+    return feedbacks;
 }
 
 /**
  * Fetches the feedbacks (for an exercise) of the playground.
- * 
+ *
  * @example
  * const { data, isLoading, error } = useFeedbacks(exercise);
- * 
+ *
  * @param exercise The exercise to fetch the feedbacks for.
  * @param submission The submission to fetch the feedbacks for.
  * @param options The react-query options.
  */
 export default function useFeedbacks(
-  exercise?: Exercise,
-  submission?: Submission,
-  options: Omit<UseQueryOptions<Feedback[], Error, Feedback[]>, 'queryFn'> = {}
+    exercise?: Exercise,
+    submission?: Submission,
+    options: Omit<UseQueryOptions<Feedback[], Error, Feedback[]>, 'queryFn'> = {}
 ) {
-  const { dataMode } = useBaseInfo();
+    const {dataMode} = useBaseInfo();
 
-  return useQuery({
-    queryKey: ["feedbacks", dataMode, exercise?.id, submission?.id],
-    queryFn: async () => {
-      return fetchFeedbacks(exercise, submission, dataMode);
-    },
-    ...options
-  });
+    return useQuery({
+        queryKey: ["feedbacks", dataMode, exercise?.id, submission?.id],
+        queryFn: async () => {
+            return fetchFeedbacks(exercise, submission, dataMode);
+        },
+        ...options
+    });
 }

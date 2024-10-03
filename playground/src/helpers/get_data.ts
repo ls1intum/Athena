@@ -1,6 +1,6 @@
 import type { Exercise } from "@/model/exercise";
 import type { Submission } from "@/model/submission";
-import type { Feedback } from "@/model/feedback";
+import type {CategorizedFeedback, Feedback} from "@/model/feedback";
 import type { DataMode } from "@/model/data_mode";
 
 import path from "path";
@@ -98,14 +98,43 @@ function replaceJsonPlaceholders(
 function addExerciseTypeToSubmissionsAndFeedbacks(json: any): any {
   const exerciseType = json.type;
 
-  json.submissions = json.submissions?.map((submissionJson: any) => {
-    submissionJson.type = exerciseType;
-    submissionJson.feedbacks = submissionJson.feedbacks?.map((feedbackJson: any) => {
-      feedbackJson.type = exerciseType;
-      return feedbackJson;
-    });
-    return submissionJson;
-  });
+json.submissions = json.submissions?.map((submissionJson: any) => {
+  submissionJson.type = exerciseType;
+
+  // Check if feedbacks is an object or an array
+  if (submissionJson.feedbacks && typeof submissionJson.feedbacks === 'object') {
+
+    // Check if feedbacks is an array (no categories case)
+    if (Array.isArray(submissionJson.feedbacks)) {
+      submissionJson.feedbacks = submissionJson.feedbacks.map((feedbackJson: any) => {
+        feedbackJson.type = exerciseType;
+        return feedbackJson;
+      });
+    } else {
+      // If feedbacks is an object with categories
+      Object.keys(submissionJson.feedbacks).forEach((category) => {
+        if (Array.isArray(submissionJson.feedbacks[category])) {
+          // Map over the feedback array for each category
+          submissionJson.feedbacks[category] = submissionJson.feedbacks[category].map((feedbackJson: any) => {
+            feedbackJson.type = exerciseType;
+            return feedbackJson;
+          });
+        } else {
+          // If feedbacks[category] is not an array, handle it appropriately
+          console.warn(`Expected array, but got ${typeof submissionJson.feedbacks[category]} for category ${category} in submission ID ${submissionJson.id}`);
+          submissionJson.feedbacks[category] = []; // or handle it based on your use case
+        }
+      });
+    }
+
+  } else {
+    // Handle case where feedbacks is not an object or array (e.g., undefined, null, etc.)
+    console.warn(`Expected object or array for feedbacks, but got ${typeof submissionJson.feedbacks} for submission ID ${submissionJson.id}`);
+    submissionJson.feedbacks = [];  // or handle it based on your use case
+  }
+
+  return submissionJson;
+});
   return json;
 }
 
@@ -235,6 +264,36 @@ function jsonToFeedbacks(json: any): Feedback[] {
   });
 }
 
+function jsonToCategorizedFeedbacks(json: any): CategorizedFeedback {
+  const categorizedFeedback: CategorizedFeedback = {};
+
+  json.submissions.forEach((submissionJson: any) => {
+    // Check if feedbacks exist and are grouped by categories
+    if (submissionJson.feedbacks && typeof submissionJson.feedbacks === 'object') {
+      // Iterate over each feedback category (e.g., Tutor, LLM)
+      Object.keys(submissionJson.feedbacks).forEach((category: string) => {
+        // Ensure the category exists in the categorizedFeedback object
+        if (!categorizedFeedback[category]) {
+          categorizedFeedback[category] = [];
+        }
+
+        // Iterate over feedbacks in this category and transform them
+        submissionJson.feedbacks[category].forEach((feedbackJson: any) => {
+          const feedback: Feedback = {
+            ...feedbackJson,
+            exercise_id: json.id, // Add exercise_id
+            submission_id: submissionJson.id, // Add submission_id
+          };
+
+          // Add the transformed feedback to the respective category
+          categorizedFeedback[category].push(feedback);
+        });
+      });
+    }
+  });
+  return categorizedFeedback;
+}
+
 export function getExercises(dataMode: DataMode, athenaOrigin: string): Exercise[] {
   return getAllExerciseJSON(dataMode, athenaOrigin).map(jsonToExercise);
 }
@@ -259,4 +318,16 @@ export function getFeedbacks(
     return jsonToFeedbacks(getExerciseJSON(dataMode, exerciseId, athenaOrigin));
   }
   return getAllExerciseJSON(dataMode, athenaOrigin).flatMap(jsonToFeedbacks);
+}
+
+export function getCategorizedFeedbacks(
+  dataMode: DataMode,
+  exerciseId: number | undefined,
+  athenaOrigin: string
+): CategorizedFeedback {
+
+  if (exerciseId !== undefined) {
+    return jsonToCategorizedFeedbacks(getExerciseJSON(dataMode, exerciseId, athenaOrigin));
+  }
+  return {};
 }
