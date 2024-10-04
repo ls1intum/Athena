@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircleInfo} from "@fortawesome/free-solid-svg-icons/faCircleInfo";
 import Popup from "@/components/expert_evaluation/expert_view/popup";
+import sanitizeHTML from "sanitize-html";
 
 interface SingleChoiceLikertScaleProps {
   title: string;
@@ -38,6 +39,12 @@ const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
     'bg-green-700',     // Fifth section
   ];
 
+  const sanitize = (html: string) => {
+    return sanitizeHTML(html, {
+      allowedTags: ['b', 'br', 'p', 'i'],
+    });
+  };
+
   return (
     <>
       {/* Title and Info Section */}
@@ -53,8 +60,8 @@ const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
         </span>
       </div>
       <Popup isOpen={isPopupOpen} onClose={closePopup} title="Information">
-          <p>{description}</p>
-                </Popup>
+        <p dangerouslySetInnerHTML={{__html: sanitize(description)}}></p>
+      </Popup>
 
       {/* Question Section */}
       <p className="text-gray-800">{summary}</p>
