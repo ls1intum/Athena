@@ -1,4 +1,4 @@
-import {Submission, TextSubmission} from "@/model/submission";
+import {Submission} from "@/model/submission";
 
 export type ExerciseType = "text" | "programming" | "modeling";
 
@@ -27,7 +27,7 @@ type ExerciseBase = {
   grading_instructions?: string;
   grading_criteria?: GradingCriteria[];
   problem_statement?: string;
-  submissions?: Submission[];
+  submissions?: Submission[]; // Playground only
   meta: {
     [key: string]: any;
   };
@@ -36,7 +36,6 @@ type ExerciseBase = {
 export type TextExercise = ExerciseBase & {
   type: "text";
   example_solution?: string;
-  submissions?: TextSubmission[];
 };
 
 export type ProgrammingExercise = ExerciseBase & {

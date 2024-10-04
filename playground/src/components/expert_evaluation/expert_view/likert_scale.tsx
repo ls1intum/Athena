@@ -6,7 +6,7 @@ import Popup from "@/components/expert_evaluation/expert_view/popup";
 interface SingleChoiceLikertScaleProps {
   title: string;
   summary: string;
-  description: MetricDescription;
+  description: string;
 }
 
 const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
@@ -53,9 +53,7 @@ const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
         </span>
       </div>
       <Popup isOpen={isPopupOpen} onClose={closePopup} title="Information">
-          <p><b>Good: </b>{description.good}</p>
-          <p><b>Mid: </b>{description.mid}</p>
-          <p><b>Bad: </b>{description.bad}</p>
+          <p>{description}</p>
                 </Popup>
 
       {/* Question Section */}

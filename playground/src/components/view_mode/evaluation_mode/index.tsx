@@ -6,6 +6,7 @@ import { useState } from "react";
 import DefineExperiment from "./define_experiment";
 import ConfigureModules from "./configure_modules";
 import ConductExperiment from "./conduct_experiment";
+import EvaluationManagement, {EvaluationConfig} from "@/components/view_mode/evaluation_mode/expert_evaluation/evaluation_management";
 
 export default function EvaluationMode() {
   const [experiment, setExperiment] = useState<Experiment | undefined>(
@@ -14,6 +15,9 @@ export default function EvaluationMode() {
   const [moduleConfigurations, setModuleConfigurations] = useState<
     ModuleConfiguration[] | undefined
   >(undefined);
+  const [evaluationConfig, setEvaluationConfig] = useState<EvaluationConfig | undefined>(
+    undefined
+  );
 
   return (
     <>
@@ -40,6 +44,13 @@ export default function EvaluationMode() {
           )}
         </>
       )}
+      <h2 className="text-4xl font-bold text-white mb-4">Expert Evaluation</h2>
+      <EvaluationManagement
+        evaluationConfig={evaluationConfig}
+        onChangeEvaluationConfig={(evaluationConfig) => {
+          setEvaluationConfig(evaluationConfig);
+        }}
+      />
     </>
   );
 }
