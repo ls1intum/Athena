@@ -3,7 +3,7 @@ import Popup from "@/components/expert_evaluation/expert_view/popup";
 
 interface SideBySideHeaderProps {
     exercise: any;
-    currentSubmissionIndex: number;
+    globalSubmissionIndex: number;
     totalSubmissions: number;
     onNext: () => void;
     onPrevious: () => void;
@@ -11,7 +11,7 @@ interface SideBySideHeaderProps {
 
 const SideBySideHeader: React.FC<SideBySideHeaderProps> = ({
                                                                exercise,
-                                                               currentSubmissionIndex,
+                                                               globalSubmissionIndex,
                                                                totalSubmissions,
                                                                onNext,
                                                                onPrevious,
@@ -28,7 +28,7 @@ const SideBySideHeader: React.FC<SideBySideHeaderProps> = ({
     const openEvaluationTutorial = () => setIsEvaluationTutorialOpen(true);
     const closeEvaluationTutorial = () => setIsEvaluationTutorialOpen(false);
 
-     if (!exercise) {
+    if (!exercise) {
         return <div>Loading...</div>;
     }
     return (
@@ -38,7 +38,7 @@ const SideBySideHeader: React.FC<SideBySideHeaderProps> = ({
                 className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 space-y-2 md:space-y-0">
                 <h1 className="text-3xl font-semibold text-gray-900">Side by Side Evaluation</h1>
                 <span className="text-lg text-gray-700">
-          Submission <strong>{currentSubmissionIndex + 1}</strong> / {totalSubmissions}
+          Submission <strong>{globalSubmissionIndex + 1}</strong> / {totalSubmissions}
         </span>
             </div>
 
@@ -90,13 +90,13 @@ const SideBySideHeader: React.FC<SideBySideHeaderProps> = ({
                         <button
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition min-w-[120px] md:w-auto"
                             onClick={onPrevious}
-                            disabled={currentSubmissionIndex === 0}>
+                            disabled={globalSubmissionIndex === 0}>
                             ⬅️ Previous
                         </button>
                         <button
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition min-w-[120px] md:w-auto"
                             onClick={onNext}
-                            disabled={currentSubmissionIndex === totalSubmissions - 1}>
+                            disabled={globalSubmissionIndex === totalSubmissions - 1}>
                             Next ➡️
                         </button>
                     </div>

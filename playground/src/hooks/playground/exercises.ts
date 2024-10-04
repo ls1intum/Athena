@@ -10,6 +10,11 @@ export async function fetchExercises(dataMode: DataMode) {
   return await response.json() as Promise<Exercise[]>;
 }
 
+export async function fetchExercisesEager(dataMode: DataMode) {
+  const response = await fetch(`${baseUrl}/api/data/${dataMode}/exercises_eager`);
+  return await response.json() as Promise<Exercise[]>;
+}
+
 /**
  * Fetches the exercises of the playground.
  * 

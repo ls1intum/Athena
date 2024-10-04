@@ -3,7 +3,7 @@ import SingleChoiceLikertScale from "@/components/expert_evaluation/expert_view/
 import TextSubmissionDetail from "@/components/details/submission_detail/text";
 import type {TextSubmission} from "@/model/submission";
 import {CategorizedFeedback} from "@/model/feedback";
-import {fetchCategorizedFeedbacks} from "@/hooks/playground/feedbacks";
+import {fetchCategorizedFeedbacks, fetchFeedbacks} from "@/hooks/playground/feedbacks";
 import {Exercise} from "@/model/exercise";
 
 // Define the metric data
@@ -55,33 +55,17 @@ const metrics = [
 interface LikertScaleFormProps {
     submission: TextSubmission;
     exercise: Exercise;
+    feedback: CategorizedFeedback;
 }
 
 
-const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise}) => {
-    const [feedbacks, setFeedbacks] = useState<CategorizedFeedback>({});
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (submission && exercise) {
-                try {
-                    const fetchedFeedbacks = await fetchCategorizedFeedbacks(exercise, submission, "evaluation");
-                    setFeedbacks(fetchedFeedbacks);
-                } catch
-                    (error) {
-                    console.error('Error loading feedbacks for submission:', error);
-                }
-            }
-        };
-        fetchData(); // Call the data loading function when the component mounts
-    }, [exercise, submission]);
-
+const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise, feedback}) => {
 
     if (!exercise || !submission) {
         return <div>Loading...</div>; // Show a loading state until the data is fetched
     }
 
-    const shuffledFeedbacks = Object.entries(feedbacks).sort(() => Math.random() - 0.5);
+    const shuffledFeedbacks = Object.entries(feedback).sort(() => Math.random() - 0.5);
 
     return (
         <div className="overflow-x-auto">

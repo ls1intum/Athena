@@ -235,6 +235,10 @@ function jsonToExercise(json: any): Exercise {
   return exercise;
 }
 
+function jsonToExerciseEager(json: any): Exercise {
+  return json as Exercise;
+}
+
 function jsonToSubmissions(json: any): Submission[] {
   return json.submissions.map((submissionJson: any) => {
     const submission = submissionJson as Submission;
@@ -281,8 +285,8 @@ function jsonToCategorizedFeedbacks(json: any): CategorizedFeedback {
         submissionJson.feedbacks[category].forEach((feedbackJson: any) => {
           const feedback: Feedback = {
             ...feedbackJson,
-            exercise_id: json.id, // Add exercise_id
-            submission_id: submissionJson.id, // Add submission_id
+            exercise_id: json.id,
+            submission_id: submissionJson.id,
           };
 
           // Add the transformed feedback to the respective category
@@ -296,6 +300,10 @@ function jsonToCategorizedFeedbacks(json: any): CategorizedFeedback {
 
 export function getExercises(dataMode: DataMode, athenaOrigin: string): Exercise[] {
   return getAllExerciseJSON(dataMode, athenaOrigin).map(jsonToExercise);
+}
+
+export function getExercisesEager(dataMode: DataMode, athenaOrigin: string): Exercise[] {
+  return getAllExerciseJSON(dataMode, athenaOrigin).map(jsonToExerciseEager);
 }
 
 export function getSubmissions(
