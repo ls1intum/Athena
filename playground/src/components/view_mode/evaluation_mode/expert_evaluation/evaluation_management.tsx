@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { downloadJSONFile } from "@/helpers/download";
 import { twMerge } from "tailwind-merge";
-import ExerciseSelect from "@/components/selectors/exercise_select";
 import MetricsForm from "@/components/view_mode/evaluation_mode/expert_evaluation/metrics_form";
-import {Exercise} from "@/model/exercise";
-import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
-import {Metric} from "@/model/metric";
-
+import { Exercise } from "@/model/exercise";
+import { ExpertEvaluationConfig } from "@/model/expert_evaluation_config";
+import { Metric } from "@/model/metric";
+import MultipleExercisesSelect from "@/components/selectors/multiple_exercises_select";
 
 type DefineEvaluationProps = {
   expertEvaluationConfig: ExpertEvaluationConfig | undefined;
@@ -26,7 +25,6 @@ export default function EvaluationManagement({
   const [expertIds, setExpertIds] = useState<string[]>([]);
   const [isImporting, setIsImporting] = useState<boolean>(false);
 
-  // Synchronize with selected evaluation config
   useEffect(() => {
     if (selectedConfigId === "new") {
       setName("");
@@ -42,7 +40,6 @@ export default function EvaluationManagement({
     }
   }, [selectedConfigId, expertEvaluationConfigs]);
 
-  // Get the currently selected evaluation config
   const getSelectedConfig = (): ExpertEvaluationConfig => {
     if (selectedConfigId === "new") {
       return {
@@ -69,7 +66,6 @@ export default function EvaluationManagement({
 
   const definedExpertEvaluationConfig = getSelectedConfig();
 
-  // Add or update the current evaluation config
   const saveExpertEvaluationConfig = (newConfig: ExpertEvaluationConfig) => {
     setExpertEvaluationConfigs((prevConfigs) => {
       const existingIndex = prevConfigs.findIndex((config) => config.id === newConfig.id);
@@ -84,20 +80,12 @@ export default function EvaluationManagement({
     setSelectedConfigId(newConfig.id);
   };
 
-  // Export evaluation config
   const handleExport = () => {
     const configToExport = definedExpertEvaluationConfig;
     if (!configToExport) return;
-    downloadJSONFile(`evaluation_config_${configToExport.name}_${configToExport.id}`, {
-      type: "evaluation_config",
-      id: configToExport.id,
-      name: configToExport.name,
-      metrics: configToExport.metrics,
-      exercises: configToExport.exercises,
-    });
+    downloadJSONFile(`evaluation_config_${configToExport.name}_${configToExport.id}`, configToExport);
   };
 
-  // Import evaluation config
   const handleImport = async (fileContent: string) => {
     const importedConfig = JSON.parse(fileContent) as ExpertEvaluationConfig;
     if (importedConfig.type !== "evaluation_config") {
@@ -144,7 +132,6 @@ export default function EvaluationManagement({
         </div>
       </div>
 
-      {/* Dropdown to switch between evaluation configs */}
       <label className="flex flex-col">
         <span className="text-lg font-bold">Evaluation</span>
         <select
@@ -161,7 +148,6 @@ export default function EvaluationManagement({
         </select>
       </label>
 
-      {/* Show form for new config or edit existing config */}
       {selectedConfigId === "new" ? (
         <>
           <label className="flex flex-col">
@@ -174,25 +160,23 @@ export default function EvaluationManagement({
               onChange={(e) => setName(e.target.value)}
             />
           </label>
-          <ExerciseSelect
-            exercises={exercises}
+          <MultipleExercisesSelect
+            selectedExercises={exercises}
             exerciseType="text"
             onChange={setExercises}
-            multiple={true}
           />
           <MetricsForm metrics={metrics} setMetrics={setMetrics} />
         </>
       ) : (
         <>
           <h4 className="text-lg font-bold">Editing: {name}</h4>
-          <ExerciseSelect
-            exercises={exercises}
+          <MultipleExercisesSelect
+            selectedExercises={exercises}
             exerciseType="text"
             onChange={(newExercises) => {
               setExercises(newExercises);
               saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, exercises: newExercises });
             }}
-            multiple={true}
           />
           <MetricsForm
             metrics={metrics}
