@@ -4,9 +4,10 @@ import requests
 
 from typing import Dict, List
 from enum import Enum
-from pydantic import Field, validator, PositiveInt
+from pydantic import Field, field_validator, PositiveInt
 from langchain.base_language import BaseLanguageModel
-from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
 
 from athena.logger import logger
 from .model_config import ModelConfig
@@ -15,6 +16,7 @@ OPENAI_PREFIX = "openai_"
 AZURE_OPENAI_PREFIX = "azure_openai_"
 openai_available = bool(os.environ.get("OPENAI_API_KEY"))
 azure_openai_available = bool(os.environ.get("AZURE_OPENAI_API_KEY"))
+api_version = os.environ.get("OPENAI_API_VERSION")
 
 available_models: Dict[str, BaseLanguageModel] = {}
 
@@ -34,9 +36,9 @@ if azure_openai_available:
             "api-key": os.environ["AZURE_OPENAI_API_KEY"]
         }
 
-        models_response = requests.get(f"{base_url}/models?api-version=2023-03-15-preview", headers=headers, timeout=30)
+        models_response = requests.get(f"{base_url}/models?api-version={api_version}", headers=headers, timeout=30)
         models_data = models_response.json()["data"]
-        deployments_response = requests.get(f"{base_url}/deployments?api-version=2023-03-15-preview", headers=headers,
+        deployments_response = requests.get(f"{base_url}/deployments?api-version={api_version}", headers=headers,
                                             timeout=30)
         deployments_data = deployments_response.json()["data"]
 
@@ -100,7 +102,7 @@ decreasing the model's likelihood to repeat the same line verbatim.
 [See more information about frequency and presence penalties.](https://platform.openai.com/docs/api-reference/parameter-details)\
 """)
 
-        @validator('max_tokens')
+        @field_validator('max_tokens')
         def max_tokens_must_be_positive(cls, v):
             """
             Validate that max_tokens is a positive integer.

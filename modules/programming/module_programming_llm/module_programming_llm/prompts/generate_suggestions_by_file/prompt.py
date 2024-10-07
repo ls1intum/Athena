@@ -11,15 +11,15 @@ Meaning, the feedback you provide should be appliable to the submission with lit
 # Problem statement
 {problem_statement}
 
-# Grading instructions
+# Grading instructions, follow them unless absolutely necessary to deviate
 {grading_instructions}
 Max points: {max_points}, bonus points: {bonus_points} (whole assessment, not just this file)
 
 # Diff between solution (deletions) and student\'s submission (additions):
 {solution_to_submission_diff}
 
-# Diff between template (deletions) and student\'s submission (additions):
-{template_to_submission_diff}
+# Summary of other solution files
+{solution_summary}
 """
 
 human_message = """\
@@ -27,4 +27,11 @@ Student\'s submission file to grade (with line numbers <number>: <line>):
 \"\"\"
 {submission_file}
 \"\"\"\
+
+Diff between template (deletions) and student\'s submission (additions):
+{template_to_submission_diff}
+
+Do not give points for code that was not written by students!
+
+Path: {file_path}
 """
