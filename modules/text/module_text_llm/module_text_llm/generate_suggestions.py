@@ -6,7 +6,7 @@ from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
 from module_text_llm.config import BasicApproachConfig
-from module_text_llm.helpers.llm_utils import (
+from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions, 
     check_prompt_length_and_omit_features_if_necessary, 
     num_tokens_from_prompt,
