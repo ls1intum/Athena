@@ -58,9 +58,8 @@ jobs:
 
       - name: Build llm_core image
         id: set-image-core_llm
-        if: matrix.image == 'module_text_llm'
         run: |
-          cd modules/llm_core
+          cd llm_core
           docker build -t llm_core .
           cd ..
 
