@@ -11,37 +11,44 @@ const metrics = [
         title: '✅ Correctness',
         summary: 'Is the feedback free of content errors?',
         description: `
-            <b>good</b>: 'The feedback accurately reflects the submission, solution, and criteria, with no errors.',<br>
-            mid: 'The feedback is mostly accurate but includes minor errors that don’t impact the overall evaluation.',<br>
-            bad: 'The feedback contains major errors that misrepresent the submission or solution, likely causing confusion.'
+**good**: The feedback accurately reflects the submission, solution, and criteria, with no errors.
+
+**mid**: The feedback is mostly accurate but includes minor errors that don’t impact the overall evaluation.
+
+**bad**: The feedback contains major errors that misrepresent the submission or solution, likely causing confusion
         `
     },
     {
         title: '🎯 Actionability',
         summary: 'Can students realistically act on this feedback?',
         description: `
-            good: 'The feedback is respectful and constructive, recognizing both strengths and areas for improvement.',<br>
-            mid: 'The feedback is professional but mainly corrective, with little positive reinforcement.',<br>
-            bad: 'The feedback is overly critical or dismissive, using unprofessional or disrespectful language.'
+**good**: The feedback is respectful and constructive, recognizing both strengths and areas for improvement.
+
+**mid**: The feedback is professional but mainly corrective, with little positive reinforcement.
+
+**bad**: The feedback is overly critical or dismissive, using unprofessional or disrespectful language.
         `
     },
     {
         title: '💬 Tone',
         summary: 'Is the feedback respectful and constructive?',
         description: `
-            good: 'The feedback is respectful and constructive, recognizing both strengths and areas for improvement.',<br>
-            mid: 'The feedback is professional but mainly corrective, with little positive reinforcement.',<br>
-            bad: 'The feedback is overly critical or dismissive, using unprofessional or disrespectful language.'
-        `
+**good**: The feedback is respectful and constructive, recognizing both strengths and areas for improvement.
 
+**mid**: The feedback is professional but mainly corrective, with little positive reinforcement.
+
+**bad**: The feedback is overly critical or dismissive, using unprofessional or disrespectful language.
+        `
     },
 {
     title: '🔍 Completeness',
     summary: 'Does the feedback cover all relevant aspects without unnecessary information?',
     description: `
-        good: 'The feedback addresses all key aspects and avoids irrelevant details.',<br>
-        mid: 'The feedback covers most important points but may miss minor details or include some irrelevant information.',<br>
-        bad: 'The feedback misses important aspects or includes too much irrelevant content.'
+**good**: The feedback addresses all key aspects and avoids irrelevant details.
+
+**mid**: The feedback covers most important points but may miss minor details or include some irrelevant information.
+
+**bad**: The feedback misses important aspects or includes too much irrelevant content.
     `
 },
 ];

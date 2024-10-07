@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash, faSave, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {useState} from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEdit, faPlus, faSave, faTrash} from "@fortawesome/free-solid-svg-icons";
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from "rehype-raw";
 
 type Metric = {
   title: string;
@@ -138,13 +140,12 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
                     className="border border-gray-300 rounded-md p-2 w-full"
                     placeholder="Metric Summary"
                   />
-                  <textarea
-                    value={metric.description}
-                    readOnly
-                    className="border border-gray-300 rounded-md p-2 w-full"
-                    rows={2}
-                    placeholder="Metric Description"
-                  />
+                  {/* Render description as markdown */}
+                  <div className="border border-gray-300 rounded-md p-2 w-full">
+                    <ReactMarkdown rehypePlugins={[rehypeRaw]} className="prose prose-sm max-w-none" >
+                      {metric.description}
+                    </ReactMarkdown>
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -220,8 +221,8 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
               Add Metric
             </button>
           </div>
-          </div>
         </div>
+      </div>
     </label>
-);
+  );
 }
