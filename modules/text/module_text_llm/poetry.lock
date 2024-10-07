@@ -934,7 +934,7 @@ name = "llm-core"
 version = "0.1.0"
 description = "SHared LLM module."
 optional = false
-python-versions = "3.11.*"
+python-versions = "*"
 files = []
 develop = true
 
@@ -944,6 +944,7 @@ gitpython = "3.1.41"
 langchain = "0.2.11"
 langchain-community = "0.2.10"
 langchain-openai = "0.1.19"
+langsmith = ">=0.1.0,<0.2.0"
 nltk = "3.8.1"
 openai = "1.37.1"
 python-dotenv = "1.0.0"
@@ -1765,25 +1766,6 @@ files = [
 ]
 
 [[package]]
-name = "replicate"
-version = "0.11.0"
-description = "Python client for Replicate"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "replicate-0.11.0-py3-none-any.whl", hash = "sha256:fbb8815068864dc822cd4fa7b6103d6f4089d6ef122abd6c3441ca0f0f110c46"},
-    {file = "replicate-0.11.0.tar.gz", hash = "sha256:4d54b5838c1552a6f76cc37c3af8d9a7998105382082d672acad31636ad443b5"},
-]
-
-[package.dependencies]
-packaging = "*"
-pydantic = ">1"
-requests = ">2"
-
-[package.extras]
-dev = ["black", "mypy", "pytest", "responses", "ruff"]
-
-[[package]]
 name = "requests"
 version = "2.32.3"
 description = "Python HTTP for Humans."
@@ -2369,4 +2351,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "4d5b2fb3d7d759fa884f4a118d3d099d897d4c674f1d5c69d94461d5c57670c6"
+content-hash = "c7054e678876fb7e978fab368eca297d27da931cd56eb8dfc07af4114f960613"
