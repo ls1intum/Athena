@@ -5,36 +5,25 @@ import { twMerge } from "tailwind-merge";
 import ExerciseSelect from "@/components/selectors/exercise_select";
 import MetricsForm from "@/components/view_mode/evaluation_mode/expert_evaluation/metrics_form";
 import {Exercise} from "@/model/exercise";
+import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
+import {Metric} from "@/model/metric";
 
-export type EvaluationConfig = {
-  id: string;
-  name: string;
-  metrics: Metric[];
-  exercises: Exercise[];
-};
-
-export type EvaluationConfigExport = {
-  type: "evaluation_config";
-  id: string;
-  name: string;
-  metrics: Metric[];
-  exercises: Exercise[];
-};
 
 type DefineEvaluationProps = {
-  evaluationConfig: EvaluationConfig | undefined;
-  onChangeEvaluationConfig: (evaluationConfig: EvaluationConfig | undefined) => void;
+  expertEvaluationConfig: ExpertEvaluationConfig | undefined;
+  onChangeExpertEvaluationConfig: (expertEvaluationConfig: ExpertEvaluationConfig | undefined) => void;
 };
 
 export default function EvaluationManagement({
-  evaluationConfig,
-  onChangeEvaluationConfig,
+  expertEvaluationConfig,
+  onChangeExpertEvaluationConfig,
 }: DefineEvaluationProps) {
-  const [evaluationConfigs, setEvaluationConfigs] = useState<EvaluationConfig[]>([]);
+  const [expertEvaluationConfigs, setExpertEvaluationConfigs] = useState<ExpertEvaluationConfig[]>([]);
   const [selectedConfigId, setSelectedConfigId] = useState<string>("new");
   const [name, setName] = useState<string>("");
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [expertIds, setExpertIds] = useState<string[]>([]);
   const [isImporting, setIsImporting] = useState<boolean>(false);
 
   // Synchronize with selected evaluation config
@@ -44,41 +33,45 @@ export default function EvaluationManagement({
       setMetrics([]);
       setExercises([]);
     } else {
-      const selectedConfig = evaluationConfigs.find((config) => config.id === selectedConfigId);
+      const selectedConfig = expertEvaluationConfigs.find((config) => config.id === selectedConfigId);
       if (selectedConfig) {
         setName(selectedConfig.name);
         setMetrics(selectedConfig.metrics);
         setExercises(selectedConfig.exercises);
       }
     }
-  }, [selectedConfigId, evaluationConfigs]);
+  }, [selectedConfigId, expertEvaluationConfigs]);
 
   // Get the currently selected evaluation config
-  const getSelectedConfig = (): EvaluationConfig => {
+  const getSelectedConfig = (): ExpertEvaluationConfig => {
     if (selectedConfigId === "new") {
       return {
+        type: "evaluation_config",
         id: uuidv4(),
         name,
         metrics,
         exercises,
+        expertIds: [],
       };
     } else {
       return (
-        evaluationConfigs.find((config) => config.id === selectedConfigId) || {
+        expertEvaluationConfigs.find((config) => config.id === selectedConfigId) || {
+          type: "evaluation_config",
           id: uuidv4(),
           name: "",
           metrics: [],
           exercises: [],
+          expertIds: [],
         }
       );
     }
   };
 
-  const definedEvaluationConfig = getSelectedConfig();
+  const definedExpertEvaluationConfig = getSelectedConfig();
 
   // Add or update the current evaluation config
-  const saveEvaluationConfig = (newConfig: EvaluationConfig) => {
-    setEvaluationConfigs((prevConfigs) => {
+  const saveExpertEvaluationConfig = (newConfig: ExpertEvaluationConfig) => {
+    setExpertEvaluationConfigs((prevConfigs) => {
       const existingIndex = prevConfigs.findIndex((config) => config.id === newConfig.id);
       if (existingIndex !== -1) {
         const updatedConfigs = [...prevConfigs];
@@ -93,7 +86,7 @@ export default function EvaluationManagement({
 
   // Export evaluation config
   const handleExport = () => {
-    const configToExport = definedEvaluationConfig;
+    const configToExport = definedExpertEvaluationConfig;
     if (!configToExport) return;
     downloadJSONFile(`evaluation_config_${configToExport.name}_${configToExport.id}`, {
       type: "evaluation_config",
@@ -106,14 +99,13 @@ export default function EvaluationManagement({
 
   // Import evaluation config
   const handleImport = async (fileContent: string) => {
-    const importedConfig = JSON.parse(fileContent) as EvaluationConfigExport;
-    const { type, id, name, metrics, exercises } = importedConfig;
-    if (type !== "evaluation_config") {
+    const importedConfig = JSON.parse(fileContent) as ExpertEvaluationConfig;
+    if (importedConfig.type !== "evaluation_config") {
       alert("Invalid config type");
       return;
     }
 
-    saveEvaluationConfig({ id, name, metrics, exercises });
+    saveExpertEvaluationConfig(importedConfig);
   };
 
   return (
@@ -122,7 +114,7 @@ export default function EvaluationManagement({
         <h3 className="text-2xl font-bold">Manage Evaluations</h3>
         <div className="flex flex-row">
           <button
-            disabled={!definedEvaluationConfig}
+            disabled={!definedExpertEvaluationConfig}
             className="rounded-md p-2 text-primary-500 hover:text-primary-600 hover:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
             onClick={handleExport}
           >
@@ -161,7 +153,7 @@ export default function EvaluationManagement({
           onChange={(e) => setSelectedConfigId(e.target.value)}
         >
           <option value="new">New Evaluation</option>
-          {evaluationConfigs.map((config) => (
+          {expertEvaluationConfigs.map((config) => (
             <option key={config.id} value={config.id}>
               {config.name}
             </option>
@@ -198,7 +190,7 @@ export default function EvaluationManagement({
             exerciseType="text"
             onChange={(newExercises) => {
               setExercises(newExercises);
-              saveEvaluationConfig({ ...definedEvaluationConfig, exercises: newExercises });
+              saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, exercises: newExercises });
             }}
             multiple={true}
           />
@@ -206,7 +198,7 @@ export default function EvaluationManagement({
             metrics={metrics}
             setMetrics={(newMetrics) => {
               setMetrics(newMetrics);
-              saveEvaluationConfig({ ...definedEvaluationConfig, metrics: newMetrics });
+              saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, metrics: newMetrics });
             }}
           />
         </>
@@ -216,11 +208,11 @@ export default function EvaluationManagement({
         <button
           className={twMerge(
             "bg-primary-500 text-white rounded-md p-2 mt-2 hover:bg-primary-600",
-            !definedEvaluationConfig ? "disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed" : ""
+            !definedExpertEvaluationConfig ? "disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed" : ""
           )}
           onClick={() => {
-            if (definedEvaluationConfig) {
-              saveEvaluationConfig(definedEvaluationConfig);
+            if (definedExpertEvaluationConfig) {
+              saveExpertEvaluationConfig(definedExpertEvaluationConfig);
             }
           }}
         >
@@ -231,7 +223,7 @@ export default function EvaluationManagement({
             className="bg-red-500 text-white rounded-md p-2 mt-2 hover:bg-red-600"
             onClick={() => {
               if (confirm("Cancel evaluation?")) {
-                setEvaluationConfigs((prevConfigs) =>
+                setExpertEvaluationConfigs((prevConfigs) =>
                   prevConfigs.filter((config) => config.id !== selectedConfigId)
                 );
                 setSelectedConfigId("new");

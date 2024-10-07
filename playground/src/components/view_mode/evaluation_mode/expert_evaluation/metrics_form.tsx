@@ -3,12 +3,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faPlus, faSave, faTrash} from "@fortawesome/free-solid-svg-icons";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from "rehype-raw";
+import {Metric} from "@/model/metric";
 
-type Metric = {
-  title: string;
-  summary: string;
-  description: string;
-};
 
 type MetricsFormProps = {
   metrics: Metric[];
