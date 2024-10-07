@@ -78,5 +78,6 @@ services:
     build: modules/modeling/module_modeling_llm
     depends_on:
       - athena
+      - llm_core
     ports:
       - "5008:5008"
