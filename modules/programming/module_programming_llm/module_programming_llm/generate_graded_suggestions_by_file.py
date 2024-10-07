@@ -13,7 +13,7 @@ from module_programming_llm.split_grading_instructions_by_file import (
 from module_programming_llm.split_problem_statement_by_file import (
     split_problem_statement_by_file,
 )
-from module_programming_llm.helpers.llm_utils import (
+from llm_core.utils.llm_utils import (
     check_prompt_length_and_omit_features_if_necessary,
     get_chat_prompt_with_formatting_instructions,
     num_tokens_from_string,

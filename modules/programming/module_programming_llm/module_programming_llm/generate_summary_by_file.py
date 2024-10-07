@@ -9,7 +9,7 @@ from athena import emit_meta
 from athena.programming import Exercise, Submission
 
 from module_programming_llm.config import GradedBasicApproachConfig, BasicApproachConfig
-from module_programming_llm.helpers.llm_utils import (
+from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
     num_tokens_from_prompt,
     predict_and_parse,

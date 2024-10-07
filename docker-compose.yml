@@ -37,6 +37,7 @@ services:
     build: modules/programming/module_programming_llm
     depends_on:
       - athena
+      - llm_core
     ports:
       - "5002:5002"
 
