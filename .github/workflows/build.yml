@@ -59,7 +59,7 @@ jobs:
       - name: Build llm_core image
         id: set-image-core_llm
         run: |
-          cd llm_core
+          cd modules/llm_core
           docker build -t llm_core .
           cd ..
 
