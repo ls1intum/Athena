@@ -23,7 +23,7 @@ export default function EvaluationConfigSelector({
         <option value="new">New Evaluation</option>
         {expertEvaluationConfigs.map((config) => (
           <option key={config.id} value={config.id}>
-            {config.name}
+            {config.name}: {config.creationDate?.toString() ?? ""}
           </option>
         ))}
       </select>

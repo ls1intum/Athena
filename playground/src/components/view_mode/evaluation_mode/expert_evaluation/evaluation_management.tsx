@@ -17,6 +17,7 @@ export default function EvaluationManagement() {
   const [expertEvaluationConfigs, setExpertEvaluationConfigs] = useState<ExpertEvaluationConfig[]>([]);
   const [selectedConfigId, setSelectedConfigId] = useState<string>("new");
   const [name, setName] = useState<string>("");
+  const [creationDate, setCreationDate] = useState<Date | undefined>(undefined);
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [expertIds, setExpertIds] = useState<string[]>([]);
@@ -24,12 +25,14 @@ export default function EvaluationManagement() {
   useEffect(() => {
     if (selectedConfigId === "new") {
       setName("");
+      setCreationDate(new Date());
       setMetrics([]);
       setExercises([]);
     } else {
       const selectedConfig = expertEvaluationConfigs.find((config) => config.id === selectedConfigId);
       if (selectedConfig) {
         setName(selectedConfig.name);
+        setCreationDate(selectedConfig.creationDate);
         setMetrics(selectedConfig.metrics);
         setExercises(selectedConfig.exercises);
       }
@@ -39,10 +42,12 @@ export default function EvaluationManagement() {
   const getSelectedConfig = (): ExpertEvaluationConfig => {
     if (selectedConfigId === "new") {
       return {
-        type: "evaluation_config", id: uuidv4(), name, metrics, exercises, expertIds: [],
+        creationDate: creationDate || new Date(),
+        type: "evaluation_config", id: uuidv4(), name, metrics, exercises, expertIds: []
       };
     } else {
       return (expertEvaluationConfigs.find((config) => config.id === selectedConfigId) || {
+        creationDate: new Date(),
         type: "evaluation_config", id: uuidv4(), name: "", metrics: [], exercises: [], expertIds: [],
       });
     }

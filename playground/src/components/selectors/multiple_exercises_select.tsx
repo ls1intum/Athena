@@ -14,7 +14,7 @@ export default function MultipleExercisesSelect({
   exerciseType,
   disabled,
 }: ExpertEvaluationExerciseSelectProps) {
-  const { data, error, isLoading } = useExercises();
+  const { data, error, isLoading } = useExercises({ eager: true });
 
   if (error) {
     return <div className="text-red-500 text-sm">Failed to load exercises</div>;
