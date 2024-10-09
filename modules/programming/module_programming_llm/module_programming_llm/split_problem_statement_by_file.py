@@ -12,8 +12,9 @@ from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
     num_tokens_from_string,
     num_tokens_from_prompt,
-    predict_and_parse
 )
+from llm_core.utils.predict_and_parse import predict_and_parse
+
 from module_programming_llm.helpers.utils import get_diff
 
 
