@@ -66,17 +66,15 @@ const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise, 
         return <div>Loading...</div>; // Show a loading state until the data is fetched
     }
 
-    const shuffledFeedbacks = Object.entries(feedback).sort(() => Math.random() - 0.5);
-
     return (
         <div className="overflow-x-auto">
             <div className="flex min-w-[480px] space-x-6">
-                {shuffledFeedbacks.map(([feedbackType, feedbackList]) => (
+                {Object.entries(feedback).map(([feedbackType, feedbackList]) => (
                     <div key={feedbackType} className="flex-1 min-w-[480px] flex flex-col">
                         {/* Render TextSubmissionDetail */}
                         <div className="flex-grow flex flex-col mb-6">
                             <TextSubmissionDetail
-                                identifier={`id-${submission.id}`}
+                                identifier={`id-${submission.id}-${feedbackType}`}
                                 key={submission.id}
                                 submission={submission}
                                 feedbacks={feedbackList}

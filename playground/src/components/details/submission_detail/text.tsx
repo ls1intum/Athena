@@ -43,6 +43,7 @@ export default function TextSubmissionDetail({
           manualRatings={manualRatings}
           onManualRatingsChange={onManualRatingsChange}
           createNewFeedback={() => createNewFeedback(submission)}
+          hideFeedbackDetails={hideFeedbackDetails}
         />
       </div>
       {((unreferencedFeedbacks && unreferencedFeedbacks.length > 0) ||
