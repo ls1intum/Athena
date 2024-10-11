@@ -1,7 +1,6 @@
 from typing import Type, TypeVar, List
 from pydantic import BaseModel
 import tiktoken
-from langchain.chat_models import ChatOpenAI
 from langchain.base_language import BaseLanguageModel
 from langchain.prompts import (
     ChatPromptTemplate,
