@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Popup from "@/components/expert_evaluation/expert_view/popup";
+import {Metric} from "@/model/metric";
 
 type SideBySideHeaderProps = {
     exercise: any;
     globalSubmissionIndex: number;
     totalSubmissions: number;
+    metrics: Metric[];
     onNext: () => void;
     onPrevious: () => void;
 }
@@ -13,6 +15,7 @@ export default function SideBySideHeader({
     exercise,
     globalSubmissionIndex,
     totalSubmissions,
+    metrics,
     onNext,
     onPrevious,
 }: SideBySideHeaderProps) {
@@ -53,9 +56,9 @@ export default function SideBySideHeader({
                             📄 Exercise Details
                         </button>
                         <Popup isOpen={isExerciseDetailOpen} onClose={closeExerciseDetail} title="Exercise Details">
-                            <p><b>Exercise Problem Statement</b></p>
+                            <h3 className="font-semibold">{"Exercise Problem Statement"}</h3>
                             <p>{exercise.problem_statement}</p>
-                            <p><b>Sample Solution</b></p>
+                            <h3 className="font-semibold">{"Sample Solution"}</h3>
                             <p>{exercise.example_solution}</p>
                         </Popup>
 
@@ -63,7 +66,12 @@ export default function SideBySideHeader({
                             📊 Metric Details
                         </button>
                         <Popup isOpen={isMetricDetailOpen} onClose={closeMetricDetail} title="Metric Details">
-                            TODO add metrics description
+                            {metrics.map((metric, index) => (
+                                <div key={index} className="mb-4">
+                                    <h3 className="font-semibold">{metric.title}</h3>
+                                    <p>{metric.description}</p>
+                                </div>
+                            ))}
                         </Popup>
 
                         <button className={buttonSecondary} onClick={openEvaluationTutorial}>

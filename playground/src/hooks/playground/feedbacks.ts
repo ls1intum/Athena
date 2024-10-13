@@ -45,11 +45,9 @@ export async function fetchCategorizedFeedbacks(
         Object.keys(feedbacks).forEach((category) => {
             filteredFeedbacks[category] = feedbacks[category]
                 .filter((feedback) => {
-                    // Filter based on submission_id, if submission is provided
                     return submission ? feedback.submission_id === submission.id : true;
                 })
                 .map((feedback) => {
-                    // Process structured grading instruction
                     if (feedback.structured_grading_instruction_id) {
                         feedback.structured_grading_instruction = exercise?.grading_criteria
                             ?.flatMap((criteria) => criteria.structured_grading_instructions)

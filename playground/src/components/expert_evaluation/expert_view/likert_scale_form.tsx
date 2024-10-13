@@ -4,8 +4,9 @@ import TextSubmissionDetail from "@/components/details/submission_detail/text";
 import type {TextSubmission} from "@/model/submission";
 import {CategorizedFeedback} from "@/model/feedback";
 import {Exercise} from "@/model/exercise";
+import {Metric} from "@/model/metric";
 
-// Define the metric data
+/*// Define the metric data
 const metrics = [
     {
         title: '✅ Correctness',
@@ -51,16 +52,17 @@ const metrics = [
 **bad**: The feedback misses important aspects or includes too much irrelevant content.
     `
 },
-];
+];*/
 
 interface LikertScaleFormProps {
     submission: TextSubmission;
     exercise: Exercise;
     feedback: CategorizedFeedback;
+    metrics: Metric[];
 }
 
 
-const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise, feedback}) => {
+const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise, feedback, metrics}) => {
 
     if (!exercise || !submission) {
         return <div>Loading...</div>; // Show a loading state until the data is fetched

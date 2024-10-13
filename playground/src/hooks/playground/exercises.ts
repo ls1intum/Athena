@@ -16,6 +16,14 @@ export async function fetchExercisesEager(dataMode: DataMode) {
   return await response.json() as Promise<Exercise[]>;
 }
 
+export async function fetchExpertEvaluationExercisesEager(
+    expertEvaluationId: string,
+    dataMode: DataMode) {
+
+  const response = await fetch(`${baseUrl}/api/data/${dataMode}/expert_evaluation/${expertEvaluationId}/exercises`);
+  return await response.json() as Promise<Exercise[]>;
+}
+
 /**
  * Fetches the exercises of the playground.
  * 
