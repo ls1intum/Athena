@@ -8,6 +8,7 @@ import fs from "fs";
 
 import baseUrl from "@/helpers/base_url";
 import {Metric} from "@/model/metric";
+import {ExpertEvaluationProgress} from "@/model/expert_evaluation_progress";
 
 /**
  * Splits the given data mode into its parts.
@@ -184,16 +185,16 @@ function getEvaluationConfigJSON(
     expertEvaluationId: string,
 ): any {
 
-    const metricPath = path.join(
+    const configPath = path.join(
         process.cwd(),
         "data",
         ...getDataModeParts(dataMode),
         `evaluation_${expertEvaluationId}`,
-        `evaluation_config_${expertEvaluationId}.json` //TODO change
+        `evaluation_config_${expertEvaluationId}.json`
     );
 
-    if (fs.existsSync(metricPath)) {
-        return JSON.parse(fs.readFileSync(metricPath, "utf8"));
+    if (fs.existsSync(configPath)) {
+        return JSON.parse(fs.readFileSync(configPath, "utf8"));
     }
     throw new Error(`Evaluation Config ${expertEvaluationId} not found`);
 }
@@ -230,21 +231,22 @@ function jsonToExercise(json: any): Exercise {
   return exercise;
 }
 
+//TODO shuffle when exporting
 function jsonToExerciseAndShuffleSubmissionsAndFeedback(json: any, addStructuredGrading: boolean = false): Exercise {
     let exercise = json as Exercise;
 
     const submissions = exercise.submissions;
     if (submissions) {
         // Shuffle submissions
-        exercise.submissions = submissions.sort(() => Math.random() - 0.5);
+        //exercise.submissions = submissions.sort(() => Math.random() - 0.5);
 
         for (const submission of submissions) {
             const feedback = submission.feedbacks;
 
             if (feedback) {
                 // Shuffle the feedback categories
-                const shuffledFeedbackEntries = Object.entries(feedback).sort(() => Math.random() - 0.5);
-                submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);
+                //const shuffledFeedbackEntries = Object.entries(feedback).sort(() => Math.random() - 0.5);
+                //submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);
 
                 if (addStructuredGrading) {
                     const processedFeedbacks: CategorizedFeedback = {};
@@ -395,4 +397,51 @@ export function getMetrics(
     return jsonToMetrics(getEvaluationConfigJSON(dataMode, expertEvaluationId));
 }
 
+export function saveProgressToFileSync(
+    dataMode: DataMode,
+    expertEvaluationId: string,
+    expertEvaluationProgress: ExpertEvaluationProgress
+) {
+    const progressData = JSON.stringify(expertEvaluationProgress, null, 2);
+
+    const progressPath = path.join(
+        process.cwd(),
+        "data",
+        ...getDataModeParts(dataMode),
+        `evaluation_${expertEvaluationId}`,
+        `evaluation_progress_${expertEvaluationId}.json` //TODO to expert ID
+    );
+
+    return fs.writeFileSync(progressPath, progressData, 'utf8');
+}
+
+export function getProgressFromFileSync(
+    dataMode: DataMode,
+    expertEvaluationId: string
+): ExpertEvaluationProgress {
+
+    const progressPath = path.join(
+        process.cwd(),
+        "data",
+        ...getDataModeParts(dataMode),
+        `evaluation_${expertEvaluationId}`,
+        `evaluation_progress_${expertEvaluationId}.json` //TODO to expert ID
+    );
+
+    if (fs.existsSync(progressPath)) {
+        return JSON.parse(fs.readFileSync(progressPath, "utf8"));
+    } else {
+
+        const progress: ExpertEvaluationProgress = {
+            current_submission_index: 0,
+            current_exercise_index: 0,
+            selected_values: {},
+        };
+        const progressData = JSON.stringify(progress, null, 2);
+
+        fs.writeFileSync(progressPath, progressData, 'utf8');
+        return progress;
+    }
+
+}
 

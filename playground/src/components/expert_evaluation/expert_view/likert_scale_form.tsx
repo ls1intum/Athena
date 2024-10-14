@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import SingleChoiceLikertScale from "@/components/expert_evaluation/expert_view/likert_scale";
 import TextSubmissionDetail from "@/components/details/submission_detail/text";
 import type {TextSubmission} from "@/model/submission";
@@ -6,67 +6,35 @@ import {CategorizedFeedback} from "@/model/feedback";
 import {Exercise} from "@/model/exercise";
 import {Metric} from "@/model/metric";
 
-/*// Define the metric data
-const metrics = [
-    {
-        title: '✅ Correctness',
-        summary: 'Is the feedback free of content errors?',
-        description: `
-**good**: The feedback accurately reflects the submission, solution, and criteria, with no errors.
-
-**mid**: The feedback is mostly accurate but includes minor errors that don’t impact the overall evaluation.
-
-**bad**: The feedback contains major errors that misrepresent the submission or solution, likely causing confusion
-        `
-    },
-    {
-        title: '🎯 Actionability',
-        summary: 'Can students realistically act on this feedback?',
-        description: `
-**good**: The feedback is respectful and constructive, recognizing both strengths and areas for improvement.
-
-**mid**: The feedback is professional but mainly corrective, with little positive reinforcement.
-
-**bad**: The feedback is overly critical or dismissive, using unprofessional or disrespectful language.
-        `
-    },
-    {
-        title: '💬 Tone',
-        summary: 'Is the feedback respectful and constructive?',
-        description: `
-**good**: The feedback is respectful and constructive, recognizing both strengths and areas for improvement.
-
-**mid**: The feedback is professional but mainly corrective, with little positive reinforcement.
-
-**bad**: The feedback is overly critical or dismissive, using unprofessional or disrespectful language.
-        `
-    },
-{
-    title: '🔍 Completeness',
-    summary: 'Does the feedback cover all relevant aspects without unnecessary information?',
-    description: `
-**good**: The feedback addresses all key aspects and avoids irrelevant details.
-
-**mid**: The feedback covers most important points but may miss minor details or include some irrelevant information.
-
-**bad**: The feedback misses important aspects or includes too much irrelevant content.
-    `
-},
-];*/
-
 interface LikertScaleFormProps {
     submission: TextSubmission;
     exercise: Exercise;
     feedback: CategorizedFeedback;
     metrics: Metric[];
+    selectedValues: { // Selected values for each exercise, submission, and feedback type
+    [exerciseId: string]: { //TODO define somewhere
+      [submissionId: string]: {
+        [feedbackType: string]: {
+          [metricTitle: string]: number; // The Likert scale value for each metric
+        };
+      };
+    };
+  };
+    onLikertValueChange: (feedbackType: string, metricTitle: string, value: number) => void;
 }
 
 
-const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise, feedback, metrics}) => {
+const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise, feedback, metrics,selectedValues, onLikertValueChange}) => {
+const [resetState, setResetState] = useState<boolean>(false);
+        useEffect(() => {
+            setResetState(!resetState);
+  }, [submission, exercise]); // Trigger when submission or exercise changes
+
 
     if (!exercise || !submission) {
         return <div>Loading...</div>; // Show a loading state until the data is fetched
     }
+
 
     return (
         <div className="overflow-x-auto">
@@ -87,15 +55,22 @@ const LikertScaleForm: React.FC<LikertScaleFormProps> = ({submission, exercise, 
 
                         {/* Render SingleChoiceLikertScale components */}
                         <div className="flex flex-col mt-auto">
-                            {metrics.map((metric, index) => (
-                                <div key={index} className="mb-4">
-                                    <SingleChoiceLikertScale
-                                        title={metric.title}
-                                        summary={metric.summary}
-                                        description={metric.description}
-                                    />
-                                </div>
-                            ))}
+                            {metrics.map((metric, index) => {
+                                const selectedValue =
+                                    selectedValues?.[exercise.id]?.[submission.id]?.[feedbackType]?.[metric.title] ?? null;
+                                return (
+                                    <div key={index} className="mb-4">
+                                        <SingleChoiceLikertScale
+                                            title={metric.title}
+                                            summary={metric.summary}
+                                            description={metric.description}
+                                            passedValue={selectedValue}
+                                            onLikertChange={(value: number) => onLikertValueChange(feedbackType, metric.title, value)}
+                                            resetState={resetState}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 ))}

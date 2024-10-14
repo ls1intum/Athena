@@ -6,6 +6,11 @@ import {Exercise} from "@/model/exercise";
 import {TextSubmission} from "@/model/submission";
 import {fetchMetrics} from "@/hooks/playground/metrics";
 import {Metric} from "@/model/metric";
+import {
+    fetchExpertEvaluationProgress,
+    saveExpertEvaluationProgress
+} from "@/hooks/playground/expert_evaluation_progress";
+import {ExpertEvaluationProgress} from "@/model/expert_evaluation_progress";
 
 function SideBySideExpertView() {
     const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -14,19 +19,53 @@ function SideBySideExpertView() {
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState<number>(0);
     const [metrics, setMetrics] = useState<Metric[]>([]);
 
+    const [selectedValues, setSelectedValues] = useState<ExpertEvaluationProgress['selected_values']>({});
+
+    const handleLikertValueChange = (feedbackType: string, metricTitle: string, value: number) => {
+        const exerciseId = currentExercise.id.toString(); // Get current exercise ID
+        let submissionId = "";
+        if (currentExercise.submissions) {
+            submissionId = currentExercise.submissions[currentSubmissionIndex].id.toString();
+        }
+
+  setSelectedValues((prevValues) => ({
+    ...prevValues, // Preserve existing values for all exercises
+    [exerciseId]: {
+      ...prevValues[exerciseId], // Preserve existing values for this exercise
+      [submissionId]: {
+        ...prevValues[exerciseId]?.[submissionId], // Preserve existing values for this submission
+        [feedbackType]: {
+          ...prevValues[exerciseId]?.[submissionId]?.[feedbackType], // Preserve existing values for this feedback type
+          [metricTitle]: value // Update the value for this specific metric
+        }
+      }
+    }
+  }));
+};
+
     const expertEvaluationId = "23ccfc06-92bb-47de-a221-1c18b1d716cf"; //TODO hardcoded for now
+    const dataMode = "expert_evaluation";
+    const expertId = 1
 
     useEffect(() => {
             const fetchData = async () => {
-                        try {
-                            const exercises = await fetchExpertEvaluationExercisesEager(expertEvaluationId, "expert_evaluation");
-                            setExercises(exercises);
-                            const metrics = await fetchMetrics(expertEvaluationId, "expert_evaluation");
-                            setMetrics(metrics);
-                        } catch
-                            (error) {
-                            console.error('Error loading exercises: ', error);
-                        }
+                    try {
+                        const exercises = await fetchExpertEvaluationExercisesEager(dataMode, expertEvaluationId);
+                        setExercises(exercises);
+                        const metrics = await fetchMetrics(dataMode, expertEvaluationId);
+                        setMetrics(metrics);
+                    } catch
+                        (error) {
+                        console.error('Error loading exercises: ', error);
+                    }
+                    try {
+                        let progress = await fetchExpertEvaluationProgress(dataMode, expertEvaluationId, expertId);
+                        setCurrentSubmissionIndex(progress.current_submission_index);
+                        setCurrentExerciseIndex(progress.current_exercise_index);
+                        setSelectedValues(progress.selected_values);
+                    } catch (error) {
+                        console.error('Error loading progress: ', error);
+                    }
                 }
             ;
             fetchData();
@@ -58,11 +97,15 @@ function SideBySideExpertView() {
             setCurrentExerciseIndex((prevIndex) => prevIndex + 1);
             setCurrentSubmissionIndex(0);
         }
-
-        //TODO save state on next
     };
 
-    const handlePrevious = () => { //TODO save on prev
+    useEffect(() => {
+        if (currentSubmissionIndex > 0) {
+            saveProgress();
+        }
+    }, [currentSubmissionIndex]);
+
+    const handlePrevious = () => {
         // If we are not at the first submission, just decrement the submission index
         if (currentSubmissionIndex > 0) {
             setCurrentSubmissionIndex((prevIndex) => prevIndex - 1);
@@ -76,6 +119,16 @@ function SideBySideExpertView() {
         }
     };
 
+    const saveProgress = () => {
+        const progress: ExpertEvaluationProgress = {
+            current_submission_index: currentSubmissionIndex,
+            current_exercise_index: currentExerciseIndex,
+            selected_values: selectedValues,
+        };
+
+        //setSelectedValues({});
+        saveExpertEvaluationProgress(dataMode, expertEvaluationId, progress);
+    }
 
     const currentExercise = exercises[currentExerciseIndex];
     const currentSubmission = currentExercise?.submissions?.[currentSubmissionIndex];
@@ -96,7 +149,9 @@ function SideBySideExpertView() {
                 <LikertScaleForm submission={currentSubmission as TextSubmission}
                                  exercise={currentExercise}
                                  feedback={currentSubmission.feedbacks}
-                                 metrics={metrics}/>
+                                 metrics={metrics}
+                                 selectedValues={selectedValues}
+                                 onLikertValueChange={handleLikertValueChange}/>
             </div>
         );
     } else {
