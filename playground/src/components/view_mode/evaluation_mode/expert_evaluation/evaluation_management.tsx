@@ -11,6 +11,7 @@ import EvaluationConfigSelector from "@/components/selectors/evaluation_config_s
 import {
   EvaluationManagementExportImport
 } from "@/components/view_mode/evaluation_mode/expert_evaluation/evaluation_management_export_import";
+import ExpertLinks from "@/components/view_mode/evaluation_mode/expert_evaluation/expert_links";
 
 
 export default function EvaluationManagement() {
@@ -25,19 +26,23 @@ export default function EvaluationManagement() {
 
   useEffect(() => {
     if (selectedConfigId === "new") {
+      setSelectedConfigId(uuidv4())
       setName("");
       setStarted(false);
       setCreationDate(new Date());
       setMetrics([]);
       setExercises([]);
+      setExpertIds([]);
     } else {
       const selectedConfig = expertEvaluationConfigs.find((config) => config.id === selectedConfigId);
       if (selectedConfig) {
+        setSelectedConfigId(selectedConfig.id);
         setName(selectedConfig.name);
         setStarted(selectedConfig.started);
         setCreationDate(selectedConfig.creationDate);
         setMetrics(selectedConfig.metrics);
         setExercises(selectedConfig.exercises);
+        setExpertIds(selectedConfig.expertIds);
       }
     }
   }, [selectedConfigId, expertEvaluationConfigs]);
@@ -47,13 +52,23 @@ export default function EvaluationManagement() {
       return {
         started: started,
         creationDate: creationDate || new Date(),
-        type: "evaluation_config", id: uuidv4(), name, metrics, exercises, expertIds: []
+        type: "evaluation_config",
+        id: uuidv4(),
+        name,
+        metrics,
+        exercises,
+        expertIds,
       };
     } else {
       return (expertEvaluationConfigs.find((config) => config.id === selectedConfigId) || {
         started: false,
         creationDate: new Date(),
-        type: "evaluation_config", id: uuidv4(), name: "", metrics: [], exercises: [], expertIds: [],
+        type: "evaluation_config",
+        id: uuidv4(),
+        name: "",
+        metrics: [],
+        exercises: [],
+        expertIds: [],
       });
     }
   };
@@ -133,7 +148,7 @@ export default function EvaluationManagement() {
               }
             }
           }}
-          disabled={started} // Disable if the experiment has started
+          disabled={started}
         />
       </label>
 
@@ -148,7 +163,7 @@ export default function EvaluationManagement() {
             }
           }
         }}
-        disabled={started} // Disable if the experiment has started
+        disabled={started}
       />
 
       <MetricsForm
@@ -161,7 +176,20 @@ export default function EvaluationManagement() {
             }
           }
         }}
-        disabled={started} // Disable if the experiment has started
+        disabled={started}
+      />
+
+      <ExpertLinks
+        expertIds={expertIds}
+        setExpertIds={(newExpertIds) => {
+            setExpertIds(newExpertIds);
+            if (selectedConfigId !== "new") {
+              saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, expertIds: newExpertIds });
+            }
+          }
+        }
+        started={started}
+        configId={selectedConfigId}
       />
 
       <div className="flex flex-row gap-2">
