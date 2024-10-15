@@ -11,7 +11,7 @@ type MetricsFormProps = {
   disabled: boolean; // New prop to control whether the form is disabled
 };
 
-export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFormProps) {
+export default function MetricsForm({metrics, setMetrics, disabled}: MetricsFormProps) {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editingMetric, setEditingMetric] = useState<Metric>({
     title: "",
@@ -29,7 +29,7 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     isEditing: boolean = false
   ) => {
-    const { name, value } = e.target;
+    const {name, value} = e.target;
     if (isEditing) {
       setEditingMetric((prevMetric) => ({
         ...prevMetric,
@@ -50,7 +50,7 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
     }
 
     setMetrics([...metrics, newMetric]);
-    setNewMetric({ title: "", summary: "", description: "" }); // Reset form
+    setNewMetric({title: "", summary: "", description: ""}); // Reset form
   };
 
   // Start editing a metric in place
@@ -80,13 +80,15 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
     : "";  // Style for disabled input fields
 
   const buttonDisabledStyle = disabled
-    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+    ? "hidden"
     : "";  // Style for disabled buttons
 
   return (
     <label className="flex flex-col">
       <span className="text-lg font-bold">Metrics</span>
       <div className="flex flex-col gap-4">
+
+        {/* List of Metrics */}
         {metrics.map((metric, index) => (
           <div key={index} className="flex flex-col gap-2 border p-4 rounded-md shadow-sm">
             {editIndex === index ? (
@@ -123,7 +125,7 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
                   className={`bg-green-500 text-white rounded-md p-2 hover:bg-green-600 flex items-center gap-2 ${buttonDisabledStyle}`}
                   disabled={disabled}
                 >
-                  <FontAwesomeIcon icon={faSave} />
+                  <FontAwesomeIcon icon={faSave}/>
                   Save
                 </button>
               </div>
@@ -144,7 +146,7 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
                   placeholder="Metric Summary"
                 />
                 <div className="border border-gray-300 rounded-md p-2 w-full">
-                  <ReactMarkdown rehypePlugins={[rehypeRaw]} className="prose prose-sm max-w-none" >
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]} className="prose prose-sm max-w-none">
                     {metric.description}
                   </ReactMarkdown>
                 </div>
@@ -154,7 +156,7 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
                     className={`bg-gray-500 text-white rounded-md p-2 hover:bg-gray-600 flex items-center gap-2 ${buttonDisabledStyle}`}
                     disabled={disabled}
                   >
-                    <FontAwesomeIcon icon={faEdit} />
+                    <FontAwesomeIcon icon={faEdit}/>
                     Edit
                   </button>
                   <button
@@ -162,7 +164,7 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
                     className={`bg-red-500 text-white rounded-md p-2 hover:bg-red-600 flex items-center gap-2 ${buttonDisabledStyle}`}
                     disabled={disabled}
                   >
-                    <FontAwesomeIcon icon={faTrash} />
+                    <FontAwesomeIcon icon={faTrash}/>
                     Remove
                   </button>
                 </div>
@@ -171,63 +173,65 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
           </div>
         ))}
 
-        <div className="flex flex-col gap-2 border p-4 rounded-md shadow-sm mt-4">
-          <div>
-            <label className="block text-sm">
-              <span className="text-gray-700">Title</span>
-              <input
-                type="text"
-                name="title"
-                value={newMetric.title}
-                onChange={(e) => handleChange(e, false)}
-                className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
-                placeholder="Enter Metric Title"
-                disabled={disabled}
-              />
-            </label>
-          </div>
+        {/* New Metric Form */}
+        {!disabled && (
+          <div className="flex flex-col gap-2 border p-4 rounded-md shadow-sm mt-4">
+            <div>
+              <label className="block text-sm">
+                <span className="text-gray-700">Title</span>
+                <input
+                  type="text"
+                  name="title"
+                  value={newMetric.title}
+                  onChange={(e) => handleChange(e, false)}
+                  className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
+                  placeholder="Enter Metric Title"
+                  disabled={disabled}
+                />
+              </label>
+            </div>
 
-          <div>
-            <label className="block text-sm">
-              <span className="text-gray-700">Summary</span>
-              <input
-                type="text"
-                name="summary"
-                value={newMetric.summary}
-                onChange={(e) => handleChange(e, false)}
-                className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
-                placeholder="Enter Metric Summary"
-                disabled={disabled}
-              />
-            </label>
-          </div>
+            <div>
+              <label className="block text-sm">
+                <span className="text-gray-700">Summary</span>
+                <input
+                  type="text"
+                  name="summary"
+                  value={newMetric.summary}
+                  onChange={(e) => handleChange(e, false)}
+                  className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
+                  placeholder="Enter Metric Summary"
+                />
+              </label>
+            </div>
 
-          <div>
-            <label className="block text-sm">
-              <span className="text-gray-700">Description</span>
-              <textarea
-                name="description"
-                value={newMetric.description}
-                onChange={(e) => handleChange(e, false)}
-                className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
-                rows={3}
-                placeholder="Enter Metric Description"
-                disabled={disabled}
-              />
-            </label>
-          </div>
+            <div>
+              <label className="block text-sm">
+                <span className="text-gray-700">Description</span>
+                <textarea
+                  name="description"
+                  value={newMetric.description}
+                  onChange={(e) => handleChange(e, false)}
+                  className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
+                  rows={3}
+                  placeholder="Enter Metric Description"
+                />
+              </label>
+            </div>
 
-          <div className="flex gap-2">
-            <button
-              onClick={addMetric}
-              className={`bg-green-600 text-white rounded-md p-2 hover:bg-green-700 flex items-center gap-2 ${buttonDisabledStyle}`}
-              disabled={disabled}
-            >
-              <FontAwesomeIcon icon={faPlus}/>
-              Add Metric
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={addMetric}
+                className={`bg-green-600 text-white rounded-md p-2 hover:bg-green-700 flex items-center gap-2 ${buttonDisabledStyle}`}
+              >
+                <FontAwesomeIcon icon={faPlus}/>
+                Add Metric
+              </button>
+            </div>
+
           </div>
-        </div>
+        )}
+
       </div>
     </label>
   );
