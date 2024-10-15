@@ -35,8 +35,8 @@ export default function MultipleExercisesSelect({
   };
 
   return (
-    <label className="flex flex-col">
-      <span className="text-lg font-bold">Exercises</span>
+    <section className="flex flex-col">
+      <span className="text-lg font-bold mb-2">Exercises</span>
       {availableExercises.map((ex) => (
         <label key={ex.id} className="flex items-center gap-2">
           <input
@@ -48,6 +48,6 @@ export default function MultipleExercisesSelect({
           {ex.id} {ex.type}{ex.type === "programming" ? ` (${ex.programming_language})` : ""}: {ex.title}
         </label>
       ))}
-    </label>
+    </section>
   );
 }

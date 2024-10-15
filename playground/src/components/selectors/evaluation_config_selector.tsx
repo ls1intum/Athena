@@ -13,8 +13,8 @@ export default function EvaluationConfigSelector({
   expertEvaluationConfigs,
 }: EvaluationConfigSelectorProps) {
   return (
-    <label className="flex flex-col">
-      <span className="text-lg font-bold">Evaluation</span>
+    <section className="flex flex-col">
+      <span className="text-lg font-bold mb-2">Evaluation</span>
       <select
         className="border border-gray-300 rounded-md p-2"
         value={selectedConfigId}
@@ -27,6 +27,6 @@ export default function EvaluationConfigSelector({
           </option>
         ))}
       </select>
-    </label>
+    </section>
   );
 };

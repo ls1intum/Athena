@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { downloadJSONFile } from "@/helpers/download";
-import { twMerge } from "tailwind-merge";
+import {useEffect, useState} from "react";
+import {v4 as uuidv4} from "uuid";
+import {downloadJSONFile} from "@/helpers/download";
+import {twMerge} from "tailwind-merge";
 import MetricsForm from "@/components/view_mode/evaluation_mode/expert_evaluation/metrics_form";
-import { Exercise } from "@/model/exercise";
-import { ExpertEvaluationConfig } from "@/model/expert_evaluation_config";
-import { Metric } from "@/model/metric";
+import {Exercise} from "@/model/exercise";
+import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
+import {Metric} from "@/model/metric";
 import MultipleExercisesSelect from "@/components/selectors/multiple_exercises_select";
 import EvaluationConfigSelector from "@/components/selectors/evaluation_config_selector";
 import {
@@ -108,7 +108,7 @@ export default function EvaluationManagement() {
   const startEvaluation = () => {
     if (confirm("Are you sure you want to start the evaluation? Once started, no further changes can be made to the configuration!")) {
       setStarted(true);
-      saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, started: true });
+      saveExpertEvaluationConfig({...definedExpertEvaluationConfig, started: true});
     }
   };
 
@@ -117,7 +117,7 @@ export default function EvaluationManagement() {
     : "";  // Style for disabled input fields
 
   return (
-    <div className="bg-white rounded-md p-4 mb-8 space-y-2">
+    <div className="bg-white rounded-md p-4 mb-8 space-y-4">
       <div className="flex flex-row justify-between items-center">
         <h3 className="text-2xl font-bold">Manage Evaluations</h3>
         <EvaluationManagementExportImport
@@ -134,7 +134,7 @@ export default function EvaluationManagement() {
       />
 
       <label className="flex flex-col">
-        <span className="text-lg font-bold">Evaluation Name</span>
+        <span className="text-lg font-bold mb-2">Evaluation Name</span>
         <input
           type="text"
           placeholder="Insert Evaluation Name"
@@ -144,7 +144,7 @@ export default function EvaluationManagement() {
             if (!started) {  // Prevent changes if the experiment has started
               setName(e.target.value);
               if (selectedConfigId !== "new") {
-                saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, name: e.target.value });
+                saveExpertEvaluationConfig({...definedExpertEvaluationConfig, name: e.target.value});
               }
             }
           }}
@@ -159,7 +159,7 @@ export default function EvaluationManagement() {
           if (!started) {  // Prevent changes if the experiment has started
             setExercises(newExercises);
             if (selectedConfigId !== "new") {
-              saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, exercises: newExercises });
+              saveExpertEvaluationConfig({...definedExpertEvaluationConfig, exercises: newExercises});
             }
           }
         }}
@@ -172,7 +172,7 @@ export default function EvaluationManagement() {
           if (!started) {  // Prevent changes if the experiment has started
             setMetrics(newMetrics);
             if (selectedConfigId !== "new") {
-              saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, metrics: newMetrics });
+              saveExpertEvaluationConfig({...definedExpertEvaluationConfig, metrics: newMetrics});
             }
           }
         }}
@@ -182,59 +182,62 @@ export default function EvaluationManagement() {
       <ExpertLinks
         expertIds={expertIds}
         setExpertIds={(newExpertIds) => {
-            setExpertIds(newExpertIds);
-            if (selectedConfigId !== "new") {
-              saveExpertEvaluationConfig({ ...definedExpertEvaluationConfig, expertIds: newExpertIds });
-            }
+          setExpertIds(newExpertIds);
+          if (selectedConfigId !== "new") {
+            saveExpertEvaluationConfig({...definedExpertEvaluationConfig, expertIds: newExpertIds});
           }
+        }
         }
         started={started}
         configId={selectedConfigId}
       />
 
-      <div className="flex flex-row gap-2">
-        <button
-          className={twMerge(
-            "bg-primary-500 text-white rounded-md p-2 mt-2 hover:bg-primary-600",
-            !definedExpertEvaluationConfig || started ?
-              "disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed" : ""
-          )}
-          onClick={() => {
-            if (definedExpertEvaluationConfig) {
-              saveExpertEvaluationConfig(definedExpertEvaluationConfig);
-            }
-          }}
-          disabled={started}  // Disable if the experiment has started
-        >
-          {selectedConfigId === "new" ? "Define Experiment" : "Save Changes"}
-        </button>
 
-        {selectedConfigId !== "new" && !started && (
+      {!started && (
+        <div className="flex flex-row gap-2">
           <button
-            className="bg-red-500 text-white rounded-md p-2 mt-2 hover:bg-red-600"
+            className={twMerge(
+              "bg-primary-500 text-white rounded-md p-2 mt-2 hover:bg-primary-600",
+              !definedExpertEvaluationConfig
+                ? "disabled:text-gray-500 disabled:bg-gray-200 disabled:cursor-not-allowed"
+                : ""
+            )}
             onClick={() => {
-              if (confirm("Cancel evaluation?")) {
-                setExpertEvaluationConfigs((prevConfigs) =>
-                  prevConfigs.filter((config) => config.id !== selectedConfigId)
-                );
-                setSelectedConfigId("new");
+              if (definedExpertEvaluationConfig) {
+                saveExpertEvaluationConfig(definedExpertEvaluationConfig);
               }
             }}
+            disabled={!definedExpertEvaluationConfig}  // Disable if no config is defined
           >
-            Cancel
+            {selectedConfigId === "new" ? "Define Experiment" : "Save Changes"}
           </button>
-        )}
 
-        {!started && (
+          {selectedConfigId !== "new" && (
+            <button
+              className="bg-red-500 text-white rounded-md p-2 mt-2 hover:bg-red-600"
+              onClick={() => {
+                if (confirm("Cancel evaluation?")) {
+                  setExpertEvaluationConfigs((prevConfigs) =>
+                    prevConfigs.filter((config) => config.id !== selectedConfigId)
+                  );
+                  setSelectedConfigId("new");
+                }
+              }}
+            >
+              Cancel
+            </button>
+          )}
+
           <button
             className="bg-green-500 text-white rounded-md p-2 mt-2 hover:bg-green-600 disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed"
             onClick={startEvaluation}
-            disabled={started}
+            disabled={!definedExpertEvaluationConfig}
           >
             Start Evaluation
           </button>
-        )}
-      </div>
+
+        </div>
+      )}
     </div>
   );
 }

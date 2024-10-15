@@ -84,8 +84,8 @@ export default function MetricsForm({metrics, setMetrics, disabled}: MetricsForm
     : "";  // Style for disabled buttons
 
   return (
-    <label className="flex flex-col">
-      <span className="text-lg font-bold">Metrics</span>
+    <section className="flex flex-col">
+      <span className="text-lg font-bold mb-2">Metrics</span>
       <div className="flex flex-col gap-4">
 
         {/* List of Metrics */}
@@ -233,6 +233,6 @@ export default function MetricsForm({metrics, setMetrics, disabled}: MetricsForm
         )}
 
       </div>
-    </label>
+    </section>
   );
 }
