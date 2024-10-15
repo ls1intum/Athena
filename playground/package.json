@@ -14,6 +14,11 @@
   },
   "dependencies": {
     "@blueprintjs/core": "5.5.1",
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-brands-svg-icons": "^6.6.0",
+    "@fortawesome/free-regular-svg-icons": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@ls1intum/apollon": "3.3.5",
     "@monaco-editor/react": "4.6.0",
     "@radix-ui/react-collapsible": "1.0.3",

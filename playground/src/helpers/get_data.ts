@@ -1,12 +1,14 @@
 import type { Exercise } from "@/model/exercise";
 import type { Submission } from "@/model/submission";
-import type { Feedback } from "@/model/feedback";
+import type {CategorizedFeedback, Feedback} from "@/model/feedback";
 import type { DataMode } from "@/model/data_mode";
 
 import path from "path";
 import fs from "fs";
 
 import baseUrl from "@/helpers/base_url";
+import {Metric} from "@/model/metric";
+import {ExpertEvaluationProgress} from "@/model/expert_evaluation_progress";
 
 /**
  * Splits the given data mode into its parts.
@@ -98,15 +100,18 @@ function replaceJsonPlaceholders(
 function addExerciseTypeToSubmissionsAndFeedbacks(json: any): any {
   const exerciseType = json.type;
 
-  json.submissions = json.submissions?.map((submissionJson: any) => {
-    submissionJson.type = exerciseType;
-    submissionJson.feedbacks = submissionJson.feedbacks?.map((feedbackJson: any) => {
-      feedbackJson.type = exerciseType;
-      return feedbackJson;
+    json.submissions = json.submissions?.map((submissionJson: any) => {submissionJson.type = exerciseType;
+
+  if (Array.isArray(submissionJson.feedbacks)) {
+            submissionJson.feedbacks = submissionJson.feedbacks?.map((feedbackJson: any) => {
+                feedbackJson.type = exerciseType;
+                return feedbackJson;
+            });
+        }
+
+        return submissionJson;
     });
-    return submissionJson;
-  });
-  return json;
+    return json;
 }
 
 /**
@@ -175,6 +180,26 @@ function getExerciseJSON(
   throw new Error(`Exercise ${exerciseId} not found`);
 }
 
+function getEvaluationConfigJSON(
+    dataMode: DataMode,
+    expertEvaluationId: string,
+): any {
+
+    const configPath = path.join(
+        process.cwd(),
+        "data",
+        ...getDataModeParts(dataMode),
+        `evaluation_${expertEvaluationId}`,
+        `evaluation_config_${expertEvaluationId}.json`
+    );
+
+    if (fs.existsSync(configPath)) {
+        return JSON.parse(fs.readFileSync(configPath, "utf8"));
+    }
+    throw new Error(`Evaluation Config ${expertEvaluationId} not found`);
+}
+
+
 function getAllExerciseJSON(dataMode: DataMode, athenaOrigin: string): any[] {
   // find in cwd/data/<dataMode> all exercise-*.json
   // or in cwd/data/evaluation/<custom> all exercise-*.json if dataMode is evaluation-<custom>
@@ -206,6 +231,54 @@ function jsonToExercise(json: any): Exercise {
   return exercise;
 }
 
+//TODO shuffle when exporting
+function jsonToExerciseAndShuffleSubmissionsAndFeedback(json: any, addStructuredGrading: boolean = false): Exercise {
+    let exercise = json as Exercise;
+
+    const submissions = exercise.submissions;
+    if (submissions) {
+        // Shuffle submissions //TODO when creating config
+     /*   exercise.submissions = submissions.sort(() => Math.random() - 0.5);*/
+
+        for (const submission of submissions) {
+            const feedback = submission.feedbacks;
+
+            if (feedback) {
+                // Shuffle the feedback categories //TODO when creating config
+               /* const shuffledFeedbackEntries = Object.entries(feedback).sort(() => Math.random() - 0.5);
+                submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);*/
+
+                if (addStructuredGrading) {
+                    const processedFeedbacks: CategorizedFeedback = {};
+
+                    Object.keys(feedback).forEach((category) => {
+                        const categoryFeedback = feedback[category];
+                        if (Array.isArray(categoryFeedback)) {
+                            // Map over feedback and link structured grading instructions
+                            processedFeedbacks[category] = feedback[category].map((feedbackItem) => {
+                                // Link structured grading instructions
+                                if (feedbackItem.structured_grading_instruction_id) {
+                                    feedbackItem.structured_grading_instruction = exercise?.grading_criteria
+                                        ?.flatMap((criteria) => criteria.structured_grading_instructions)
+                                        .find((instruction) => instruction.id === feedbackItem.structured_grading_instruction_id);
+                                }
+                                return feedbackItem;
+                            });
+                        }
+                    });
+                    // Replace submission feedbacks with processed feedbacks
+                    submission.feedbacks = processedFeedbacks;
+
+                }
+            }
+        }
+    }
+
+    return exercise
+
+
+}
+
 function jsonToSubmissions(json: any): Submission[] {
   return json.submissions.map((submissionJson: any) => {
     const submission = submissionJson as Submission;
@@ -235,8 +308,50 @@ function jsonToFeedbacks(json: any): Feedback[] {
   });
 }
 
+function jsonToCategorizedFeedbacks(json: any): CategorizedFeedback {
+    const categorizedFeedback: CategorizedFeedback = {};
+
+    json.submissions.forEach((submissionJson: any) => {
+        // Check if feedbacks exist and are grouped by categories
+        if (submissionJson.feedbacks && typeof submissionJson.feedbacks === 'object') {
+            // Iterate over each feedback category (e.g., Tutor, LLM)
+            Object.keys(submissionJson.feedbacks).forEach((category: string) => {
+                // Ensure the category exists in the categorizedFeedback object
+                if (!categorizedFeedback[category]) {
+                    categorizedFeedback[category] = [];
+                }
+
+                // Iterate over feedbacks in this category and transform them
+                submissionJson.feedbacks[category].forEach((feedbackJson: any) => {
+                    const feedback: Feedback = {
+                        ...feedbackJson,
+                        exercise_id: json.id,
+                        submission_id: submissionJson.id,
+                    };
+
+                    // Add the transformed feedback to the respective category
+                    categorizedFeedback[category].push(feedback);
+                });
+            });
+        }
+    });
+    return categorizedFeedback;
+}
+
+function jsonToMetrics(json: any): Metric [] {
+    return json.metrics;
+}
+
 export function getExercises(dataMode: DataMode, athenaOrigin: string): Exercise[] {
   return getAllExerciseJSON(dataMode, athenaOrigin).map(jsonToExercise);
+}
+
+export function getExercisesEager(dataMode: DataMode, athenaOrigin: string): Exercise[] {
+    return getAllExerciseJSON(dataMode, athenaOrigin).map(json => jsonToExerciseAndShuffleSubmissionsAndFeedback(json));
+}
+
+export function getExpertEvaluationExercisesEager(dataMode: DataMode, expertEvaluationId: string): Exercise[] {
+    return getEvaluationConfigJSON(dataMode, expertEvaluationId).exercises.map((json: any) => jsonToExerciseAndShuffleSubmissionsAndFeedback(json, true))
 }
 
 export function getSubmissions(
@@ -260,3 +375,74 @@ export function getFeedbacks(
   }
   return getAllExerciseJSON(dataMode, athenaOrigin).flatMap(jsonToFeedbacks);
 }
+
+export function getCategorizedFeedbacks(
+  dataMode: DataMode,
+  exerciseId: number | undefined,
+  athenaOrigin: string
+): CategorizedFeedback {
+
+    if (exerciseId !== undefined) {
+        return jsonToCategorizedFeedbacks(getExerciseJSON(dataMode, exerciseId, athenaOrigin));
+    }
+    return {};
+}
+
+export function getMetrics(
+    dataMode: DataMode,
+    expertEvaluationId: string,
+): Metric[] {
+
+    return jsonToMetrics(getEvaluationConfigJSON(dataMode, expertEvaluationId));
+}
+
+export function saveProgressToFileSync(
+    dataMode: DataMode,
+    expertEvaluationId: string,
+    expertId: string,
+    expertEvaluationProgress: ExpertEvaluationProgress
+) {
+    const progressData = JSON.stringify(expertEvaluationProgress, null, 2);
+
+    const progressPath = path.join(
+        process.cwd(),
+        "data",
+        ...getDataModeParts(dataMode),
+        `evaluation_${expertEvaluationId}`,
+        `evaluation_progress_${expertId}.json`
+    );
+
+    return fs.writeFileSync(progressPath, progressData, 'utf8');
+}
+
+export function getProgressFromFileSync(
+    dataMode: DataMode,
+    expertEvaluationId: string,
+    expertId: string
+): ExpertEvaluationProgress {
+
+    const progressPath = path.join(
+        process.cwd(),
+        "data",
+        ...getDataModeParts(dataMode),
+        `evaluation_${expertEvaluationId}`,
+        `evaluation_progress_${expertId}.json`
+    );
+
+    if (fs.existsSync(progressPath)) {
+        return JSON.parse(fs.readFileSync(progressPath, "utf8"));
+    } else {
+        //TODO do not create if it does not exist, should be created for each expert with a link
+        const progress: ExpertEvaluationProgress = {
+            current_submission_index: 0,
+            current_exercise_index: 0,
+            selected_values: {},
+        };
+        const progressData = JSON.stringify(progress, null, 2);
+
+        fs.writeFileSync(progressPath, progressData, 'utf8');
+        return progress;
+    }
+
+}
+
