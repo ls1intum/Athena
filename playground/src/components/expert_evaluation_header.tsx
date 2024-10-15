@@ -5,7 +5,7 @@ function ExpertEvaluation() {
   const router = useRouter();
 
   const handleGoToExpertView = () => {
-    router.push('/expert_view');
+    router.push('/23ccfc06-92bb-47de-a221-1c18b1d716cf/1/expert_view'); //TODO
   };
 
   return (

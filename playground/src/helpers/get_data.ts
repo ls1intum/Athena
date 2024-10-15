@@ -237,16 +237,16 @@ function jsonToExerciseAndShuffleSubmissionsAndFeedback(json: any, addStructured
 
     const submissions = exercise.submissions;
     if (submissions) {
-        // Shuffle submissions
-        //exercise.submissions = submissions.sort(() => Math.random() - 0.5);
+        // Shuffle submissions //TODO when creating config
+     /*   exercise.submissions = submissions.sort(() => Math.random() - 0.5);*/
 
         for (const submission of submissions) {
             const feedback = submission.feedbacks;
 
             if (feedback) {
-                // Shuffle the feedback categories
-                //const shuffledFeedbackEntries = Object.entries(feedback).sort(() => Math.random() - 0.5);
-                //submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);
+                // Shuffle the feedback categories //TODO when creating config
+               /* const shuffledFeedbackEntries = Object.entries(feedback).sort(() => Math.random() - 0.5);
+                submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);*/
 
                 if (addStructuredGrading) {
                     const processedFeedbacks: CategorizedFeedback = {};
@@ -272,7 +272,6 @@ function jsonToExerciseAndShuffleSubmissionsAndFeedback(json: any, addStructured
                 }
             }
         }
-
     }
 
     return exercise
@@ -400,6 +399,7 @@ export function getMetrics(
 export function saveProgressToFileSync(
     dataMode: DataMode,
     expertEvaluationId: string,
+    expertId: string,
     expertEvaluationProgress: ExpertEvaluationProgress
 ) {
     const progressData = JSON.stringify(expertEvaluationProgress, null, 2);
@@ -409,7 +409,7 @@ export function saveProgressToFileSync(
         "data",
         ...getDataModeParts(dataMode),
         `evaluation_${expertEvaluationId}`,
-        `evaluation_progress_${expertEvaluationId}.json` //TODO to expert ID
+        `evaluation_progress_${expertId}.json`
     );
 
     return fs.writeFileSync(progressPath, progressData, 'utf8');
@@ -417,7 +417,8 @@ export function saveProgressToFileSync(
 
 export function getProgressFromFileSync(
     dataMode: DataMode,
-    expertEvaluationId: string
+    expertEvaluationId: string,
+    expertId: string
 ): ExpertEvaluationProgress {
 
     const progressPath = path.join(
@@ -425,13 +426,13 @@ export function getProgressFromFileSync(
         "data",
         ...getDataModeParts(dataMode),
         `evaluation_${expertEvaluationId}`,
-        `evaluation_progress_${expertEvaluationId}.json` //TODO to expert ID
+        `evaluation_progress_${expertId}.json`
     );
 
     if (fs.existsSync(progressPath)) {
         return JSON.parse(fs.readFileSync(progressPath, "utf8"));
     } else {
-
+        //TODO do not create if it does not exist, should be created for each expert with a link
         const progress: ExpertEvaluationProgress = {
             current_submission_index: 0,
             current_exercise_index: 0,
