@@ -11,65 +11,50 @@ import {
     saveExpertEvaluationProgress
 } from "@/hooks/playground/expert_evaluation_progress";
 import {ExpertEvaluationProgress} from "@/model/expert_evaluation_progress";
+import {useRouter} from "next/router";
 
 function SideBySideExpertView() {
+    const router = useRouter();
+    const {expert_evaluation_config_id, expert_id} = router.query as {
+        expert_evaluation_config_id: string;
+        expert_id: string
+    };
+    const dataMode = "expert_evaluation";
+
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [submissionsLength, setSubmissionsLength] = useState<number>(0);
     const [currentSubmissionIndex, setCurrentSubmissionIndex] = useState<number>(0);
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState<number>(0);
     const [metrics, setMetrics] = useState<Metric[]>([]);
-
     const [selectedValues, setSelectedValues] = useState<ExpertEvaluationProgress['selected_values']>({});
-
-    const handleLikertValueChange = (feedbackType: string, metricTitle: string, value: number) => {
-        const exerciseId = currentExercise.id.toString(); // Get current exercise ID
-        let submissionId = "";
-        if (currentExercise.submissions) {
-            submissionId = currentExercise.submissions[currentSubmissionIndex].id.toString();
-        }
-
-  setSelectedValues((prevValues) => ({
-    ...prevValues, // Preserve existing values for all exercises
-    [exerciseId]: {
-      ...prevValues[exerciseId], // Preserve existing values for this exercise
-      [submissionId]: {
-        ...prevValues[exerciseId]?.[submissionId], // Preserve existing values for this submission
-        [feedbackType]: {
-          ...prevValues[exerciseId]?.[submissionId]?.[feedbackType], // Preserve existing values for this feedback type
-          [metricTitle]: value // Update the value for this specific metric
-        }
-      }
-    }
-  }));
-};
-
-    const expertEvaluationId = "23ccfc06-92bb-47de-a221-1c18b1d716cf"; //TODO hardcoded for now
-    const dataMode = "expert_evaluation";
-    const expertId = 1
 
     useEffect(() => {
             const fetchData = async () => {
-                    try {
-                        const exercises = await fetchExpertEvaluationExercisesEager(dataMode, expertEvaluationId);
-                        setExercises(exercises);
-                        const metrics = await fetchMetrics(dataMode, expertEvaluationId);
-                        setMetrics(metrics);
-                    } catch
-                        (error) {
-                        console.error('Error loading exercises: ', error);
-                    }
-                    try {
-                        let progress = await fetchExpertEvaluationProgress(dataMode, expertEvaluationId, expertId);
-                        setCurrentSubmissionIndex(progress.current_submission_index);
-                        setCurrentExerciseIndex(progress.current_exercise_index);
-                        setSelectedValues(progress.selected_values);
-                    } catch (error) {
-                        console.error('Error loading progress: ', error);
+
+                    if (expert_evaluation_config_id && expert_id) {
+                        try {
+                            const exercises = await fetchExpertEvaluationExercisesEager(dataMode, expert_evaluation_config_id);
+                            setExercises(exercises);
+                            const metrics = await fetchMetrics(dataMode, expert_evaluation_config_id);
+                            setMetrics(metrics);
+                        } catch
+                            (error) {
+                            console.error('Error loading exercises and metrics: ', error);
+                        }
+                        try {
+                            let expertEvaluationProgress = await fetchExpertEvaluationProgress(dataMode, expert_evaluation_config_id, expert_id);
+                            setCurrentSubmissionIndex(expertEvaluationProgress.current_submission_index);
+                            setCurrentExerciseIndex(expertEvaluationProgress.current_exercise_index);
+                            setSelectedValues(expertEvaluationProgress.selected_values);
+
+                        } catch (error) {
+                            console.error('Error loading expert evaluation progress: ', error);
+                        }
                     }
                 }
             ;
             fetchData();
-        }, []
+        }, [expert_evaluation_config_id, expert_id]
     );
 
     useEffect(() => {
@@ -84,10 +69,8 @@ function SideBySideExpertView() {
         }
     }, [exercises, metrics]);
 
-
     const handleNext = () => {
         const currentExercise = exercises[currentExerciseIndex];
-
         // If we are at the last submission for the current exercise, go to the next exercise
         if (currentSubmissionIndex < currentExercise.submissions!.length - 1) {
             setCurrentSubmissionIndex((prevIndex) => prevIndex + 1);
@@ -120,19 +103,41 @@ function SideBySideExpertView() {
     };
 
     const saveProgress = () => {
-        const progress: ExpertEvaluationProgress = {
-            current_submission_index: currentSubmissionIndex,
-            current_exercise_index: currentExerciseIndex,
-            selected_values: selectedValues,
-        };
 
-        //setSelectedValues({});
-        saveExpertEvaluationProgress(dataMode, expertEvaluationId, progress);
+        if (expert_evaluation_config_id && expert_id) {
+            const progress: ExpertEvaluationProgress = {
+                current_submission_index: currentSubmissionIndex,
+                current_exercise_index: currentExerciseIndex,
+                selected_values: selectedValues,
+            };
+            saveExpertEvaluationProgress(dataMode, expert_evaluation_config_id, expert_id, progress);
+        }
+    }
+
+    const handleLikertValueChange = (feedbackType: string, metricTitle: string, value: number) => {
+        const exerciseId = currentExercise.id.toString();
+        let submissionId = "";
+        if (currentExercise.submissions) {
+            submissionId = currentExercise.submissions[currentSubmissionIndex].id.toString();
+        }
+
+        setSelectedValues((prevValues) => ({
+            ...prevValues,
+            [exerciseId]: {
+                ...prevValues[exerciseId],
+                [submissionId]: {
+                    ...prevValues[exerciseId]?.[submissionId],
+                    [feedbackType]: {
+                        ...prevValues[exerciseId]?.[submissionId]?.[feedbackType],
+                        [metricTitle]: value
+                    }
+                }
+            }
+        }));
     }
 
     const currentExercise = exercises[currentExerciseIndex];
     const currentSubmission = currentExercise?.submissions?.[currentSubmissionIndex];
-    //TODO
     const globalSubmissionIndex = exercises.slice(0, currentExerciseIndex).reduce((sum, exercise) => sum + exercise.submissions!.length, 0) + currentSubmissionIndex;
 
     if (currentExercise && currentSubmission && currentSubmission.feedbacks) {
