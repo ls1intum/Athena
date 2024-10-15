@@ -3,6 +3,7 @@ import { Metric } from "@/model/metric";
 
 export type ExpertEvaluationConfig = {
   type: "evaluation_config";
+  started: boolean;
   creationDate: Date;
   id: string;
   name: string;

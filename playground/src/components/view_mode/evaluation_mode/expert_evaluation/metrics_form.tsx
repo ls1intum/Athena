@@ -5,13 +5,13 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from "rehype-raw";
 import {Metric} from "@/model/metric";
 
-
 type MetricsFormProps = {
   metrics: Metric[];
   setMetrics: (metrics: Metric[]) => void;
+  disabled: boolean; // New prop to control whether the form is disabled
 };
 
-export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
+export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFormProps) {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editingMetric, setEditingMetric] = useState<Metric>({
     title: "",
@@ -75,44 +75,53 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
     setMetrics(metrics.filter((_, i) => i !== index));
   };
 
+  const inputDisabledStyle = disabled
+    ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+    : "";  // Style for disabled input fields
+
+  const buttonDisabledStyle = disabled
+    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+    : "";  // Style for disabled buttons
+
   return (
     <label className="flex flex-col">
       <span className="text-lg font-bold">Metrics</span>
       <div className="flex flex-col gap-4">
-
-        {/* List of added metrics with in-place editing */}
         {metrics.map((metric, index) => (
           <div key={index} className="flex flex-col gap-2 border p-4 rounded-md shadow-sm">
             {editIndex === index ? (
               <div className="space-y-2">
-                {/* Editable fields */}
                 <input
                   type="text"
                   name="title"
                   value={editingMetric.title}
                   onChange={(e) => handleChange(e, true)}
-                  className="border border-gray-300 rounded-md p-2 w-full"
+                  className={`border border-gray-300 rounded-md p-2 w-full ${inputDisabledStyle}`}
                   placeholder="Metric Title"
+                  disabled={disabled}
                 />
                 <input
                   type="text"
                   name="summary"
                   value={editingMetric.summary}
                   onChange={(e) => handleChange(e, true)}
-                  className="border border-gray-300 rounded-md p-2 w-full"
+                  className={`border border-gray-300 rounded-md p-2 w-full ${inputDisabledStyle}`}
                   placeholder="Metric Summary"
+                  disabled={disabled}
                 />
                 <textarea
                   name="description"
                   value={editingMetric.description}
                   onChange={(e) => handleChange(e, true)}
-                  className="border border-gray-300 rounded-md p-2 w-full"
+                  className={`border border-gray-300 rounded-md p-2 w-full ${inputDisabledStyle}`}
                   rows={2}
                   placeholder="Metric Description"
+                  disabled={disabled}
                 />
                 <button
                   onClick={saveMetric}
-                  className="bg-green-500 text-white rounded-md p-2 hover:bg-green-600 flex items-center gap-2"
+                  className={`bg-green-500 text-white rounded-md p-2 hover:bg-green-600 flex items-center gap-2 ${buttonDisabledStyle}`}
+                  disabled={disabled}
                 >
                   <FontAwesomeIcon icon={faSave} />
                   Save
@@ -120,40 +129,38 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
               </div>
             ) : (
               <div className="space-y-2">
-                {/* Display metric data */}
-                <div className="flex flex-col gap-2">
-                  <input
-                    type="text"
-                    value={metric.title}
-                    readOnly
-                    className="border border-gray-300 rounded-md p-2 w-full"
-                    placeholder="Metric Title"
-                  />
-                  <input
-                    type="text"
-                    value={metric.summary}
-                    readOnly
-                    className="border border-gray-300 rounded-md p-2 w-full"
-                    placeholder="Metric Summary"
-                  />
-                  {/* Render description as markdown */}
-                  <div className="border border-gray-300 rounded-md p-2 w-full">
-                    <ReactMarkdown rehypePlugins={[rehypeRaw]} className="prose prose-sm max-w-none" >
-                      {metric.description}
-                    </ReactMarkdown>
-                  </div>
+                <input
+                  type="text"
+                  value={metric.title}
+                  readOnly
+                  className={`border border-gray-300 rounded-md p-2 w-full ${inputDisabledStyle}`}
+                  placeholder="Metric Title"
+                />
+                <input
+                  type="text"
+                  value={metric.summary}
+                  readOnly
+                  className={`border border-gray-300 rounded-md p-2 w-full ${inputDisabledStyle}`}
+                  placeholder="Metric Summary"
+                />
+                <div className="border border-gray-300 rounded-md p-2 w-full">
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]} className="prose prose-sm max-w-none" >
+                    {metric.description}
+                  </ReactMarkdown>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => startEditMetric(index)}
-                    className="bg-gray-500 text-white rounded-md p-2 hover:bg-gray-600 flex items-center gap-2"
+                    className={`bg-gray-500 text-white rounded-md p-2 hover:bg-gray-600 flex items-center gap-2 ${buttonDisabledStyle}`}
+                    disabled={disabled}
                   >
                     <FontAwesomeIcon icon={faEdit} />
                     Edit
                   </button>
                   <button
                     onClick={() => removeMetric(index)}
-                    className="bg-red-500 text-white rounded-md p-2 hover:bg-red-600 flex items-center gap-2"
+                    className={`bg-red-500 text-white rounded-md p-2 hover:bg-red-600 flex items-center gap-2 ${buttonDisabledStyle}`}
+                    disabled={disabled}
                   >
                     <FontAwesomeIcon icon={faTrash} />
                     Remove
@@ -164,7 +171,6 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
           </div>
         ))}
 
-        {/* Form to add a new metric */}
         <div className="flex flex-col gap-2 border p-4 rounded-md shadow-sm mt-4">
           <div>
             <label className="block text-sm">
@@ -174,8 +180,9 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
                 name="title"
                 value={newMetric.title}
                 onChange={(e) => handleChange(e, false)}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
                 placeholder="Enter Metric Title"
+                disabled={disabled}
               />
             </label>
           </div>
@@ -188,8 +195,9 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
                 name="summary"
                 value={newMetric.summary}
                 onChange={(e) => handleChange(e, false)}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
                 placeholder="Enter Metric Summary"
+                disabled={disabled}
               />
             </label>
           </div>
@@ -201,9 +209,10 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
                 name="description"
                 value={newMetric.description}
                 onChange={(e) => handleChange(e, false)}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
                 rows={3}
                 placeholder="Enter Metric Description"
+                disabled={disabled}
               />
             </label>
           </div>
@@ -211,7 +220,8 @@ export default function MetricsForm({ metrics, setMetrics }: MetricsFormProps) {
           <div className="flex gap-2">
             <button
               onClick={addMetric}
-              className="bg-green-600 text-white rounded-md p-2 hover:bg-green-700 flex items-center gap-2"
+              className={`bg-green-600 text-white rounded-md p-2 hover:bg-green-700 flex items-center gap-2 ${buttonDisabledStyle}`}
+              disabled={disabled}
             >
               <FontAwesomeIcon icon={faPlus}/>
               Add Metric
