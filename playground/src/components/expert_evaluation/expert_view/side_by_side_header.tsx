@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import Popup from "@/components/expert_evaluation/expert_view/popup";
 import {Metric} from "@/model/metric";
+import rehypeRaw from "rehype-raw";
+import ReactMarkdown from "react-markdown";
 
 type SideBySideHeaderProps = {
     exercise: any;
@@ -67,13 +69,18 @@ export default function SideBySideHeader({
                         <button className={buttonSecondary} onClick={openMetricDetail}>
                             📊 Metric Details
                         </button>
+                      
                         <Popup isOpen={isMetricDetailOpen} onClose={closeMetricDetail} title="Metric Details">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {metrics.map((metric, index) => (
-                                <div key={index} className="mb-4">
-                                    <h3 className="font-semibold">{metric.title}</h3>
-                                    <p>{metric.description}</p>
-                                </div>
+                              <div key={index} className="border border-gray-300 rounded-md p-4">
+                                <h2 className="font-semibold mb-4">{metric.title}</h2>
+                                <ReactMarkdown rehypePlugins={[rehypeRaw]} className="prose-sm">
+                                  {metric.description}
+                                </ReactMarkdown>
+                              </div>
                             ))}
+                          </div>
                         </Popup>
 
                         <button className={buttonSecondary} onClick={openEvaluationTutorial}>
