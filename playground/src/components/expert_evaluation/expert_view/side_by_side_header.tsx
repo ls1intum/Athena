@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Popup from "@/components/expert_evaluation/expert_view/popup";
 import {Metric} from "@/model/metric";
 
@@ -9,6 +9,7 @@ type SideBySideHeaderProps = {
     metrics: Metric[];
     onNext: () => void;
     onPrevious: () => void;
+    onContinueLater: () => void;
 }
 
 export default function SideBySideHeader({
@@ -18,6 +19,7 @@ export default function SideBySideHeader({
     metrics,
     onNext,
     onPrevious,
+    onContinueLater,
 }: SideBySideHeaderProps) {
     const [isExerciseDetailOpen, setIsExerciseDetailOpen] = useState<boolean>(false);
     const [isMetricDetailOpen, setIsMetricDetailOpen] = useState<boolean>(false);
@@ -85,7 +87,10 @@ export default function SideBySideHeader({
 
                 {/* Align buttons to the end */}
                 <div className="flex flex-col items-end gap-2 mt-4 md:mt-0 w-full md:w-[250px] self-end">
-                    <button className={`${buttonSecondary} w-full`}>
+                    <button
+                        className={`${buttonSecondary} w-full`}
+                        onClick={onContinueLater}
+                    >
                         😴 Continue Later
                     </button>
 

@@ -29,10 +29,10 @@ const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
         setIsPopupOpen(true);
     };
 
-      useEffect(() => {
-         console.log(passedValue)
-    setSelectedValue(passedValue);
-  }, [resetState]); //passedValue
+    useEffect(() => {
+        console.log(passedValue)
+        setSelectedValue(passedValue);
+    }, [resetState]); //passedValue
 
 
     const handleChange = (value: number) => {
@@ -54,7 +54,7 @@ const SingleChoiceLikertScale: React.FC<SingleChoiceLikertScaleProps> = ({
     ];
 
     useEffect(() => {
-      //  setSelectedValue(null); // Reset the selection to unselect all options
+        //  setSelectedValue(null); // Reset the selection to unselect all options
     }, [resetState]); // Watch for changes to resetState
 
     return (

@@ -29,6 +29,7 @@ const [resetState, setResetState] = useState<boolean>(false);
         useEffect(() => {
             setResetState(!resetState);
   }, [submission, exercise]); // Trigger when submission or exercise changes
+    //TODO is this needed
 
 
     if (!exercise || !submission) {

@@ -29,41 +29,6 @@ export async function fetchFeedbacks(
     return feedbacks;
 }
 
-export async function fetchCategorizedFeedbacks(
-    exercise: Exercise | undefined,
-    submission: Submission | undefined,
-    dataMode: DataMode
-) {
-    const response = await fetch(
-        `${baseUrl}/api/data/${dataMode}/${exercise ? `exercise/${exercise.id}/` : ""}categorized_feedback`
-    );
-
-    let feedbacks = await response.json() as CategorizedFeedback;
-    if (submission) {
-        const filteredFeedbacks: CategorizedFeedback = {};
-
-        Object.keys(feedbacks).forEach((category) => {
-            filteredFeedbacks[category] = feedbacks[category]
-                .filter((feedback) => {
-                    return submission ? feedback.submission_id === submission.id : true;
-                })
-                .map((feedback) => {
-                    if (feedback.structured_grading_instruction_id) {
-                        feedback.structured_grading_instruction = exercise?.grading_criteria
-                            ?.flatMap((criteria) => criteria.structured_grading_instructions)
-                            .find((instruction) => instruction.id === feedback.structured_grading_instruction_id);
-                    }
-                    return feedback;
-                });
-
-        });
-
-        return filteredFeedbacks;
-    }
-
-    return feedbacks;
-}
-
 /**
  * Fetches the feedbacks (for an exercise) of the playground.
  *

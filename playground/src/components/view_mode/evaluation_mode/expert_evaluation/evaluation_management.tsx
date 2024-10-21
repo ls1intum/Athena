@@ -11,6 +11,10 @@ import EvaluationConfigSelector from "@/components/selectors/evaluation_config_s
 import {
   EvaluationManagementExportImport
 } from "@/components/view_mode/evaluation_mode/expert_evaluation/evaluation_management_export_import";
+import {
+  fetchAllExpertEvaluationConfigs,
+  saveExpertEvaluationConfig as externalSaveExpertEvaluationConfig
+} from "@/hooks/playground/expert_evaluation_config";
 import ExpertLinks from "@/components/view_mode/evaluation_mode/expert_evaluation/expert_links";
 
 
@@ -23,6 +27,18 @@ export default function EvaluationManagement() {
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [expertIds, setExpertIds] = useState<string[]>([]);
+
+  const dataMode = 'expert_evaluation';
+
+  useEffect(() => {
+    const fetchData = async () => {
+    console.log("upon loading page?");
+
+    const savedConfigs = await fetchAllExpertEvaluationConfigs(dataMode);
+    setExpertEvaluationConfigs(savedConfigs);
+  };
+  fetchData();
+  }, []);
 
   useEffect(() => {
     if (selectedConfigId === "new") {
@@ -87,6 +103,8 @@ export default function EvaluationManagement() {
       }
     });
     setSelectedConfigId(newConfig.id);
+
+    externalSaveExpertEvaluationConfig(dataMode, newConfig);
   };
 
   const handleExport = () => {

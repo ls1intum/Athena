@@ -1,10 +1,8 @@
 import SideBySideHeader from '@/components/expert_evaluation/expert_view/side_by_side_header';
 import React, {useEffect, useState} from 'react';
 import LikertScaleForm from "@/components/expert_evaluation/expert_view/likert_scale_form";
-import {fetchExpertEvaluationExercisesEager} from "@/hooks/playground/exercises";
 import {Exercise} from "@/model/exercise";
 import {TextSubmission} from "@/model/submission";
-import {fetchMetrics} from "@/hooks/playground/metrics";
 import {Metric} from "@/model/metric";
 import {
     fetchExpertEvaluationProgress,
@@ -12,6 +10,8 @@ import {
 } from "@/hooks/playground/expert_evaluation_progress";
 import {ExpertEvaluationProgress} from "@/model/expert_evaluation_progress";
 import {useRouter} from "next/router";
+import {fetchExpertEvaluationConfig} from "@/hooks/playground/expert_evaluation_config";
+import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
 
 function SideBySideExpertView() {
     const router = useRouter();
@@ -27,20 +27,24 @@ function SideBySideExpertView() {
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState<number>(0);
     const [metrics, setMetrics] = useState<Metric[]>([]);
     const [selectedValues, setSelectedValues] = useState<ExpertEvaluationProgress['selected_values']>({});
+    const [evaluationStarted, setEvaluationStarted] = useState<boolean>(false);
 
     useEffect(() => {
             const fetchData = async () => {
-
                     if (expert_evaluation_config_id && expert_id) {
                         try {
-                            const exercises = await fetchExpertEvaluationExercisesEager(dataMode, expert_evaluation_config_id);
-                            setExercises(exercises);
-                            const metrics = await fetchMetrics(dataMode, expert_evaluation_config_id);
-                            setMetrics(metrics);
+                            // Fetch and set data from evaluation config
+                            // TODO SharedExpertEvaluationConfig anonym and no links
+                            const config: ExpertEvaluationConfig = await fetchExpertEvaluationConfig(dataMode, expert_evaluation_config_id);
+                            setExercises(config.exercises);
+                            setMetrics(config.metrics);
+                            setEvaluationStarted(config.started);
+
                         } catch
                             (error) {
-                            console.error('Error loading exercises and metrics: ', error);
+                            console.error('Error loading expert evaluation configuration: ', error);
                         }
+
                         try {
                             let expertEvaluationProgress = await fetchExpertEvaluationProgress(dataMode, expert_evaluation_config_id, expert_id);
                             setCurrentSubmissionIndex(expertEvaluationProgress.current_submission_index);
@@ -52,8 +56,7 @@ function SideBySideExpertView() {
                         }
                     }
                 }
-            ;
-            fetchData();
+            ;fetchData();
         }, [expert_evaluation_config_id, expert_id]
     );
 
@@ -103,7 +106,6 @@ function SideBySideExpertView() {
     };
 
     const saveProgress = () => {
-
         if (expert_evaluation_config_id && expert_id) {
             const progress: ExpertEvaluationProgress = {
                 current_submission_index: currentSubmissionIndex,
@@ -136,6 +138,23 @@ function SideBySideExpertView() {
         }));
     }
 
+    if (!exercises && !metrics) {
+        return <div className={"bg-white p-6 text-red-60"}>
+            Could not fetch config data for expert evaluation (id={expert_evaluation_config_id})
+        </div>;
+    }
+
+    if (!evaluationStarted) {
+        return <div className={"bg-white p-6 text-red-60"}>The expert evaluation (id={expert_evaluation_config_id}) has not yet
+            started.</div>;
+    }
+
+    if (!currentSubmissionIndex && !currentExerciseIndex && !selectedValues) {
+        return <div className={"bg-white p-6 text-red-600"}>
+            Could not find expert (id={expert_id}) belonging to expert evaluation (id={expert_evaluation_config_id}).
+        </div>;
+    }
+
     const currentExercise = exercises[currentExerciseIndex];
     const currentSubmission = currentExercise?.submissions?.[currentSubmissionIndex];
     const globalSubmissionIndex = exercises.slice(0, currentExerciseIndex).reduce((sum, exercise) => sum + exercise.submissions!.length, 0) + currentSubmissionIndex;
@@ -150,6 +169,7 @@ function SideBySideExpertView() {
                     onNext={handleNext}
                     onPrevious={handlePrevious}
                     metrics={metrics}
+                    onContinueLater={saveProgress}
                 />
                 <LikertScaleForm submission={currentSubmission as TextSubmission}
                                  exercise={currentExercise}

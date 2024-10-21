@@ -9,5 +9,7 @@ export type ExpertEvaluationConfig = {
   name: string;
   metrics: Metric[];
   exercises: Exercise[];
-  expertIds: string[];
-};
+  expertIds?: string[];
+}
+
+
