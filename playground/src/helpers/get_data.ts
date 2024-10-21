@@ -497,29 +497,31 @@ export function getAnonymizedConfigFromFileSync(
     const config: ExpertEvaluationConfig = JSON.parse(fs.readFileSync(configPath, "utf8"));
     delete config["expertIds"];
 
+        //TODO rethink anonymization
+/*
     const renamedFeedback: any = {};
 
-for (const exercise of config.exercises) {
-    const submissions = exercise.submissions;
+    for (const exercise of config.exercises) {
+        const submissions = exercise.submissions;
 
-    if (submissions) {
-        for (const submission of submissions) {
-            const feedback = submission.feedbacks;
+        if (submissions) {
+            for (const submission of submissions) {
+                const feedback = submission.feedbacks;
 
-            if (feedback) {
-                const renamedFeedback: any = {}; // Temporary object for renamed feedback
+                if (feedback) {
+                    const renamedFeedback: any = {}; // Temporary object for renamed feedback
 
-                // Rename the feedback categories to numbers starting from 0
-                Object.keys(feedback).forEach((category, index) => {
-                    renamedFeedback[index] = feedback[category]; // Assign numeric keys
-                });
+                    // Rename the feedback categories to numbers starting from 0
+                    Object.keys(feedback).forEach((category, index) => {
+                        renamedFeedback[index] = feedback[category]; // Assign numeric keys
+                    });
 
-                // Replace the original feedback with the renamed feedback
-                submission.feedbacks = renamedFeedback;
+                    // Replace the original feedback with the renamed feedback
+                    submission.feedbacks = renamedFeedback;
+                }
             }
         }
-    }
-}
+    }*/
     return config;
 }
 
