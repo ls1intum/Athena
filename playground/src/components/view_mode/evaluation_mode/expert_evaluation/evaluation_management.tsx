@@ -6,7 +6,6 @@ import MetricsForm from "@/components/view_mode/evaluation_mode/expert_evaluatio
 import {Exercise} from "@/model/exercise";
 import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
 import {Metric} from "@/model/metric";
-import MultipleExercisesSelect from "@/components/selectors/multiple_exercises_select";
 import EvaluationConfigSelector from "@/components/selectors/evaluation_config_selector";
 import {
   EvaluationManagementExportImport
@@ -16,6 +15,7 @@ import {
   saveExpertEvaluationConfig as externalSaveExpertEvaluationConfig
 } from "@/hooks/playground/expert_evaluation_config";
 import ExpertLinks from "@/components/view_mode/evaluation_mode/expert_evaluation/expert_links";
+import ExerciseImport from "@/components/view_mode/evaluation_mode/expert_evaluation/exercise_import";
 
 
 export default function EvaluationManagement() {
@@ -58,7 +58,7 @@ export default function EvaluationManagement() {
         setCreationDate(selectedConfig.creationDate);
         setMetrics(selectedConfig.metrics);
         setExercises(selectedConfig.exercises);
-        setExpertIds(selectedConfig.expertIds);
+        setExpertIds(selectedConfig.expertIds || []);
       }
     }
   }, [selectedConfigId, expertEvaluationConfigs]);
@@ -119,9 +119,18 @@ export default function EvaluationManagement() {
       alert("Invalid config type");
       return;
     }
+    importedConfig.id = uuidv4();
+    importedConfig.creationDate = new Date();
+    importedConfig.started = false;
+    importedConfig.expertIds = [];
 
     saveExpertEvaluationConfig(importedConfig);
   };
+
+  const handleExerciseImport = async (fileContent: string) => {
+    const importedExercise = JSON.parse(fileContent) as Exercise;
+    setExercises([...exercises, importedExercise]);
+  }
 
   const startEvaluation = () => {
     if (confirm("Are you sure you want to start the evaluation? Once started, no further changes can be made to the configuration!")) {
@@ -170,10 +179,9 @@ export default function EvaluationManagement() {
         />
       </label>
 
-      <MultipleExercisesSelect
-        selectedExercises={exercises}
-        exerciseType="text"
-        onChange={(newExercises) => {
+      <ExerciseImport
+        exercises={exercises}
+        setExercises={(newExercises: Exercise[]) => {
           if (!started) {  // Prevent changes if the experiment has started
             setExercises(newExercises);
             if (selectedConfigId !== "new") {

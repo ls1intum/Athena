@@ -175,7 +175,7 @@ export default function MetricsForm({metrics, setMetrics, disabled}: MetricsForm
 
         {/* New Metric Form */}
         {!disabled && (
-          <div className="flex flex-col gap-2 border p-4 rounded-md shadow-sm mt-4">
+          <div className="flex flex-col gap-2 border p-4 rounded-md shadow-sm">
             <div>
               <label className="block text-sm">
                 <span className="text-gray-700">Title</span>
@@ -185,7 +185,7 @@ export default function MetricsForm({metrics, setMetrics, disabled}: MetricsForm
                   value={newMetric.title}
                   onChange={(e) => handleChange(e, false)}
                   className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
-                  placeholder="Enter Metric Title"
+                  placeholder="Enter a title for the metric"
                   disabled={disabled}
                 />
               </label>
@@ -200,7 +200,7 @@ export default function MetricsForm({metrics, setMetrics, disabled}: MetricsForm
                   value={newMetric.summary}
                   onChange={(e) => handleChange(e, false)}
                   className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
-                  placeholder="Enter Metric Summary"
+                  placeholder="Enter a short question that the expert can aggree or disagree with. The question should be clear and concise. The question should be formulated such that the agree option is better than the disagree option."
                 />
               </label>
             </div>
@@ -214,7 +214,7 @@ export default function MetricsForm({metrics, setMetrics, disabled}: MetricsForm
                   onChange={(e) => handleChange(e, false)}
                   className={`mt-1 block w-full border border-gray-300 rounded-md p-2 ${inputDisabledStyle}`}
                   rows={3}
-                  placeholder="Enter Metric Description"
+                  placeholder="You can provide a detailed description of the metric here. You can use markdown to format the text."
                 />
               </label>
             </div>

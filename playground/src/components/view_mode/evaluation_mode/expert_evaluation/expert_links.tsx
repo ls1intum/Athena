@@ -24,7 +24,7 @@ export default function ExpertLinks({ expertIds, setExpertIds, started, configId
   const copyLink = (link: string) => {
     navigator.clipboard.writeText(link);
     setCopiedLink(link);
-    setTimeout(() => setCopiedLink(null), 2000); // Reset copied state after 2 seconds
+    setTimeout(() => setCopiedLink(null), 2000);
   };
 
   // Delete an expert ID
@@ -35,7 +35,6 @@ export default function ExpertLinks({ expertIds, setExpertIds, started, configId
   return (
     <section className="flex flex-col">
       <div className="flex justify-between items-center mb-2">
-        {/* Heading */}
         <span className="text-lg font-bold">Expert Links</span>
 
         {/* Add New Expert Button */}
@@ -60,7 +59,7 @@ export default function ExpertLinks({ expertIds, setExpertIds, started, configId
               </a>
 
               <div className="flex space-x-2">
-                {/* Copy Link Button with FontAwesomeIcon */}
+                {/* Copy Link Button */}
                 <button
                   className="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600"
                   onClick={() => copyLink(expertLink)}
@@ -69,7 +68,7 @@ export default function ExpertLinks({ expertIds, setExpertIds, started, configId
                   <FontAwesomeIcon icon={copiedLink === expertLink ? faCheck : faCopy} />
                 </button>
 
-                {/* Delete Button with FontAwesomeIcon */}
+                {/* Delete Button */}
                 {!started && (
                   <button
                     className="bg-red-500 text-white rounded-md p-2 hover:bg-red-600"
@@ -83,6 +82,7 @@ export default function ExpertLinks({ expertIds, setExpertIds, started, configId
             </li>
           );
         })}
+        {expertIds.length === 0 && <li className="border p-2 rounded-md shadow-sm bg-gray-50 text-center">No expert links added</li>}
       </ul>
     </section>
   );
