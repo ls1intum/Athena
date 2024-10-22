@@ -10,6 +10,7 @@ import baseUrl from "@/helpers/base_url";
 import {Metric} from "@/model/metric";
 import {ExpertEvaluationProgress} from "@/model/expert_evaluation_progress";
 import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
+import {v4 as uuidv4} from "uuid";
 
 /**
  * Splits the given data mode into its parts.
@@ -232,65 +233,41 @@ function jsonToExercise(json: any): Exercise {
     return exercise;
 }
 
-//TODO shuffle when exporting
-function jsonToExerciseAndShuffleSubmissionsAndFeedback(json: any, addStructuredGrading: boolean = false): Exercise {
-    let exercise = json as Exercise;
-
-    const submissions = exercise.submissions;
-    if (submissions) {
-        // Shuffle submissions //TODO when creating config
-        /*   exercise.submissions = submissions.sort(() => Math.random() - 0.5);*/
-
-        for (const submission of submissions) {
-            const feedback = submission.feedbacks;
-
-            if (feedback) {
-                // Shuffle the feedback categories //TODO when creating config
-                /* const shuffledFeedbackEntries = Object.entries(feedback).sort(() => Math.random() - 0.5);
-                 submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);*/
-
-                if (addStructuredGrading) {
-                    const processedFeedbacks: CategorizedFeedback = {};
-
-                    Object.keys(feedback).forEach((category) => {
-                        const categoryFeedback = feedback[category];
-                        if (Array.isArray(categoryFeedback)) {
-                            // Map over feedback and link structured grading instructions
-                            processedFeedbacks[category] = feedback[category].map((feedbackItem) => {
-                                // Link structured grading instructions
-                                if (feedbackItem.structured_grading_instruction_id) {
-                                    feedbackItem.structured_grading_instruction = exercise?.grading_criteria
-                                        ?.flatMap((criteria) => criteria.structured_grading_instructions)
-                                        .find((instruction) => instruction.id === feedbackItem.structured_grading_instruction_id);
-                                }
-                                return feedbackItem;
-                            });
-                        }
-                    });
-                    // Replace submission feedbacks with processed feedbacks
-                    submission.feedbacks = processedFeedbacks;
-
-                }
-            }
-        }
-    }
-    return exercise;
+function jsonToExerciseAndSubmissionsAndFeedback(json: any): Exercise { //TODO remove
+    return json as Exercise;
 }
 
-export function randomizeSubmissionAndFeedbackTypeOrder(exercise: Exercise){
+export function addStructuredGradingInstructionsToFeedback(
+    exercise: Exercise,
+) {
     const submissions = exercise.submissions;
     if (submissions) {
-        // Shuffle submissions
-           exercise.submissions = submissions.sort(() => Math.random() - 0.5);
-
         for (const submission of submissions) {
             const feedback = submission.feedbacks;
 
             if (feedback) {
-                // Shuffle the feedback categories
-                 const shuffledFeedbackEntries = Object.entries(feedback).sort(() => Math.random() - 0.5);
-                 submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);
-            }
+                const processedFeedbacks: CategorizedFeedback = {};
+
+                Object.keys(feedback).forEach((category) => {
+                    const categoryFeedback = feedback[category];
+                    if (Array.isArray(categoryFeedback)) {
+                        // Map over feedback and link structured grading instructions
+                        processedFeedbacks[category] = feedback[category].map((feedbackItem) => {
+                            // Link structured grading instructions
+                            if (feedbackItem.structured_grading_instruction_id) {
+                                feedbackItem.structured_grading_instruction = exercise?.grading_criteria
+                                    ?.flatMap((criteria) => criteria.structured_grading_instructions)
+                                    .find(
+                                        (instruction) =>
+                                            instruction.id === feedbackItem.structured_grading_instruction_id
+                                    );
+                            }
+                            return feedbackItem;
+                        });
+                    }
+                });
+                submission.feedbacks = processedFeedbacks;
+    }
         }
     }
 }
@@ -333,11 +310,11 @@ export function getExercises(dataMode: DataMode, athenaOrigin: string): Exercise
 }
 
 export function getExercisesEager(dataMode: DataMode, athenaOrigin: string): Exercise[] {
-    return getAllExerciseJSON(dataMode, athenaOrigin).map(json => jsonToExerciseAndShuffleSubmissionsAndFeedback(json));
+    return getAllExerciseJSON(dataMode, athenaOrigin).map(json => jsonToExerciseAndSubmissionsAndFeedback(json));
 }
 
 export function getExpertEvaluationExercisesEager(dataMode: DataMode, expertEvaluationId: string): Exercise[] {
-    return getEvaluationConfigJSON(dataMode, expertEvaluationId).exercises.map((json: any) => jsonToExerciseAndShuffleSubmissionsAndFeedback(json, true))
+    return getEvaluationConfigJSON(dataMode, expertEvaluationId).exercises.map((json: any) => jsonToExerciseAndSubmissionsAndFeedback(json))
 }
 
 export function getSubmissions(
@@ -387,6 +364,46 @@ export function saveProgressToFileSync(
     );
 
     return fs.writeFileSync(progressPath, progressData, 'utf8');
+}
+
+export function anonymizeFeedbackCategoriesAndShuffle(
+    expertEvaluationConfig: ExpertEvaluationConfig
+) {
+    // Initialize mappings as a plain object
+    const mappings: { [key: string]: string } = {};
+
+    // Iterate over exercises
+    for (const exercise of expertEvaluationConfig.exercises) {
+        const submissions = exercise.submissions;
+        if (submissions) {
+            // Shuffle submissions
+            exercise.submissions = submissions.sort(() => Math.random() - 0.5);
+
+            // Iterate over submissions
+            for (const submission of submissions) {
+                const feedback = submission.feedbacks;
+
+                if (feedback) {
+                    const anonymizedFeedback: CategorizedFeedback = {};
+
+                    // Iterate over each feedback category and anonymize the category names
+                    Object.keys(feedback).forEach((originalCategory) => {
+                        const anonymizedCategory = uuidv4();
+                        mappings[anonymizedCategory] =  originalCategory;
+
+                        anonymizedFeedback[anonymizedCategory] = feedback[originalCategory];
+                    });
+
+                    // Now shuffle the anonymized feedback categories
+                    const shuffledFeedbackEntries = Object.entries(anonymizedFeedback).sort(() => Math.random() - 0.5);
+                    submission.feedbacks = Object.fromEntries(shuffledFeedbackEntries);
+                }
+            }
+        }
+    }
+
+    // Save the mappings as a plain object in the config
+    expertEvaluationConfig.mappings = mappings;
 }
 
 export function saveConfigToFileSync(
@@ -477,7 +494,6 @@ export function getConfigFromFileSync(
     return JSON.parse(fs.readFileSync(configPath, "utf8"));
 }
 
-//TODO
 export function getAnonymizedConfigFromFileSync(
     dataMode: DataMode,
     expertEvaluationId: string
@@ -496,32 +512,8 @@ export function getAnonymizedConfigFromFileSync(
 
     const config: ExpertEvaluationConfig = JSON.parse(fs.readFileSync(configPath, "utf8"));
     delete config["expertIds"];
+    delete config["mappings"];
 
-        //TODO rethink anonymization
-/*
-    const renamedFeedback: any = {};
-
-    for (const exercise of config.exercises) {
-        const submissions = exercise.submissions;
-
-        if (submissions) {
-            for (const submission of submissions) {
-                const feedback = submission.feedbacks;
-
-                if (feedback) {
-                    const renamedFeedback: any = {}; // Temporary object for renamed feedback
-
-                    // Rename the feedback categories to numbers starting from 0
-                    Object.keys(feedback).forEach((category, index) => {
-                        renamedFeedback[index] = feedback[category]; // Assign numeric keys
-                    });
-
-                    // Replace the original feedback with the renamed feedback
-                    submission.feedbacks = renamedFeedback;
-                }
-            }
-        }
-    }*/
     return config;
 }
 

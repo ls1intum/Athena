@@ -1,6 +1,11 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {DataMode} from "@/model/data_mode";
-import {getAnonymizedConfigFromFileSync, saveConfigToFileSync, randomizeSubmissionAndFeedbackTypeOrder} from "@/helpers/get_data";
+import {
+    getAnonymizedConfigFromFileSync,
+    saveConfigToFileSync,
+    addStructuredGradingInstructionsToFeedback,
+    anonymizeFeedbackCategoriesAndShuffle
+} from "@/helpers/get_data";
 import {validateDataModeMiddleware} from "@/helpers/validate_data_mode_middleware";
 import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
 
@@ -9,19 +14,22 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         const {dataMode} = req.query as { dataMode: DataMode };
         const expertEvaluationConfig: ExpertEvaluationConfig = req.body;
 
-        //TODO maybe boolean if it should me randomized?
-        expertEvaluationConfig.exercises.forEach((exercise) => {
-             randomizeSubmissionAndFeedbackTypeOrder(exercise);
-        });
-
+        anonymizeFeedbackCategoriesAndShuffle(expertEvaluationConfig);
+        console.log("After anonymize " + expertEvaluationConfig.mappings?.size);
         saveConfigToFileSync(dataMode, expertEvaluationConfig);
+
         return res.status(200).json({message: 'Config saved successfully'});
 
     } else if (req.method == 'GET') {
         const {dataMode, expertEvaluationId} = req.query as { dataMode: DataMode; expertEvaluationId: string };
-        //TODO maybe boolean param set if needs to be anonymized
 
         let config = getAnonymizedConfigFromFileSync(dataMode, expertEvaluationId);
+        if (config) {
+            config.exercises.forEach((exercise) => {
+                addStructuredGradingInstructionsToFeedback(exercise);
+            });
+        }
+
         return res.status(200).json(config)
     } else {
         res.setHeader('Allow', ['POST']);
