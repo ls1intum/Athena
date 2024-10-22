@@ -10,6 +10,7 @@ export type ExpertEvaluationConfig = {
   metrics: Metric[];
   exercises: Exercise[];
   expertIds?: string[];
+  mappings?: { [key: string]: string };
 }
 
 

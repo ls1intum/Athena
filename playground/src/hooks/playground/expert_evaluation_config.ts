@@ -2,18 +2,12 @@ import {useMutation, UseMutationOptions} from "react-query";
 import baseUrl from "@/helpers/base_url";
 import {ExpertEvaluationConfig} from "@/model/expert_evaluation_config";
 import {DataMode} from "@/model/data_mode";
-import {v4 as uuidv4} from "uuid";
-
-// TODO: Lara, please look at this code, maybe we can use it. If not, get rid of it.
 
 /** Saves a new or existing expert evaluation config to the server */
 export async function saveExpertEvaluationConfig(
     dataMode: DataMode,
     config: ExpertEvaluationConfig) {
 
-    //TODO PUT vs POST
-    //const method = config.id ? "PUT" : "POST";
-    //alert(method);
     const response = await fetch(`${baseUrl}/api/data/${dataMode}/expert_evaluation/${config.id}/config`, {
         method: 'POST',
         headers: {"Content-Type": "application/json"},
@@ -66,32 +60,6 @@ async function deleteExpertEvaluationConfig(configId: string) {
     }
     return await response.json() as Promise<{ success: boolean }>;
 }
-
-/**
- * Hook to fetch expert evaluation configs
- */
-//TOOD no idea
-/*export function useExpertEvaluationConfigs(
-  options: Omit<UseQueryOptions<ExpertEvaluationConfig[], Error>, "queryFn"> = {}
-) {
-  return useQuery<ExpertEvaluationConfig[], Error>({
-    queryKey: ["expertEvaluationConfigs"],
-    queryFn: fetchExpertEvaluationConfigs,
-    ...options,
-  });
-}*/
-
-/**
- * Hook to save an expert evaluation config
- */ // TODO no idea
-/*export function useSaveExpertEvaluationConfig(
-  options: Omit<UseMutationOptions<ExpertEvaluationConfig, Error, ExpertEvaluationConfig>, "mutationFn"> = {}
-) {
-  return useMutation({
-    mutationFn: saveExpertEvaluationConfig,
-    ...options,
-  });
-}*/
 
 /**
  * Hook to delete an expert evaluation config
