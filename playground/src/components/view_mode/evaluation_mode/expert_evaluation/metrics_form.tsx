@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { v4 as uuidv4 } from 'uuid'; // Import the uuid function
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faPlus, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ReactMarkdown from 'react-markdown';
@@ -14,11 +15,13 @@ type MetricsFormProps = {
 export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFormProps) {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editingMetric, setEditingMetric] = useState<Metric>({
+    id: "", // Add id attribute here
     title: "",
     summary: "",
     description: "",
   });
   const [newMetric, setNewMetric] = useState<Metric>({
+    id: "", // Add id attribute here
     title: "",
     summary: "",
     description: "",
@@ -49,8 +52,9 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
       return; // Prevent adding empty metrics
     }
 
-    setMetrics([...metrics, newMetric]);
-    setNewMetric({ title: "", summary: "", description: "" }); // Reset form
+    const metricWithId = { ...newMetric, id: uuidv4() }; // Add uuidv4 for unique id
+    setMetrics([...metrics, metricWithId]);
+    setNewMetric({ id: "", title: "", summary: "", description: "" }); // Reset form
   };
 
   // Start editing a metric in place
@@ -89,7 +93,7 @@ export default function MetricsForm({ metrics, setMetrics, disabled }: MetricsFo
         {/* List of Metrics */}
         {metrics.map((metric, index) => (
           <div
-            key={index}
+            key={metric.id}
             className="flex justify-between items-start border p-4 rounded-md shadow-sm"
           >
             {editIndex === index ? (

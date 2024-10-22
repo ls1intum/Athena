@@ -15,12 +15,12 @@ interface LikertScaleFormProps {
     [exerciseId: string]: { //TODO define somewhere
       [submissionId: string]: {
         [feedbackType: string]: {
-          [metricTitle: string]: number; // The Likert scale value for each metric
+          [metricId: string]: number; // The Likert scale value for each metric
         };
       };
     };
   };
-    onLikertValueChange: (feedbackType: string, metricTitle: string, value: number) => void;
+    onLikertValueChange: (feedbackType: string, metricId: string, value: number) => void;
 }
 
 
@@ -58,7 +58,7 @@ const [resetState, setResetState] = useState<boolean>(false);
                         <div className="flex flex-col mt-auto">
                             {metrics.map((metric, index) => {
                                 const selectedValue =
-                                    selectedValues?.[exercise.id]?.[submission.id]?.[feedbackType]?.[metric.title] ?? null;
+                                    selectedValues?.[exercise.id]?.[submission.id]?.[feedbackType]?.[metric.id] ?? null;
                                 return (
                                     <div key={index} className="mb-4">
                                         <SingleChoiceLikertScale
@@ -66,7 +66,7 @@ const [resetState, setResetState] = useState<boolean>(false);
                                             summary={metric.summary}
                                             description={metric.description}
                                             passedValue={selectedValue}
-                                            onLikertChange={(value: number) => onLikertValueChange(feedbackType, metric.title, value)}
+                                            onLikertChange={(value: number) => onLikertValueChange(feedbackType, metric.id, value)}
                                             resetState={resetState}
                                         />
                                     </div>

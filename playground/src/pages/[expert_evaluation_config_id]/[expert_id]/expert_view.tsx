@@ -116,7 +116,7 @@ function SideBySideExpertView() {
         }
     }
 
-    const handleLikertValueChange = (feedbackType: string, metricTitle: string, value: number) => {
+    const handleLikertValueChange = (feedbackType: string, metricId: string, value: number) => {
         const exerciseId = currentExercise.id.toString();
         let submissionId = "";
         if (currentExercise.submissions) {
@@ -131,7 +131,7 @@ function SideBySideExpertView() {
                     ...prevValues[exerciseId]?.[submissionId],
                     [feedbackType]: {
                         ...prevValues[exerciseId]?.[submissionId]?.[feedbackType],
-                        [metricTitle]: value
+                        [metricId]: value
                     }
                 }
             }
