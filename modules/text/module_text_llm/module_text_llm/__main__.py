@@ -4,7 +4,7 @@ from typing import List, Any
 
 import nltk
 import tiktoken
-
+from module_text_llm.approach_controller import generate
 from athena import app, submission_selector, submissions_consumer, feedback_consumer, feedback_provider, evaluation_provider
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
@@ -13,6 +13,7 @@ from module_text_llm.config import Configuration
 from module_text_llm.evaluation import get_feedback_statistics, get_llm_statistics
 from module_text_llm.generate_suggestions import generate_suggestions
 from module_text_llm.generate_evaluation import generate_evaluation
+from module_text_llm.generate_cot_suggestions import generate_cot_suggestions
 
 
 @submissions_consumer
@@ -30,12 +31,12 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
     logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks), submission.id, exercise.id)
 
-
+# change here to have multiple approaches
 @feedback_provider
 async def suggest_feedback(exercise: Exercise, submission: Submission, is_graded: bool, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: %s suggestions for submission %d of exercise %d were requested",
                 "Graded" if is_graded else "Non-graded", submission.id, exercise.id)
-    return await generate_suggestions(exercise, submission, module_config.approach, module_config.debug)
+    return await generate(exercise, submission, module_config.approach, module_config.debug)
 
 
 @evaluation_provider
