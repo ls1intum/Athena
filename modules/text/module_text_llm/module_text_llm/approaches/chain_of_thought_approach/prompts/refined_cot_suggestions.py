@@ -7,7 +7,11 @@ system_message = """
          Remember that your response is directly seen by students and it should adress them directly.
          For each feedback where the student has room for improvement, think about how the student could improve his solution.
          Once you have thought how the student can improve the solution, formulate it in a way that guides the student towards the correct solution without revealing it directly.
-         Consider improvements to the feedback if any of this points is not satisfied."""
+         Consider improvements to the feedback if any of this points is not satisfied.
+         
+         Respond in json
+
+         """
 
 human_message = """\
 Student\'s submission to grade (with sentence numbers <number>: <sentence>):

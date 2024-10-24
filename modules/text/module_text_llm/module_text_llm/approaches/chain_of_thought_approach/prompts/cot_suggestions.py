@@ -18,6 +18,7 @@ The maximal amount of points for this exercise is {max_points}.
 # Grading Instructions
 {grading_instructions}
 
+Respond in json
 """
 
 human_message = """\

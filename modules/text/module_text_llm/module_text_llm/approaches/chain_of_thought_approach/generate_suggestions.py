@@ -1,11 +1,12 @@
-from typing import List, Optional, Sequence
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from athena import emit_meta
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
 
-from module_text_llm.config import ChainOfThoughtConfig
+from module_text_llm.approaches.chain_of_thought_approach.config import ChainOfThoughtConfig
+
 from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions, 
     check_prompt_length_and_omit_features_if_necessary, 
@@ -51,7 +52,7 @@ class InitialAssessmentModel(BaseModel):
     
     feedbacks: List[InitialAssessment] = Field(description="Assessment feedbacks")
     
-async def generate_cot_suggestions(exercise: Exercise, submission: Submission, config: ChainOfThoughtConfig, debug: bool) -> List[Feedback]:
+async def generate_suggestions(exercise: Exercise, submission: Submission, config: ChainOfThoughtConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
 
     prompt_input = {

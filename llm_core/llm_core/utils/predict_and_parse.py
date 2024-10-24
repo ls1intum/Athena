@@ -36,7 +36,7 @@ async def predict_and_parse(
     if experiment.run_id is not None:
         tags.append(f"run-{experiment.run_id}")
 
-    structured_output_llm = model.with_structured_output(pydantic_object, method="json_mode")
+    structured_output_llm = model.with_structured_output(pydantic_object)
     chain = RunnableSequence(
         chat_prompt,
         structured_output_llm
