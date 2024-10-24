@@ -40,6 +40,10 @@ export type ModelingFeedback = FeedbackBase & {
 
 export type Feedback = TextFeedback | ProgrammingFeedback | ModelingFeedback;
 
+export type CategorizedFeedback = {
+  [key: string]: Feedback[];
+};
+
 /**
  * Returns the formatted reference of a given feedback. This can be a line range or an element ID depending on the
  * exercise type.
@@ -108,18 +112,20 @@ export function getFeedbackRange(
       ) {
         return undefined;
       }
-      const startPosition = model.getPositionAt(
-        feedback.index_start ?? feedback.index_end!
-      );
-      const endPosition = model.getPositionAt(
-        feedback.index_end ?? feedback.index_start!
-      );
-      return {
-        startLineNumber: startPosition.lineNumber,
-        startColumn: startPosition.column,
-        endLineNumber: endPosition.lineNumber,
-        endColumn: endPosition.column,
-      };
+        const startPosition = model.getPositionAt(
+            feedback.index_start ?? feedback.index_end!
+        );
+        const endPosition = model.getPositionAt(
+            feedback.index_end ?? feedback.index_start!
+        );
+
+        return {
+          startLineNumber: startPosition.lineNumber,
+          startColumn: startPosition.column,
+          endLineNumber: endPosition.lineNumber,
+          endColumn: endPosition.column,
+        };
+      //}
     default:
       return undefined;
 
@@ -200,7 +206,7 @@ export function createFeedbackItemUpdater(
 
 /**
  * Creates a new feedback for the given submission
- * 
+ *
  * @param submission - the submission for which a new feedback should be created
  * @returns a new feedback
  */
