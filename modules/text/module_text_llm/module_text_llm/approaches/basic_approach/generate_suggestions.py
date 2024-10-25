@@ -4,15 +4,13 @@ from pydantic import BaseModel, Field
 from athena import emit_meta
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
-
-from module_text_llm.config import BasicApproachConfig
 from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions, 
     check_prompt_length_and_omit_features_if_necessary, 
     num_tokens_from_prompt,
 )
 from llm_core.utils.predict_and_parse import predict_and_parse
-
+from module_text_llm.config import BasicApproachConfig
 from module_text_llm.helpers.utils import add_sentence_numbers, get_index_range_from_line_range, format_grading_instructions
 
 class FeedbackModel(BaseModel):
@@ -25,18 +23,11 @@ class FeedbackModel(BaseModel):
         description="ID of the grading instruction that was used to generate this feedback, or empty if no grading instruction was used"
     )
 
-    class Config:
-        title = "Feedback"
-
 
 class AssessmentModel(BaseModel):
     """Collection of feedbacks making up an assessment"""
     
-    feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks")
-
-    class Config:
-        title = "Assessment"
-
+    feedbacks: List[FeedbackModel] = Field(description="Assessment feedbacks")
 
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
