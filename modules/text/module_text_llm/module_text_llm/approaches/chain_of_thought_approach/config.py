@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Literal
 from llm_core.models import ModelConfigType, MiniModelConfig
 
 from module_text_llm.approaches.chain_of_thought_approach.prompts.cot_suggestions import (
@@ -30,5 +31,6 @@ _Note: **{problem_statement}**, **{example_solution}**, or **{grading_instructio
 
 class ChainOfThoughtConfig(ApproachConfig):
     # Defaults to the cheaper mini 4o model
+    type: Literal['chain_of_thought'] = 'chain_of_thought'
     model: ModelConfigType = Field(default=MiniModelConfig)  # type: ignore
     generate_suggestions_prompt: CoTGenerateSuggestionsPrompt = Field(default=CoTGenerateSuggestionsPrompt())

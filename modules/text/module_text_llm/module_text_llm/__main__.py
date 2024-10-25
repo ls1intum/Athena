@@ -27,11 +27,11 @@ def select_submission(exercise: Exercise, submissions: List[Submission]) -> Subm
 def process_incoming_feedback(exercise: Exercise, submission: Submission, feedbacks: List[Feedback]):
     logger.info("process_feedback: Received %d feedbacks for submission %d of exercise %d.", len(feedbacks), submission.id, exercise.id)
 
-# change here to have multiple approaches
 @feedback_provider
 async def suggest_feedback(exercise: Exercise, submission: Submission, is_graded: bool, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: %s suggestions for submission %d of exercise %d were requested",
                 "Graded" if is_graded else "Non-graded", submission.id, exercise.id)
+    logger.info("WHAAAAA module_config: %s", type(module_config.approach))
     return await generate_suggestions(exercise, submission, module_config.approach, module_config.debug)
 
 

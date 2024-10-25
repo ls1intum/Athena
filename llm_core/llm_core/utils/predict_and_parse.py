@@ -37,12 +37,13 @@ async def predict_and_parse(
         tags.append(f"run-{experiment.run_id}")
 
     structured_output_llm = model.with_structured_output(pydantic_object)
-    chain = RunnableSequence(
-        chat_prompt,
-        structured_output_llm
-    )
+    # chain = RunnableSequence(
+    #     chat_prompt,
+    #     structured_output_llm
+    # )
+    chain = chat_prompt | structured_output_llm
 
     try:
-        return await chain.ainvoke(prompt_input, config={"tags": tags})
+        return await chain.ainvoke(prompt_input, config={"tags": tags}) # type: ignore # 
     except ValidationError as e:
         raise ValueError(f"Could not parse output: {e}") from e

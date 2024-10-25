@@ -26,18 +26,10 @@ class FeedbackModel(BaseModel):
         description="ID of the grading instruction that was used to generate this feedback, or empty if no grading instruction was used"
     )
 
-    class Config:
-        title = "Feedback"
-
-
 class AssessmentModel(BaseModel):
     """Collection of feedbacks making up an assessment"""
     
     feedbacks: List[FeedbackModel] = Field(description="Assessment feedbacks")
-
-    class Config:
-        title = "Assessment"
-
 class InitialAssessment(BaseModel):
     title: str = Field(description="Very short title, i.e. feedback category or similar", example="Logic Error")
     description: str = Field(description="Feedback description")
@@ -54,6 +46,7 @@ class InitialAssessmentModel(BaseModel):
     
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: ChainOfThoughtConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
+    logger.warning("Doing chain of thught ")
 
     prompt_input = {
         "max_points": exercise.max_points,
@@ -103,7 +96,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
     )
 
     second_prompt_input = {
-        "answer" : initial_result,
+        "answer" : initial_result.dict(),
         "submission": add_sentence_numbers(submission.text)
 
     }

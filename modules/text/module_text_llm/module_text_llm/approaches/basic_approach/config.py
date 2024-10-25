@@ -1,5 +1,7 @@
 from module_text_llm.approaches.approach_config import ApproachConfig
 from pydantic import Field, BaseModel
+from typing import Literal
+
 
 from module_text_llm.approaches.basic_approach.prompts.generate_suggestions import (
   system_message as generate_suggestions_system_message, 
@@ -19,5 +21,6 @@ _Note: **{problem_statement}**, **{example_solution}**, or **{grading_instructio
 
     
 class BasicApproachConfig(ApproachConfig):
+    type: Literal['basic'] = 'basic'
     generate_suggestions_prompt: GenerateSuggestionsPrompt = Field(default=GenerateSuggestionsPrompt())
 

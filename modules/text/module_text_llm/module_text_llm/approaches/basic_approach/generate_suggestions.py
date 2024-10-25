@@ -30,7 +30,7 @@ class FeedbackModel(BaseModel):
 class AssessmentModel(BaseModel):
     """Collection of feedbacks making up an assessment"""
     
-    feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks")
+    feedbacks: List[FeedbackModel] = Field(description="Assessment feedbacks")
 
     class Config:
         title = "Assessment"
@@ -38,6 +38,7 @@ class AssessmentModel(BaseModel):
 
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
+    logger.warning("Doing basic")
 
     prompt_input = {
         "max_points": exercise.max_points,
