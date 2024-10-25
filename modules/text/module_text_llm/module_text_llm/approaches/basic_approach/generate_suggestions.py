@@ -23,22 +23,14 @@ class FeedbackModel(BaseModel):
         description="ID of the grading instruction that was used to generate this feedback, or empty if no grading instruction was used"
     )
 
-    class Config:
-        title = "Feedback"
-
 
 class AssessmentModel(BaseModel):
     """Collection of feedbacks making up an assessment"""
     
     feedbacks: List[FeedbackModel] = Field(description="Assessment feedbacks")
 
-    class Config:
-        title = "Assessment"
-
-
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
-    logger.warning("Doing basic")
 
     prompt_input = {
         "max_points": exercise.max_points,

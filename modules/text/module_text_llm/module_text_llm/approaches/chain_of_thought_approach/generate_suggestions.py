@@ -46,7 +46,6 @@ class InitialAssessmentModel(BaseModel):
     
 async def generate_suggestions(exercise: Exercise, submission: Submission, config: ChainOfThoughtConfig, debug: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
-    logger.warning("Doing chain of thught ")
 
     prompt_input = {
         "max_points": exercise.max_points,
