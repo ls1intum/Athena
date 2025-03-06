@@ -28,18 +28,14 @@ def run_assessment_module_manager(monkeypatch):
     monkeypatch.setenv("MODULE_MODELING_LLM_SECRET", "integration test MODULE_MODELING_LLM_SECRET")
     monkeypatch.setenv("MODULE_PROGRAMMING_WINNOWING_SECRET", "integration test MODULE_PROGRAMMING_WINNOWING_SECRET")
 
-    poetry_path = os.getenv("POETRY_PATH")
-    # very important, in tests scope, not modules
-    if poetry_path is None:
-        raise EnvironmentError("Set POETRY_PATH environment variable to run the test")
-
     current_cwd = os.getcwd()
     module_cwd = os.path.join(current_cwd, "assessment_module_manager")
 
     ON_POSIX = 'posix' in sys.builtin_module_names
 
+    python_executable = os.path.join(module_cwd, ".venv", "bin", "python")
     process = subprocess.Popen(
-        [poetry_path, "run", "python", "-m", "assessment_module_manager"],
+        [python_executable, "-m", "assessment_module_manager"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,

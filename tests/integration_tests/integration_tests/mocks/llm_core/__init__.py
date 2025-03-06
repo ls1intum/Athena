@@ -2,7 +2,8 @@ import importlib.util
 import sys
 import os
 
-# we take the original utils package, since it contains a bunch on useful methods and does not provide any outgoing llm links
+# we take the original utils package
+# it contains a bunch on useful methods and does not provide any external llm dependencies
 utils_path = None
 for path in sys.path:
     if path.endswith('llm_core'):

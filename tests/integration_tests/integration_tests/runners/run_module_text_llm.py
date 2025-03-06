@@ -30,16 +30,13 @@ def run_module_text_llm(monkeypatch):
     current_cwd = os.getcwd() # global level Athena
     monkeypatch.setenv('PYTHONPATH', current_cwd + '/tests/integration_tests/integration_tests/mocks:' + os.environ.get('PYTHONPATH', ''))
 
-    poetry_path = os.getenv("POETRY_PATH")
-    if poetry_path is None:
-        raise EnvironmentError("Set POETRY_PATH environment variable to run the test")
-
     module_cwd = os.path.join(current_cwd, "modules/text/module_text_llm")
 
     ON_POSIX = 'posix' in sys.builtin_module_names
 
+    python_executable = os.path.join(module_cwd, ".venv", "bin", "python")
     process = subprocess.Popen(
-        [poetry_path, "run", "python", "-m", "module_text_llm"],
+        [python_executable, "-m", "module_text_llm"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
@@ -55,7 +52,7 @@ def run_module_text_llm(monkeypatch):
 
     ready = False
     stderr_output = ""
-    for _ in range(5):
+    for _ in range(10):
         while True:
             try:
                 current_output = queue.get_nowait()
