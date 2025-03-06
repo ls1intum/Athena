@@ -22,7 +22,7 @@ def main():
         os.environ["PATH"] = os.path.join(path_to_module_environment, "bin") + os.pathsep + original_env
         subprocess.run([sys.executable, "-m", "venv", path_to_module_environment])
 
-        result = subprocess.run(["poetry", "run", "pytest"], cwd=path_to_module_environment)
+        result = subprocess.run(["poetry", "run", "pytest"])
         if result.returncode != 0:
             success = False
 
