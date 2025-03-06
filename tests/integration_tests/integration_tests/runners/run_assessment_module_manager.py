@@ -26,6 +26,7 @@ def run_assessment_module_manager(monkeypatch):
     monkeypatch.setenv("MODULE_PROGRAMMING_THEMISML_SECRET", "integration test MODULE_PROGRAMMING_THEMISML_SECRET")
     monkeypatch.setenv("MODULE_PROGRAMMING_APTED_SECRET", "integration test MODULE_PROGRAMMING_APTED_SECRET")
     monkeypatch.setenv("MODULE_MODELING_LLM_SECRET", "integration test MODULE_MODELING_LLM_SECRET")
+    monkeypatch.setenv("MODULE_PROGRAMMING_WINNOWING_SECRET", "integration test MODULE_PROGRAMMING_WINNOWING_SECRET")
 
     poetry_path = os.getenv("POETRY_PATH")
     # very important, in tests scope, not modules
