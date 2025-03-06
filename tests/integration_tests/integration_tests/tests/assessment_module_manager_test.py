@@ -14,6 +14,7 @@ def test_health_endpoint(run_assessment_module_manager, run_module_programming_l
 
     assert response_data.get("status") == "ok", "Unexpected status in response body"
 
+    # can be expanded to all modules in the future, for now we only focus on llm-based modules
     expected_modules = {
         "module_programming_llm": {
             "url": "http://localhost:5002",

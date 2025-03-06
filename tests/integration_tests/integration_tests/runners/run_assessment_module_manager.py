@@ -1,5 +1,3 @@
-from abc import ABC, abstractmethod
-
 import pytest
 import subprocess
 import os
@@ -7,16 +5,6 @@ import sys
 import time
 from threading import Thread
 from queue import Queue, Empty
-
-from langchain_core.language_models import FakeListLLM
-from pydantic import BaseModel
-
-
-class FakeLLMConfig(BaseModel, ABC):
-
-    @abstractmethod
-    def get_model(self) -> FakeListLLM:
-        pass
 
 def enqueue_output(out, queue):
     for line in iter(out.readline, b''):
@@ -40,6 +28,7 @@ def run_assessment_module_manager(monkeypatch):
     monkeypatch.setenv("MODULE_MODELING_LLM_SECRET", "integration test MODULE_MODELING_LLM_SECRET")
 
     poetry_path = os.getenv("POETRY_PATH")
+    # very important, in tests scope, not modules
     if poetry_path is None:
         raise EnvironmentError("Set POETRY_PATH environment variable to run the test")
 

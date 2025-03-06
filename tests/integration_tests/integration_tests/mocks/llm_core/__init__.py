@@ -2,6 +2,7 @@ import importlib.util
 import sys
 import os
 
+# we take the original utils package, since it contains a bunch on useful methods and does not provide any outgoing llm links
 utils_path = None
 for path in sys.path:
     if path.endswith('llm_core'):
