@@ -11,14 +11,12 @@ def main():
         sys.exit(1)
     os.environ["POETRY_PATH"] = poetry_path
 
-    test_modules = [
-        "tests/integration_tests"
-    ]
+    test_modules = ["tests/integration_tests"]
 
     success = True
 
     for module in test_modules:
-        result = subprocess.run([poetry_path, "run", "pytest", module])
+        result = subprocess.run([poetry_path, "run", "pytest", module], cwd=module)
         if result.returncode != 0:
             success = False
 
