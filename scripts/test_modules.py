@@ -16,7 +16,7 @@ def main():
     success = True
 
     for module in test_modules:
-        result = subprocess.run([poetry_path, "run", "pytest"], cwd=module)
+        result = subprocess.run(["poetry", "run", "pytest"], cwd=module)
         if result.returncode != 0:
             success = False
 
