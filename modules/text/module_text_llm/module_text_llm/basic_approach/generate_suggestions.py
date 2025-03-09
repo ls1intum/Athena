@@ -1,11 +1,9 @@
-from typing import List, Optional, Sequence
-from pydantic import BaseModel, Field
+from typing import List
+from module_text_llm.approach_config import ApproachConfig
 
 from athena import emit_meta
 from athena.text import Exercise, Submission, Feedback
 from athena.logger import logger
-
-from module_text_llm.config import BasicApproachConfig
 from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions, 
     check_prompt_length_and_omit_features_if_necessary, 
@@ -13,34 +11,12 @@ from llm_core.utils.llm_utils import (
 )
 from llm_core.utils.predict_and_parse import predict_and_parse
 
+# from module_text_llm.config import BasicApproachConfig
 from module_text_llm.helpers.utils import add_sentence_numbers, get_index_range_from_line_range, format_grading_instructions
+from module_text_llm.basic_approach.prompt_generate_suggestions import AssessmentModel
 
-class FeedbackModel(BaseModel):
-    title: str = Field(description="Very short title, i.e. feedback category or similar", example="Logic Error")
-    description: str = Field(description="Feedback description")
-    line_start: Optional[int] = Field(description="Referenced line number start, or empty if unreferenced")
-    line_end: Optional[int] = Field(description="Referenced line number end, or empty if unreferenced")
-    credits: float = Field(0.0, description="Number of points received/deducted")
-    grading_instruction_id: Optional[int] = Field(
-        description="ID of the grading instruction that was used to generate this feedback, or empty if no grading instruction was used"
-    )
-
-    class Config:
-        title = "Feedback"
-
-
-class AssessmentModel(BaseModel):
-    """Collection of feedbacks making up an assessment"""
-    
-    feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks")
-
-    class Config:
-        title = "Assessment"
-
-
-async def generate_suggestions(exercise: Exercise, submission: Submission, config: BasicApproachConfig, debug: bool) -> List[Feedback]:
+async def generate_suggestions(exercise: Exercise, submission: Submission, config: ApproachConfig, debug: bool, is_graded: bool) -> List[Feedback]:
     model = config.model.get_model()  # type: ignore[attr-defined]
-
     prompt_input = {
         "max_points": exercise.max_points,
         "bonus_points": exercise.bonus_points,
@@ -83,7 +59,8 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
         tags=[
             f"exercise-{exercise.id}",
             f"submission-{submission.id}",
-        ]
+        ],
+        use_function_calling=True
     )
 
     if debug:
@@ -113,6 +90,7 @@ async def generate_suggestions(exercise: Exercise, submission: Submission, confi
             index_start=index_start,
             index_end=index_end,
             credits=feedback.credits,
+            is_graded=is_graded,
             structured_grading_instruction_id=grading_instruction_id,
             meta={}
         ))
