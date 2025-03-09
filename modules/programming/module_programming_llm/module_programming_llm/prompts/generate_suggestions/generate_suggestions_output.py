@@ -23,11 +23,7 @@ class FeedbackModel(BaseModel):
         title = "Feedback"
 
 
-class ValidateSuggestionsOutput(BaseModel):
+class GenerateSuggestionsOutput(BaseModel):
     """Collection of feedbacks making up an assessment for a file"""
-
-    feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks", default=[])
-    file_path: str = Field(description="The full path of the file, as specified in the input prompt")
-
-    class Config:
-        title = "Assessment"
+    feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks for a file", default=[])
+    file_path: str = Field(description="The path of the file, as specified in the input prompt")

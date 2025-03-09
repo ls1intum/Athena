@@ -19,7 +19,7 @@ class GenerateFileSummaryOutput(BaseModel):
     class Config:
         title = "SolutionSummary"
 
-    def describe_solution_summary(self) -> str:
+    def describe_problem_summary(self) -> str:
         descriptions = []
         for file_path, file_summary in self.items.items():
             description = f"File {file_path}: {file_summary}"

@@ -1,20 +1,18 @@
 import asyncio
 import json
 import os
-from collections import defaultdict
 from typing import Optional, List, Sequence, Dict
 
 from athena import emit_meta
 from module_programming_llm.prompts.pipeline_step import PipelineStep
-from .filter_out_solution_input import FilterOutSolutionInput
-from .filter_out_solution_output import FilterOutSolutionOutput
-from module_programming_llm.prompts.generate_suggestions_by_file.generate_suggestions_by_file_output import \
+from ..filter_out_solution_input import FilterOutSolutionInput
+from ..filter_out_solution_output import FilterOutSolutionOutput
+from module_programming_llm.prompts.generate_suggestions.generate_suggestions_output import \
     FeedbackModel as SuggestionsFeedbackModel
 from .prompt import system_message as prompt_system_message, human_message as prompt_human_message
 from pydantic import Field
 from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
-    num_tokens_from_string,
     check_prompt_length_and_omit_features_if_necessary,
 )
 from llm_core.utils.predict_and_parse import predict_and_parse
@@ -25,15 +23,14 @@ from module_programming_llm.helpers.utils import (
 )
 from llm_core.models import ModelConfigType
 
-class FilterOutSolution(PipelineStep[FilterOutSolutionInput, List[Optional[FilterOutSolutionOutput]]]):
-    """A pipeline step to remove potential solutions from the output."""
+
+class FilterOutSolutionZeroShot(PipelineStep[FilterOutSolutionInput, List[Optional[FilterOutSolutionOutput]]]):
+    """A pipeline step to remove potential solutions from the output(zero shot)."""
 
     system_message: str = Field(prompt_system_message,
                                 description="Message for priming AI behavior and instructing it what to do.")
     human_message: str = Field(prompt_human_message,
                                description="Message from a human. The input on which the AI is supposed to act.")
-    tokens_before_split: int = Field(default=2000,
-                                     description="Split the grading instructions into file-based ones after this number of tokens.")
 
     # pylint: disable=too-many-locals
     async def process(
@@ -51,19 +48,6 @@ class FilterOutSolution(PipelineStep[FilterOutSolutionInput, List[Optional[Filte
             human_message=self.human_message,
             pydantic_object=FilterOutSolutionOutput,
         )
-
-        problem_statement_tokens = num_tokens_from_string(input_data.problem_statement or "")
-        is_short_problem_statement = problem_statement_tokens <= self.tokens_before_split
-        file_problem_statements = (
-            {
-                item.file_path: item.problem_statement
-                for item in input_data.problem_statement_by_file.items
-            }
-            if input_data.problem_statement_by_file is not None
-            else {}
-        )
-
-        prompt_inputs: List[dict] = []
 
         solution_repo = input_data.solution_repo
         template_repo = input_data.template_repo
@@ -87,21 +71,17 @@ class FilterOutSolution(PipelineStep[FilterOutSolutionInput, List[Optional[Filte
             if feedback is not None:
                 feedback_suggestions_by_file[feedback.file_path] = feedback.feedbacks
 
-        # Gather prompt inputs for each file
-        for file_path, file_content in changed_files.items():
-            problem_statement = (
-                input_data.problem_statement or ""
-                if is_short_problem_statement
-                else file_problem_statements.get(
-                    file_path, "No relevant problem statement section found."
-                )
-            )
-            problem_statement = (
-                problem_statement
-                if problem_statement.strip()
-                else "No problem statement found."
-            )
+        problem_statement = (
+            input_data.problem_statement
+            if input_data.problem_statement.strip()
+            else "No problem statement found."
+        )
+        template_to_solution_diffs = ""
+        feedback_suggestions = ""
 
+
+        # Gather prompt inputs for each file
+        for file_path, _ in changed_files.items():
             template_to_solution_diff = get_diff(
                 src_repo=template_repo,
                 dst_repo=solution_repo,
@@ -110,18 +90,19 @@ class FilterOutSolution(PipelineStep[FilterOutSolutionInput, List[Optional[Filte
                 file_path=file_path,
             )
 
-            file_content = add_line_numbers(file_content)
+            template_to_solution_diffs += "File path: {0}\nFile content: {1}\n".format(file_path,
+                                                                                       template_to_solution_diff)
+            feedback_suggestions += "File path: {0}\nFeedback suggestions: {1}\n".format(file_path, json.dumps(
+                    [ob.__dict__ for ob in feedback_suggestions_by_file.get(file_path) or []]))
 
-            prompt_inputs.append(
-                {
-                    "file_path": file_path,
-                    "code_with_line_numbers": file_content,
-                    "problem_statement": problem_statement,
-                    "template_to_solution_diff": template_to_solution_diff,
-                    "feedback_suggestions": json.dumps(
-                        [ob.__dict__ for ob in feedback_suggestions_by_file.get(file_path) or []])
-                }
-            )
+        prompt_inputs: List[dict] = []
+        prompt_inputs.append(
+            {
+                "problem_statement": problem_statement,
+                "template_to_solution_diff": template_to_solution_diffs,
+                "feedback_suggestions": feedback_suggestions
+            }
+        )
 
         # Filter long prompts if necessary
         omittable_features = [
@@ -156,7 +137,7 @@ class FilterOutSolution(PipelineStep[FilterOutSolutionInput, List[Optional[Filte
                         f"exercise-{input_data.exercise_id}",
                         f"submission-{input_data.submission_id}",
                         f"file-{prompt_input['file_path']}",
-                        "filter-out-solution",
+                        "filter-out-solution-zero-shot",
                     ],
                 )
                 for prompt_input in prompt_inputs
@@ -165,10 +146,9 @@ class FilterOutSolution(PipelineStep[FilterOutSolutionInput, List[Optional[Filte
 
         if debug:
             emit_meta(
-                "filter_out_solutions",
+                "filter_out_solutions_zero_shot",
                 [
                     {
-                        "file_path": prompt_input["file_path"],
                         "prompt": prompt.format(**prompt_input),
                         "result": result.dict() if result is not None else None,
                     }

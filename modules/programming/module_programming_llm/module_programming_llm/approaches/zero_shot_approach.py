@@ -4,48 +4,23 @@ from athena.programming import Submission, Exercise, Feedback
 from module_programming_llm.config import Configuration
 from llm_core.models import ModelConfigType
 from module_programming_llm.helpers import bulk_search
-from module_programming_llm.prompts import GenerateFileSummary, SplitProblemStatementByFile, \
-    SplitGradingInstructionsByFile, GenerateSuggestionsByFile
-from module_programming_llm.prompts.filter_out_solution.filter_out_solution_by_file import FilterOutSolutionByFile
+from module_programming_llm.prompts import GenerateSuggestionsZeroShot, FilterOutSolutionZeroShot
 from module_programming_llm.prompts.filter_out_solution.filter_out_solution_input import FilterOutSolutionInput
 from module_programming_llm.prompts.filter_out_solution.filter_out_solution_output import FilterOutSolutionOutput
-from module_programming_llm.prompts.generate_file_summary import GenerateFileSummaryOutput, GenerateFileSummaryInput
 from module_programming_llm.prompts.generate_grading_criterion.generate_grading_criterion import \
     GenerateGradingCriterion, GenerateGradingCriterionOutput, GenerateGradingCriterionInput
 from module_programming_llm.prompts.generate_suggestions import \
     GenerateSuggestionsInput
 from module_programming_llm.prompts.rag import RAGInput, RAG, RAGOutput
-from module_programming_llm.prompts.split_grading_instructions_by_file import SplitGradingInstructionsByFileOutput, \
-    SplitGradingInstructionsByFileInput
-from module_programming_llm.prompts.split_problem_statement_by_file import SplitProblemStatementByFileOutput, \
-    SplitProblemStatementByFileInput
 
 
-async def generate_file_summary(step: GenerateFileSummary,
-                                input_data: GenerateFileSummaryInput, debug: bool,
-                                model: ModelConfigType) -> (Optional)[GenerateFileSummaryOutput]:  # type: ignore
-    return await step.process(input_data, debug, model)
-
-
-async def split_problem_statement(step: SplitProblemStatementByFile,
-                                  input_data: SplitProblemStatementByFileInput, debug: bool,
-                                  model: ModelConfigType) -> Optional[SplitProblemStatementByFileOutput]:  # type: ignore
-    return await step.process(input_data, debug, model)
-
-
-async def split_grading_instructions(step: SplitGradingInstructionsByFile,
-                                     input_data: SplitGradingInstructionsByFileInput, debug: bool,
-                                     model: ModelConfigType) -> Optional[SplitGradingInstructionsByFileOutput]:  # type: ignore
-    return await step.process(input_data, debug, model)
-
-
-async def generate_suggestions(step: GenerateSuggestionsByFile,
+async def generate_suggestions(step: GenerateSuggestionsZeroShot,
                                input_data: GenerateSuggestionsInput, debug: bool,
                                model: ModelConfigType) -> List[Optional[GenerateSuggestionsByFileOutput]]:  # type: ignore
     return await step.process(input_data, debug, model)
 
 
-async def filter_out_solutions(step: FilterOutSolutionByFile,
+async def filter_out_solutions(step: FilterOutSolutionZeroShot,
                                input_data: FilterOutSolutionInput, debug: bool,
                                model: ModelConfigType) -> List[Optional[FilterOutSolutionOutput]]:  # type: ignore
     return await step.process(input_data, debug, model)
@@ -76,10 +51,6 @@ async def generate_feedback(exercise: Exercise, submission: Submission, is_grade
 
     rag_result = "" if rag_query_output is None else bulk_search(rag_query_output.rag_queries, model)
 
-    generate_file_summary_input = GenerateFileSummaryInput(template_repo, submission_repo, exercise.id, submission.id)
-    file_summary_output = await generate_file_summary(module_config.basic_by_file_approach.generate_file_summary,
-                                                      generate_file_summary_input, is_debug, model)
-
     if not exercise.grading_criteria:
         generate_grading_criterion_input = GenerateGradingCriterionInput(template_repo, solution_repo, exercise.id,
                                                                          exercise.max_points, exercise.bonus_points,
@@ -91,41 +62,23 @@ async def generate_feedback(exercise: Exercise, submission: Submission, is_grade
         if generate_grading_criterion_output is not None:
             exercise.grading_criteria = generate_grading_criterion_output.structured_grading_criterion.criteria
 
-    split_grading_instructions_output = None
-    if exercise.grading_criteria is not None:
-        split_grading_instructions_input = SplitGradingInstructionsByFileInput(template_repo, submission_repo,
-                                                                               solution_repo, exercise.id,
-                                                                               submission.id,
-                                                                               exercise.grading_instructions,
-                                                                               exercise.grading_criteria)
-        split_grading_instructions_output = await split_grading_instructions(
-            module_config.basic_by_file_approach.split_grading_instructions_by_file, split_grading_instructions_input,
-            is_debug, model)
-
-    split_problem_statement_input = SplitProblemStatementByFileInput(template_repo, submission_repo, solution_repo,
-                                                                     exercise.problem_statement, exercise.id,
-                                                                     submission.id)
-    split_problem_statement_output = await split_problem_statement(
-        module_config.basic_by_file_approach.split_problem_statement_by_file, split_problem_statement_input, is_debug,
-        model)
-
     generate_suggestions_input = GenerateSuggestionsInput(template_repo, submission_repo, solution_repo,
-                                                          exercise.id,
-                                                          submission.id, exercise.max_points,
-                                                          exercise.bonus_points, exercise.programming_language,
-                                                          file_summary_output.describe_problem_summary() if file_summary_output else "",
-                                                          rag_result,
-                                                          split_grading_instructions_output,
-                                                          split_problem_statement_output,
-                                                          exercise.grading_criteria, exercise.problem_statement,
-                                                          exercise.grading_instructions)
+                                                                exercise.id,
+                                                                submission.id, exercise.max_points,
+                                                                exercise.bonus_points, exercise.programming_language,
+                                                                "",
+                                                                rag_result,
+                                                                None,
+                                                                None,
+                                                                exercise.grading_criteria, exercise.problem_statement,
+                                                                exercise.grading_instructions)
     output = await generate_suggestions(
         module_config.basic_by_file_approach.generate_suggestions_by_file, generate_suggestions_input, is_debug, model)
 
     if not is_graded:
         filter_out_solution_input = FilterOutSolutionInput(solution_repo, template_repo, exercise.problem_statement,
                                                            exercise.id, submission.id, output,
-                                                           split_problem_statement_output)
+                                                           None)
         output = await filter_out_solutions(module_config.basic_by_file_approach.filter_out_solution,
                                             filter_out_solution_input, is_debug, model)
 

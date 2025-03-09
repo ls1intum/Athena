@@ -4,8 +4,8 @@ from typing import Optional, List
 
 from athena import emit_meta
 from module_programming_llm.prompts.pipeline_step import PipelineStep
-from .generate_suggestions_by_file_input import GenerateSuggestionsByFileInput
-from .generate_suggestions_by_file_output import GenerateSuggestionsByFileOutput, FeedbackModel
+from .. import GenerateSuggestionsInput
+from ..generate_suggestions_output import GenerateSuggestionsOutput
 from .prompt import system_message as prompt_system_message, human_message as prompt_human_message
 from pydantic import Field
 from llm_core.utils.llm_utils import (
@@ -22,7 +22,7 @@ from module_programming_llm.helpers.utils import (
 from llm_core.models import ModelConfigType
 
 
-class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsByFileInput, List[Optional[GenerateSuggestionsByFileOutput]]]):
+class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsInput, List[Optional[GenerateSuggestionsOutput]]]):
     """Generates concise feedback for submitted files, facilitating a quicker review and understanding of the content"""
 
     system_message: str = Field(prompt_system_message,
@@ -32,7 +32,7 @@ class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsByFileInput, Lis
     max_number_of_files: int = Field(default=25,
                                      description="Maximum number of files. If exceeded, it will prioritize the most important ones.")
     tokens_before_split: int = Field(default=2000,
-                                     description="Split the grading instructions into file-based ones after this number of tokens.")
+                                     description="Split the prompt into file-based ones after this number of tokens.")
 
     # pylint: disable=too-many-locals
     async def process(self, input_data: GenerateSuggestionsByFileInput, debug: bool, model: ModelConfigType) -> List[Optional[GenerateSuggestionsByFileOutput]]: # type: ignore
@@ -42,7 +42,7 @@ class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsByFileInput, Lis
             model=model,
             system_message=self.system_message,
             human_message=self.human_message,
-            pydantic_object=GenerateSuggestionsByFileOutput,
+            pydantic_object=GenerateSuggestionsOutput,
         )
 
         problem_statement_tokens = num_tokens_from_string(input_data.problem_statement or "")
@@ -123,13 +123,6 @@ class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsByFileInput, Lis
             )
 
             file_content = add_line_numbers(file_content)
-            solution_to_submission_diff = get_diff(
-                src_repo=solution_repo,
-                dst_repo=submission_repo,
-                src_prefix="solution",
-                dst_prefix="submission",
-                file_path=file_path,
-            )
             template_to_submission_diff = get_diff(
                 src_repo=template_repo,
                 dst_repo=submission_repo,
@@ -217,13 +210,13 @@ class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsByFileInput, Lis
             prompt_inputs = filtered_prompt_inputs
 
         # noinspection PyTypeChecker
-        results: List[Optional[GenerateSuggestionsByFileOutput]] = await asyncio.gather(
+        results: List[Optional[GenerateSuggestionsOutput]] = await asyncio.gather(
             *[
                 predict_and_parse(
                     model=model,
                     chat_prompt=prompt,
                     prompt_input=prompt_input,
-                    pydantic_object=GenerateSuggestionsByFileOutput,
+                    pydantic_object=GenerateSuggestionsOutput,
                     tags=[
                         f"exercise-{input_data.exercise_id}",
                         f"submission-{input_data.submission_id}",
@@ -237,7 +230,7 @@ class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsByFileInput, Lis
 
         if debug:
             emit_meta(
-                "generate_suggestions",
+                "generate_suggestions_by_file",
                 [
                     {
                         "file_path": prompt_input["file_path"],

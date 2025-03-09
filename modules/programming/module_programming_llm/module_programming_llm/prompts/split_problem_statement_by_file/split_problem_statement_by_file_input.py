@@ -1,7 +1,6 @@
 from typing import Optional
 
 from git import Repo
-from pydantic import Field
 
 
 class SplitProblemStatementByFileInput:

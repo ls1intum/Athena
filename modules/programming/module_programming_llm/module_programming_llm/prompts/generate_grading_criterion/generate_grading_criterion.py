@@ -11,14 +11,12 @@ from .prompt import system_message as prompt_system_message, human_message as pr
 from pydantic import Field
 from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
-    num_tokens_from_string,
-    check_prompt_length_and_omit_features_if_necessary, num_tokens_from_prompt,
+    num_tokens_from_prompt,
 )
 from llm_core.utils.predict_and_parse import predict_and_parse
 from module_programming_llm.helpers.utils import (
     get_diff,
     load_files_from_repo,
-    add_line_numbers, get_programming_language_file_extension
 )
 from llm_core.models import ModelConfigType
 
@@ -43,21 +41,17 @@ class GenerateGradingCriterion(PipelineStep[GenerateGradingCriterionInput, Optio
             name_only=True
         ).split("\n")
 
-        all_changed_files = load_files_from_repo(
-            input_data.solution_repo
-        )
         changed_files = {}
         changed_files_content = ""
         for file in changed_files_from_template_to_solution:
-            if not file.endswith('.pbxproj'):
-                changed_files[file] = get_diff(
-                    src_repo=input_data.template_repo,
-                    dst_repo=input_data.solution_repo,
-                    src_prefix="template",
-                    dst_prefix="solution",
-                    file_path=file,
-                )
-                changed_files_content += "\n" + file + ":" + changed_files[file]
+            changed_files[file] = get_diff(
+                src_repo=input_data.template_repo,
+                dst_repo=input_data.solution_repo,
+                src_prefix="template",
+                dst_prefix="solution",
+                file_path=file,
+            )
+            changed_files_content += "\n" + file + ":" + changed_files[file]
 
         prompt = get_chat_prompt_with_formatting_instructions(
             model=model,

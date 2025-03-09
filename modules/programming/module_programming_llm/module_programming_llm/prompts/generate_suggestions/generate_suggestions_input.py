@@ -7,7 +7,7 @@ from module_programming_llm.prompts.split_grading_instructions_by_file import Sp
 from module_programming_llm.prompts.split_problem_statement_by_file import SplitProblemStatementByFileOutput
 
 
-class GenerateSuggestionsByFileInput:
+class GenerateSuggestionsInput:
     """
     DTO class for top level feedback generation job
     """
@@ -36,7 +36,7 @@ class GenerateSuggestionsByFileInput:
                  max_points: float,
                  bonus_points: float,
                  programming_language: str,
-                 solution_summary: str,
+                 problem_summary: str,
                  rag_data: List[str],
                  grading_instructions_by_file: Optional[SplitGradingInstructionsByFileOutput] = None,
                  problem_statement_by_file: Optional[SplitProblemStatementByFileOutput] = None,
@@ -56,5 +56,5 @@ class GenerateSuggestionsByFileInput:
         self.max_points = max_points
         self.bonus_points = bonus_points
         self.programming_language = programming_language
-        self.solution_summary = solution_summary
+        self.solution_summary = problem_summary
         self.rag_data = rag_data
