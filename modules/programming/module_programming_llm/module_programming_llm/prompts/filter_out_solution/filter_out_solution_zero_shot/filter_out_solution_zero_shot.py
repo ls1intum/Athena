@@ -73,7 +73,7 @@ class FilterOutSolutionZeroShot(PipelineStep[FilterOutSolutionInput, List[Option
 
         problem_statement = (
             input_data.problem_statement
-            if input_data.problem_statement.strip()
+            if input_data.problem_statement and input_data.problem_statement.strip()
             else "No problem statement found."
         )
         template_to_solution_diffs = ""
@@ -90,10 +90,8 @@ class FilterOutSolutionZeroShot(PipelineStep[FilterOutSolutionInput, List[Option
                 file_path=file_path,
             )
 
-            template_to_solution_diffs += "File path: {0}\nFile content: {1}\n".format(file_path,
-                                                                                       template_to_solution_diff)
-            feedback_suggestions += "File path: {0}\nFeedback suggestions: {1}\n".format(file_path, json.dumps(
-                    [ob.__dict__ for ob in feedback_suggestions_by_file.get(file_path) or []]))
+            template_to_solution_diffs += f"File path: {file_path}\nFile content: {template_to_solution_diff}\n"
+            feedback_suggestions += f"File path: {file_path}\nFeedback suggestions: {json.dumps([ob.__dict__ for ob in feedback_suggestions_by_file.get(file_path) or []])}\n"
 
         prompt_inputs: List[dict] = []
         prompt_inputs.append(

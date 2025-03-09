@@ -10,13 +10,13 @@ from module_programming_llm.prompts.filter_out_solution.filter_out_solution_outp
 from module_programming_llm.prompts.generate_grading_criterion.generate_grading_criterion import \
     GenerateGradingCriterion, GenerateGradingCriterionOutput, GenerateGradingCriterionInput
 from module_programming_llm.prompts.generate_suggestions import \
-    GenerateSuggestionsInput
+    GenerateSuggestionsInput, GenerateSuggestionsOutput
 from module_programming_llm.prompts.rag import RAGInput, RAG, RAGOutput
 
 
 async def generate_suggestions(step: GenerateSuggestionsZeroShot,
                                input_data: GenerateSuggestionsInput, debug: bool,
-                               model: ModelConfigType) -> List[Optional[GenerateSuggestionsByFileOutput]]:  # type: ignore
+                               model: ModelConfigType) -> List[Optional[GenerateSuggestionsOutput]]:  # type: ignore
     return await step.process(input_data, debug, model)
 
 
@@ -44,12 +44,12 @@ async def generate_feedback(exercise: Exercise, submission: Submission, is_grade
     solution_repo = exercise.get_solution_repository()
     submission_repo = submission.get_repository()
     is_debug = module_config.debug
-    model = module_config.basic_by_file_approach.model
+    model = module_config.zero_shot_approach.model
 
     rag_query_input = RAGInput(template_repo, solution_repo, exercise.id, exercise.problem_statement)
-    rag_query_output = await generate_rag_queries(module_config.basic_by_file_approach.rag_requests, rag_query_input, module_config.debug, model)
+    rag_query_output = await generate_rag_queries(module_config.zero_shot_approach.rag_requests, rag_query_input, module_config.debug, model)
 
-    rag_result = "" if rag_query_output is None else bulk_search(rag_query_output.rag_queries, model)
+    rag_result = [] if rag_query_output is None else bulk_search(rag_query_output.rag_queries, model)
 
     if not exercise.grading_criteria:
         generate_grading_criterion_input = GenerateGradingCriterionInput(template_repo, solution_repo, exercise.id,
@@ -57,7 +57,7 @@ async def generate_feedback(exercise: Exercise, submission: Submission, is_grade
                                                                          exercise.problem_statement,
                                                                          exercise.grading_instructions)
         generate_grading_criterion_output = await generate_grading_criterion(
-            module_config.basic_by_file_approach.generate_grading_criterion, generate_grading_criterion_input, is_debug,
+            module_config.zero_shot_approach.generate_grading_criterion, generate_grading_criterion_input, is_debug,
             model)
         if generate_grading_criterion_output is not None:
             exercise.grading_criteria = generate_grading_criterion_output.structured_grading_criterion.criteria
@@ -73,13 +73,13 @@ async def generate_feedback(exercise: Exercise, submission: Submission, is_grade
                                                                 exercise.grading_criteria, exercise.problem_statement,
                                                                 exercise.grading_instructions)
     output = await generate_suggestions(
-        module_config.basic_by_file_approach.generate_suggestions_by_file, generate_suggestions_input, is_debug, model)
+        module_config.zero_shot_approach.generate_suggestions_zero_shot, generate_suggestions_input, is_debug, model)
 
     if not is_graded:
         filter_out_solution_input = FilterOutSolutionInput(solution_repo, template_repo, exercise.problem_statement,
                                                            exercise.id, submission.id, output,
                                                            None)
-        output = await filter_out_solutions(module_config.basic_by_file_approach.filter_out_solution,
+        output = await filter_out_solutions(module_config.zero_shot_approach.filter_out_solution,
                                             filter_out_solution_input, is_debug, model)
 
     grading_instruction_ids = set(

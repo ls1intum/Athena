@@ -4,7 +4,7 @@ from typing import Optional, List
 
 from athena import emit_meta
 from module_programming_llm.prompts.pipeline_step import PipelineStep
-from .. import GenerateSuggestionsInput
+from ..generate_suggestions_input import GenerateSuggestionsInput
 from ..generate_suggestions_output import GenerateSuggestionsOutput
 from .prompt import system_message as prompt_system_message, human_message as prompt_human_message
 from pydantic import Field
@@ -35,7 +35,7 @@ class GenerateSuggestionsByFile(PipelineStep[GenerateSuggestionsInput, List[Opti
                                      description="Split the prompt into file-based ones after this number of tokens.")
 
     # pylint: disable=too-many-locals
-    async def process(self, input_data: GenerateSuggestionsByFileInput, debug: bool, model: ModelConfigType) -> List[Optional[GenerateSuggestionsByFileOutput]]: # type: ignore
+    async def process(self, input_data: GenerateSuggestionsInput, debug: bool, model: ModelConfigType) -> List[Optional[GenerateSuggestionsOutput]]: # type: ignore
         model = model.get_model() # type: ignore[attr-defined]
 
         prompt = get_chat_prompt_with_formatting_instructions(

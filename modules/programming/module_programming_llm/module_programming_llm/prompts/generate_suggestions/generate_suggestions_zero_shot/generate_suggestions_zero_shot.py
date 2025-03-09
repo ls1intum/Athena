@@ -4,9 +4,9 @@ from typing import Optional, List
 
 from athena import emit_meta
 from module_programming_llm.prompts.pipeline_step import PipelineStep
-from .. import GenerateSuggestionsInput
+from ..generate_suggestions_input import GenerateSuggestionsInput
 from ..generate_suggestions_output import GenerateSuggestionsOutput
-from prompt import system_message as prompt_system_message, human_message as prompt_human_message
+from .prompt import system_message as prompt_system_message, human_message as prompt_human_message
 from pydantic import Field
 from llm_core.utils.llm_utils import (
     get_chat_prompt_with_formatting_instructions,
@@ -60,8 +60,8 @@ class GenerateSuggestionsZeroShot(PipelineStep[GenerateSuggestionsInput, List[Op
         )
 
         problem_statement = (
-            input_data.problem_statement
-            if input_data.problem_statement.strip()
+            input_data.problem_statement.strip()
+            if input_data.problem_statement and input_data.problem_statement.strip()
             else "No problem statement found."
         )
 
@@ -80,7 +80,7 @@ class GenerateSuggestionsZeroShot(PipelineStep[GenerateSuggestionsInput, List[Op
         # The LLM will process them jointly here
         for file_path, file_content in changed_files.items():
             file_content = add_line_numbers(file_content)
-            submission_files += "File path: {0}\nFile content: {1}\n".format(file_path, file_content)
+            submission_files += f"File path: {file_path}\nFile content: {file_content}\n"
 
             template_to_submission_diff = get_diff(
                 src_repo=template_repo,
@@ -89,8 +89,7 @@ class GenerateSuggestionsZeroShot(PipelineStep[GenerateSuggestionsInput, List[Op
                 dst_prefix="submission",
                 file_path=file_path,
             )
-            template_to_submission_files += "File path: {0}\nFile content: {1}\n".format(file_path,
-                                                                                         template_to_submission_diff)
+            template_to_submission_files += f"File path: {file_path}\nFile content: {template_to_submission_diff}\n"
 
             template_to_solution_diff = get_diff(
                 src_repo=template_repo,
@@ -99,8 +98,7 @@ class GenerateSuggestionsZeroShot(PipelineStep[GenerateSuggestionsInput, List[Op
                 dst_prefix="solution",
                 file_path=file_path,
             )
-            template_to_solution_files += "File path: {0}\nFile content: {1}\n".format(file_path,
-                                                                                       template_to_solution_diff)
+            template_to_solution_files += f"File path: {file_path}\nFile content: {template_to_solution_diff}\n"
 
         prompt_input = {
             "max_points": input_data.max_points,

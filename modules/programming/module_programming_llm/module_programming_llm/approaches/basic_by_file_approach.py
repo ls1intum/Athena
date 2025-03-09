@@ -13,7 +13,7 @@ from module_programming_llm.prompts.generate_file_summary import GenerateFileSum
 from module_programming_llm.prompts.generate_grading_criterion.generate_grading_criterion import \
     GenerateGradingCriterion, GenerateGradingCriterionOutput, GenerateGradingCriterionInput
 from module_programming_llm.prompts.generate_suggestions import \
-    GenerateSuggestionsInput
+    GenerateSuggestionsInput, GenerateSuggestionsOutput
 from module_programming_llm.prompts.rag import RAGInput, RAG, RAGOutput
 from module_programming_llm.prompts.split_grading_instructions_by_file import SplitGradingInstructionsByFileOutput, \
     SplitGradingInstructionsByFileInput
@@ -41,7 +41,7 @@ async def split_grading_instructions(step: SplitGradingInstructionsByFile,
 
 async def generate_suggestions(step: GenerateSuggestionsByFile,
                                input_data: GenerateSuggestionsInput, debug: bool,
-                               model: ModelConfigType) -> List[Optional[GenerateSuggestionsByFileOutput]]:  # type: ignore
+                               model: ModelConfigType) -> List[Optional[GenerateSuggestionsOutput]]:  # type: ignore
     return await step.process(input_data, debug, model)
 
 
@@ -74,7 +74,7 @@ async def generate_feedback(exercise: Exercise, submission: Submission, is_grade
     rag_query_input = RAGInput(template_repo, solution_repo, exercise.id, exercise.problem_statement)
     rag_query_output = await generate_rag_queries(module_config.basic_by_file_approach.rag_requests, rag_query_input, module_config.debug, model)
 
-    rag_result = "" if rag_query_output is None else bulk_search(rag_query_output.rag_queries, model)
+    rag_result = [] if rag_query_output is None else bulk_search(rag_query_output.rag_queries, model)
 
     generate_file_summary_input = GenerateFileSummaryInput(template_repo, submission_repo, exercise.id, submission.id)
     file_summary_output = await generate_file_summary(module_config.basic_by_file_approach.generate_file_summary,

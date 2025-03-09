@@ -15,6 +15,7 @@ class GenerateGradingCriterionInput:
     max_points: float
     bonus_points: float
 
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def __init__(self,
                  template_repo: Repo,
                  solution_repo: Repo,

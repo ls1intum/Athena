@@ -27,6 +27,7 @@ class GenerateSuggestionsInput:
     solution_summary: str
     rag_data: List[str]
 
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def __init__(self,
                  template_repo: Repo,
                  submission_repo: Repo,

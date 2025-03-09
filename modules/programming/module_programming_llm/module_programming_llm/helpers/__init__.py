@@ -1,1 +1,1 @@
-from web_search import bulk_search
+from .web_search import bulk_search

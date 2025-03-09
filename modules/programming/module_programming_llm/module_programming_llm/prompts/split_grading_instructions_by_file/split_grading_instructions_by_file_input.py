@@ -17,6 +17,7 @@ class SplitGradingInstructionsByFileInput:
     exercise_id: int
     submission_id: int
 
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def __init__(self, template_repo: Repo, submission_repo: Repo, solution_repo: Repo, exercise_id: int = 1,
                  submission_id: int = 1, grading_instructions: Optional[str] = None,
                  grading_criteria: Optional[List[GradingCriterion]] = None):

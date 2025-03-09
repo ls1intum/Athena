@@ -13,7 +13,7 @@ from athena import (
 )
 from athena.programming import Exercise, Submission, Feedback
 from athena.logger import logger
-from module_programming_llm.approaches import generate_feedback
+from module_programming_llm.approaches import generate_feedback_basic_approach, generate_feedback_zero_shot_approach
 from module_programming_llm.config import Configuration
 
 
@@ -37,7 +37,7 @@ def process_incoming_feedback(exercise: Exercise, submission: Submission, feedba
 async def suggest_feedback(exercise: Exercise, submission: Submission, is_graded: bool, module_config: Configuration) -> List[Feedback]:
     logger.info("suggest_feedback: %s suggestions for submission %d of exercise %d were requested",
                 "Graded" if is_graded else "Non-graded", submission.id, exercise.id)
-    return await generate_feedback(exercise, submission, is_graded, module_config)
+    return await generate_feedback_basic_approach(exercise, submission, is_graded, module_config)
 
 
 

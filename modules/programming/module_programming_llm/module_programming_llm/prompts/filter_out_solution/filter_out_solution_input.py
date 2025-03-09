@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from git import Repo
 
-from module_programming_llm.prompts.generate_suggestions_by_file import GenerateSuggestionsByFileOutput
+from module_programming_llm.prompts.generate_suggestions import GenerateSuggestionsOutput
 from module_programming_llm.prompts.split_problem_statement_by_file import SplitProblemStatementByFileOutput
 
 
@@ -16,10 +16,11 @@ class FilterOutSolutionInput:
     problem_statement: Optional[str]
     exercise_id: int
     submission_id: int
-    feedback_suggestions: List[Optional[GenerateSuggestionsByFileOutput]]
+    feedback_suggestions: List[Optional[GenerateSuggestionsOutput]]
 
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def __init__(self, solution_repo: Repo, template_repo: Repo, problem_statement: Optional[str], exercise_id: int,
-                 submission_id: int, feedback_suggestions: List[Optional[GenerateSuggestionsByFileOutput]],
+                 submission_id: int, feedback_suggestions: List[Optional[GenerateSuggestionsOutput]],
                  problem_statement_by_file: Optional[SplitProblemStatementByFileOutput]):
         self.solution_repo = solution_repo
         self.template_repo = template_repo
