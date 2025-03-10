@@ -33,4 +33,4 @@ class Feedback(Schema, ABC):
         return type(self).get_model_class()(**self.dict(), is_suggestion=is_suggestion, lms_id=lms_id, lms_url=lms_url)
 
     class Config:
-        const = True
+        orm_mode = True
