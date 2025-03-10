@@ -68,7 +68,7 @@ def answer_query_qa(query, model: ModelConfigType, web_search_probability=0.1):
         return result["answer"]
 
     except Exception as e:
-        logging.warning(f"Web search failed: {e}")
+        logging.warning("Web search failed: %s", e)
         # If web search fails, fall back to the vector store results
         if retrieved_docs:
             qa_chain = RetrievalQAWithSourcesChain.from_chain_type(
@@ -109,5 +109,5 @@ def answer_query_google(query):
         return tool.run(query)
 
     except Exception as e:
-        logging.warning(f"Google Search API request failed: {e}")
+        logging.warning("Web search failed: %s", e)
         return "I couldn't retrieve search results at this time."
