@@ -93,14 +93,11 @@ class FilterOutSolutionZeroShot(PipelineStep[FilterOutSolutionInput, List[Option
             template_to_solution_diffs += f"File path: {file_path}\nFile content: {template_to_solution_diff}\n"
             feedback_suggestions += f"File path: {file_path}\nFeedback suggestions: {json.dumps([ob.__dict__ for ob in feedback_suggestions_by_file.get(file_path) or []])}\n"
 
-        prompt_inputs: List[dict] = []
-        prompt_inputs.append(
-            {
+        prompt_input = {
                 "problem_statement": problem_statement,
                 "template_to_solution_diff": template_to_solution_diffs,
-                "feedback_suggestions": feedback_suggestions
+                "generated_suggestions": feedback_suggestions
             }
-        )
 
         # Filter long prompts if necessary
         omittable_features = [
@@ -117,7 +114,6 @@ class FilterOutSolutionZeroShot(PipelineStep[FilterOutSolutionInput, List[Option
                     omittable_features=omittable_features,
                     debug=debug,
                 )
-                for prompt_input in prompt_inputs
             ]
             if should_run
         ]
@@ -135,7 +131,6 @@ class FilterOutSolutionZeroShot(PipelineStep[FilterOutSolutionInput, List[Option
                     tags=[
                         f"exercise-{input_data.exercise_id}",
                         f"submission-{input_data.submission_id}",
-                        f"file-{prompt_input['file_path']}",
                         "filter-out-solution-zero-shot",
                     ],
                 )
