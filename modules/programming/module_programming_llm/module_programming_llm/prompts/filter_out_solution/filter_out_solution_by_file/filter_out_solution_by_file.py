@@ -149,6 +149,7 @@ class FilterOutSolutionByFile(PipelineStep[FilterOutSolutionInput, List[Optional
                     chat_prompt=prompt,
                     prompt_input=prompt_input,
                     pydantic_object=FilterOutSolutionOutput,
+                    use_function_calling=True,
                     tags=[
                         f"exercise-{input_data.exercise_id}",
                         f"submission-{input_data.submission_id}",

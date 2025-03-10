@@ -32,6 +32,7 @@ class GenerateGradingCriterion(PipelineStep[GenerateGradingCriterionInput, Optio
                                      description="Split the grading instructions into file-based ones after this number of tokens.")
 
     async def process(self, input_data: GenerateGradingCriterionInput, debug: bool, model: ModelConfigType) -> Optional[GenerateGradingCriterionOutput]: # type: ignore
+        # should be cached to save costs and make execution times faster
         model = model.get_model() # type: ignore[attr-defined]
 
         changed_files_from_template_to_solution = get_diff(
@@ -77,6 +78,7 @@ class GenerateGradingCriterion(PipelineStep[GenerateGradingCriterionInput, Optio
             chat_prompt=prompt,
             prompt_input=prompt_input,
             pydantic_object=GenerateGradingCriterionOutput,
+            use_function_calling=True,
             tags=[
                 f"exercise-{input_data.exercise_id}",
                 "generate_grading_criterion"

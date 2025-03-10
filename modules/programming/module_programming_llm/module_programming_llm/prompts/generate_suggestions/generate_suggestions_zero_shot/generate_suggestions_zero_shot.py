@@ -147,6 +147,7 @@ class GenerateSuggestionsZeroShot(PipelineStep[GenerateSuggestionsInput, List[Op
                     chat_prompt=prompt,
                     prompt_input=prompt_input,
                     pydantic_object=GenerateSuggestionsOutput,
+                    use_function_calling=True,
                     tags=[
                         f"exercise-{input_data.exercise_id}",
                         f"submission-{input_data.submission_id}",

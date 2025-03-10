@@ -35,7 +35,7 @@ class SplitProblemStatementByFile(PipelineStep[SplitProblemStatementByFileInput,
         Returns:
                 Optional[SplitGradingInstructionsByFileOutput]: Split problem statement by file
         """
-
+        # should be cached to save costs and make execution times faster
         # Return None if the problem statement is too short
         if num_tokens_from_string(input_data.problem_statement or "") <= self.tokens_before_split:
             return None
@@ -83,6 +83,7 @@ class SplitProblemStatementByFile(PipelineStep[SplitProblemStatementByFileInput,
             chat_prompt=prompt,
             prompt_input=prompt_input,
             pydantic_object=SplitProblemStatementByFileOutput,
+            use_function_calling=True,
             tags=[
                 f"exercise-{input_data.exercise_id}",
                 f"submission-{input_data.submission_id}",

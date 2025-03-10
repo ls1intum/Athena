@@ -28,6 +28,3 @@ class FilterOutSolutionOutput(BaseModel):
 
     feedbacks: Sequence[FeedbackModel] = Field(description="Assessment feedbacks", default=[])
     file_path: str = Field(description="The full path of the file, as specified in the input prompt")
-
-    class Config:
-        title = "Assessment"

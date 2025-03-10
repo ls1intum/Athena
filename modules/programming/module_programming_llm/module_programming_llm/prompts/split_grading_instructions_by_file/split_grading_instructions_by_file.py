@@ -42,7 +42,7 @@ class SplitGradingInstructionsByFile(
         Returns:
                 Optional[SplitGradingInstructionsByFileOutput]: Split grading instructions, None if it is too short or too long
         """
-
+        # should be cached to save costs and make execution times faster
         grading_instructions = format_grading_instructions(input_data.grading_instructions, input_data.grading_criteria)
 
         # Return None if the grading instructions are too short
@@ -85,6 +85,7 @@ class SplitGradingInstructionsByFile(
             chat_prompt=prompt,
             prompt_input=prompt_input,
             pydantic_object=SplitGradingInstructionsByFileOutput,
+            use_function_calling=True,
             tags=[
                 f"exercise-{input_data.exercise_id}",
                 f"submission-{input_data.submission_id}",

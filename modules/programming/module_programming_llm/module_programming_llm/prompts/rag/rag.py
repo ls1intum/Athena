@@ -29,6 +29,7 @@ class RAG(PipelineStep[RAGInput, Optional[RAGOutput]]):
 
     async def process(self, input_data: RAGInput, debug: bool, model: ModelConfigType) -> Optional[
         RAGOutput]:  # type: ignore
+        # should be cached to save costs and make execution times faster
         model = model.get_model()  # type: ignore[attr-defined]
 
         changed_files_from_template_to_solution = get_diff(
@@ -65,6 +66,7 @@ class RAG(PipelineStep[RAGInput, Optional[RAGOutput]]):
             chat_prompt=prompt,
             prompt_input=prompt_input,
             pydantic_object=RAGOutput,
+            use_function_calling=True,
             tags=[
                 f"exercise-{input_data.exercise_id}",
                 "generate_rag_requests"

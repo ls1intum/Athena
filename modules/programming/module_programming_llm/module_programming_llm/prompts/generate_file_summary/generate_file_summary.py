@@ -41,6 +41,7 @@ class GenerateFileSummary(PipelineStep[GenerateFileSummaryInput, Optional[Genera
             GenerateFileSummaryOutput: Summarized details of the submission files.
         """
 
+        # should be cached to save costs and make execution times faster
         prompt = get_chat_prompt_with_formatting_instructions(
             model=model.get_model(),  # type: ignore[attr-defined]
             system_message=self.system_message,
@@ -90,6 +91,7 @@ class GenerateFileSummary(PipelineStep[GenerateFileSummaryInput, Optional[Genera
                     chat_prompt=prompt,
                     prompt_input=prompt_input,
                     pydantic_object=FileDescription,
+                    use_function_calling=True,
                     tags=[
                         f"exercise-{input_data.exercise_id}",
                         f"submission-{input_data.submission_id}",

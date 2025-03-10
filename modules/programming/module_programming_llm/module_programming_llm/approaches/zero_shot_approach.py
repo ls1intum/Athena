@@ -100,8 +100,8 @@ async def generate_feedback(exercise: Exercise, submission: Submission, is_grade
             )
             feedbacks.append(
                 Feedback(
-                    exercise_id=exercise.id,
-                    submission_id=submission.id,
+                    exerciseId=exercise.id,
+                    submissionId=submission.id,
                     title=feedback.title,
                     description=feedback.description,
                     file_path=result.file_path,
