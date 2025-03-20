@@ -58,9 +58,15 @@ async def predict_and_parse(
     if (use_function_calling):
         structured_output_llm = model.with_structured_output(pydantic_object)
         chain = chat_prompt | structured_output_llm
+
+        chain_with_retries = chain.with_retry(
+            retry_if_exception_type=(ValidationError, ValueError),
+            wait_exponential_jitter=True,
+            stop_after_attempt=3
+        )
         
         try:
-            result = await chain.ainvoke(prompt_input, config={"tags": tags})
+            result = await chain_with_retries.ainvoke(prompt_input, config={"tags": tags})
             
             if isinstance(result, pydantic_object):
                 return result
