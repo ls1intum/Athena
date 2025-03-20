@@ -44,7 +44,7 @@ def answer_query_qa(query, model: ModelConfigType, web_search_probability=0.1):
     retriever = vectorstore.as_retriever()
     retrieved_docs = retriever.get_relevant_documents(query)
 
-    # Decide whether to perform a web search (20% chance by default)
+    # Decide whether to perform a web search
     force_web_search = random.random() < web_search_probability
 
     if retrieved_docs and not force_web_search:
