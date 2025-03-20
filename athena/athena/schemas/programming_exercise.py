@@ -52,3 +52,10 @@ class ProgrammingExercise(Exercise):
     def get_tests_repository(self) -> Repo:
         """Return the tests repository as a Repo object."""
         return get_repository(self.tests_repository_uri)
+
+    def to_model(self):
+        model = super().to_model()
+        model.solution_repository_uri = str(self.solution_repository_uri)
+        model.template_repository_uri = str(self.template_repository_uri)
+        model.tests_repository_uri = str(self.tests_repository_uri)
+        return model

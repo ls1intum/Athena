@@ -10,7 +10,7 @@ python = "3.11.*"
 athena = {path = "../athena", develop = true}
 fastapi = "^0.109.1"
 uvicorn = "^0.23.0"
-httpx = "^0.24.1"
+httpx = "^0.27.0"
 
 [tool.poetry.group.dev.dependencies]
 types-requests = "^2.31.0.8"
